@@ -2,10 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 interface PublishedPageProps {
   params: {
@@ -15,6 +13,18 @@ interface PublishedPageProps {
 
 export default async function PublishedPage({ params }: PublishedPageProps) {
   const { slug } = params;
+
+  // Create Supabase client for public access
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
 
   // Fetch published page
   const { data: publishedPage, error } = await supabase
@@ -60,6 +70,18 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PublishedPageProps) {
   const { slug } = params;
+
+  // Create Supabase client for public access
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
 
   const { data: publishedPage } = await supabase
     .from('published_pages')
@@ -108,7 +130,3 @@ export async function generateMetadata({ params }: PublishedPageProps) {
     },
   };
 }
-
-// Enable static generation for published pages
-export const dynamic = 'force-dynamic'; // For now, generate on-demand
-export const revalidate = 60; // Revalidate every 60 seconds
