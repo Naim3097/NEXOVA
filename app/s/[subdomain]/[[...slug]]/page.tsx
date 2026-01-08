@@ -1,11 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
-import DOMPurify from 'isomorphic-dompurify';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface SubdomainPageProps {
   params: {
@@ -16,6 +10,18 @@ interface SubdomainPageProps {
 
 export default async function SubdomainPage({ params }: SubdomainPageProps) {
   const { subdomain, slug } = params;
+
+  // Create Supabase client for public access
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
 
   // Get the specific project slug or default to homepage
   const projectSlug = slug && slug.length > 0 ? slug[0] : null;
@@ -103,31 +109,10 @@ export default async function SubdomainPage({ params }: SubdomainPageProps) {
     notFound();
   }
 
-  // Sanitize HTML to prevent XSS attacks
-  const sanitizedHTML = DOMPurify.sanitize(publishedPage.html_content, {
-    ALLOWED_TAGS: [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span', 'img', 'a', 'button',
-      'section', 'article', 'header', 'footer', 'nav', 'ul', 'ol', 'li', 'table',
-      'thead', 'tbody', 'tr', 'td', 'th', 'form', 'input', 'textarea', 'label',
-      'select', 'option', 'br', 'hr', 'strong', 'em', 'b', 'i', 'u', 'svg', 'path',
-      'script', 'style' // Allow inline scripts and styles for functionality
-    ],
-    ALLOWED_ATTR: [
-      'href', 'src', 'alt', 'style', 'class', 'id', 'type', 'name', 'value',
-      'placeholder', 'required', 'onclick', 'onsubmit', 'target', 'rel',
-      'width', 'height', 'viewBox', 'd', 'fill', 'stroke', 'stroke-width',
-      'data-*', 'action', 'method', 'for', 'checked', 'disabled', 'role', 'aria-*'
-    ],
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
-    KEEP_CONTENT: true,
-    ALLOW_DATA_ATTR: true,
-    ADD_TAGS: ['style', 'script'], // Allow these tags but sanitize their content
-    FORCE_BODY: false
-  });
-
-  // Return the sanitized HTML content
+  // Return the HTML content directly from database
+  // Note: HTML should be sanitized before storing in the database
   return (
-    <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+    <div dangerouslySetInnerHTML={{ __html: publishedPage.html_content }} />
   );
 }
 
@@ -135,6 +120,18 @@ export default async function SubdomainPage({ params }: SubdomainPageProps) {
 export async function generateMetadata({ params }: SubdomainPageProps) {
   const { subdomain, slug } = params;
   const projectSlug = slug && slug.length > 0 ? slug[0] : null;
+
+  // Create Supabase client for public access
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
 
   const { data: profile } = await supabase
     .from('profiles')
