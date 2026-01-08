@@ -83,18 +83,18 @@ export async function generateMetadata({ params }: PublishedPageProps) {
   const seo = project?.seo_settings || {};
 
   return {
-    title: seo.title || project.name,
-    description: seo.description || project.description,
+    title: seo.title || project?.name || 'Product Page',
+    description: seo.description || project?.description || '',
     openGraph: {
-      title: seo.ogTitle || seo.title || project.name,
-      description: seo.ogDescription || seo.description || project.description,
+      title: seo.ogTitle || seo.title || project?.name || 'Product Page',
+      description: seo.ogDescription || seo.description || project?.description || '',
       images: seo.ogImage ? [seo.ogImage] : [],
       type: seo.ogType || 'website',
     },
     twitter: {
       card: seo.twitterCard || 'summary_large_image',
-      title: seo.ogTitle || seo.title || project.name,
-      description: seo.ogDescription || seo.description || project.description,
+      title: seo.ogTitle || seo.title || project?.name || 'Product Page',
+      description: seo.ogDescription || seo.description || project?.description || '',
       images: seo.ogImage ? [seo.ogImage] : [],
     },
     robots: {
