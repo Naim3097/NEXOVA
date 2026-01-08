@@ -85,29 +85,24 @@ export async function generateMetadata({ params }: PublishedPageProps) {
 
   const { data: publishedPage } = await supabase
     .from('published_pages')
-    .select(`
-      html_content,
-      project_id,
-      projects (
-        name,
-        description,
-        seo_settings
-      )
-    `)
+    .select('*')
     .eq('slug', slug)
     .single();
 
-  if (!publishedPage || !publishedPage.projects) {
+  if (!publishedPage) {
     return {
       title: 'Page Not Found',
     };
   }
 
-  const project = Array.isArray(publishedPage.projects)
-    ? publishedPage.projects[0]
-    : publishedPage.projects;
+  // Fetch project separately
+  const { data: project } = await supabase
+    .from('projects')
+    .select('name, description, seo_settings')
+    .eq('id', publishedPage.project_id)
+    .single();
 
-  const seo = project.seo_settings || {};
+  const seo = project?.seo_settings || {};
 
   return {
     title: seo.title || project.name,
