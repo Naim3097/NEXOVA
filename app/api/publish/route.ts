@@ -1,10 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateHTML } from '@/lib/publishing/html-generator';
+import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
+import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import type { Project, Element } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate CSRF protection
+    if (!validateCsrf(request)) {
+      return NextResponse.json(CSRF_ERROR_RESPONSE, { status: 403 });
+    }
+
+    // Apply rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = rateLimit(clientId, RATE_LIMITS.MODERATE);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many publish requests. Please try again later.',
+          resetAt: new Date(rateLimitResult.resetAt).toISOString(),
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMITS.MODERATE.maxRequests.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { projectId } = body;
 

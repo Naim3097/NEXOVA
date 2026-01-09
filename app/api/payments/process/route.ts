@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { processLeanXPayment } from '@/lib/leanx';
+import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate CSRF protection
+    if (!validateCsrf(request)) {
+      return NextResponse.json(CSRF_ERROR_RESPONSE, { status: 403 });
+    }
+
     const supabase = getSupabaseAdmin();
     const body = await request.json();
+
+    // ⚠️ CRITICAL SECURITY WARNING ⚠️
+    // This endpoint handles raw credit card data which is a PCI-DSS compliance violation
+    // See SECURITY_WARNING_PAYMENT.md for detailed information and recommended fixes
+    // DO NOT USE IN PRODUCTION - Use LeanX hosted checkout or tokenization instead
     const {
       transactionId,
       cardNumber,

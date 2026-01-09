@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
+import { PaymentCreateSchema, safeValidateData, formatValidationErrors } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate CSRF protection
+    if (!validateCsrf(request)) {
+      return NextResponse.json(CSRF_ERROR_RESPONSE, { status: 403 });
+    }
+
     // Apply rate limiting
     const clientId = getClientIdentifier(request);
     const rateLimitResult = rateLimit(clientId, RATE_LIMITS.STRICT);
@@ -27,6 +34,19 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     const body = await request.json();
+
+    // Validate input with Zod
+    const validationResult = safeValidateData(PaymentCreateSchema, body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: formatValidationErrors(validationResult.errors),
+        },
+        { status: 400 }
+      );
+    }
+
     const {
       projectId,
       productName,
@@ -40,15 +60,7 @@ export async function POST(request: NextRequest) {
       customerEmail,
       customerName,
       customerPhone,
-    } = body;
-
-    // Validation
-    if (!projectId || !productName || !amount || !currency) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
+    } = validationResult.data;
 
     // Get project and verify it exists
     const { data: project, error: projectError } = await supabase

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -36,11 +37,12 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
     notFound();
   }
 
-  // Return the HTML content directly from database
-  // Note: HTML should be sanitized before storing in the database
+  // Sanitize HTML content before rendering to prevent XSS attacks
+  const sanitizedHtml = sanitizeHtml(publishedPage.html_content);
+
   return (
     <div
-      dangerouslySetInnerHTML={{ __html: publishedPage.html_content }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );
 }

@@ -8,6 +8,22 @@ export interface FormSubmissionEmailData {
   ipAddress: string;
 }
 
+/**
+ * Escape HTML entities to prevent XSS in email templates
+ */
+function escapeHtml(unsafe: string): string {
+  if (typeof unsafe !== 'string') {
+    unsafe = String(unsafe);
+  }
+
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // Lazy initialize Resend client
 function getResendClient() {
   if (!process.env.RESEND_API_KEY) {
@@ -31,16 +47,16 @@ export async function sendFormSubmissionNotification(
   }
 
   try {
-    // Format submission data for email
+    // Format submission data for email with HTML escaping
     const formattedData = Object.entries(data.submissionData)
-      .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+      .map(([key, value]) => `<strong>${escapeHtml(key)}:</strong> ${escapeHtml(String(value))}`)
       .join('<br>');
 
     // Send email
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'noreply@yourdomain.com',
       to: recipientEmail,
-      subject: `New Form Submission: ${data.projectName}`,
+      subject: `New Form Submission: ${escapeHtml(data.projectName)}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -96,16 +112,16 @@ export async function sendFormSubmissionNotification(
             </div>
             <div class="content">
               <div class="info-row">
-                <strong>Project:</strong> ${data.projectName}
+                <strong>Project:</strong> ${escapeHtml(data.projectName)}
               </div>
               <div class="info-row">
-                <strong>Form ID:</strong> ${data.formId}
+                <strong>Form ID:</strong> ${escapeHtml(data.formId)}
               </div>
               <div class="info-row">
-                <strong>Submitted:</strong> ${new Date(data.submittedAt).toLocaleString()}
+                <strong>Submitted:</strong> ${escapeHtml(new Date(data.submittedAt).toLocaleString())}
               </div>
               <div class="info-row">
-                <strong>IP Address:</strong> ${data.ipAddress}
+                <strong>IP Address:</strong> ${escapeHtml(data.ipAddress)}
               </div>
 
               <div class="submission-data">

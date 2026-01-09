@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 export const runtime = 'edge';
 
@@ -9,6 +10,17 @@ export const runtime = 'edge';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting to prevent database flooding
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = rateLimit(clientId, RATE_LIMITS.LENIENT);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { project_id, event_type, session_id, device_type, metadata } = body;
 

@@ -212,8 +212,8 @@ export function verifyLeanXWebhook(
   try {
     const secretKey = process.env.LEANX_WEBHOOK_SECRET;
     if (!secretKey) {
-      console.warn('LEANX_WEBHOOK_SECRET not configured');
-      return true; // Allow in development
+      console.error('LEANX_WEBHOOK_SECRET not configured - rejecting webhook');
+      return false; // Fail closed - reject webhooks when secret is not configured
     }
 
     return validateLeanXWebhook(payload, signature, secretKey);

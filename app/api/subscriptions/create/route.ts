@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { processLeanXSubscription } from '@/lib/leanx';
+import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate CSRF protection
+    if (!validateCsrf(request)) {
+      return NextResponse.json(CSRF_ERROR_RESPONSE, { status: 403 });
+    }
+
     const cookieStore = cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
