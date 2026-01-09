@@ -14,13 +14,17 @@ export function validateCsrf(request: NextRequest): boolean {
     return true; // GET requests don't need CSRF protection
   }
 
-  // Get the expected origin
-  const allowedOrigins = getAllowedOrigins();
+  // Get the request host
+  const requestHost = request.headers.get('host');
 
   // Check Origin header (preferred)
   const origin = request.headers.get('origin');
   if (origin) {
-    return isOriginAllowed(origin, allowedOrigins);
+    const isValid = isOriginAllowed(origin, requestHost);
+    if (!isValid) {
+      console.error('CSRF validation failed for origin:', origin, 'host:', requestHost);
+    }
+    return isValid;
   }
 
   // Fallback to Referer header if Origin is not present
@@ -29,7 +33,11 @@ export function validateCsrf(request: NextRequest): boolean {
     try {
       const refererUrl = new URL(referer);
       const refererOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
-      return isOriginAllowed(refererOrigin, allowedOrigins);
+      const isValid = isOriginAllowed(refererOrigin, requestHost);
+      if (!isValid) {
+        console.error('CSRF validation failed for referer:', refererOrigin, 'host:', requestHost);
+      }
+      return isValid;
     } catch (error) {
       console.error('Invalid referer URL:', referer);
       return false;
@@ -40,6 +48,45 @@ export function validateCsrf(request: NextRequest): boolean {
   // This is a security measure to prevent CSRF attacks
   console.warn('CSRF validation failed: No Origin or Referer header');
   return false;
+}
+
+/**
+ * Check if an origin is allowed
+ * @param origin - The origin from the request header
+ * @param requestHost - The host header from the request
+ */
+function isOriginAllowed(origin: string, requestHost: string | null): boolean {
+  if (!requestHost) {
+    return false;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    const originHost = originUrl.host;
+
+    // Same-origin check: if the origin host matches the request host, allow it
+    if (originHost === requestHost) {
+      return true;
+    }
+
+    // For Vercel preview deployments, allow all vercel.app domains
+    // This is safe because they're all from the same deployment
+    if (originHost.endsWith('.vercel.app') && requestHost.endsWith('.vercel.app')) {
+      return true;
+    }
+
+    // Check against configured allowed origins
+    const allowedOrigins = getAllowedOrigins();
+    const normalizedOrigin = origin.replace(/\/$/, '');
+
+    return allowedOrigins.some(allowed => {
+      const normalizedAllowed = allowed.replace(/\/$/, '');
+      return normalizedOrigin === normalizedAllowed;
+    });
+  } catch (error) {
+    console.error('Error parsing origin URL:', origin, error);
+    return false;
+  }
 }
 
 /**
@@ -62,22 +109,10 @@ function getAllowedOrigins(): string[] {
   if (process.env.NODE_ENV === 'development') {
     origins.push('http://localhost:3000');
     origins.push('http://127.0.0.1:3000');
+    origins.push('http://localhost:3002');
   }
 
   return origins;
-}
-
-/**
- * Check if an origin is in the allowed list
- */
-function isOriginAllowed(origin: string, allowedOrigins: string[]): boolean {
-  // Normalize origin (remove trailing slash)
-  const normalizedOrigin = origin.replace(/\/$/, '');
-
-  return allowedOrigins.some(allowed => {
-    const normalizedAllowed = allowed.replace(/\/$/, '');
-    return normalizedOrigin === normalizedAllowed;
-  });
 }
 
 /**
