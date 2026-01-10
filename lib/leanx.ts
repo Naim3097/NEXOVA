@@ -131,31 +131,89 @@ export async function createLeanXPayment(
 }
 
 /**
+ * LeanX Transaction Status Response
+ */
+interface LeanXTransactionStatusResponse {
+  response_code: number;
+  description: string;
+  data?: {
+    bill_no: string;
+    invoice_ref: string;
+    amount: number;
+    status: string;
+    payment_method?: string;
+    created_at?: string;
+    updated_at?: string;
+    completed_at?: string;
+  };
+  breakdown_errors?: string;
+}
+
+/**
  * Verify payment status with LeanX
+ * Uses LeanX Transaction Status API to check payment status
  */
 export async function verifyLeanXPayment(
   config: LeanXConfig,
-  transactionId: string
+  billNoOrInvoiceRef: string,
+  queryType: 'bill_no' | 'invoice_ref' = 'bill_no'
 ): Promise<PaymentResponse> {
   try {
-    // TODO: Replace with actual LeanX API endpoint
-    // const response = await fetch(`https://api.leanx.com/v1/payments/${transactionId}`, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Authorization': `Bearer ${config.apiKey}`,
-    //     'X-Merchant-ID': config.merchantId,
-    //   },
-    // });
+    const payload = queryType === 'bill_no'
+      ? { bill_no: billNoOrInvoiceRef }
+      : { invoice_ref: billNoOrInvoiceRef };
 
-    // const data = await response.json();
+    console.log('Verifying LeanX payment:', {
+      host: LEANX_API_HOST,
+      queryType,
+      value: billNoOrInvoiceRef,
+    });
 
-    // MOCK RESPONSE
-    return {
-      success: true,
-      transactionId: transactionId,
-      status: 'completed',
-      message: 'Payment verified successfully',
-    };
+    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/transaction-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': config.authToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result: LeanXTransactionStatusResponse = await response.json();
+
+    console.log('LeanX status check response:', {
+      response_code: result.response_code,
+      description: result.description,
+      has_data: !!result.data,
+    });
+
+    // Success response code is 2000
+    if (result.response_code === 2000 && result.data) {
+      // Map LeanX status to our internal status
+      let internalStatus = result.data.status;
+      if (result.data.status === 'success' || result.data.status === 'paid') {
+        internalStatus = 'completed';
+      } else if (result.data.status === 'pending' || result.data.status === 'processing') {
+        internalStatus = 'processing';
+      } else if (result.data.status === 'failed' || result.data.status === 'declined') {
+        internalStatus = 'failed';
+      } else if (result.data.status === 'cancelled') {
+        internalStatus = 'cancelled';
+      } else if (result.data.status === 'refunded') {
+        internalStatus = 'refunded';
+      }
+
+      return {
+        success: true,
+        transactionId: result.data.bill_no,
+        status: internalStatus,
+        message: 'Payment verified successfully',
+      };
+    } else {
+      return {
+        success: false,
+        error: result.breakdown_errors || result.description || 'Transaction status check failed',
+      };
+    }
 
   } catch (error) {
     console.error('LeanX Verification Error:', error);

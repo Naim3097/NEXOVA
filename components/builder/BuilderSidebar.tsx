@@ -43,7 +43,7 @@ const navigation = [
   },
   {
     name: 'Products',
-    href: '/products',
+    href: '/dashboard/products',
     icon: Package,
     description: 'Manage inventory',
   },

@@ -200,16 +200,7 @@ const elementTemplates: ElementTemplate[] = [
     icon: <CreditCard className="w-5 h-5" />,
     description: 'Accept payments via LeanX gateway',
     defaultProps: {
-      products: [
-        {
-          id: '1',
-          name: 'Your Product',
-          description: 'A great product you will love',
-          price: 99.00,
-          image: '',
-          featured: false,
-        }
-      ],
+      products: [],
       currency: 'MYR',
       buttonText: 'Pay Now',
       buttonColor: '#3b82f6',

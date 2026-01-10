@@ -7,13 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/auth-client';
-import { ExternalLink, Edit } from 'lucide-react';
+import { ExternalLink, Edit, Trash2 } from 'lucide-react';
 import type { Project } from '@/types';
 
 function DashboardContent() {
   const { user, profile, signOut } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -36,6 +37,37 @@ function DashboardContent() {
       console.error('Error fetching projects:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string, projectName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${projectName}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingId(projectId);
+
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+        .eq('user_id', user?.id); // Ensure user can only delete their own projects
+
+      if (error) throw error;
+
+      // Remove from local state
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+
+      // Show success message
+      alert('Project deleted successfully');
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      alert('Failed to delete project. Please try again.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -150,6 +182,15 @@ function DashboardContent() {
                             Edit
                           </Button>
                         </Link>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteProject(project.id, project.name)}
+                          disabled={deletingId === project.id}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          {deletingId === project.id ? 'Deleting...' : 'Delete'}
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -163,7 +204,12 @@ function DashboardContent() {
               <CardTitle>Quick Links</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link href="/dashboard/products">
+                  <Button variant="outline" className="w-full">
+                    Manage Products
+                  </Button>
+                </Link>
                 <Link href="/dashboard/transactions">
                   <Button variant="outline" className="w-full">
                     View Transactions

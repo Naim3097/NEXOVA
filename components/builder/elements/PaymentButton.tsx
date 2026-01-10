@@ -24,26 +24,14 @@ export const PaymentButtonElement: React.FC<PaymentButtonElementProps> = ({
     buttonColor,
     buttonSize,
     bgColor,
-    // Legacy fields for backwards compatibility
-    productName,
-    productDescription,
-    amount,
-    productImage,
   } = props;
 
-  // Use products array or fall back to legacy single product
-  const displayProducts = products.length > 0
-    ? products
-    : [{
-        id: '1',
-        name: productName || 'Product Name',
-        description: productDescription || '',
-        price: amount || 0,
-        image: productImage,
-      }];
-
-  const [selectedProduct, setSelectedProduct] = useState<Product>(displayProducts[0]);
+  const displayProducts = products;
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+    displayProducts.length > 0 ? displayProducts[0] : null
+  );
   const hasMultipleProducts = displayProducts.length > 1;
+  const hasNoProducts = displayProducts.length === 0;
 
   // Button size classes
   const sizeClasses = {
@@ -78,8 +66,27 @@ export const PaymentButtonElement: React.FC<PaymentButtonElementProps> = ({
       )}
 
       <div className="max-w-5xl mx-auto">
-        {/* Multiple Products Grid */}
-        {hasMultipleProducts ? (
+        {/* Empty State */}
+        {hasNoProducts ? (
+          <div className="max-w-lg mx-auto text-center">
+            <div className="bg-white rounded-lg shadow-lg p-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
+                <CreditCard className="w-10 h-10 text-gray-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                No Products Added
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Add products from your inventory using the properties panel on the right
+              </p>
+              <div className="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
+                <CreditCard className="w-4 h-4" />
+                <span>Products will appear here</span>
+              </div>
+            </div>
+          </div>
+        ) : hasMultipleProducts ? (
+          /* Multiple Products Grid */
           <div>
             <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
               Choose Your Product
@@ -147,7 +154,7 @@ export const PaymentButtonElement: React.FC<PaymentButtonElementProps> = ({
               ))}
             </div>
           </div>
-        ) : (
+        ) : selectedProduct ? (
           /* Single Product Display */
           <div className="max-w-lg mx-auto text-center">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
@@ -199,15 +206,17 @@ export const PaymentButtonElement: React.FC<PaymentButtonElementProps> = ({
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Builder Info */}
-        <div className="text-sm text-gray-600 bg-blue-50 rounded-lg p-3 max-w-lg mx-auto mt-6">
-          <p className="font-medium text-center">Preview Mode</p>
-          <p className="text-xs text-center">
-            Customers will see the payment checkout when they click {hasMultipleProducts ? 'a product' : 'this button'}
-          </p>
-        </div>
+        {!hasNoProducts && (
+          <div className="text-sm text-gray-600 bg-blue-50 rounded-lg p-3 max-w-lg mx-auto mt-6">
+            <p className="font-medium text-center">Preview Mode</p>
+            <p className="text-xs text-center">
+              Customers will see the payment checkout when they click {hasMultipleProducts ? 'a product' : 'this button'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

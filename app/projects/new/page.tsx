@@ -79,6 +79,73 @@ function NewProjectForm() {
     }
   };
 
+  const createProductsFromTemplate = async (projectId: string, template: any) => {
+    try {
+      // Find pricing element in template
+      const pricingElement = template.data?.elements?.find(
+        (el: any) => el.type === 'pricing'
+      );
+
+      if (!pricingElement || !pricingElement.props?.plans) {
+        console.log('No pricing data found in template');
+        return;
+      }
+
+      // Create products from pricing plans
+      const products = pricingElement.props.plans.map((plan: any) => ({
+        user_id: user?.id,
+        code: `${plan.name.replace(/\s+/g, '-').toUpperCase()}-${Date.now()}`,
+        name: plan.name,
+        description: plan.description || '',
+        stock: 999, // Unlimited for digital products
+        base_price: parseFloat(plan.price) || 0,
+        currency: plan.currency || 'RM',
+        quantity_pricing: [],
+        notes: `Auto-created from ${template.name} template`,
+        status: 'active',
+        source_project_id: projectId,
+        source_template: template.name,
+        is_template_product: true,
+      }));
+
+      const { data: createdProducts, error } = await supabase
+        .from('products')
+        .insert(products)
+        .select();
+
+      if (error) {
+        console.error('Error creating products from template:', error);
+        return;
+      }
+
+      console.log(`Created ${createdProducts?.length || 0} products from template`);
+
+      // Update the pricing element to reference the created product IDs
+      if (createdProducts && createdProducts.length > 0) {
+        const { error: updateError } = await supabase
+          .from('elements')
+          .update({
+            props: {
+              ...pricingElement.props,
+              plans: pricingElement.props.plans.map((plan: any, index: number) => ({
+                ...plan,
+                product_id: createdProducts[index]?.id || null,
+              })),
+            },
+          })
+          .eq('project_id', projectId)
+          .eq('type', 'pricing');
+
+        if (updateError) {
+          console.error('Error linking products to pricing element:', updateError);
+        }
+      }
+    } catch (err) {
+      console.error('Error in createProductsFromTemplate:', err);
+      // Don't throw - product creation is optional
+    }
+  };
+
   const createProject = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -148,6 +215,9 @@ function NewProjectForm() {
 
         if (elementsError) throw elementsError;
       }
+
+      // Auto-create products from template pricing data
+      await createProductsFromTemplate(project.id, template);
 
       // Update template usage count
       await supabase

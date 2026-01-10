@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { Trash2, Copy, Plus, ChevronDown, ChevronRight, X } from 'lucide-react';
+import ProductSelector from '@/components/builder/ProductSelector';
 
 // Array Item Editor Component
 interface ArrayItemEditorProps {
@@ -1397,269 +1398,87 @@ export const PropertiesPanel = () => {
                 </p>
               </div>
 
-              {/* Custom Pricing Plans Editor with Features */}
-              <div className="border border-gray-300 rounded-md p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold text-gray-700">Pricing Plans</h4>
-                  <button
-                    type="button"
-                    onClick={() => {
+              {/* Product Selector for Pricing Plans */}
+              {currentProject && (
+                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Select products from your inventory to create pricing plans or{' '}
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      manage products
+                    </a>
+                  </p>
+                  <ProductSelector
+                    onSelect={(product) => {
                       const newPlans = [...(props.plans || []), {
-                        name: 'New Plan',
-                        price: '29',
-                        currency: 'RM',
-                        period: 'month',
-                        description: 'Perfect for individuals',
-                        features: ['Feature 1', 'Feature 2', 'Feature 3'],
-                        buttonText: 'Get Started',
+                        name: product.name,
+                        price: product.base_price.toString(),
+                        currency: product.currency,
+                        description: product.description || '',
+                        features: product.description ? product.description.split('\n').filter((f: string) => f.trim()) : [],
+                        buttonText: 'Buy Now',
                         buttonUrl: '#',
                         highlighted: false,
                         enablePayment: props.enablePaymentIntegration || false,
-                        productId: `plan_${Date.now()}`,
-                        priceNumeric: 29,
+                        productId: product.id,
+                        priceNumeric: product.base_price,
+                        stock: product.stock,
                       }];
                       handlePropChange('plans', newPlans);
                     }}
-                    className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                  >
-                    + Add Plan
-                  </button>
+                  />
                 </div>
+              )}
 
-                {(!props.plans || props.plans.length === 0) && (
-                  <p className="text-xs text-gray-500 text-center py-4">
-                    No plans added. Click "Add Plan" to get started.
-                  </p>
-                )}
-
-                {(props.plans || []).map((plan: any, planIndex: number) => (
-                  <div key={planIndex} className="border border-gray-200 rounded-md p-4 mb-4 last:mb-0 bg-white">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="text-sm font-semibold text-gray-700">Plan {planIndex + 1}: {plan.name}</h5>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newPlans = (props.plans || []).filter((_: any, i: number) => i !== planIndex);
-                          handlePropChange('plans', newPlans);
-                        }}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Remove
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {/* Plan Name */}
-                      <div>
-                        <Label className="text-xs">Plan Name</Label>
-                        <Input
-                          value={plan.name || ''}
-                          onChange={(e) => {
-                            const newPlans = [...(props.plans || [])];
-                            newPlans[planIndex] = { ...newPlans[planIndex], name: e.target.value };
-                            handlePropChange('plans', newPlans);
-                          }}
-                          placeholder="Pro Plan"
-                          className="text-sm"
-                        />
-                      </div>
-
-                      {/* Price */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <Label className="text-xs">Price (Display)</Label>
-                          <Input
-                            value={plan.price || ''}
-                            onChange={(e) => {
-                              const newPlans = [...(props.plans || [])];
-                              newPlans[planIndex] = { ...newPlans[planIndex], price: e.target.value };
-                              handlePropChange('plans', newPlans);
-                            }}
-                            placeholder="29"
-                            className="text-sm"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">Currency</Label>
-                          <Input
-                            value={plan.currency || 'RM'}
-                            onChange={(e) => {
-                              const newPlans = [...(props.plans || [])];
-                              newPlans[planIndex] = { ...newPlans[planIndex], currency: e.target.value };
-                              handlePropChange('plans', newPlans);
-                            }}
-                            placeholder="RM"
-                            className="text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Period */}
-                      <div>
-                        <Label className="text-xs">Billing Period</Label>
-                        <Input
-                          value={plan.period || 'month'}
-                          onChange={(e) => {
-                            const newPlans = [...(props.plans || [])];
-                            newPlans[planIndex] = { ...newPlans[planIndex], period: e.target.value };
-                            handlePropChange('plans', newPlans);
-                          }}
-                          placeholder="month"
-                          className="text-sm"
-                        />
-                      </div>
-
-                      {/* Description */}
-                      <div>
-                        <Label className="text-xs">Description</Label>
-                        <textarea
-                          value={plan.description || ''}
-                          onChange={(e) => {
-                            const newPlans = [...(props.plans || [])];
-                            newPlans[planIndex] = { ...newPlans[planIndex], description: e.target.value };
-                            handlePropChange('plans', newPlans);
-                          }}
-                          placeholder="Perfect for small teams"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                          rows={2}
-                        />
-                      </div>
-
-                      {/* Features/Eligibility List */}
-                      <div className="border-t border-gray-200 pt-3">
+              {/* Plans List (Read-only with remove option) */}
+              {(props.plans || []).length > 0 && (
+                <div className="border border-gray-300 rounded-md p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products/Plans</h4>
+                  <div className="space-y-3">
+                    {(props.plans || []).map((plan: any, planIndex: number) => (
+                      <div key={planIndex} className="border border-gray-200 rounded-md p-3 bg-gray-50">
                         <div className="flex items-center justify-between mb-2">
-                          <Label className="text-xs font-semibold">Features/Eligibility</Label>
+                          <h5 className="text-sm font-semibold text-gray-900">{plan.name}</h5>
                           <button
                             type="button"
                             onClick={() => {
-                              const newPlans = [...(props.plans || [])];
-                              const currentFeatures = newPlans[planIndex].features || [];
-                              newPlans[planIndex] = {
-                                ...newPlans[planIndex],
-                                features: [...currentFeatures, 'New feature']
-                              };
+                              const newPlans = (props.plans || []).filter((_: any, i: number) => i !== planIndex);
                               handlePropChange('plans', newPlans);
                             }}
-                            className="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                            className="text-xs text-red-600 hover:text-red-800"
                           >
-                            + Add Feature
+                            Remove
                           </button>
                         </div>
-                        <div className="space-y-2">
-                          {(plan.features || []).map((feature: string, featureIndex: number) => (
-                            <div key={featureIndex} className="flex items-center gap-2">
-                              <Input
-                                value={feature}
-                                onChange={(e) => {
-                                  const newPlans = [...(props.plans || [])];
-                                  const newFeatures = [...(newPlans[planIndex].features || [])];
-                                  newFeatures[featureIndex] = e.target.value;
-                                  newPlans[planIndex] = { ...newPlans[planIndex], features: newFeatures };
-                                  handlePropChange('plans', newPlans);
-                                }}
-                                placeholder="Feature description"
-                                className="text-xs flex-1"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newPlans = [...(props.plans || [])];
-                                  const newFeatures = (newPlans[planIndex].features || []).filter(
-                                    (_: string, i: number) => i !== featureIndex
-                                  );
-                                  newPlans[planIndex] = { ...newPlans[planIndex], features: newFeatures };
-                                  handlePropChange('plans', newPlans);
-                                }}
-                                className="text-xs text-red-600 hover:text-red-800 px-2"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Button Configuration */}
-                      <div className="border-t border-gray-200 pt-3">
-                        <Label className="text-xs font-semibold mb-2 block">Button Settings</Label>
-                        <div className="space-y-2">
-                          <div>
-                            <Label className="text-xs">Button Text</Label>
-                            <Input
-                              value={plan.buttonText || ''}
-                              onChange={(e) => {
-                                const newPlans = [...(props.plans || [])];
-                                newPlans[planIndex] = { ...newPlans[planIndex], buttonText: e.target.value };
-                                handlePropChange('plans', newPlans);
-                              }}
-                              placeholder="Get Started"
-                              className="text-sm"
-                            />
-                          </div>
-
-                          {!props.enablePaymentIntegration && (
+                        <div className="space-y-1 text-xs text-gray-600">
+                          <p><strong>Price:</strong> {plan.currency || 'RM'} {plan.price || plan.priceNumeric}</p>
+                          {plan.description && <p><strong>Description:</strong> {plan.description}</p>}
+                          {plan.features && plan.features.length > 0 && (
                             <div>
-                              <Label className="text-xs">Button URL</Label>
-                              <Input
-                                value={plan.buttonUrl || '#'}
-                                onChange={(e) => {
-                                  const newPlans = [...(props.plans || [])];
-                                  newPlans[planIndex] = { ...newPlans[planIndex], buttonUrl: e.target.value };
-                                  handlePropChange('plans', newPlans);
-                                }}
-                                placeholder="https://..."
-                                className="text-sm"
-                              />
-                            </div>
-                          )}
-
-                          {props.enablePaymentIntegration && (
-                            <div className="bg-blue-50 p-2 rounded">
-                              <div className="mb-2">
-                                <Label className="text-xs">Price (Numeric for Payment)</Label>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  value={plan.priceNumeric || parseFloat(plan.price) || 0}
-                                  onChange={(e) => {
-                                    const newPlans = [...(props.plans || [])];
-                                    newPlans[planIndex] = {
-                                      ...newPlans[planIndex],
-                                      priceNumeric: parseFloat(e.target.value) || 0
-                                    };
-                                    handlePropChange('plans', newPlans);
-                                  }}
-                                  placeholder="29.00"
-                                  className="text-sm"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Amount to charge (e.g., 29.00)</p>
-                              </div>
+                              <strong>Features:</strong>
+                              <ul className="list-disc list-inside ml-2 mt-1">
+                                {plan.features.map((feature: string, idx: number) => (
+                                  <li key={idx}>{feature}</li>
+                                ))}
+                              </ul>
                             </div>
                           )}
                         </div>
                       </div>
-
-                      {/* Highlight Toggle */}
-                      <div className="flex items-center gap-2 pt-2">
-                        <input
-                          type="checkbox"
-                          id={`highlighted-${planIndex}`}
-                          checked={plan.highlighted || false}
-                          onChange={(e) => {
-                            const newPlans = [...(props.plans || [])];
-                            newPlans[planIndex] = { ...newPlans[planIndex], highlighted: e.target.checked };
-                            handlePropChange('plans', newPlans);
-                          }}
-                          className="w-4 h-4"
-                        />
-                        <Label htmlFor={`highlighted-${planIndex}`} className="text-xs cursor-pointer">
-                          Mark as "Most Popular"
-                        </Label>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                  <p className="text-xs text-gray-500 mt-3">
+                    To edit product details, go to the{' '}
+                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                      Products page
+                    </a>
+                  </p>
+                </div>
+              )}
 
               {/* Background Image Section */}
               {currentProject && (
@@ -1875,154 +1694,76 @@ export const PropertiesPanel = () => {
             <div className="space-y-4 pt-6">
               <div className="font-semibold text-sm text-gray-700 mb-2">Products</div>
 
-              {/* Currency Selector */}
-              <div>
-                <Label htmlFor="currency">Currency</Label>
-                <select
-                  id="currency"
-                  value={props.currency || 'MYR'}
-                  onChange={(e) => handlePropChange('currency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="MYR">MYR</option>
-                  <option value="USD">USD</option>
-                  <option value="SGD">SGD</option>
-                </select>
-              </div>
-
-              {/* Products Array Editor */}
+              {/* Product Selector from Database */}
               {currentProject && (
-                <div className="border border-gray-300 rounded-md p-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-gray-700">Product List</h4>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const newProducts = [...(props.products || []), {
-                          id: Date.now().toString(),
-                          name: 'New Product',
-                          description: 'Product description',
-                          price: 99.00,
-                          image: '',
-                          featured: false,
-                        }];
-                        handlePropChange('products', newProducts);
-                      }}
-                      className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Select products from your inventory or{' '}
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline font-medium"
                     >
-                      + Add Product
-                    </button>
-                  </div>
+                      manage products
+                    </a>
+                  </p>
+                  <ProductSelector
+                    onSelect={(product) => {
+                      const newProducts = [...(props.products || []), {
+                        id: product.id,
+                        name: product.name,
+                        description: product.description || '',
+                        price: product.base_price,
+                        currency: product.currency,
+                        image: product.image_url || '',
+                        stock: product.stock,
+                        featured: false,
+                      }];
+                      handlePropChange('products', newProducts);
+                    }}
+                  />
+                </div>
+              )}
 
-                  {(!props.products || props.products.length === 0) && (
-                    <p className="text-xs text-gray-500 text-center py-4">
-                      No products added. Click "Add Product" to get started.
-                    </p>
-                  )}
-
-                  {(props.products || []).map((product: any, index: number) => (
-                    <div key={product.id || index} className="border border-gray-200 rounded-md p-3 mb-3 last:mb-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h5 className="text-xs font-semibold text-gray-700">Product {index + 1}</h5>
+              {/* Products List (Read-only with remove option) */}
+              {currentProject && (props.products || []).length > 0 && (
+                <div className="border border-gray-300 rounded-md p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products</h4>
+                  <div className="space-y-2">
+                    {(props.products || []).map((product: any, index: number) => (
+                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                        <div className="flex items-center gap-2 flex-1">
+                          {product.image && (
+                            <img src={product.image} alt={product.name} className="w-8 h-8 object-cover rounded" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {product.currency || 'RM'} {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                              {product.stock !== undefined && ` • Stock: ${product.stock}`}
+                            </p>
+                          </div>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
                             const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
                             handlePropChange('products', newProducts);
                           }}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="text-xs text-red-600 hover:text-red-800 ml-2"
                         >
                           Remove
                         </button>
                       </div>
-
-                      <div className="space-y-2">
-                        {/* Product Image Upload */}
-                        <div>
-                          <Label className="text-xs">Product Image</Label>
-                          <ImageUpload
-                            currentProject={currentProject}
-                            value={product.image || ''}
-                            onChange={(url) => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], image: url };
-                              handlePropChange('products', newProducts);
-                            }}
-                            onRemove={() => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], image: '' };
-                              handlePropChange('products', newProducts);
-                            }}
-                          />
-                        </div>
-
-                        {/* Product Name */}
-                        <div>
-                          <Label className="text-xs">Product Name</Label>
-                          <Input
-                            value={product.name || ''}
-                            onChange={(e) => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], name: e.target.value };
-                              handlePropChange('products', newProducts);
-                            }}
-                            placeholder="Product Name"
-                            className="text-sm"
-                          />
-                        </div>
-
-                        {/* Product Description */}
-                        <div>
-                          <Label className="text-xs">Description</Label>
-                          <Input
-                            value={product.description || ''}
-                            onChange={(e) => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], description: e.target.value };
-                              handlePropChange('products', newProducts);
-                            }}
-                            placeholder="Product description"
-                            className="text-sm"
-                          />
-                        </div>
-
-                        {/* Product Price */}
-                        <div>
-                          <Label className="text-xs">Price</Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={product.price || 0}
-                            onChange={(e) => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], price: parseFloat(e.target.value) || 0 };
-                              handlePropChange('products', newProducts);
-                            }}
-                            placeholder="99.00"
-                            className="text-sm"
-                          />
-                        </div>
-
-                        {/* Featured Toggle */}
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            id={`featured-${index}`}
-                            checked={product.featured || false}
-                            onChange={(e) => {
-                              const newProducts = [...(props.products || [])];
-                              newProducts[index] = { ...newProducts[index], featured: e.target.checked };
-                              handlePropChange('products', newProducts);
-                            }}
-                            className="w-4 h-4"
-                          />
-                          <Label htmlFor={`featured-${index}`} className="text-xs cursor-pointer">
-                            Mark as Most Popular
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    To edit product details, go to the{' '}
+                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                      Products page
+                    </a>
+                  </p>
                 </div>
               )}
 

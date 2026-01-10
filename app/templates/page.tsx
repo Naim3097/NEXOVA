@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreviewModal } from '@/components/templates/TemplatePreviewModal';
 import { supabase } from '@/lib/supabase/auth-client';
+import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
 
 interface Template {
   id: string;
@@ -30,6 +31,7 @@ export default function TemplatesPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     fetchTemplates();
@@ -57,12 +59,7 @@ export default function TemplatesPage() {
 
   const categories = [
     { value: 'all', label: 'All Templates' },
-    { value: 'saas', label: 'SaaS' },
-    { value: 'ecommerce', label: 'E-commerce' },
-    { value: 'course', label: 'Course' },
-    { value: 'leadgen', label: 'Lead Gen' },
-    { value: 'event', label: 'Event' },
-    { value: 'portfolio', label: 'Portfolio' },
+    { value: 'ebook', label: 'Ebook' },
   ];
 
   // Filter by category
@@ -97,7 +94,15 @@ export default function TemplatesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar */}
+        <BuilderSidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto bg-background">
         {/* Header */}
         <div className="border-b bg-card">
           <div className="container mx-auto px-4 py-8">
@@ -208,6 +213,7 @@ export default function TemplatesPage() {
           onClose={() => setShowPreview(false)}
           onUseTemplate={handleUseTemplate}
         />
+        </div>
       </div>
     </ProtectedRoute>
   );
