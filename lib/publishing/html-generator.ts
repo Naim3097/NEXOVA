@@ -38,7 +38,8 @@ export function generateHTML(
   project: Project,
   elements: Element[]
 ): string {
-  const { seo_settings } = project;
+  // Provide default empty object if seo_settings is null/undefined
+  const seo_settings = project.seo_settings || {};
 
   return `<!DOCTYPE html>
 <html lang="${seo_settings.language || 'en'}">
