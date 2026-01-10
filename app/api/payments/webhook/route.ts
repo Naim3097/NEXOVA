@@ -32,8 +32,15 @@ export async function POST(request: NextRequest) {
 
     // Parse the webhook payload
     const payload = JSON.parse(body);
+
+    // LeanX webhook format uses:
+    // - bill_no (their transaction ID)
+    // - invoice_ref (our order ID)
+    // - status (payment status)
     const {
       event,
+      bill_no,
+      invoice_ref,
       transaction_id,
       order_id,
       status,
@@ -42,16 +49,20 @@ export async function POST(request: NextRequest) {
       payment_method,
     } = payload;
 
+    // Support both LeanX format and generic format
+    const leanxTransactionId = bill_no || transaction_id;
+    const leanxOrderId = invoice_ref || order_id;
+
     // Get transaction by order_id or transaction_id using parameterized queries
     // Try transaction_id first
     let transaction = null;
     let transactionError = null;
 
-    if (transaction_id) {
+    if (leanxTransactionId) {
       const result = await supabase
         .from('transactions')
         .select('*, projects(user_id)')
-        .eq('transaction_id', transaction_id)
+        .eq('transaction_id', leanxTransactionId)
         .maybeSingle();
 
       if (result.data) {
@@ -62,12 +73,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // If not found by transaction_id, try order_id
-    if (!transaction && order_id) {
+    // If not found by transaction_id, try order_id (invoice_ref)
+    if (!transaction && leanxOrderId) {
       const result = await supabase
         .from('transactions')
         .select('*, projects(user_id)')
-        .eq('order_id', order_id)
+        .eq('order_id', leanxOrderId)
         .maybeSingle();
 
       if (result.data) {
@@ -78,7 +89,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (transactionError || !transaction) {
-      console.error('Transaction not found for webhook:', { transaction_id, order_id });
+      console.error('Transaction not found for webhook:', {
+        bill_no,
+        invoice_ref,
+        transaction_id: leanxTransactionId,
+        order_id: leanxOrderId,
+      });
       return NextResponse.json(
         { error: 'Transaction not found' },
         { status: 404 }
@@ -132,8 +148,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update LeanX transaction ID if provided
-    if (transaction_id && transaction_id !== transaction.transaction_id) {
-      updateData.transaction_id = transaction_id;
+    if (leanxTransactionId && leanxTransactionId !== transaction.transaction_id) {
+      updateData.transaction_id = leanxTransactionId;
     }
 
     await supabase
@@ -143,7 +159,8 @@ export async function POST(request: NextRequest) {
 
     console.log('Webhook processed successfully:', {
       event,
-      transaction_id,
+      bill_no,
+      invoice_ref,
       status: transactionStatus,
     });
 

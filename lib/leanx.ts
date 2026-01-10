@@ -2,13 +2,14 @@
  * LeanX Payment Gateway Integration
  *
  * This module handles integration with LeanX payment gateway.
- * For actual implementation, refer to LeanX API documentation.
+ * Based on LeanX API documentation for redirect-based payments.
  */
 
+const LEANX_API_HOST = process.env.LEANX_API_HOST || 'https://api.leanx.io';
+
 interface LeanXConfig {
-  apiKey: string;
-  secretKey: string;
-  merchantId: string;
+  authToken: string;
+  collectionUuid: string;
 }
 
 interface PaymentRequest {
@@ -34,48 +35,91 @@ interface PaymentResponse {
 }
 
 /**
- * Create a payment with LeanX
- * NOTE: This is a mock implementation. Replace with actual LeanX API calls.
+ * LeanX API Request Body
+ */
+interface LeanXPaymentRequest {
+  collection_uuid: string;
+  amount: number;
+  invoice_ref: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  redirect_url: string;
+  callback_url: string;
+}
+
+/**
+ * LeanX API Response
+ */
+interface LeanXPaymentResponse {
+  response_code: number;
+  description: string;
+  data?: {
+    redirect_url: string;
+    bill_no: string;
+    invoice_ref: string;
+  };
+  breakdown_errors?: string;
+}
+
+/**
+ * Create a payment with LeanX using the real API
  */
 export async function createLeanXPayment(
   config: LeanXConfig,
   payment: PaymentRequest
 ): Promise<PaymentResponse> {
   try {
-    // TODO: Replace with actual LeanX API endpoint
-    // const response = await fetch('https://api.leanx.com/v1/payments', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${config.apiKey}`,
-    //     'X-Merchant-ID': config.merchantId,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     order_id: payment.orderId,
-    //     amount: payment.amount,
-    //     currency: payment.currency,
-    //     description: payment.productName,
-    //     customer_email: payment.customerEmail,
-    //     callback_url: payment.callbackUrl,
-    //     return_url: payment.returnUrl,
-    //   }),
-    // });
-
-    // const data = await response.json();
-
-    // MOCK RESPONSE - Replace with actual API response
-    const crypto = require('crypto');
-    const randomString = crypto.randomBytes(8).toString('hex').toUpperCase();
-    const mockTransactionId = `TXN-${Date.now()}-${randomString}`;
-    const mockPaymentUrl = `https://checkout.leanx.com/pay/${mockTransactionId}`;
-
-    return {
-      success: true,
-      transactionId: mockTransactionId,
-      paymentUrl: mockPaymentUrl,
-      status: 'pending',
-      message: 'Payment created successfully',
+    const payload: LeanXPaymentRequest = {
+      collection_uuid: config.collectionUuid,
+      amount: payment.amount,
+      invoice_ref: payment.orderId,
+      full_name: payment.customerName || 'Customer',
+      email: payment.customerEmail || '',
+      phone_number: payment.customerPhone || '',
+      redirect_url: payment.returnUrl,
+      callback_url: payment.callbackUrl,
     };
+
+    console.log('Creating LeanX payment:', {
+      host: LEANX_API_HOST,
+      collection_uuid: config.collectionUuid,
+      amount: payment.amount,
+      invoice_ref: payment.orderId,
+    });
+
+    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/create-bill-page`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': config.authToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result: LeanXPaymentResponse = await response.json();
+
+    console.log('LeanX API response:', {
+      response_code: result.response_code,
+      description: result.description,
+      has_data: !!result.data,
+    });
+
+    // Success response code is 2000
+    if (result.response_code === 2000 && result.data) {
+      return {
+        success: true,
+        transactionId: result.data.bill_no,
+        paymentUrl: result.data.redirect_url,
+        status: 'pending',
+        message: 'Payment created successfully',
+      };
+    } else {
+      return {
+        success: false,
+        error: result.breakdown_errors || result.description || 'Payment creation failed',
+      };
+    }
 
   } catch (error) {
     console.error('LeanX API Error:', error);

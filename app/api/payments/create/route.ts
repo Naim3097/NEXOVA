@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 import { PaymentCreateSchema, safeValidateData, formatValidationErrors } from '@/lib/validation';
+import { createLeanXPayment } from '@/lib/leanx';
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Get user's LeanX credentials
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('leanx_api_key, leanx_secret_key, leanx_merchant_id, leanx_enabled')
+      .select('leanx_api_key, leanx_collection_uuid, leanx_enabled')
       .eq('id', project.user_id)
       .single();
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if LeanX is enabled and configured
-    if (!profile.leanx_enabled || !profile.leanx_api_key) {
+    if (!profile.leanx_enabled || !profile.leanx_api_key || !profile.leanx_collection_uuid) {
       return NextResponse.json(
         { error: 'LeanX payment gateway not configured. Please configure your LeanX credentials in settings.' },
         { status: 400 }
@@ -150,17 +151,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return transaction details
+    // Call LeanX API to create payment session
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+    const callbackUrl = `${baseUrl}/api/payments/webhook`;
+    const returnUrl = `${baseUrl}/payment/success?order=${orderId}`;
+
+    const leanxResult = await createLeanXPayment(
+      {
+        authToken: profile.leanx_api_key!,
+        collectionUuid: profile.leanx_collection_uuid!,
+      },
+      {
+        orderId,
+        amount: totalAmount,
+        currency,
+        productName,
+        productDescription,
+        customerEmail,
+        customerName,
+        customerPhone,
+        callbackUrl,
+        returnUrl,
+      }
+    );
+
+    if (!leanxResult.success) {
+      // Update transaction to failed
+      await supabase
+        .from('transactions')
+        .update({
+          status: 'failed',
+          error_message: leanxResult.error
+        })
+        .eq('id', transaction.id);
+
+      return NextResponse.json(
+        { error: leanxResult.error || 'Failed to create payment session' },
+        { status: 400 }
+      );
+    }
+
+    // Update transaction with LeanX bill_no
+    await supabase
+      .from('transactions')
+      .update({ transaction_id: leanxResult.transactionId })
+      .eq('id', transaction.id);
+
+    // Return payment URL for redirect
     return NextResponse.json({
       success: true,
+      paymentUrl: leanxResult.paymentUrl,
       transaction: {
         id: transaction.id,
         orderId: orderId,
+        billNo: leanxResult.transactionId,
         amount: totalAmount,
         currency: currency,
         status: 'pending',
       },
-      message: 'Transaction created successfully',
+      message: 'Payment session created successfully',
     });
 
   } catch (error) {

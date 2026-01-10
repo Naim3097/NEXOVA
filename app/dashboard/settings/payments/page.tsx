@@ -21,6 +21,7 @@ export default function PaymentSettingsPage() {
 
   const [formData, setFormData] = useState({
     leanx_api_key: '',
+    leanx_collection_uuid: '',
     leanx_secret_key: '',
     leanx_merchant_id: '',
     leanx_enabled: false,
@@ -39,7 +40,7 @@ export default function PaymentSettingsPage() {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('leanx_api_key, leanx_secret_key, leanx_merchant_id, leanx_enabled')
+          .select('leanx_api_key, leanx_collection_uuid, leanx_secret_key, leanx_merchant_id, leanx_enabled')
           .eq('id', user.id)
           .single();
 
@@ -48,6 +49,7 @@ export default function PaymentSettingsPage() {
         if (profile) {
           setFormData({
             leanx_api_key: profile.leanx_api_key || '',
+            leanx_collection_uuid: profile.leanx_collection_uuid || '',
             leanx_secret_key: profile.leanx_secret_key || '',
             leanx_merchant_id: profile.leanx_merchant_id || '',
             leanx_enabled: profile.leanx_enabled || false,
@@ -82,6 +84,7 @@ export default function PaymentSettingsPage() {
         .from('profiles')
         .update({
           leanx_api_key: formData.leanx_api_key || null,
+          leanx_collection_uuid: formData.leanx_collection_uuid || null,
           leanx_secret_key: formData.leanx_secret_key || null,
           leanx_merchant_id: formData.leanx_merchant_id || null,
           leanx_enabled: formData.leanx_enabled,
@@ -183,32 +186,34 @@ export default function PaymentSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Merchant ID */}
+          {/* Merchant ID (Optional - For Reference) */}
           <div>
-            <Label htmlFor="merchant_id">Merchant ID</Label>
+            <Label htmlFor="merchant_id">
+              Merchant ID <span className="text-xs text-muted-foreground">(Optional - For Reference)</span>
+            </Label>
             <Input
               id="merchant_id"
               type="text"
               value={formData.leanx_merchant_id}
               onChange={(e) => setFormData({ ...formData, leanx_merchant_id: e.target.value })}
-              placeholder="Enter your LeanX merchant ID"
+              placeholder="Your LeanX merchant ID (optional)"
               className="mt-1"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Your unique merchant identifier from LeanX
+              Your merchant identifier for reference (not used in API calls)
             </p>
           </div>
 
-          {/* API Key */}
+          {/* Auth Token (API Key) */}
           <div>
-            <Label htmlFor="api_key">API Key</Label>
+            <Label htmlFor="api_key">Auth Token</Label>
             <div className="relative mt-1">
               <Input
                 id="api_key"
                 type={showApiKey ? 'text' : 'password'}
                 value={formData.leanx_api_key}
                 onChange={(e) => setFormData({ ...formData, leanx_api_key: e.target.value })}
-                placeholder="Enter your LeanX API key"
+                placeholder="LP-XXXXXXXXXX"
                 className="pr-10"
               />
               <button
@@ -220,20 +225,38 @@ export default function PaymentSettingsPage() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Your public API key for creating payments
+              Your LeanX Auth Token (starts with LP-...)
             </p>
           </div>
 
-          {/* Secret Key */}
+          {/* Collection UUID */}
           <div>
-            <Label htmlFor="secret_key">Secret Key</Label>
+            <Label htmlFor="collection_uuid">Collection UUID</Label>
+            <Input
+              id="collection_uuid"
+              type="text"
+              value={formData.leanx_collection_uuid}
+              onChange={(e) => setFormData({ ...formData, leanx_collection_uuid: e.target.value })}
+              placeholder="Dc-XXXXXX-Lx or CL-XXXXXX"
+              className="mt-1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Your LeanX Collection UUID (starts with Dc- or CL-)
+            </p>
+          </div>
+
+          {/* Secret Key (Optional) */}
+          <div>
+            <Label htmlFor="secret_key">
+              Secret Key <span className="text-xs text-muted-foreground">(Optional)</span>
+            </Label>
             <div className="relative mt-1">
               <Input
                 id="secret_key"
                 type={showSecretKey ? 'text' : 'password'}
                 value={formData.leanx_secret_key}
                 onChange={(e) => setFormData({ ...formData, leanx_secret_key: e.target.value })}
-                placeholder="Enter your LeanX secret key"
+                placeholder="Enter your LeanX secret key (optional)"
                 className="pr-10"
               />
               <button
@@ -245,7 +268,7 @@ export default function PaymentSettingsPage() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Your private secret key for webhook verification (keep this secure!)
+              For webhook signature verification (recommended for security but optional)
             </p>
           </div>
         </CardContent>
@@ -258,11 +281,18 @@ export default function PaymentSettingsPage() {
           <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800">
             <li>Log in to your LeanX merchant dashboard</li>
             <li>Navigate to Settings → API Credentials</li>
-            <li>Copy your Merchant ID, API Key, and Secret Key</li>
+            <li>Copy your <strong>Auth Token</strong> (starts with LP-...)</li>
+            <li>Create or find your <strong>Collection UUID</strong> (starts with Dc-... or CL-...)</li>
+            <li>Optionally, copy your <strong>Secret Key</strong> for webhook verification</li>
             <li>Paste them here and click Save</li>
           </ol>
+          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-xs text-yellow-800">
+              <strong>Required:</strong> Auth Token and Collection UUID are required for payments to work. Secret Key is optional but recommended for webhook security.
+            </p>
+          </div>
           <p className="text-xs text-blue-700 mt-3">
-            Don't have a LeanX account? <a href="https://leanx.com" target="_blank" rel="noopener noreferrer" className="underline font-semibold">Sign up here</a>
+            Don't have a LeanX account? <a href="https://leanx.io" target="_blank" rel="noopener noreferrer" className="underline font-semibold">Sign up here</a>
           </p>
         </CardContent>
       </Card>
