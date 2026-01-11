@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { generateHTML } from '@/lib/publishing/html-generator';
 import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
@@ -176,6 +177,22 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to update project status' },
         { status: 500 }
       );
+    }
+
+    // Revalidate the published page cache to show latest changes immediately
+    try {
+      // Revalidate path-based URL
+      revalidatePath(`/p/${slug}`);
+
+      // Revalidate subdomain-based URL if exists
+      if (profile.subdomain) {
+        revalidatePath(`/s/${profile.subdomain}`);
+      }
+
+      console.log('Cache revalidated for published page:', slug);
+    } catch (revalidateError) {
+      console.warn('Cache revalidation failed:', revalidateError);
+      // Don't fail the publish if cache revalidation fails
     }
 
     return NextResponse.json({

@@ -615,8 +615,10 @@ function generatePaymentButtonHTML(element: Element): string {
 
   // Format currency
   const formatCurrency = (value: number) => {
-    if (currency === 'MYR') return `RM ${value.toFixed(2)}`;
-    return `${currency} ${value.toFixed(2)}`;
+    // Handle undefined or null values
+    const price = value || 0;
+    if (currency === 'MYR') return `RM ${price.toFixed(2)}`;
+    return `${currency} ${price.toFixed(2)}`;
   };
 
   return `
@@ -655,7 +657,7 @@ function generatePaymentButtonHTML(element: Element): string {
                 <span style="font-size: 2rem; font-weight: bold; color: #111827;">${formatCurrency(product.price)}</span>
               </div>
               <button
-                onclick="openCheckoutModal('${checkoutModalId}', '${product.name}', ${product.price}, '${product.id}')"
+                onclick="openCheckoutModal('${checkoutModalId}', '${product.name}', ${product.price || 0}, '${product.id || ''}')"
                 style="
                   ${buttonSizeStyle}
                   background-color: ${buttonColor};
@@ -704,7 +706,7 @@ function generatePaymentButtonHTML(element: Element): string {
           </div>
           <button
             id="${buttonId}"
-            onclick="openCheckoutModal('${checkoutModalId}', '${displayProducts[0].name}', ${displayProducts[0].price}, '${displayProducts[0].id}')"
+            onclick="openCheckoutModal('${checkoutModalId}', '${displayProducts[0].name}', ${displayProducts[0].price || 0}, '${displayProducts[0].id || ''}')"
             style="
               ${buttonSizeStyle}
               background-color: ${buttonColor};
@@ -953,6 +955,12 @@ function generatePaymentButtonHTML(element: Element): string {
         document.getElementById('${checkoutModalId}').style.display = 'block';
         document.body.style.overflow = 'hidden';
       });
+
+      // Open checkout modal (global function for onclick handlers)
+      window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+        document.getElementById(modalId).style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      };
 
       // Close checkout modal
       window.closeCheckoutModal = function(modalId) {
@@ -1274,6 +1282,8 @@ function generatePricingHTML(element: Element): string {
     enablePaymentIntegration = false
   } = element.props;
 
+  const checkoutModalId = `pricing-checkout-modal-${element.id}`;
+
   if (layout === 'cards') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; padding: 5rem 1rem; background: #f9fafb; scroll-margin-top: 4rem;">
@@ -1313,37 +1323,71 @@ function generatePricingHTML(element: Element): string {
           </ul>
           ${enablePaymentIntegration ? `
             <button
-              onclick="initPricingPayment_${element.id}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, '${plan.currency}')"
-              class="button ${plan.highlighted ? 'button-primary' : 'button-outline'}"
-              style="text-align: center; padding: 0.75rem 1.5rem; border: none; cursor: pointer; width: 100%;"
+              onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+              style="
+                width: 100%;
+                padding: 0.75rem 1.5rem;
+                background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'};
+                color: ${plan.highlighted ? 'white' : '#3b82f6'};
+                border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'};
+                border-radius: 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+                text-align: center;
+              "
+              onmouseover="this.style.transform='scale(1.05)'"
+              onmouseout="this.style.transform='scale(1)'"
             >
               ${plan.buttonText}
             </button>
           ` : `
-            <a href="${plan.buttonUrl}" class="button ${plan.highlighted ? 'button-primary' : 'button-outline'}" style="text-align: center; padding: 0.75rem 1.5rem;">${plan.buttonText}</a>
+            <a href="${plan.buttonUrl}" style="display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.5rem; font-weight: 600; text-align: center; text-decoration: none;">${plan.buttonText}</a>
           `}
         </div>
       `).join('')}
     </div>
   </div>
-</section>${enablePaymentIntegration ? `
-<script>
-  function initPricingPayment_${element.id}(planName, price, currency) {
-    // Show a simple modal or alert (can be enhanced with a proper checkout UI)
-    alert('Payment processing for: ' + planName + '\\nAmount: ' + currency + ' ' + price + '\\n\\nThis will integrate with LeanX payment gateway.');
+</section>
 
-    // TODO: Integrate with actual LeanX payment API
-    // Example: Create transaction, redirect to payment page
-    // fetch('/api/payment/create', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     productName: planName,
-    //     amount: price,
-    //     currency: currency
-    //   })
-    // }).then(res => res.json())
-    //   .then(data => window.location.href = data.paymentUrl);
+${enablePaymentIntegration ? `
+<!-- Checkout Modal for Pricing -->
+<div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
+        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div style="padding: 1.5rem; text-align: center;">
+        <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
+        <p style="color: #6b7280; font-size: 0.875rem;">Add a Payment Button element to enable full checkout functionality.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Define openCheckoutModal for pricing if not already defined
+  if (!window.openCheckoutModal) {
+    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+  }
+
+  // Define closeCheckoutModal if not already defined
+  if (!window.closeCheckoutModal) {
+    window.closeCheckoutModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
   }
 </script>
 ` : ''}`;
@@ -1392,14 +1436,21 @@ function generatePricingHTML(element: Element): string {
               <td style="padding: 1rem;">
                 ${enablePaymentIntegration ? `
                   <button
-                    onclick="initPricingPayment_${element.id}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, '${plan.currency}')"
-                    class="button ${plan.highlighted ? 'button-primary' : 'button-outline'}"
-                    style="border: none; cursor: pointer;"
+                    onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+                    style="
+                      padding: 0.5rem 1.25rem;
+                      background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'};
+                      color: ${plan.highlighted ? 'white' : '#3b82f6'};
+                      border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'};
+                      border-radius: 0.375rem;
+                      font-weight: 600;
+                      cursor: pointer;
+                    "
                   >
                     ${plan.buttonText}
                   </button>
                 ` : `
-                  <a href="${plan.buttonUrl}" class="button ${plan.highlighted ? 'button-primary' : 'button-outline'}">${plan.buttonText}</a>
+                  <a href="${plan.buttonUrl}" style="display: inline-block; padding: 0.5rem 1.25rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.375rem; font-weight: 600; text-decoration: none;">${plan.buttonText}</a>
                 `}
               </td>
             </tr>
@@ -1408,24 +1459,46 @@ function generatePricingHTML(element: Element): string {
       </table>
     </div>
   </div>
-</section>${enablePaymentIntegration ? `
-<script>
-  function initPricingPayment_${element.id}(planName, price, currency) {
-    // Show a simple modal or alert (can be enhanced with a proper checkout UI)
-    alert('Payment processing for: ' + planName + '\\nAmount: ' + currency + ' ' + price + '\\n\\nThis will integrate with LeanX payment gateway.');
+</section>
 
-    // TODO: Integrate with actual LeanX payment API
-    // Example: Create transaction, redirect to payment page
-    // fetch('/api/payment/create', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     productName: planName,
-    //     amount: price,
-    //     currency: currency
-    //   })
-    // }).then(res => res.json())
-    //   .then(data => window.location.href = data.paymentUrl);
+${enablePaymentIntegration ? `
+<!-- Checkout Modal for Pricing -->
+<div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
+        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div style="padding: 1.5rem; text-align: center;">
+        <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
+        <p style="color: #6b7280; font-size: 0.875rem;">Add a Payment Button element to enable full checkout functionality.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Define openCheckoutModal for pricing if not already defined
+  if (!window.openCheckoutModal) {
+    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+  }
+
+  // Define closeCheckoutModal if not already defined
+  if (!window.closeCheckoutModal) {
+    window.closeCheckoutModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
   }
 </script>
 ` : ''}`;
