@@ -47,6 +47,11 @@ export function generateHTML(
   ${generateHeadContent(project, seo_settings)}
 </head>
 <body>
+  <!-- Global project configuration -->
+  <script>
+    window.__PROJECT_ID__ = '${project.id}';
+  </script>
+
   ${generateBodyContent(elements)}
   ${generateAnalyticsScripts(project)}
 </body>
@@ -878,7 +883,7 @@ function generatePaymentButtonHTML(element: Element): string {
 
   <script>
     (function() {
-      const projectId = '${element.project_id || 'demo'}';
+      const projectId = window.__PROJECT_ID__;
       const elementId = '${element.id}';
       let transactionId = null;
       let addShipping = false;
