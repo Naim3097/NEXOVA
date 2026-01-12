@@ -964,7 +964,9 @@ function generatePaymentButtonHTML(element: Element): string {
         } catch (error) {
           submitButton.disabled = false;
           submitButton.innerHTML = originalButtonText;
-          alert('${failureMessage}');
+          // Show the actual error message from the API
+          const errorMessage = error.message || '${failureMessage}';
+          alert(errorMessage);
           console.error('Payment error:', error);
         }
       });
