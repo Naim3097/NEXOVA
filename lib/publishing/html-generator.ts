@@ -935,22 +935,25 @@ function generatePaymentButtonHTML(element: Element): string {
         submitButton.innerHTML = '<span style="display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
 
         try {
+          // Build payment payload
+          const payload = {
+            projectId: projectId,
+            productName: '${displayProducts[0].name}',
+            productDescription: '${displayProducts[0].description || ''}',
+            amount: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
+            currency: '${currency}',
+          };
+
+          // Only include customerEmail if provided
+          if (email && email.trim()) {
+            payload.customerEmail = email.trim();
+          }
+
           // Create transaction and get LeanX payment URL
           const createResponse = await fetch('/api/payments/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              projectId: projectId,
-              productName: '${displayProducts[0].name}',
-              productDescription: '${displayProducts[0].description || ''}',
-              amount: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
-              currency: '${currency}',
-              customerEmail: email,
-              hasBumpOffer: false,
-              bumpOfferName: '',
-              bumpOfferAmount: 0,
-              bumpOfferAccepted: false
-            })
+            body: JSON.stringify(payload)
           });
 
           const createResult = await createResponse.json();
