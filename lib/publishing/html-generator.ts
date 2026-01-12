@@ -955,7 +955,12 @@ function generatePaymentButtonHTML(element: Element): string {
 
           const createResult = await createResponse.json();
           if (!createResult.success || !createResult.paymentUrl) {
-            throw new Error(createResult.error || 'Failed to create payment session');
+            // Include validation details if available
+            let errorMsg = createResult.error || 'Failed to create payment session';
+            if (createResult.details) {
+              errorMsg += '\\n\\nDetails:\\n' + JSON.stringify(createResult.details, null, 2);
+            }
+            throw new Error(errorMsg);
           }
 
           // Redirect to LeanX payment page
