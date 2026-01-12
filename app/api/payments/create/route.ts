@@ -36,9 +36,12 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const body = await request.json();
 
+    console.log('[Payment Create] Received body:', JSON.stringify(body));
+
     // Validate input with Zod
     const validationResult = safeValidateData(PaymentCreateSchema, body);
     if (!validationResult.success) {
+      console.error('[Payment Create] Validation failed:', validationResult.errors);
       return NextResponse.json(
         {
           error: 'Validation failed',
@@ -47,6 +50,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log('[Payment Create] Validation passed, projectId:', validationResult.data.projectId);
 
     const {
       projectId,
