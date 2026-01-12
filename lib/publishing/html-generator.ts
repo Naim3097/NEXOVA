@@ -747,8 +747,8 @@ function generatePaymentButtonHTML(element: Element): string {
           <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
             <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Order Summary</h3>
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-              <span>${productName}</span>
-              <span style="font-weight: 600;">${formatCurrency(amount)}</span>
+              <span>${displayProducts[0].name}</span>
+              <span style="font-weight: 600;">${formatCurrency(displayProducts[0].price)}</span>
             </div>
             <div id="shipping-cost-${element.id}" style="display: none; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid #e5e7eb; margin-top: 0.5rem;">
               <span style="font-size: 0.875rem;">Priority Shipping & Insurance</span>
@@ -756,7 +756,7 @@ function generatePaymentButtonHTML(element: Element): string {
             </div>
             <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid #d1d5db;">
               <span style="font-weight: bold;">Total</span>
-              <span id="total-amount-${element.id}" style="font-weight: bold;">${formatCurrency(amount)}</span>
+              <span id="total-amount-${element.id}" style="font-weight: bold;">${formatCurrency(displayProducts[0].price)}</span>
             </div>
           </div>
 
@@ -796,7 +796,7 @@ function generatePaymentButtonHTML(element: Element): string {
             type="submit"
             style="width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 1.125rem; cursor: pointer;"
           >
-            Proceed to Secure Payment - <span id="button-total-${element.id}">${formatCurrency(amount)}</span>
+            Proceed to Secure Payment - <span id="button-total-${element.id}">${formatCurrency(displayProducts[0].price)}</span>
           </button>
 <style>
 @keyframes spin {
@@ -895,7 +895,7 @@ function generatePaymentButtonHTML(element: Element): string {
 
           if (shippingCost) shippingCost.style.display = addShipping ? 'flex' : 'none';
 
-          const baseAmount = ${amount};
+          const baseAmount = ${displayProducts[0].price};
           const total = addShipping ? baseAmount + 10 : baseAmount;
           const formatted = '${currency}' === 'MYR' ? 'RM ' + total.toFixed(2) : '${currency} ' + total.toFixed(2);
 
@@ -941,9 +941,9 @@ function generatePaymentButtonHTML(element: Element): string {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               projectId: projectId,
-              productName: '${productName}',
-              productDescription: '${productDescription || ''}',
-              amount: addShipping ? ${amount} + 10 : ${amount},
+              productName: '${displayProducts[0].name}',
+              productDescription: '${displayProducts[0].description || ''}',
+              amount: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
               currency: '${currency}',
               customerEmail: email,
               hasBumpOffer: false,
