@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
       productDescription,
       amount,
       currency,
+      bankId,
       hasBumpOffer,
       bumpOfferName,
       bumpOfferAmount,
@@ -177,6 +178,7 @@ export async function POST(request: NextRequest) {
         customerPhone,
         callbackUrl,
         returnUrl,
+        paymentServiceId: bankId, // Bank ID for Silent Bill method
       }
     );
 

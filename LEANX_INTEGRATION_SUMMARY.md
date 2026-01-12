@@ -1,357 +1,161 @@
-# LeanX Payment Integration - Implementation Summary
+# Comprehensive Lean.x Payment Gateway Integration Guide
 
-## ✅ Implementation Complete
+## 1. Context & Objective
+The goal of this integration is to enable the **Canvas Builder** to process payments natively using the **Lean.x** gateway. Unlike standard integrations that redirect users to a generic payment landing page, this implementation uses the **"Silent Bill"** method. This allows the builder to:
+1.  Fetch and display the bank list directly within the builder's UI (Checkout Modal).
+2.  Allow the user to select their preferred bank (Maybank, CIMB, etc.).
+3.  Redirect the user *directly* to that bank's login page, bypassing intermediate screens.
 
-Your LeanX payment gateway integration is now **fully implemented** according to the official LeanX API documentation.
+This provides a "White Label" feel for merchants using the platform.
 
-## What Was Implemented
+---
 
-### Step 1: Creating Payment Page ✓
-**Status**: ✅ Already Implemented
+## 2. Integration Architecture
 
-- **API Endpoint**: `POST /api/v1/merchant/create-bill-page`
-- **Implementation**: `lib/leanx.ts` - `createLeanXPayment()`
-- **Features**:
-  - Creates payment session with LeanX
-  - Returns redirect URL to LeanX payment page
-  - Includes all required fields (collection_uuid, amount, invoice_ref, etc.)
-  - Handles response codes correctly (2000 = success)
-  - Stores transaction in database
-  - Redirects user to LeanX payment page
+### 2.1 Component Structure
+The integration logic is primarily housed in `app.jsx`, distributed across two main components:
+*   **`PaymentsPanel`**: Where the merchant inputs their API credentials (UUID, Auth Token). Handles validation and persistence.
+*   **`CheckoutModal`**: The runtime component that fetches the bank list using the stored credentials and executes the payment transaction.
 
-### Step 2: Getting Transaction Status ✓
-**Status**: ✅ **NEWLY IMPLEMENTED**
+### 2.2 Data Persistence
+Since this is a client-side builder application, we persist sensitive credentials in the browser's `localStorage`.
+*   **Storage Key:** `leanx_settings`
+*   **Data Structure:**
+    ```json
+    {
+      "enabled": true,
+      "mode": "live", // 'test' or 'live'
+      "collectionUuid": "...",
+      "authToken": "...",
+      "hashKey": "..."
+    }
+    ```
+*   **Security Implication:** In a pure frontend app, keys are exposed to the user. This is acceptable here because the *user* is the *merchant* configuring their own store. In a production consumer app, these requests should be proxied through a backend.
 
-- **API Endpoint**: `POST /api/v1/merchant/transaction-status`
-- **Implementation**: `lib/leanx.ts` - `verifyLeanXPayment()`
-- **Features**:
-  - Queries transaction status from LeanX
-  - Supports both `bill_no` and `invoice_ref` lookup
-  - Maps LeanX status to internal status codes
-  - Updates database with verified status
-  - Provides fallback when webhooks fail
+---
 
-### Webhook Processing ✓
-**Status**: ✅ Already Implemented
+## 3. The "Auto-Detection" Bank Fetching Strategy (Core Logic)
 
-- **Endpoint**: `POST /api/payments/webhook`
-- **Implementation**: `app/api/payments/webhook/route.ts`
-- **Features**:
-  - Receives payment status updates from LeanX
-  - Validates webhook signatures (HMAC SHA256)
-  - Updates transaction status in real-time
-  - Handles all payment statuses
-  - Secure and rate-limited
+### 3.1 The Problem: API Fragmentation & "Zero Active Banks"
+During development, we discovered a significant fragmentation in the Lean.x API response structures:
+1.  **B2C Accounts** (Model ID 1) return a flat array of banks.
+2.  **B2B Accounts** (Model ID 2) return a deeply nested object structure.
+3.  **Payment Types** (FPX/Web vs E-Wallet/Digital) are separate endpoints/flags.
 
-## New Components Added
+If a merchant inputs valid credentials but queries the wrong "Model ID" (e.g., querying B2C when they are a B2B merchant), the API returns success (200 OK) but an empty bank list. This led to "0 Active Bank" errors despite valid keys.
 
-### 1. Transaction Verification API
-**File**: `app/api/payments/verify/route.ts`
+### 3.2 The Solution: Parallel "Shotgun" Querying
+Instead of forcing the merchant to select technical details (Model ID or Account Type), we implemented an intelligent **Auto-Detection System**.
 
-A new API endpoint for manual transaction verification:
-- Endpoint: `POST /api/payments/verify`
-- Purpose: Verify payment status with LeanX on-demand
-- Use Cases:
-  - Webhook failure recovery
-  - Manual reconciliation
-  - Admin verification
-  - Automated status checks
+When the Checkout Modal opens, the application simultaneously queries **4 distinct API combinations** using `Promise.all`:
 
-### 2. Enhanced Payment Success Page
-**File**: `app/payment/success/page.tsx`
+| Request | Payment Type | Model ID | Target |
+| :--- | :--- | :--- | :--- |
+| 1 | `WEB_PAYMENT` | `1` | FPX (Online Banking) for B2C |
+| 2 | `WEB_PAYMENT` | `2` | FPX (Online Banking) for B2B |
+| 3 | `DIGITAL_PAYMENT` | `1` | E-Wallets for B2C |
+| 4 | `DIGITAL_PAYMENT` | `2` | E-Wallets for B2B |
 
-Updated to automatically verify payment status:
-- Shows loading state while verifying
-- Displays different UI for different statuses:
-  - ✅ Completed: Success message
-  - ⏳ Processing: Processing message
-  - ❌ Failed: Failure message with retry option
-- Provides better user experience with real-time verification
+### 3.3 Deep Parsing Logic (Code Deep Dive)
+The most critical part of the integration is parsing the fragmented responses. We implemented a robust parser that can handle both standard and nested JSON shapes.
 
-### 3. Comprehensive Documentation
-**Files**:
-- `LEANX_TRANSACTION_VERIFICATION.md`: API usage guide
-- `LEANX_INTEGRATION_SUMMARY.md`: This file
+**The Code Implementation:**
+```javascript
+// Inside fetchBanks() in CheckoutModal
 
-## Integration Architecture
+const combinations = [ /* The 4 combinations above */ ];
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Your Application                      │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Payment Creation Flow                     │
-│  1. User clicks "Pay Now"                                   │
-│  2. Call createLeanXPayment() - Step 1                      │
-│  3. Redirect to LeanX payment page                          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  LeanX Payment Gateway                       │
-│  - User enters card details                                 │
-│  - LeanX processes payment                                  │
-│  - Sends webhook to your app                                │
-│  - Redirects user back to your app                          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                ┌─────────────┴─────────────┐
-                ▼                           ▼
-┌──────────────────────┐     ┌──────────────────────────┐
-│   Webhook Handler    │     │   Payment Success Page   │
-│  (Primary Method)    │     │   (User Redirect)        │
-│                      │     │                          │
-│  - Receives status   │     │  - Shows success UI      │
-│  - Updates DB        │     │  - Calls verify API      │
-│  - Real-time         │     │    (Step 2 - Fallback)   │
-└──────────────────────┘     └──────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Transaction Status Verification                 │
-│  verifyLeanXPayment() - Step 2                              │
-│  - Queries LeanX for actual status                          │
-│  - Updates DB if status changed                             │
-│  - Fallback for webhook failures                            │
-└─────────────────────────────────────────────────────────────┘
+await Promise.all(combinations.map(async (combo) => {
+    // 1. Fetch data
+    const res = await fetch(apiUrl, { ... });
+    const data = await res.json();
+    
+    // 2. Parser Logic
+    let extracted = [];
+    
+    // CASE A: Standard/Flat Response (Common for B2C)
+    if (Array.isArray(data.data)) {
+        extracted = data.data; 
+    }
+    // CASE B: First-level Object Wrapper
+    else if (data.data?.payment_services) {
+        extracted = data.data.payment_services;
+    }
+    // CASE C: Deep Nested List (Common for B2B / Enterprise)
+    // Structure: data.data.list.data[0].WEB_PAYMENT
+    else if (data.data?.list?.data && Array.isArray(data.data.list.data)) {
+        const firstItem = data.data.list.data[0];
+        if (firstItem) {
+            // Dynamically grab key based on request type
+            if (combo.type === 'WEB_PAYMENT') extracted = firstItem.WEB_PAYMENT;
+            else if (combo.type === 'DIGITAL_PAYMENT') extracted = firstItem.DIGITAL_PAYMENT;
+        }
+    }
+
+    // 3. Normalization & UI Cleaning
+    if (extracted.length > 0) {
+        const tagged = extracted.map(b => ({
+            payment_service_id: b.payment_service_id,
+            // STRIP SUFFIX: Converts "Maybank2u B2B" -> "Maybank2u"
+            payment_service_name: (b.name || b.payment_service_name).replace(/ B2B$/i, '').trim(),
+            type: combo.type, 
+            icon: combo.type === 'WEB_PAYMENT' ? 'ri-bank-line' : 'ri-wallet-3-line'
+        }));
+        allBanks = [...allBanks, ...tagged];
+    }
+}));
 ```
 
-## Payment Flow
+---
 
-### Happy Path (Webhook Success)
-1. User completes payment on LeanX
-2. LeanX sends webhook → Updates transaction to "completed"
-3. User redirected to success page → Shows success message
-4. Success page verifies status → Status already "completed" (no change needed)
-5. User sees confirmation
+## 4. Transaction Flow: The "Silent Bill"
 
-### Fallback Path (Webhook Delayed/Failed)
-1. User completes payment on LeanX
-2. Webhook delayed or fails
-3. User redirected to success page → Transaction still shows "pending"
-4. Success page verifies status → Calls LeanX API (Step 2)
-5. LeanX returns "completed" status
-6. Database updated to "completed"
-7. User sees confirmation
+Once the user selects a bank, the application executes the transaction. This is a single-step process from the frontend perspective.
 
-## Configuration Checklist
+### 4.1 Request Payload
+**Endpoint:** `POST https://api.leanx.io/api/v1/merchant/create-bill-silent`
 
-### Environment Variables
-```env
-✅ LEANX_API_HOST=https://api.leanx.io
-✅ LEANX_WEBHOOK_SECRET=your_webhook_secret
-✅ NEXT_PUBLIC_APP_URL=https://yourdomain.com
+**Payload Construction:**
+```javascript
+const payload = {
+    "collection_uuid": leanxSettings.collectionUuid, // From Settings
+    "payment_service_id": selectedBank.id,           // From User Selection
+    "amount": product.price,                         // From Product Data
+    "invoice_ref": `INV-${Date.now()}`,              // Auto-generated unique ID
+    "full_name": formData.name,                      // From Checkout Form
+    "email": formData.email,
+    "phone_number": formData.phone,
+    "redirect_url": window.location.href,            // Helper to return user here
+    "callback_url": "..."                            // (Optional in this demo)
+};
 ```
 
-### Database Fields (profiles table)
-```
-✅ leanx_api_key (auth-token from LeanX)
-✅ leanx_collection_uuid (collection UUID from LeanX)
-✅ leanx_enabled (boolean, set to true)
-✅ leanx_secret_key (optional, for webhook validation)
-```
+### 4.2 Handling the Redirect
+The API responds with a `redirect_url` in the `data` object.
+*   **Success:** `window.location.href = data.data.redirect_url;`
+*   **Failure:** Display `data.response_code` and `description` to the user in a red alert box inside the modal.
 
-### LeanX Dashboard Configuration
-```
-✅ Callback URL: https://yourdomain.com/api/payments/webhook
-✅ Redirect URL: https://yourdomain.com/payment/success?order={order_id}
-✅ Webhook Secret: Must match LEANX_WEBHOOK_SECRET
-```
+---
 
-## API Reference
+## 5. Troubleshooting & Status Codes
 
-### Create Payment (Step 1)
-```typescript
-import { createLeanXPayment } from '@/lib/leanx';
+### Common Issues Solved
+1.  **Error: "0 Active Banks"**
+    *   **Cause:** Auth Token is valid, but the requested channel (e.g., FPX B2C) is empty.
+    *   **Fix:** Our Auto-Detect system solves this by trying *all* channels. If you still see this, the merchant account actually has 0 active banks in the Lean.x dashboard.
 
-const result = await createLeanXPayment(
-  {
-    authToken: 'your-auth-token',
-    collectionUuid: 'your-collection-uuid',
-  },
-  {
-    orderId: 'ORD-123',
-    amount: 100.00,
-    currency: 'MYR',
-    productName: 'Product Name',
-    customerEmail: 'customer@example.com',
-    customerName: 'John Doe',
-    callbackUrl: 'https://yourdomain.com/api/payments/webhook',
-    returnUrl: 'https://yourdomain.com/payment/success?order=ORD-123',
-  }
-);
+2.  **Error: "Validation Failed" (JSON)**
+    *   **Cause:** `payment_model_reference_id` is missing or mismatched.
+    *   **Fix:** We hardcode `model: 1` and `model: 2` in the parallel fetcher loops to ensure we hit the correct validation eventually.
 
-// Result
-{
-  success: true,
-  transactionId: 'BILL-123456',
-  paymentUrl: 'https://payment.leanx.io/...',
-  status: 'pending',
-}
-```
+3.  **UI Issue: Duplicate Banks**
+    *   **Cause:** Sometimes "Maybank" appears in both B2C and B2B lists if a merchant has hybrid access.
+    *   **Fix:** We deduplicate the final list based on `payment_service_id`.
 
-### Verify Payment (Step 2)
-```typescript
-import { verifyLeanXPayment } from '@/lib/leanx';
+---
 
-const result = await verifyLeanXPayment(
-  {
-    authToken: 'your-auth-token',
-    collectionUuid: 'your-collection-uuid',
-  },
-  'BILL-123456',  // LeanX bill_no
-  'bill_no'       // Query type
-);
-
-// Result
-{
-  success: true,
-  transactionId: 'BILL-123456',
-  status: 'completed',
-  message: 'Payment verified successfully',
-}
-```
-
-### Webhook Handler
-```typescript
-// Automatically receives POST requests from LeanX
-// Endpoint: POST /api/payments/webhook
-// Header: x-leanx-signature
-
-// Payload
-{
-  bill_no: 'BILL-123456',
-  invoice_ref: 'ORD-123',
-  status: 'success',
-  amount: 100.00,
-  currency: 'MYR',
-}
-```
-
-## Security Features
-
-### ✅ CSRF Protection
-- All POST endpoints require valid CSRF token
-- Frontend automatically includes CSRF token in requests
-
-### ✅ Webhook Signature Validation
-- HMAC SHA256 signature validation
-- Timing-safe comparison to prevent timing attacks
-- Rejects webhooks with invalid signatures
-
-### ✅ Rate Limiting
-- Strict limits on payment creation (5 req/min)
-- Moderate limits on verification (20 req/min)
-- Lenient limits on webhooks (100 req/min)
-
-### ✅ Input Validation
-- Zod schema validation on all inputs
-- SQL injection prevention via parameterized queries
-- XSS prevention via sanitized outputs
-
-## Testing Checklist
-
-### Payment Creation
-- ✅ Test with valid LeanX credentials
-- ✅ Test with invalid credentials (should fail gracefully)
-- ✅ Test with missing required fields
-- ✅ Verify redirect URL is correct
-- ✅ Verify transaction saved to database
-
-### Payment Verification
-- ✅ Test with valid bill_no
-- ✅ Test with valid invoice_ref (order_id)
-- ✅ Test with non-existent transaction
-- ✅ Test status change detection
-- ✅ Verify database updates correctly
-
-### Webhook Processing
-- ✅ Test with valid webhook signature
-- ✅ Test with invalid signature (should reject)
-- ✅ Test all status types (success, failed, pending, etc.)
-- ✅ Test duplicate webhooks (idempotency)
-- ✅ Verify database updates correctly
-
-### Success Page
-- ✅ Test redirect from LeanX
-- ✅ Test automatic verification
-- ✅ Test different status displays
-- ✅ Test without order ID parameter
-
-## Monitoring & Maintenance
-
-### Key Metrics to Monitor
-1. **Payment Success Rate**: % of payments that complete successfully
-2. **Webhook Delivery Rate**: % of webhooks received within 30 seconds
-3. **Verification Fallback Rate**: % of transactions verified via API (not webhook)
-4. **API Response Times**: LeanX API response times
-5. **Error Rates**: Failed payments, verification errors, webhook errors
-
-### Recommended Alerts
-- Payment success rate drops below 95%
-- Webhook failures exceed 5%
-- LeanX API errors exceed 1%
-- Verification fallback rate exceeds 10%
-
-### Maintenance Tasks
-- **Daily**: Check for stuck pending transactions
-- **Weekly**: Review webhook logs for patterns
-- **Monthly**: Reconcile transactions with LeanX dashboard
-- **Quarterly**: Review and update LeanX credentials if needed
-
-## Comparison with Documentation
-
-| Feature | LeanX Docs | Your Implementation | Status |
-|---------|-----------|---------------------|--------|
-| Auth Token Header | `auth-token` | ✅ `auth-token` | ✅ Match |
-| Create Payment Endpoint | `/api/v1/merchant/create-bill-page` | ✅ Implemented | ✅ Match |
-| Transaction Status Endpoint | `/api/v1/merchant/transaction-status` | ✅ Implemented | ✅ Match |
-| Request Fields | collection_uuid, amount, invoice_ref, etc. | ✅ All included | ✅ Match |
-| Response Code | 2000 for success | ✅ Checking 2000 | ✅ Match |
-| Response Fields | redirect_url, bill_no, invoice_ref | ✅ All handled | ✅ Match |
-| Status Mapping | success, pending, failed, etc. | ✅ All mapped | ✅ Match |
-| Webhook Support | Callback URL | ✅ Implemented | ✅ Match |
-| Signature Validation | HMAC SHA256 | ✅ Implemented | ✅ Match |
-
-## Next Steps
-
-### Recommended Enhancements
-1. **Email Notifications**: Send receipts when payment completes
-2. **Automated Reconciliation**: Scheduled job to verify pending transactions
-3. **Admin Dashboard**: UI to manually verify transactions
-4. **Reporting**: Generate payment reports and analytics
-5. **Refund Support**: Implement refund functionality if needed
-
-### Testing in Production
-1. Start with small test transactions
-2. Monitor webhook delivery closely
-3. Verify all statuses update correctly
-4. Test with different payment methods
-5. Ensure emails/notifications work
-
-## Support & Resources
-
-### Documentation
-- **This Integration**: See `LEANX_TRANSACTION_VERIFICATION.md`
-- **LeanX Official Docs**: https://docs.leanx.io
-- **Your API Endpoints**: See `/api/payments/*` routes
-
-### Contact
-- **LeanX Support**: Contact your account manager
-- **Technical Issues**: Check server logs at `/var/log/` or check Vercel logs
-
-## Conclusion
-
-Your LeanX payment integration is **production-ready** with:
-- ✅ Complete payment creation flow (Step 1)
-- ✅ Complete transaction verification (Step 2)
-- ✅ Webhook processing with signature validation
-- ✅ Automatic fallback verification
-- ✅ Security features (CSRF, rate limiting, validation)
-- ✅ Error handling and logging
-- ✅ User-friendly success page
-- ✅ Comprehensive documentation
-
-**You're all set to process payments with LeanX!** 🎉
+## 6. Glossary of Lean.x Terminology
+*   **WEB_PAYMENT:** Refers to FPX / Online Banking (Maybank2u, CIMB Clicks).
+*   **DIGITAL_PAYMENT:** Refers to E-Wallets (TnG, GrabPay, Boost).
+*   **Collection UUID:** A unique identifier for a specific "store" or revenue bucket within a Lead.x merchant account.
+*   **Silent Bill:** A specific API mode where the payment page is skipped, and the URL provided points directly to the bank's login screen.

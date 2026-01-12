@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Lock, CreditCard as LeanXIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Lock, CreditCard as LeanXIcon, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { CheckoutFormData } from '@/types';
+
+interface Bank {
+  id: string;
+  name: string;
+  logo?: string;
+}
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -29,16 +35,45 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isProcessing = false,
 }) => {
   const [formData, setFormData] = useState<CheckoutFormData>({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
+    bankId: '',
     customerName: '',
     customerEmail: '',
     customerPhone: '',
   });
 
+  const [banks, setBanks] = useState<Bank[]>([]);
+  const [loadingBanks, setLoadingBanks] = useState(false);
+  const [bankError, setBankError] = useState<string | null>(null);
   const [addShipping, setAddShipping] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
+
+  // Fetch banks when modal opens
+  useEffect(() => {
+    if (isOpen && banks.length === 0) {
+      fetchBanks();
+    }
+  }, [isOpen]);
+
+  const fetchBanks = async () => {
+    setLoadingBanks(true);
+    setBankError(null);
+
+    try {
+      const response = await fetch('/api/payments/banks');
+      const data = await response.json();
+
+      if (data.success && data.banks) {
+        setBanks(data.banks);
+      } else {
+        setBankError(data.error || 'Failed to load banks');
+      }
+    } catch (error) {
+      console.error('Failed to fetch banks:', error);
+      setBankError('Failed to load banks');
+    } finally {
+      setLoadingBanks(false);
+    }
+  };
 
   const shippingCost = 10.00; // Fixed shipping cost
   const totalAmount = addShipping ? amount + shippingCost : amount;
@@ -51,59 +86,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return `${curr} ${value.toFixed(2)}`;
   };
 
-  // Format card number input (add spaces every 4 digits)
-  const formatCardNumber = (value: string) => {
-    const cleaned = value.replace(/\s/g, '');
-    const groups = cleaned.match(/.{1,4}/g);
-    return groups ? groups.join(' ') : cleaned;
-  };
-
-  // Format expiry date input (MM/YY)
-  const formatExpiryDate = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length >= 2) {
-      return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4);
-    }
-    return cleaned;
-  };
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\s/g, '');
-    if (value.length <= 16 && /^\d*$/.test(value)) {
-      setFormData({ ...formData, cardNumber: value });
-      setErrors({ ...errors, cardNumber: undefined });
-    }
-  };
-
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '');
-    if (value.length <= 4) {
-      setFormData({ ...formData, expiryDate: value });
-      setErrors({ ...errors, expiryDate: undefined });
-    }
-  };
-
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.length <= 3 && /^\d*$/.test(value)) {
-      setFormData({ ...formData, cvv: value });
-      setErrors({ ...errors, cvv: undefined });
-    }
-  };
-
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
 
-    if (formData.cardNumber.length !== 16) {
-      newErrors.cardNumber = 'Invalid card number';
-    }
-
-    if (formData.expiryDate.length !== 4) {
-      newErrors.expiryDate = 'Invalid expiry date';
-    }
-
-    if (formData.cvv.length !== 3) {
-      newErrors.cvv = 'Invalid CVV';
+    if (!formData.bankId) {
+      newErrors.bankId = 'Please select a bank';
     }
 
     setErrors(newErrors);
@@ -192,84 +179,90 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </label>
           </div>
 
-          {/* Payment Details */}
+          {/* Bank Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">Payment Details</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">Select Your Bank</h3>
 
-            <div className="space-y-4">
-              {/* Card Number */}
-              <div>
-                <Label htmlFor="cardNumber">Card Number</Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="cardNumber"
-                    type="text"
-                    value={formatCardNumber(formData.cardNumber)}
-                    onChange={handleCardNumberChange}
-                    placeholder="4242 4242 4242 4242"
+            {loadingBanks ? (
+              <div className="flex items-center justify-center py-8">
+                <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            ) : bankError ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                <p className="text-red-600 text-sm">{bankError}</p>
+                <Button
+                  type="button"
+                  onClick={fetchBanks}
+                  className="mt-2 text-sm"
+                  variant="outline"
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {banks.map((bank) => (
+                  <button
+                    key={bank.id}
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, bankId: bank.id });
+                      setErrors({ ...errors, bankId: undefined });
+                    }}
                     disabled={isProcessing}
-                    className={errors.cardNumber ? 'border-red-500' : ''}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <svg className="w-8 h-5" viewBox="0 0 32 20" fill="none">
-                      <rect width="32" height="20" rx="3" fill="#E5E7EB" />
-                    </svg>
-                  </div>
-                </div>
-                {errors.cardNumber && (
-                  <p className="text-xs text-red-500 mt-1">{errors.cardNumber}</p>
+                    className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
+                      formData.bankId === bank.id
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      {bank.logo ? (
+                        <img
+                          src={bank.logo}
+                          alt={bank.name}
+                          className="w-8 h-8 object-contain"
+                        />
+                      ) : (
+                        <Building2 className="w-6 h-6 text-gray-400" />
+                      )}
+                      <span className="font-medium text-gray-900">{bank.name}</span>
+                    </div>
+                    {formData.bankId === bank.id && (
+                      <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </button>
+                ))}
+                {errors.bankId && (
+                  <p className="text-xs text-red-500 mt-1">{errors.bankId}</p>
                 )}
               </div>
+            )}
 
-              {/* Expiry and CVV */}
-              <div className="grid grid-cols-2 gap-3">
+            {/* Optional Customer Details */}
+            {!loadingBanks && !bankError && (
+              <div className="mt-4 space-y-3">
                 <div>
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Label htmlFor="customerEmail">Email (Optional)</Label>
                   <Input
-                    id="expiryDate"
-                    type="text"
-                    value={formatExpiryDate(formData.expiryDate)}
-                    onChange={handleExpiryChange}
-                    placeholder="12/25"
+                    id="customerEmail"
+                    type="email"
+                    value={formData.customerEmail || ''}
+                    onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
+                    placeholder="your@email.com"
                     disabled={isProcessing}
-                    className={errors.expiryDate ? 'border-red-500 mt-1' : 'mt-1'}
+                    className="mt-1"
                   />
-                  {errors.expiryDate && (
-                    <p className="text-xs text-red-500 mt-1">{errors.expiryDate}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="cvv">CVV</Label>
-                  <Input
-                    id="cvv"
-                    type="text"
-                    value={formData.cvv}
-                    onChange={handleCvvChange}
-                    placeholder="123"
-                    disabled={isProcessing}
-                    className={errors.cvv ? 'border-red-500 mt-1' : 'mt-1'}
-                  />
-                  {errors.cvv && (
-                    <p className="text-xs text-red-500 mt-1">{errors.cvv}</p>
-                  )}
                 </div>
               </div>
-
-              {/* Optional Customer Details */}
-              <div>
-                <Label htmlFor="customerEmail">Email (Optional)</Label>
-                <Input
-                  id="customerEmail"
-                  type="email"
-                  value={formData.customerEmail || ''}
-                  onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                  placeholder="your@email.com"
-                  disabled={isProcessing}
-                  className="mt-1"
-                />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Submit Button */}

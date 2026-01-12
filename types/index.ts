@@ -393,9 +393,8 @@ export interface PaymentButtonProps {
 }
 
 export interface CheckoutFormData {
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
+  // Silent Bill method - bank selection instead of card details
+  bankId: string;
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;

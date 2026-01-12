@@ -31,6 +31,7 @@ export const PaymentCreateSchema = z.object({
   productDescription: z.string().max(5000).optional(),
   amount: z.number().positive().max(1000000),
   currency: z.enum(['MYR', 'USD', 'SGD', 'EUR', 'GBP']),
+  bankId: z.string().min(1, 'Bank selection is required'), // Silent Bill method
   hasBumpOffer: z.boolean().optional(),
   bumpOfferName: z.string().max(255).optional(),
   bumpOfferAmount: z.number().positive().max(100000).optional(),

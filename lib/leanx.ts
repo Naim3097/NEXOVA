@@ -23,6 +23,7 @@ interface PaymentRequest {
   customerPhone?: string;
   callbackUrl: string;
   returnUrl: string;
+  paymentServiceId?: string; // Bank ID for Silent Bill method
 }
 
 interface PaymentResponse {
@@ -46,6 +47,7 @@ interface LeanXPaymentRequest {
   phone_number: string;
   redirect_url: string;
   callback_url: string;
+  payment_service_id?: string; // Required for Silent Bill method
 }
 
 /**
@@ -63,13 +65,103 @@ interface LeanXPaymentResponse {
 }
 
 /**
- * Create a payment with LeanX using the real API
+ * LeanX Bank List Response
+ */
+interface LeanXBankListResponse {
+  response_code: number;
+  description: string;
+  data?: Array<{
+    payment_service_id: string;
+    payment_service_name: string;
+    payment_service_logo?: string;
+  }>;
+  breakdown_errors?: string;
+}
+
+/**
+ * Bank information for display
+ */
+export interface Bank {
+  id: string;
+  name: string;
+  logo?: string;
+}
+
+/**
+ * Fetch available banks from LeanX for Silent Bill method
+ */
+export async function getLeanXBankList(
+  config: LeanXConfig
+): Promise<{ success: boolean; banks?: Bank[]; error?: string }> {
+  try {
+    console.log('Fetching LeanX bank list:', {
+      host: LEANX_API_HOST,
+    });
+
+    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/bank-list`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': config.authToken,
+      },
+      body: JSON.stringify({
+        collection_uuid: config.collectionUuid,
+      }),
+    });
+
+    const result: LeanXBankListResponse = await response.json();
+
+    console.log('LeanX bank list response:', {
+      response_code: result.response_code,
+      description: result.description,
+      bank_count: result.data?.length || 0,
+    });
+
+    // Success response code is 2000
+    if (result.response_code === 2000 && result.data) {
+      const banks: Bank[] = result.data.map(bank => ({
+        id: bank.payment_service_id,
+        name: bank.payment_service_name,
+        logo: bank.payment_service_logo,
+      }));
+
+      return {
+        success: true,
+        banks,
+      };
+    } else {
+      return {
+        success: false,
+        error: result.breakdown_errors || result.description || 'Failed to fetch bank list',
+      };
+    }
+
+  } catch (error) {
+    console.error('LeanX Bank List Error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Create a payment with LeanX using the Silent Bill method
+ * Requires payment_service_id (bank ID) for direct bank redirect
  */
 export async function createLeanXPayment(
   config: LeanXConfig,
   payment: PaymentRequest
 ): Promise<PaymentResponse> {
   try {
+    // Validate required payment_service_id for Silent Bill method
+    if (!payment.paymentServiceId) {
+      return {
+        success: false,
+        error: 'payment_service_id is required for Silent Bill method',
+      };
+    }
+
     const payload: LeanXPaymentRequest = {
       collection_uuid: config.collectionUuid,
       amount: payment.amount,
@@ -79,16 +171,18 @@ export async function createLeanXPayment(
       phone_number: payment.customerPhone || '',
       redirect_url: payment.returnUrl,
       callback_url: payment.callbackUrl,
+      payment_service_id: payment.paymentServiceId,
     };
 
-    console.log('Creating LeanX payment:', {
+    console.log('Creating LeanX payment (Silent Bill):', {
       host: LEANX_API_HOST,
       collection_uuid: config.collectionUuid,
       amount: payment.amount,
       invoice_ref: payment.orderId,
+      payment_service_id: payment.paymentServiceId,
     });
 
-    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/create-bill-page`, {
+    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/create-bill-silent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
