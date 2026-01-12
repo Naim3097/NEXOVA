@@ -771,44 +771,14 @@ function generatePaymentButtonHTML(element: Element): string {
             </label>
           </div>
 
-          <!-- Payment Details -->
-          <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 1rem;">Payment Details</h3>
-
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Card Number</label>
-            <input
-              type="text"
-              id="card-number-${element.id}"
-              placeholder="4242 4242 4242 4242"
-              maxlength="19"
-              required
-              style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
-            >
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
-            <div>
-              <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Expiry Date</label>
-              <input
-                type="text"
-                id="expiry-date-${element.id}"
-                placeholder="MM/YY"
-                maxlength="5"
-                required
-                style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
-              >
-            </div>
-            <div>
-              <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">CVV</label>
-              <input
-                type="text"
-                id="cvv-${element.id}"
-                placeholder="123"
-                maxlength="3"
-                required
-                style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
-              >
-            </div>
+          <!-- Payment Info -->
+          <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+            <p style="font-size: 0.875rem; color: #1e40af; margin: 0;">
+              <svg style="display: inline; width: 1.25rem; height: 1.25rem; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              You'll be redirected to our secure payment partner (LeanX) to complete your purchase.
+            </p>
           </div>
 
           <div style="margin-bottom: 1.5rem;">
@@ -819,14 +789,20 @@ function generatePaymentButtonHTML(element: Element): string {
               placeholder="your@email.com"
               style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
             >
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">We'll send your receipt to this email</p>
           </div>
 
           <button
             type="submit"
             style="width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 1.125rem; cursor: pointer;"
           >
-            Complete Order - <span id="button-total-${element.id}">${formatCurrency(amount)}</span>
+            Proceed to Secure Payment - <span id="button-total-${element.id}">${formatCurrency(amount)}</span>
           </button>
+<style>
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
 
           <div style="text-align: center; margin-top: 1rem;">
             <p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0;">
@@ -908,28 +884,6 @@ function generatePaymentButtonHTML(element: Element): string {
       let addShipping = false;
       let bumpOfferAccepted = false;
 
-      // Format card number
-      const cardNumberInput = document.getElementById('card-number-${element.id}');
-      if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', function(e) {
-          let value = e.target.value.replace(/\\s/g, '');
-          let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
-          e.target.value = formatted;
-        });
-      }
-
-      // Format expiry date
-      const expiryInput = document.getElementById('expiry-date-${element.id}');
-      if (expiryInput) {
-        expiryInput.addEventListener('input', function(e) {
-          let value = e.target.value.replace(/\\D/g, '');
-          if (value.length >= 2) {
-            value = value.slice(0, 2) + '/' + value.slice(2, 4);
-          }
-          e.target.value = value;
-        });
-      }
-
       // Handle shipping checkbox
       const shippingCheckbox = document.getElementById('add-shipping-${element.id}');
       if (shippingCheckbox) {
@@ -972,19 +926,16 @@ function generatePaymentButtonHTML(element: Element): string {
       document.getElementById('checkout-form-${element.id}').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const cardNumber = document.getElementById('card-number-${element.id}').value.replace(/\\s/g, '');
-        const expiryDate = document.getElementById('expiry-date-${element.id}').value.replace(/\\//g, '');
-        const cvv = document.getElementById('cvv-${element.id}').value;
         const email = document.getElementById('customer-email-${element.id}').value;
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
 
-        // Validation
-        if (cardNumber.length !== 16 || expiryDate.length !== 4 || cvv.length !== 3) {
-          alert('Please enter valid payment details');
-          return;
-        }
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span style="display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
 
         try {
-          // Create transaction
+          // Create transaction and get LeanX payment URL
           const createResponse = await fetch('/api/payments/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -992,35 +943,27 @@ function generatePaymentButtonHTML(element: Element): string {
               projectId: projectId,
               productName: '${productName}',
               productDescription: '${productDescription || ''}',
-              amount: ${amount},
+              amount: addShipping ? ${amount} + 10 : ${amount},
               currency: '${currency}',
               customerEmail: email,
-              hasBumpOffer: ${enableBumpOffer},
-              bumpOfferName: '${bumpOfferName || ''}',
-              bumpOfferAmount: ${bumpOfferAmount || 0},
+              hasBumpOffer: false,
+              bumpOfferName: '',
+              bumpOfferAmount: 0,
               bumpOfferAccepted: false
             })
           });
 
           const createResult = await createResponse.json();
-          if (!createResult.success) {
-            throw new Error(createResult.error || 'Failed to create transaction');
+          if (!createResult.success || !createResult.paymentUrl) {
+            throw new Error(createResult.error || 'Failed to create payment session');
           }
 
-          transactionId = createResult.transaction.id;
-
-          // Close checkout modal
-          closeCheckoutModal('${checkoutModalId}');
-
-          // Show bump offer modal if enabled
-          ${enableBumpOffer && bumpOfferName ? `
-          document.getElementById('${bumpModalId}').style.display = 'block';
-          ` : `
-          // Process payment directly if no bump offer
-          await processPayment(transactionId, cardNumber, expiryDate, cvv);
-          `}
+          // Redirect to LeanX payment page
+          window.location.href = createResult.paymentUrl;
 
         } catch (error) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonText;
           alert('${failureMessage}');
           console.error('Payment error:', error);
         }
