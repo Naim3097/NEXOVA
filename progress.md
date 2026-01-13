@@ -1,11 +1,11 @@
 # X.IDE v2 - Landing Page Builder
 ## Project Progress Tracker
 
-**Project Status:** 🟢 MVP+ Enhanced Builder with Products Management!
-**Version:** 2.4
-**Last Updated:** 2026-01-09
-**Overall Completion:** 100% (Phases 0-10.10 Complete)
-**Latest Change:** Phase 10.10 Products Inventory Management - Complete CRUD system for products, centralized catalog, builder integration with ProductSelector, API endpoints, dashboard UI, simplified payment/pricing workflows
+**Project Status:** 🟢 MVP+ Enhanced Builder with Full Payment Integration!
+**Version:** 2.5
+**Last Updated:** 2026-01-13
+**Overall Completion:** 100% (Phases 0-10.11 Complete)
+**Latest Change:** Phase 10.11 LeanX Payment Gateway Integration - Complete payment processing with test checkout, 2-step verification, public payment APIs, backend payment routes, proper error handling, functional payment buttons on published pages
 
 ---
 
@@ -3218,6 +3218,305 @@ Users previously had to manually enter product details every time they used paym
 
 ---
 
-**Last Updated:** 2026-01-09
-**Document Version:** 1.5
+## Phase 10.11: LeanX Payment Gateway Integration
+
+**Status:** ✅ COMPLETED
+**Completion Date:** 2026-01-13
+
+### Overview:
+Complete end-to-end integration of LeanX Payment Gateway (Malaysian payment gateway) enabling real payment processing for both test environments (dashboard) and published pages. Merchants can now test payment flows from the dashboard, and visitors can complete actual transactions on published pages.
+
+### Problem Solved:
+The platform had Payment Button and Pricing Table elements without actual payment processing capability. There was no way for merchants to test payment flows, no payment functionality on published pages for visitors, no proper payment verification system, and a critical bug where failed payments could be marked as successful.
+
+### Achievements:
+- [x] Test checkout functionality in payment settings
+- [x] Backend payment API routes (avoid CORS)
+- [x] Correct LeanX API endpoint implementation
+- [x] 2-step payment verification system
+- [x] Fixed failed payments showing as successful
+- [x] Public payment APIs for unauthenticated visitors
+- [x] Payment Button functional on published pages
+- [x] Pricing Table payment functional on published pages
+- [x] Transaction recording before redirect
+- [x] Proper error handling and debug info
+- [x] All payment flows tested and verified
+
+### Technical Implementation:
+
+**1. Test Checkout System:**
+- Component: `components/payment/TestCheckoutModal.tsx`
+- Features:
+  - Bank selection interface (FPX and E-Wallets)
+  - Customer information form
+  - Payment processing with LeanX Silent Bill API
+  - Real-time bank fetching based on user credentials
+  - Test amount: RM 10.00 fixed
+  - Transaction tracking with unique invoice references
+- User flow: Settings → Test Checkout → Select Bank → Enter Details → Process Payment → Bank Login → Return to Success Page
+
+**2. Backend Payment APIs (CORS Solution):**
+
+**Test APIs (Authenticated):**
+- `GET /api/payments/test-banks` - Fetch banks for test checkout
+- `POST /api/payments/test-create` - Create test payments
+- Uses: User's LeanX credentials from profile
+
+**Public APIs (Unauthenticated):**
+- `POST /api/payments/public-banks` - Fetch banks for published pages
+- `POST /api/payments/create-public` - Create payments from published pages
+- Uses: Service role key to access project owner's credentials via project_id
+
+**Security Pattern:**
+- Published pages send `project_id` instead of credentials
+- Backend: project_id → user_id → credentials chain
+- Service role key bypasses RLS for unauthenticated access
+- Credentials never exposed to frontend
+
+**3. LeanX API Integration Fix:**
+- **Critical Fix in `lib/leanx.ts:124`:**
+  - Before: `/payment-service-list` endpoint (broken)
+  - After: `/list-payment-services` endpoint (working)
+  - Added required parameters: `payment_type`, `payment_status`, `payment_model_reference_id`
+  - Fixed error: "E-Wallet B2C: fetch failed"
+
+**Auto-Detection Strategy:**
+- Parallel queries to 4 combinations:
+  1. WEB_PAYMENT + Model 1 (B2C FPX)
+  2. WEB_PAYMENT + Model 2 (B2B FPX)
+  3. DIGITAL_PAYMENT + Model 1 (B2C E-Wallets)
+  4. DIGITAL_PAYMENT + Model 2 (B2B E-Wallets)
+- Ensures banks found regardless of merchant account type
+
+**4. Payment Verification System:**
+- **File:** `app/payment/success/page.tsx`
+- **2-Step Verification (per LeanX Integration Guide section 4.2):**
+
+**Step 1: URL Parameter Check**
+- Check for explicit success indicators: '1', '00', 'success', 'SUCCESS', '2000'
+- Check for explicit failure indicators: 'failed', 'FAILED', 'cancelled', 'CANCELLED'
+- Immediate status determination if params present
+
+**Step 2: Manual API Verification (Fallback)**
+- Only runs if URL params missing/unreliable
+- Calls `/api/payments/verify` with invoice reference
+- Uses actual status from LeanX API response
+- **Critical Change:** Defaults to 'failed' if verification fails (not 'success')
+
+**Verification States:**
+- `verifying` - Loading state (1 second delay)
+- `success` - Payment confirmed successful
+- `pending` - Payment still processing
+- `failed` - Payment failed, cancelled, or verification error
+
+**Debug Features:**
+- Debug info panel for failed payments
+- Shows raw API response
+- Helps troubleshoot issues (insufficient funds, user cancellation, etc.)
+
+**5. Published Page Payment Integration:**
+- **Modified:** `lib/publishing/html-generator.ts`
+- **Bank Fetching:** Changed to POST `/api/payments/public-banks`
+- **Payment Creation:** Changed to POST `/api/payments/create-public`
+- **Impact:**
+  - Payment Button elements now functional on published pages
+  - Pricing Table elements now functional on published pages
+  - Visitors can select products and complete real payments
+  - No authentication required for visitors
+
+**6. Database Schema:**
+- **Transactions Table:** Already existed from Phase 10.10
+- Records:
+  - Transaction ID from LeanX
+  - Order ID (invoice reference)
+  - Product details
+  - Customer information
+  - Payment status (pending → success/failed)
+  - LeanX payment URL
+  - Raw LeanX response (JSONB for debugging)
+- No migration required
+
+### Files Created:
+1. `components/payment/TestCheckoutModal.tsx` - Test checkout modal component
+2. `app/api/payments/test-banks/route.ts` - Fetch banks for test checkout
+3. `app/api/payments/test-create/route.ts` - Create test payments
+4. `app/api/payments/public-banks/route.ts` - Fetch banks for published pages
+5. `app/api/payments/create-public/route.ts` - Create payments from published pages
+
+### Files Modified:
+1. `lib/leanx.ts` - Fixed API endpoint and parameters (line 124)
+2. `app/payment/success/page.tsx` - Implemented 2-step verification
+3. `app/dashboard/settings/payments/page.tsx` - Added test checkout button
+4. `lib/publishing/html-generator.ts` - Updated to use public APIs (lines 927-957, 1116-1142)
+
+### Error Resolution:
+
+**Error 1: "No active payment methods found"**
+- **Cause:** CORS blocking direct LeanX API calls from browser
+- **Fix:** Created backend API routes that call LeanX server-side
+- **Files:** `test-banks/route.ts`, `test-create/route.ts`
+
+**Error 2: "E-Wallet B2C: fetch failed"**
+- **Cause:** Wrong API endpoint `/payment-service-list`
+- **Fix:** Changed to `/list-payment-services` with correct parameters
+- **File:** `lib/leanx.ts:124`
+
+**Error 3: Failed payments showing as successful**
+- **Cause:** Payment verification defaulted to success on API failure
+- **Fix:** Implemented 2-step verification, default to failed
+- **File:** `app/payment/success/page.tsx`
+
+### Payment Flow Architecture:
+
+**Test Checkout Flow:**
+```
+Dashboard → Payment Settings → Test Checkout Button
+  → TestCheckoutModal opens
+  → Fetch banks via /api/payments/test-banks
+  → Select bank + enter customer details
+  → Create payment via /api/payments/test-create
+  → Redirect to bank login page
+  → Bank processes payment
+  → Redirect to /payment/success?order=INV-...
+  → 2-step verification (URL params → API fallback)
+  → Show success/failed result with debug info
+```
+
+**Published Page Payment Flow:**
+```
+Visitor on published page → Click Payment Button/Pricing Table CTA
+  → Modal opens with bank selection
+  → Fetch banks via /api/payments/public-banks (with project_id)
+  → Select bank + enter customer details
+  → Create payment via /api/payments/create-public (with project_id)
+  → Backend queries: project_id → user_id → LeanX credentials
+  → Call LeanX API with owner's credentials
+  → Create transaction record in database
+  → Return redirect URL to frontend
+  → Redirect visitor to bank login page
+  → Bank processes payment
+  → Redirect to /payment/success?order=INV-...
+  → 2-step verification
+  → Show success/failed result
+```
+
+### LeanX Integration Details:
+
+**Payment Types Supported:**
+- **WEB_PAYMENT:** FPX / Online Banking (Maybank2u, CIMB Clicks, etc.)
+- **DIGITAL_PAYMENT:** E-Wallets (Touch 'n Go, GrabPay, Boost, etc.)
+
+**Account Types Supported:**
+- **B2C (Model ID 1):** Individual consumers
+- **B2B (Model ID 2):** Business transactions
+
+**API Endpoints Used:**
+- `POST /api/v1/merchant/list-payment-services` - Get available banks
+- `POST /api/v1/merchant/create-bill-silent` - Create payment transaction
+- `POST /api/v1/merchant/manual-checking-transaction` - Verify payment status
+
+**Credentials Required:**
+- LeanX API Key (auth-token)
+- Collection UUID
+- Stored in user's profile table
+- Never exposed to frontend
+
+### Integration with Phase 10.10 Products:
+
+**Complete E-Commerce Flow:**
+1. Merchant creates products in Products page (Phase 10.10)
+2. Merchant adds Payment Button/Pricing Table to page builder
+3. Merchant selects products from inventory dropdown
+4. Merchant configures LeanX credentials in Payment Settings
+5. Merchant tests payment flow with Test Checkout (Phase 10.11)
+6. Merchant publishes page
+7. Visitor views published page, clicks CTA button
+8. Visitor sees product details and bank selection
+9. Visitor completes payment at bank
+10. Transaction recorded, payment verified, order confirmed
+
+### User Flows Working:
+- ✅ Configure LeanX credentials in Payment Settings
+- ✅ Click "Test Checkout" button
+- ✅ See available banks (FPX and E-Wallets)
+- ✅ Select bank and enter customer details
+- ✅ Process test payment (RM 10.00)
+- ✅ Redirect to bank login page
+- ✅ Return to success page with verification
+- ✅ View payment status (success/pending/failed)
+- ✅ See debug info for failed payments
+- ✅ Publish page with Payment Button
+- ✅ Visitor clicks payment button on published page
+- ✅ Visitor sees bank selection modal
+- ✅ Visitor completes payment
+- ✅ Transaction recorded in database
+- ✅ Payment verification works correctly
+- ✅ Failed payments show as failed (not success)
+
+### Security Considerations:
+
+**Credential Protection:**
+- LeanX credentials stored in user profile (not exposed to frontend)
+- Service role key used only in backend API routes
+- Published pages never receive actual credentials
+- Backend fetches credentials via project_id → user_id chain
+
+**Transaction Security:**
+- Unique invoice references prevent duplicates
+- Transaction records created before redirect (no lost payments)
+- Status tracking prevents replay attacks
+- RLS policies ensure user data isolation
+
+**Payment Verification:**
+- 2-step verification prevents false positives
+- Manual API check as fallback when URL params missing
+- Debug info only shown for failed payments (no sensitive data leak)
+- Proper error handling for all failure scenarios
+
+### Success Metrics:
+- ✅ Test checkout functionality fully operational
+- ✅ Backend payment APIs working correctly
+- ✅ LeanX API endpoints correctly implemented
+- ✅ 2-step payment verification functional
+- ✅ Failed payments correctly identified as failed
+- ✅ Public payment APIs for visitors working
+- ✅ Payment Button functional on published pages
+- ✅ Pricing Table payment functional on published pages
+- ✅ Transaction recording before redirect successful
+- ✅ Zero payment processing errors in production
+- ✅ All payment flows tested and verified
+
+**User Impact:**
+- Merchants can test payment flows before publishing (reduces errors)
+- Visitors can complete real payments on published pages (revenue generation)
+- No false positive payment confirmations (accurate order tracking)
+- Proper error messages for failed payments (better UX)
+- Debug info available for troubleshooting payment issues
+
+### Documentation References:
+- `LEANX_TEST_CHECKOUT_IMPLEMENTATION_GUIDE.md` - Test checkout structure
+- `LEANX_INTEGRATION_SUMMARY (1).md` - Auto-detection strategy, 2-step verification
+
+### Deployment:
+- **Environment Variables:** NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_APP_URL
+- **Vercel Deployment:** Successful with expected warnings
+- **Production Status:** All payment features live and functional
+- **Testing:** ✅ All payment flows verified in production
+
+### Future Enhancements (Phase 11+):
+- Webhook handler for automatic status updates
+- Payment analytics dashboard
+- Refund processing
+- Recurring payments/subscriptions
+- Multiple payment gateways (Stripe, PayPal)
+- Payment confirmation emails
+- Order tracking page
+- Customer payment history
+- Invoice generation and download
+- Discount codes and promotions
+
+---
+
+**Last Updated:** 2026-01-13
+**Document Version:** 1.6
 **Status:** Living Document (update as project progresses)
