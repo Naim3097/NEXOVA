@@ -955,41 +955,23 @@ function generatePaymentButtonHTML(element: Element): string {
       // Render banks list
       function renderBanks(banksList) {
         const listEl = document.getElementById('banks-list-${element.id}');
-        listEl.innerHTML = banksList.map(bank => \`
-          <button
-            type="button"
-            onclick="window.selectBank_${element.id}('\${bank.id}')"
-            id="bank-btn-\${bank.id}"
-            style="
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              padding: 1rem;
-              margin-bottom: 0.75rem;
-              border: 2px solid #e5e7eb;
-              border-radius: 0.5rem;
-              background: white;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-            onmouseover="this.style.borderColor='#d1d5db'"
-            onmouseout="this.style.borderColor=(selectedBankId==='\${bank.id}' ? '#2563eb' : '#e5e7eb')"
-          >
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              \${bank.logo ?
-                \`<img src="\${bank.logo}" alt="\${bank.name}" style="width: 2rem; height: 2rem; object-fit: contain;" />\` :
-                \`<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>\`
-              }
-              <span style="font-weight: 500; color: #111827;">\${bank.name}</span>
-            </div>
-            <div id="bank-check-\${bank.id}" style="display: none; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center;">
-              <svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-            </div>
-          </button>
-        \`).join('');
+        listEl.innerHTML = banksList.map(function(bank) {
+          var logoHtml = bank.logo ?
+            '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
+            '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>';
+
+          return '<button type="button" onclick="window.selectBank_${element.id}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 1rem; margin-bottom: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
+            '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
+              logoHtml +
+              '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
+            '</div>' +
+            '<div id="bank-check-' + bank.id + '" style="display: none; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center;">' +
+              '<svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="currentColor" viewBox="0 0 20 20">' +
+                '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />' +
+              '</svg>' +
+            '</div>' +
+          '</button>';
+        }).join('');
       }
 
       // Select bank
@@ -999,9 +981,9 @@ function generatePaymentButtonHTML(element: Element): string {
         document.getElementById('bank-error-${element.id}').style.display = 'none';
 
         // Update UI
-        banks.forEach(bank => {
-          const btn = document.getElementById(\`bank-btn-\${bank.id}\`);
-          const check = document.getElementById(\`bank-check-\${bank.id}\`);
+        banks.forEach(function(bank) {
+          var btn = document.getElementById('bank-btn-' + bank.id);
+          var check = document.getElementById('bank-check-' + bank.id);
           if (bank.id === bankId) {
             btn.style.borderColor = '#2563eb';
             btn.style.background = '#eff6ff';
