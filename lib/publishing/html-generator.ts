@@ -934,7 +934,11 @@ function generatePaymentButtonHTML(element: Element): string {
         listEl.style.display = 'none';
 
         try {
-          const response = await fetch('/api/payments/banks?projectId=' + projectId);
+          const response = await fetch('/api/payments/public-banks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: projectId })
+          });
           const data = await response.json();
 
           if (data.success && data.banks) {
@@ -1110,40 +1114,32 @@ function generatePaymentButtonHTML(element: Element): string {
         submitButton.innerHTML = '<span style="display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
 
         try {
-          // Build payment payload
+          // Build payment payload for public API
           const payload = {
-            projectId: projectId,
-            productName: '${displayProducts[0].name}',
-            productDescription: '${displayProducts[0].description || ''}',
-            amount: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
-            currency: '${currency}',
-            bankId: bankId, // Include selected bank ID for Silent Bill method
+            project_id: projectId,
+            product_id: '${displayProducts[0].id || ''}',
+            product_name: '${displayProducts[0].name}',
+            product_price: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
+            payment_service_id: bankId,
+            customer_name: 'Customer',
+            customer_email: email && email.trim() ? email.trim() : '',
+            customer_phone: '',
           };
 
-          // Only include customerEmail if provided
-          if (email && email.trim()) {
-            payload.customerEmail = email.trim();
-          }
-
-          // Create transaction and get LeanX payment URL
-          const createResponse = await fetch('/api/payments/create', {
+          // Create payment and get redirect URL
+          const createResponse = await fetch('/api/payments/create-public', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
 
           const createResult = await createResponse.json();
-          if (!createResult.success || !createResult.paymentUrl) {
-            // Include validation details if available
-            let errorMsg = createResult.error || 'Failed to create payment session';
-            if (createResult.details) {
-              errorMsg += '\\n\\nDetails:\\n' + JSON.stringify(createResult.details, null, 2);
-            }
-            throw new Error(errorMsg);
+          if (!createResult.success || !createResult.redirect_url) {
+            throw new Error(createResult.error || 'Failed to create payment');
           }
 
-          // Redirect to LeanX payment page
-          window.location.href = createResult.paymentUrl;
+          // Redirect to LeanX bank page
+          window.location.href = createResult.redirect_url;
 
         } catch (error) {
           submitButton.disabled = false;

@@ -130,10 +130,29 @@ const payload = {
 };
 ```
 
-### 4.2 Handling the Redirect
-The API responds with a `redirect_url` in the `data` object.
-*   **Success:** `window.location.href = data.data.redirect_url;`
-*   **Failure:** Display `data.response_code` and `description` to the user in a red alert box inside the modal.
+### 4.2 Handling the Redirect & Return (Verification Strategy)
+The API responds with a `redirect_url` pointing to the Bank. We append `?payment_return=true` to our own return URL to detect when the user comes back.
+
+**The "Fall-back" Verification Logic:**
+Sometimes the redirect URL from the bank drops query parameters (like `status=1`). To ensure reliability, we implemented a 2-step check:
+
+1.  **Step 1: URL Params:** Check for `status=1` or `status=SUCCESS` in the URL.
+2.  **Step 2: Manual API Check (Fallback):** If URL params are missing, we use the `invoice_ref` (stored in localStorage before payment) to query the API directly.
+
+```javascript
+// POST https://api.leanx.io/api/v1/merchant/manual-checking-transaction?invoice_no=...
+const res = await fetch(verifyUrl, { method: 'POST', ... });
+if (data.data.transaction_details.invoice_status === 'SUCCESS') {
+   // Mark as Success
+}
+```
+
+### 4.3 Payment Result UI (Success/Fail)
+Once the status is confirmed, the application overlays a dedicated result view (`PaymentResultView`) over the builder interface:
+
+*   **Success State:** Displays a green success icon and a "Return to Builder" button. This confirms money has been received.
+*   **Failure State:** Displays a red error icon and a "Try Again" button.
+*   **Debug Feature:** Crucially, the Failure screen includes a **Debug Info** box. This displays the raw JSON data from the verification process (e.g., specific error messages from the bank or Lean.x), allowing developers to diagnose issues like "Insufficient Funds" or "Cancelled by User" immediately.
 
 ---
 
