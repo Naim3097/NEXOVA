@@ -1,11 +1,15 @@
+import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="w-full max-w-md p-6">{children}</div>
-    </div>
+    <AuthLayoutWrapper>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="w-full max-w-md p-6">{children}</div>
+      </div>
+    </AuthLayoutWrapper>
   );
 }
