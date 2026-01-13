@@ -80,61 +80,137 @@ interface LeanXBankListResponse {
 
 /**
  * Bank information for display
+ * Includes payment type (WEB_PAYMENT for FPX, DIGITAL_PAYMENT for E-Wallets)
  */
 export interface Bank {
   id: string;
   name: string;
+  type: 'WEB_PAYMENT' | 'DIGITAL_PAYMENT';
+  icon: string; // 'ri-bank-line' for FPX, 'ri-wallet-3-line' for E-Wallets
   logo?: string;
 }
 
 /**
  * Fetch available banks from LeanX for Silent Bill method
+ * Uses the "Auto-Detection" strategy with parallel queries for all combinations:
+ * - WEB_PAYMENT (FPX/Online Banking) for both B2C (Model 1) and B2B (Model 2)
+ * - DIGITAL_PAYMENT (E-Wallets) for both B2C (Model 1) and B2B (Model 2)
+ *
+ * This handles API fragmentation where different merchant account types
+ * return banks in different response structures.
  */
 export async function getLeanXBankList(
   config: LeanXConfig
 ): Promise<{ success: boolean; banks?: Bank[]; error?: string }> {
   try {
-    console.log('Fetching LeanX bank list:', {
+    console.log('Fetching LeanX bank list with Auto-Detection strategy:', {
       host: LEANX_API_HOST,
     });
 
-    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/bank-list`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': config.authToken,
-      },
-      body: JSON.stringify({
-        collection_uuid: config.collectionUuid,
-      }),
+    // Define all 4 combinations to query in parallel
+    const combinations = [
+      { type: 'WEB_PAYMENT', model: 1, label: 'FPX B2C' },
+      { type: 'WEB_PAYMENT', model: 2, label: 'FPX B2B' },
+      { type: 'DIGITAL_PAYMENT', model: 1, label: 'E-Wallet B2C' },
+      { type: 'DIGITAL_PAYMENT', model: 2, label: 'E-Wallet B2B' },
+    ];
+
+    let allBanks: Bank[] = [];
+    const errors: string[] = [];
+
+    // Query all combinations in parallel
+    await Promise.all(combinations.map(async (combo) => {
+      try {
+        const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/payment-service-list`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': config.authToken,
+          },
+          body: JSON.stringify({
+            collection_uuid: config.collectionUuid,
+            payment_model_reference_id: combo.model,
+          }),
+        });
+
+        const data = await response.json();
+
+        console.log(`LeanX ${combo.label} response:`, {
+          response_code: data.response_code,
+          has_data: !!data.data,
+        });
+
+        // Parse the response - handle multiple possible structures
+        let extracted: any[] = [];
+
+        // CASE A: Standard/Flat Response (Common for B2C)
+        if (Array.isArray(data.data)) {
+          extracted = data.data;
+        }
+        // CASE B: First-level Object Wrapper
+        else if (data.data?.payment_services) {
+          extracted = data.data.payment_services;
+        }
+        // CASE C: Deep Nested List (Common for B2B / Enterprise)
+        // Structure: data.data.list.data[0].WEB_PAYMENT or data.data.list.data[0].DIGITAL_PAYMENT
+        else if (data.data?.list?.data && Array.isArray(data.data.list.data)) {
+          const firstItem = data.data.list.data[0];
+          if (firstItem) {
+            // Dynamically grab key based on request type
+            if (combo.type === 'WEB_PAYMENT') {
+              extracted = firstItem.WEB_PAYMENT || [];
+            } else if (combo.type === 'DIGITAL_PAYMENT') {
+              extracted = firstItem.DIGITAL_PAYMENT || [];
+            }
+          }
+        }
+
+        // Normalize and add to collection
+        if (extracted && extracted.length > 0) {
+          const tagged = extracted.map((b: any) => ({
+            id: b.payment_service_id,
+            // STRIP SUFFIX: Converts "Maybank2u B2B" -> "Maybank2u"
+            name: (b.name || b.payment_service_name || '').replace(/ B2B$/i, '').trim(),
+            type: combo.type as 'WEB_PAYMENT' | 'DIGITAL_PAYMENT',
+            icon: combo.type === 'WEB_PAYMENT' ? 'ri-bank-line' : 'ri-wallet-3-line',
+            logo: b.payment_service_logo,
+          }));
+          allBanks = [...allBanks, ...tagged];
+
+          console.log(`Found ${tagged.length} banks for ${combo.label}`);
+        }
+
+      } catch (error) {
+        console.error(`Error fetching ${combo.label}:`, error);
+        errors.push(`${combo.label}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }));
+
+    // Deduplicate banks by payment_service_id
+    const uniqueBanks = allBanks.filter((bank, index, self) =>
+      index === self.findIndex(b => b.id === bank.id)
+    );
+
+    console.log('LeanX Auto-Detection complete:', {
+      total_banks: uniqueBanks.length,
+      web_payment: uniqueBanks.filter(b => b.type === 'WEB_PAYMENT').length,
+      digital_payment: uniqueBanks.filter(b => b.type === 'DIGITAL_PAYMENT').length,
+      errors: errors.length,
     });
 
-    const result: LeanXBankListResponse = await response.json();
-
-    console.log('LeanX bank list response:', {
-      response_code: result.response_code,
-      description: result.description,
-      bank_count: result.data?.length || 0,
-    });
-
-    // Success response code is 2000
-    if (result.response_code === 2000 && result.data) {
-      const banks: Bank[] = result.data.map(bank => ({
-        id: bank.payment_service_id,
-        name: bank.payment_service_name,
-        logo: bank.payment_service_logo,
-      }));
-
-      return {
-        success: true,
-        banks,
-      };
-    } else {
+    if (uniqueBanks.length === 0) {
       return {
         success: false,
-        error: result.breakdown_errors || result.description || 'Failed to fetch bank list',
+        error: errors.length > 0
+          ? `Failed to fetch banks: ${errors.join('; ')}`
+          : 'No active banks found. Please check your LeanX account configuration.',
       };
     }
+
+    return {
+      success: true,
+      banks: uniqueBanks,
+    };
 
   } catch (error) {
     console.error('LeanX Bank List Error:', error);

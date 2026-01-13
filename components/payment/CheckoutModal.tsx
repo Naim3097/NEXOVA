@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Lock, CreditCard as LeanXIcon, Building2 } from 'lucide-react';
+import { X, Lock, CreditCard as LeanXIcon, Building2, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,8 @@ import type { CheckoutFormData } from '@/types';
 interface Bank {
   id: string;
   name: string;
+  type: 'WEB_PAYMENT' | 'DIGITAL_PAYMENT';
+  icon: string;
   logo?: string;
 }
 
@@ -205,43 +207,103 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
-                {banks.map((bank) => (
-                  <button
-                    key={bank.id}
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, bankId: bank.id });
-                      setErrors({ ...errors, bankId: undefined });
-                    }}
-                    disabled={isProcessing}
-                    className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                      formData.bankId === bank.id
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      {bank.logo ? (
-                        <img
-                          src={bank.logo}
-                          alt={bank.name}
-                          className="w-8 h-8 object-contain"
-                        />
-                      ) : (
-                        <Building2 className="w-6 h-6 text-gray-400" />
-                      )}
-                      <span className="font-medium text-gray-900">{bank.name}</span>
+              <div className="space-y-4">
+                {/* FPX / Online Banking Section */}
+                {banks.filter(b => b.type === 'WEB_PAYMENT').length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
+                      <Building2 className="w-4 h-4 mr-1" />
+                      Online Banking (FPX)
+                    </h4>
+                    <div className="space-y-2">
+                      {banks.filter(b => b.type === 'WEB_PAYMENT').map((bank) => (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, bankId: bank.id });
+                            setErrors({ ...errors, bankId: undefined });
+                          }}
+                          disabled={isProcessing}
+                          className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
+                            formData.bankId === bank.id
+                              ? 'border-blue-600 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            {bank.logo ? (
+                              <img
+                                src={bank.logo}
+                                alt={bank.name}
+                                className="w-8 h-8 object-contain"
+                              />
+                            ) : (
+                              <Building2 className="w-6 h-6 text-gray-400" />
+                            )}
+                            <span className="font-medium text-gray-900">{bank.name}</span>
+                          </div>
+                          {formData.bankId === bank.id && (
+                            <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
                     </div>
-                    {formData.bankId === bank.id && (
-                      <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                  </button>
-                ))}
+                  </div>
+                )}
+
+                {/* E-Wallets Section */}
+                {banks.filter(b => b.type === 'DIGITAL_PAYMENT').length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
+                      <Wallet className="w-4 h-4 mr-1" />
+                      E-Wallets
+                    </h4>
+                    <div className="space-y-2">
+                      {banks.filter(b => b.type === 'DIGITAL_PAYMENT').map((bank) => (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, bankId: bank.id });
+                            setErrors({ ...errors, bankId: undefined });
+                          }}
+                          disabled={isProcessing}
+                          className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
+                            formData.bankId === bank.id
+                              ? 'border-blue-600 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            {bank.logo ? (
+                              <img
+                                src={bank.logo}
+                                alt={bank.name}
+                                className="w-8 h-8 object-contain"
+                              />
+                            ) : (
+                              <Wallet className="w-6 h-6 text-gray-400" />
+                            )}
+                            <span className="font-medium text-gray-900">{bank.name}</span>
+                          </div>
+                          {formData.bankId === bank.id && (
+                            <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {errors.bankId && (
                   <p className="text-xs text-red-500 mt-1">{errors.bankId}</p>
                 )}
