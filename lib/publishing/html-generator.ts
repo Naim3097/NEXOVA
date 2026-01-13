@@ -2,6 +2,14 @@ import type { Project, Element, SEOSettings } from '@/types';
 import { generateTrackingScript } from '@/lib/analytics/tracking-script';
 
 /**
+ * Sanitize element ID for use in JavaScript identifiers
+ * Replaces hyphens with underscores to avoid syntax errors
+ */
+function sanitizeId(id: string): string {
+  return id.replace(/-/g, '_');
+}
+
+/**
  * Map icon names to SVG paths
  */
 function getIconSVG(iconName: string): string {
@@ -806,7 +814,7 @@ function generatePaymentButtonHTML(element: Element): string {
             <!-- Error State -->
             <div id="banks-error-${element.id}" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 0.375rem; padding: 1rem; text-align: center;">
               <p style="color: #dc2626; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Failed to load banks</p>
-              <button type="button" onclick="window.fetchBanks_${element.id}()" style="font-size: 0.875rem; padding: 0.25rem 0.75rem; background: white; border: 1px solid #dc2626; color: #dc2626; border-radius: 0.25rem; cursor: pointer;">Retry</button>
+              <button type="button" onclick="window.fetchBanks_${sanitizeId(element.id)}()" style="font-size: 0.875rem; padding: 0.25rem 0.75rem; background: white; border: 1px solid #dc2626; color: #dc2626; border-radius: 0.25rem; cursor: pointer;">Retry</button>
             </div>
 
             <!-- Banks List -->
@@ -924,7 +932,7 @@ function generatePaymentButtonHTML(element: Element): string {
       let selectedBankId = null;
 
       // Fetch banks from API
-      window.fetchBanks_${element.id} = async function() {
+      window.fetchBanks_${sanitizeId(element.id)} = async function() {
         const loadingEl = document.getElementById('banks-loading-${element.id}');
         const errorEl = document.getElementById('banks-error-${element.id}');
         const listEl = document.getElementById('banks-list-${element.id}');
@@ -980,7 +988,7 @@ function generatePaymentButtonHTML(element: Element): string {
               '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
               '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>';
 
-            html += '<button type="button" onclick="window.selectBank_${element.id}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
+            html += '<button type="button" onclick="window.selectBank_${sanitizeId(element.id)}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
               '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
                 logoHtml +
                 '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
@@ -1010,7 +1018,7 @@ function generatePaymentButtonHTML(element: Element): string {
               '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
               '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>';
 
-            html += '<button type="button" onclick="window.selectBank_${element.id}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
+            html += '<button type="button" onclick="window.selectBank_${sanitizeId(element.id)}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
               '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
                 logoHtml +
                 '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
@@ -1030,7 +1038,7 @@ function generatePaymentButtonHTML(element: Element): string {
       }
 
       // Select bank
-      window.selectBank_${element.id} = function(bankId) {
+      window.selectBank_${sanitizeId(element.id)} = function(bankId) {
         selectedBankId = bankId;
         document.getElementById('selected-bank-${element.id}').value = bankId;
         document.getElementById('bank-error-${element.id}').style.display = 'none';
@@ -1084,7 +1092,7 @@ function generatePaymentButtonHTML(element: Element): string {
 
         // Fetch banks when modal opens
         if (banks.length === 0) {
-          window.fetchBanks_${element.id}();
+          window.fetchBanks_${sanitizeId(element.id)}();
         }
       };
 
