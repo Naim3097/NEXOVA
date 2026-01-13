@@ -16,16 +16,12 @@ interface Bank {
 interface TestCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  leanxApiKey: string;
-  leanxCollectionUuid: string;
   environment: 'test' | 'live';
 }
 
 export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
   isOpen,
   onClose,
-  leanxApiKey,
-  leanxCollectionUuid,
   environment,
 }) => {
   const [banks, setBanks] = useState<Bank[]>([]);
@@ -60,84 +56,36 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
     setError(null);
 
     try {
-      const apiUrl = 'https://api.leanx.io/api/v1/merchant/list-payment-services';
+      // Use backend API to fetch banks (avoids CORS issues)
+      const response = await fetch('/api/payments/test-banks');
+      const data = await response.json();
 
-      // Query all combinations in parallel
-      const combinations = [
-        { type: 'WEB_PAYMENT', model: 1, label: 'FPX B2C' },
-        { type: 'WEB_PAYMENT', model: 2, label: 'FPX B2B' },
-        { type: 'DIGITAL_PAYMENT', model: 1, label: 'E-Wallet B2C' },
-        { type: 'DIGITAL_PAYMENT', model: 2, label: 'E-Wallet B2B' },
-      ];
+      console.log('Test banks API response:', data);
 
-      const results = await Promise.all(
-        combinations.map((combo) => fetchPaymentServices(apiUrl, combo))
-      );
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to load payment methods');
+      }
 
-      // Flatten and deduplicate
-      const allBanks = results.flat();
-      const uniqueBanks = Array.from(
-        new Map(allBanks.map((bank) => [bank.payment_service_id, bank])).values()
-      );
-
-      if (uniqueBanks.length === 0) {
+      if (!data.banks || data.banks.length === 0) {
         throw new Error('No active payment methods found. Please check your LeanX Portal settings.');
       }
 
-      setBanks(uniqueBanks);
+      // Transform banks to match the expected format
+      const transformedBanks: Bank[] = data.banks.map((bank: any) => ({
+        payment_service_id: bank.id ? parseInt(bank.id) : bank.payment_service_id,
+        payment_service_name: bank.name || bank.payment_service_name,
+        type: bank.type || 'WEB_PAYMENT',
+        icon: bank.icon || (bank.type === 'DIGITAL_PAYMENT' ? 'ri-wallet-3-line' : 'ri-bank-line'),
+      }));
+
+      console.log('Transformed banks:', transformedBanks);
+
+      setBanks(transformedBanks);
     } catch (err: any) {
       console.error('Error fetching banks:', err);
       setError(err.message || 'Failed to load payment methods');
     } finally {
       setLoadingBanks(false);
-    }
-  };
-
-  const fetchPaymentServices = async (apiUrl: string, combo: any): Promise<Bank[]> => {
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': leanxApiKey,
-        },
-        body: JSON.stringify({
-          payment_type: combo.type,
-          payment_status: 'active',
-          payment_model_reference_id: combo.model,
-        }),
-      });
-
-      const data = await response.json();
-
-      // Parse response based on structure
-      let banksList: any[] = [];
-
-      if (Array.isArray(data.data)) {
-        banksList = data.data;
-      } else if (data.data?.payment_services) {
-        banksList = data.data.payment_services;
-      } else if (data.data?.list?.data?.[0]) {
-        const firstItem = data.data.list.data[0];
-        if (combo.type === 'WEB_PAYMENT' && firstItem.WEB_PAYMENT) {
-          banksList = firstItem.WEB_PAYMENT;
-        } else if (combo.type === 'DIGITAL_PAYMENT' && firstItem.DIGITAL_PAYMENT) {
-          banksList = firstItem.DIGITAL_PAYMENT;
-        }
-      }
-
-      // Normalize bank data
-      return banksList.map((bank) => ({
-        payment_service_id: bank.payment_service_id,
-        payment_service_name: (bank.name || bank.payment_service_name)
-          .replace(/ B2B$/i, '')
-          .trim(),
-        type: combo.type,
-        icon: combo.type === 'WEB_PAYMENT' ? 'ri-bank-line' : 'ri-wallet-3-line',
-      }));
-    } catch (error) {
-      console.warn(`Failed to fetch ${combo.label}:`, error);
-      return [];
     }
   };
 
@@ -161,7 +109,6 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
       // Prepare payload
       const payload = {
-        collection_uuid: leanxCollectionUuid,
         payment_service_id: selectedBank.payment_service_id,
         amount: TEST_AMOUNT,
         invoice_ref: invoiceRef,
@@ -174,12 +121,11 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
       console.log('Creating test payment with payload:', payload);
 
-      // Create payment
-      const response = await fetch('https://api.leanx.io/api/v1/merchant/create-bill-silent', {
+      // Use backend API to create payment (avoids CORS issues)
+      const response = await fetch('/api/payments/test-create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'auth-token': leanxApiKey,
         },
         body: JSON.stringify(payload),
       });
@@ -188,11 +134,15 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
       console.log('Payment creation response:', data);
 
-      if (data.response_code === 2000 && data.data?.redirect_url) {
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Payment creation failed');
+      }
+
+      if (data.redirect_url) {
         // Success - redirect to bank
-        window.location.href = data.data.redirect_url;
+        window.location.href = data.redirect_url;
       } else {
-        throw new Error(data.message || data.description || 'Payment creation failed');
+        throw new Error('No redirect URL received');
       }
     } catch (err: any) {
       console.error('Payment error:', err);
@@ -227,19 +177,11 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Settings Preview */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600 font-medium">Environment:</span>
-                <span className="ml-2 text-gray-900 font-semibold">
-                  {environment === 'live' ? 'Live Production' : 'Test Mode'}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-600 font-medium">Collection UUID:</span>
-                <span className="ml-2 text-gray-900 font-mono text-xs">
-                  {leanxCollectionUuid.substring(0, 15)}...
-                </span>
-              </div>
+            <div className="text-sm">
+              <span className="text-gray-600 font-medium">Environment:</span>
+              <span className="ml-2 text-gray-900 font-semibold">
+                {environment === 'live' ? 'Live Production' : 'Test Mode'}
+              </span>
             </div>
           </div>
 

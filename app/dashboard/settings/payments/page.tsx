@@ -344,8 +344,6 @@ export default function PaymentSettingsPage() {
       <TestCheckoutModal
         isOpen={showTestCheckout}
         onClose={() => setShowTestCheckout(false)}
-        leanxApiKey={formData.leanx_api_key}
-        leanxCollectionUuid={formData.leanx_collection_uuid}
         environment={formData.leanx_environment}
       />
     </div>
