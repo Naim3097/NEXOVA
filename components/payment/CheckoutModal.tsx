@@ -20,6 +20,7 @@ interface CheckoutModalProps {
   productDescription?: string;
   amount: number;
   currency: string;
+  projectId: string; // Added to fetch user's LeanX credentials
   onSubmit: (formData: CheckoutFormData, addShipping: boolean) => void;
   isProcessing?: boolean;
 }
@@ -31,6 +32,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   productDescription,
   amount,
   currency,
+  projectId,
   onSubmit,
   isProcessing = false,
 }) => {
@@ -59,7 +61,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setBankError(null);
 
     try {
-      const response = await fetch('/api/payments/banks');
+      const response = await fetch(`/api/payments/banks?projectId=${projectId}`);
       const data = await response.json();
 
       if (data.success && data.banks) {

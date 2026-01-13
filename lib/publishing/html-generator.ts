@@ -934,7 +934,7 @@ function generatePaymentButtonHTML(element: Element): string {
         listEl.style.display = 'none';
 
         try {
-          const response = await fetch('/api/payments/banks');
+          const response = await fetch('/api/payments/banks?projectId=' + projectId);
           const data = await response.json();
 
           if (data.success && data.banks) {
