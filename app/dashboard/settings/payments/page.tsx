@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle, CreditCard, PlayCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 
@@ -25,6 +26,7 @@ export default function PaymentSettingsPage() {
     leanx_secret_key: '',
     leanx_merchant_id: '',
     leanx_enabled: false,
+    leanx_environment: 'live' as 'test' | 'live',
   });
 
   // Fetch current settings
@@ -120,10 +122,19 @@ export default function PaymentSettingsPage() {
     );
   }
 
+  const handleTestCheckout = () => {
+    // Navigate to a test product page or open a test checkout modal
+    // For now, let's just show a toast with instructions
+    toast({
+      title: 'Test Checkout',
+      description: 'Create a product with a payment button to test the integration.',
+    });
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      {/* Header */}
-      <div className="mb-6">
+    <div className="container mx-auto py-8 px-4 max-w-6xl">
+      {/* Header with Actions */}
+      <div className="mb-8">
         <Button
           variant="ghost"
           size="sm"
@@ -134,192 +145,192 @@ export default function PaymentSettingsPage() {
           Back to Dashboard
         </Button>
 
-        <h1 className="text-3xl font-bold">Payment Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Configure your LeanX payment gateway integration
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Payment Settings</h1>
+            <p className="text-muted-foreground mt-1">
+              Configure your LeanX payment gateway integration
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              variant="outline"
+              className="min-w-[140px]"
+            >
+              {saving ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleTestCheckout}
+              disabled={!formData.leanx_enabled || !formData.leanx_api_key || !formData.leanx_collection_uuid}
+              className="min-w-[180px]"
+            >
+              <PlayCircle className="w-4 h-4 mr-2" />
+              Launch Test Checkout
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Status Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            Status
-            {formData.leanx_enabled ? (
-              <span className="flex items-center text-green-600 text-sm font-normal">
-                <CheckCircle className="w-4 h-4 mr-1" />
-                Active
-              </span>
-            ) : (
-              <span className="flex items-center text-gray-500 text-sm font-normal">
-                <XCircle className="w-4 h-4 mr-1" />
-                Inactive
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2">
+      {/* Main Settings Card */}
+      <Card>
+        {/* Gateway Header with Toggle */}
+        <div className="p-6 border-b flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-indigo-50 flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">LeanX Gateway</h3>
+              <p className="text-sm text-muted-foreground">Secure FPX & Bank processing.</p>
+            </div>
+          </div>
+
+          {/* Toggle Switch */}
+          <label className="relative inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              id="leanx_enabled"
               checked={formData.leanx_enabled}
               onChange={(e) => setFormData({ ...formData, leanx_enabled: e.target.checked })}
-              className="w-4 h-4"
+              className="sr-only peer"
             />
-            <Label htmlFor="leanx_enabled" className="cursor-pointer">
-              Enable LeanX payment gateway
-            </Label>
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            When enabled, payment buttons on your published pages will process payments through LeanX.
-          </p>
-        </CardContent>
-      </Card>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+          </label>
+        </div>
 
-      {/* API Credentials Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>LeanX API Credentials</CardTitle>
-          <CardDescription>
-            Enter your LeanX API credentials. You can find these in your LeanX merchant dashboard.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Merchant ID (Optional - For Reference) */}
-          <div>
-            <Label htmlFor="merchant_id">
-              Merchant ID <span className="text-xs text-muted-foreground">(Optional - For Reference)</span>
-            </Label>
-            <Input
-              id="merchant_id"
-              type="text"
-              value={formData.leanx_merchant_id}
-              onChange={(e) => setFormData({ ...formData, leanx_merchant_id: e.target.value })}
-              placeholder="Your LeanX merchant ID (optional)"
-              className="mt-1"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Your merchant identifier for reference (not used in API calls)
-            </p>
-          </div>
+        {/* Configuration Form (shown when enabled) */}
+        {formData.leanx_enabled && (
+          <CardContent className="p-6 space-y-4">
+            {/* Environment and Collection UUID Row */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Environment */}
+              <div>
+                <Label htmlFor="environment">Environment</Label>
+                <Select
+                  value={formData.leanx_environment}
+                  onValueChange={(value: 'test' | 'live') => setFormData({ ...formData, leanx_environment: value })}
+                >
+                  <SelectTrigger id="environment" className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="test">Test Mode (Sandbox)</SelectItem>
+                    <SelectItem value="live">Live Production</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* Auth Token (API Key) */}
-          <div>
-            <Label htmlFor="api_key">Auth Token</Label>
-            <div className="relative mt-1">
-              <Input
-                id="api_key"
-                type={showApiKey ? 'text' : 'password'}
-                value={formData.leanx_api_key}
-                onChange={(e) => setFormData({ ...formData, leanx_api_key: e.target.value })}
-                placeholder="LP-XXXXXXXXXX"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowApiKey(!showApiKey)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              {/* Collection UUID */}
+              <div>
+                <Label htmlFor="collection_uuid">Collection UUID</Label>
+                <Input
+                  id="collection_uuid"
+                  type="text"
+                  value={formData.leanx_collection_uuid}
+                  onChange={(e) => setFormData({ ...formData, leanx_collection_uuid: e.target.value })}
+                  placeholder="Dc-..."
+                  className="mt-1"
+                />
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Your LeanX Auth Token (starts with LP-...)
-            </p>
-          </div>
 
-          {/* Collection UUID */}
-          <div>
-            <Label htmlFor="collection_uuid">Collection UUID</Label>
-            <Input
-              id="collection_uuid"
-              type="text"
-              value={formData.leanx_collection_uuid}
-              onChange={(e) => setFormData({ ...formData, leanx_collection_uuid: e.target.value })}
-              placeholder="Dc-XXXXXX-Lx or CL-XXXXXX"
-              className="mt-1"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Your LeanX Collection UUID (starts with Dc- or CL-)
-            </p>
-          </div>
-
-          {/* Secret Key (Optional) */}
-          <div>
-            <Label htmlFor="secret_key">
-              Secret Key <span className="text-xs text-muted-foreground">(Optional)</span>
-            </Label>
-            <div className="relative mt-1">
-              <Input
-                id="secret_key"
-                type={showSecretKey ? 'text' : 'password'}
-                value={formData.leanx_secret_key}
-                onChange={(e) => setFormData({ ...formData, leanx_secret_key: e.target.value })}
-                placeholder="Enter your LeanX secret key (optional)"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowSecretKey(!showSecretKey)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showSecretKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+            {/* Auth Token */}
+            <div>
+              <Label htmlFor="api_key">Auth Token</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="api_key"
+                  type={showApiKey ? 'text' : 'password'}
+                  value={formData.leanx_api_key}
+                  onChange={(e) => setFormData({ ...formData, leanx_api_key: e.target.value })}
+                  placeholder="LP-..."
+                  className="pr-10 font-mono text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              For webhook signature verification (recommended for security but optional)
-            </p>
-          </div>
-        </CardContent>
+
+            {/* Hash Key (Secret Key) */}
+            <div>
+              <Label htmlFor="secret_key">Hash Key</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="secret_key"
+                  type={showSecretKey ? 'text' : 'password'}
+                  value={formData.leanx_secret_key}
+                  onChange={(e) => setFormData({ ...formData, leanx_secret_key: e.target.value })}
+                  placeholder="c2d2..."
+                  className="pr-10 font-mono text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSecretKey(!showSecretKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showSecretKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Info Box */}
+            <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
+              <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-sm">Ready to Transact</p>
+                <p className="text-sm opacity-90 mt-1">
+                  This configuration allows you to fetch bank lists directly and process payments via the LeanX API.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Information Card */}
-      <Card className="mb-6 border-blue-200 bg-blue-50">
+      <Card className="border-blue-200 bg-blue-50">
         <CardContent className="pt-6">
-          <h3 className="font-semibold text-blue-900 mb-2">How to get your LeanX credentials:</h3>
+          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+            <Info className="w-5 h-5" />
+            How to get your LeanX credentials:
+          </h3>
           <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800">
             <li>Log in to your LeanX merchant dashboard</li>
             <li>Navigate to Settings → API Credentials</li>
             <li>Copy your <strong>Auth Token</strong> (starts with LP-...)</li>
             <li>Create or find your <strong>Collection UUID</strong> (starts with Dc-... or CL-...)</li>
-            <li>Optionally, copy your <strong>Secret Key</strong> for webhook verification</li>
-            <li>Paste them here and click Save</li>
+            <li>Copy your <strong>Hash Key</strong> for webhook verification</li>
+            <li>Paste them here, select your environment, and click Save Settings</li>
           </ol>
           <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-xs text-yellow-800">
-              <strong>Required:</strong> Auth Token and Collection UUID are required for payments to work. Secret Key is optional but recommended for webhook security.
+              <strong>Required:</strong> Auth Token and Collection UUID are required for payments to work. Hash Key is recommended for webhook security.
             </p>
           </div>
           <p className="text-xs text-blue-700 mt-3">
-            Don't have a LeanX account? <a href="https://leanx.io" target="_blank" rel="noopener noreferrer" className="underline font-semibold">Sign up here</a>
+            Don't have a LeanX account? <a href="https://leanx.io" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-blue-900">Sign up here</a>
           </p>
         </CardContent>
       </Card>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="min-w-[120px]"
-        >
-          {saving ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4 mr-2" />
-              Save Settings
-            </>
-          )}
-        </Button>
-      </div>
     </div>
   );
 }
