@@ -121,14 +121,15 @@ export async function getLeanXBankList(
     // Query all combinations in parallel
     await Promise.all(combinations.map(async (combo) => {
       try {
-        const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/payment-service-list`, {
+        const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/list-payment-services`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'auth-token': config.authToken,
           },
           body: JSON.stringify({
-            collection_uuid: config.collectionUuid,
+            payment_type: combo.type,
+            payment_status: 'active',
             payment_model_reference_id: combo.model,
           }),
         });
