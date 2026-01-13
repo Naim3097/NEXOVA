@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle, CreditCard, PlayCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
+import { TestCheckoutModal } from '@/components/payment/TestCheckoutModal';
 
 export default function PaymentSettingsPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function PaymentSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
+  const [showTestCheckout, setShowTestCheckout] = useState(false);
 
   const [formData, setFormData] = useState({
     leanx_api_key: '',
@@ -123,12 +125,18 @@ export default function PaymentSettingsPage() {
   }
 
   const handleTestCheckout = () => {
-    // Navigate to a test product page or open a test checkout modal
-    // For now, let's just show a toast with instructions
-    toast({
-      title: 'Test Checkout',
-      description: 'Create a product with a payment button to test the integration.',
-    });
+    // Validate that we have the required credentials
+    if (!formData.leanx_enabled || !formData.leanx_api_key || !formData.leanx_collection_uuid) {
+      toast({
+        title: 'Configuration Required',
+        description: 'Please enable and configure LeanX payment settings first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Open the test checkout modal
+    setShowTestCheckout(true);
   };
 
   return (
@@ -331,6 +339,15 @@ export default function PaymentSettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Test Checkout Modal */}
+      <TestCheckoutModal
+        isOpen={showTestCheckout}
+        onClose={() => setShowTestCheckout(false)}
+        leanxApiKey={formData.leanx_api_key}
+        leanxCollectionUuid={formData.leanx_collection_uuid}
+        environment={formData.leanx_environment}
+      />
     </div>
   );
 }
