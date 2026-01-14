@@ -3,10 +3,10 @@ import { generateTrackingScript } from '@/lib/analytics/tracking-script';
 
 /**
  * Sanitize element ID for use in JavaScript identifiers
- * Replaces hyphens with underscores to avoid syntax errors
+ * Removes invalid characters and replaces hyphens with underscores to avoid syntax errors
  */
 function sanitizeId(id: string): string {
-  return id.replace(/-/g, '_');
+  return id.replace(/[^a-zA-Z0-9_]/g, '_');
 }
 
 /**
