@@ -1134,6 +1134,8 @@ function generatePaymentButtonHTML(element: Element): string {
             customer_phone: '',
           };
 
+          console.log('Creating payment with payload:', payload);
+
           // Create payment and get redirect URL
           const createResponse = await fetch('/api/payments/create-public', {
             method: 'POST',
@@ -1141,7 +1143,11 @@ function generatePaymentButtonHTML(element: Element): string {
             body: JSON.stringify(payload)
           });
 
+          console.log('Response status:', createResponse.status);
+
           const createResult = await createResponse.json();
+          console.log('Response data:', createResult);
+
           if (!createResult.success || !createResult.redirect_url) {
             throw new Error(createResult.error || 'Failed to create payment');
           }
@@ -1154,8 +1160,9 @@ function generatePaymentButtonHTML(element: Element): string {
           submitButton.innerHTML = originalButtonText;
           // Show the actual error message from the API
           const errorMessage = error.message || '${failureMessage}';
+          console.error('Payment error details:', error);
+          console.error('Error message:', errorMessage);
           alert(errorMessage);
-          console.error('Payment error:', error);
         }
       });
 
