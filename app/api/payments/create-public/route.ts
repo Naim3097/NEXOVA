@@ -75,14 +75,15 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
     // Prepare payload for LeanX
+    // LeanX requires non-empty email and phone - use placeholders if not provided
     const leanxPayload = {
       collection_uuid: profile.leanx_collection_uuid,
       payment_service_id: parseInt(payment_service_id),
       amount: parseFloat(product_price).toFixed(2),
       invoice_ref: invoiceRef,
       full_name: customer_name || 'Customer',
-      email: customer_email || '',
-      phone_number: customer_phone || '',
+      email: customer_email && customer_email.trim() ? customer_email.trim() : 'noreply@customer.com',
+      phone_number: customer_phone && customer_phone.trim() ? customer_phone.trim() : '60123456789',
       redirect_url: `${origin}/payment/success?order=${invoiceRef}`,
       callback_url: `${origin}/api/payments/webhook`,
     };
