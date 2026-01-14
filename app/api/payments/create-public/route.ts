@@ -108,7 +108,10 @@ export async function POST(request: NextRequest) {
     console.log('LeanX response:', {
       response_code: leanxData.response_code,
       has_redirect_url: !!leanxData.data?.redirect_url,
+      full_response: leanxData,
     });
+
+    console.log('LeanX payload sent:', leanxPayload);
 
     if (leanxData.response_code === 2000 && leanxData.data?.redirect_url) {
       // Create transaction record in database
@@ -139,10 +142,12 @@ export async function POST(request: NextRequest) {
         invoice_ref: invoiceRef,
       });
     } else {
+      console.error('LeanX payment creation failed:', leanxData);
       return NextResponse.json(
         {
           success: false,
           error: leanxData.description || leanxData.message || 'Payment creation failed',
+          details: leanxData,
         },
         { status: 400 }
       );

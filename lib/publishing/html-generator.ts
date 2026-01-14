@@ -1153,6 +1153,7 @@ function generatePaymentButtonHTML(element: Element): string {
           console.log('Response data:', createResult);
 
           if (!createResult.success || !createResult.redirect_url) {
+            console.error('Payment creation failed. Full details:', createResult.details || createResult);
             throw new Error(createResult.error || 'Failed to create payment');
           }
 
