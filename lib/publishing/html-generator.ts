@@ -1046,18 +1046,19 @@ function generatePaymentButtonHTML(element: Element): string {
         document.getElementById('selected-bank-${element.id}').value = bankId;
         document.getElementById('bank-error-${element.id}').style.display = 'none';
 
-        // Update UI
-        banks.forEach(function(bank) {
-          var btn = document.getElementById('bank-btn-' + bank.id);
-          var check = document.getElementById('bank-check-' + bank.id);
-          if (bank.id === bankId) {
+        // Update UI - use direct DOM manipulation instead of looping through banks array
+        var allButtons = document.querySelectorAll('[id^="bank-btn-"]');
+        allButtons.forEach(function(btn) {
+          var btnBankId = btn.id.replace('bank-btn-', '');
+          var check = document.getElementById('bank-check-' + btnBankId);
+          if (btnBankId === bankId) {
             btn.style.borderColor = '#2563eb';
             btn.style.background = '#eff6ff';
-            check.style.display = 'flex';
+            if (check) check.style.display = 'flex';
           } else {
             btn.style.borderColor = '#e5e7eb';
             btn.style.background = 'white';
-            check.style.display = 'none';
+            if (check) check.style.display = 'none';
           }
         });
       };
