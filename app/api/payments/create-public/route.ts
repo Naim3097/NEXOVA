@@ -76,9 +76,10 @@ export async function POST(request: NextRequest) {
     const referer = request.headers.get('referer') || origin;
 
     // Redirect back to the sales page where customer came from
+    // Don't include payment status - let webhook update it
     const redirectUrl = referer.includes('?')
-      ? `${referer}&payment=success&order=${invoiceRef}`
-      : `${referer}?payment=success&order=${invoiceRef}`;
+      ? `${referer}&order=${invoiceRef}`
+      : `${referer}?order=${invoiceRef}`;
 
     // Prepare payload for LeanX
     // LeanX requires non-empty email and phone - use placeholders if not provided

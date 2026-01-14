@@ -1247,25 +1247,32 @@ function generatePaymentButtonHTML(element: Element): string {
         }
       }
 
-      // Check for payment success/failure in URL parameters
+      // Check for order reference in URL (customer returned from payment)
       const urlParams = new URLSearchParams(window.location.search);
-      const paymentStatus = urlParams.get('payment');
       const orderRef = urlParams.get('order');
 
-      if (paymentStatus === 'success' && orderRef) {
-        // Remove payment params from URL without page reload
+      if (orderRef) {
+        // Remove order param from URL without page reload
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
 
-        // Show success message
-        alert('Payment successful! Your order reference is: ' + orderRef + '\\n\\nThank you for your purchase!');
-      } else if (paymentStatus === 'failed' && orderRef) {
-        // Remove payment params from URL without page reload
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-
-        // Show failure message
-        alert('Payment failed or was cancelled.\\n\\nOrder reference: ' + orderRef + '\\n\\nPlease try again.');
+        // Check payment status from database
+        fetch('/api/payments/check-status?order=' + orderRef)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'completed' || data.status === 'paid') {
+              alert('Payment successful! Your order reference is: ' + orderRef + '\\n\\nThank you for your purchase!');
+            } else if (data.status === 'failed' || data.status === 'cancelled') {
+              alert('Payment was cancelled or failed.\\n\\nOrder reference: ' + orderRef + '\\n\\nPlease try again if you wish to complete your purchase.');
+            } else {
+              // Payment is still pending/processing
+              alert('Your payment is being processed.\\n\\nOrder reference: ' + orderRef + '\\n\\nYou will receive a confirmation email shortly.');
+            }
+          })
+          .catch(error => {
+            console.error('Error checking payment status:', error);
+            alert('Your payment is being processed.\\n\\nOrder reference: ' + orderRef + '\\n\\nYou will receive a confirmation email shortly.');
+          });
       }
     })();
   </script>
