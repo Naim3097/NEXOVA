@@ -71,8 +71,14 @@ export async function POST(request: NextRequest) {
     // Generate unique invoice reference
     const invoiceRef = `INV-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
 
-    // Get the origin for redirect URLs
+    // Get the origin and referer for redirect URLs
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const referer = request.headers.get('referer') || origin;
+
+    // Redirect back to the sales page where customer came from
+    const redirectUrl = referer.includes('?')
+      ? `${referer}&payment=success&order=${invoiceRef}`
+      : `${referer}?payment=success&order=${invoiceRef}`;
 
     // Prepare payload for LeanX
     // LeanX requires non-empty email and phone - use placeholders if not provided
@@ -84,7 +90,7 @@ export async function POST(request: NextRequest) {
       full_name: customer_name || 'Customer',
       email: customer_email && customer_email.trim() ? customer_email.trim() : 'noreply@customer.com',
       phone_number: customer_phone && customer_phone.trim() ? customer_phone.trim() : '60123456789',
-      redirect_url: `${origin}/payment/success?order=${invoiceRef}`,
+      redirect_url: redirectUrl,
       callback_url: `${origin}/api/payments/webhook`,
     };
 

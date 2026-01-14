@@ -830,14 +830,32 @@ function generatePaymentButtonHTML(element: Element): string {
           </div>
 
           <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Email (Optional)</label>
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">
+              Email <span style="color: #dc2626;">*</span>
+            </label>
             <input
               type="email"
               id="customer-email-${element.id}"
               placeholder="your@email.com"
+              required
               style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
             >
             <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">We'll send your receipt to this email</p>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">
+              Phone Number <span style="color: #dc2626;">*</span>
+            </label>
+            <input
+              type="tel"
+              id="customer-phone-${element.id}"
+              placeholder="60123456789"
+              required
+              pattern="[0-9]{10,15}"
+              style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
+            >
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Required for payment verification</p>
           </div>
 
           <button
@@ -1111,6 +1129,7 @@ function generatePaymentButtonHTML(element: Element): string {
         e.preventDefault();
 
         const email = document.getElementById('customer-email-${element.id}').value;
+        const phone = document.getElementById('customer-phone-${element.id}').value;
         const bankId = document.getElementById('selected-bank-${element.id}').value;
         const submitButton = e.target.querySelector('button[type="submit"]');
         const originalButtonText = submitButton.innerHTML;
@@ -1135,7 +1154,7 @@ function generatePaymentButtonHTML(element: Element): string {
             payment_service_id: bankId,
             customer_name: 'Customer',
             customer_email: email && email.trim() ? email.trim() : '',
-            customer_phone: '',
+            customer_phone: phone && phone.trim() ? phone.trim() : '',
           };
 
           console.log('Creating payment with payload:', payload);
@@ -1226,6 +1245,27 @@ function generatePaymentButtonHTML(element: Element): string {
         } finally {
           document.body.style.overflow = 'auto';
         }
+      }
+
+      // Check for payment success/failure in URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentStatus = urlParams.get('payment');
+      const orderRef = urlParams.get('order');
+
+      if (paymentStatus === 'success' && orderRef) {
+        // Remove payment params from URL without page reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        // Show success message
+        alert('Payment successful! Your order reference is: ' + orderRef + '\\n\\nThank you for your purchase!');
+      } else if (paymentStatus === 'failed' && orderRef) {
+        // Remove payment params from URL without page reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        // Show failure message
+        alert('Payment failed or was cancelled.\\n\\nOrder reference: ' + orderRef + '\\n\\nPlease try again.');
       }
     })();
   </script>
