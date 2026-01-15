@@ -16,6 +16,16 @@ import {
 } from '@/store/builder';
 import { profileAtom } from '@/store/auth';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase/auth-client';
 import {
   Undo2,
@@ -68,8 +78,11 @@ export const Toolbar = ({
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDescription, setNewProjectDescription] = useState('');
 
-  const handleSave = async () => {
+  const handleSave = async (customName?: string, customDescription?: string) => {
     if (isGuestMode) {
       alert('Sign up to save your work!');
       return;
@@ -78,6 +91,16 @@ export const Toolbar = ({
     if (!currentProject) {
       console.error('No project to save');
       alert('No project loaded');
+      return;
+    }
+
+    // Check if this is a temporary project and we need to ask for a name
+    const isTempProject = currentProject.id.startsWith('temp-project-');
+    if (isTempProject && !customName) {
+      // Show dialog to ask for project name
+      setNewProjectName(currentProject.name);
+      setNewProjectDescription(currentProject.description || '');
+      setNameDialogOpen(true);
       return;
     }
 
@@ -97,11 +120,72 @@ export const Toolbar = ({
         throw new Error('Not authenticated. Please log in again.');
       }
 
+      // Check if this is a temporary project (starts with "temp-project-")
+      const isTempProject = currentProject.id.startsWith('temp-project-');
+
+      let projectId = currentProject.id;
+
+      if (isTempProject) {
+        console.log('Temporary project detected, creating new project in database...');
+
+        // Check project limit before creating
+        const { data: limitCheck, error: limitError } = await supabase
+          .rpc('check_project_limit', { p_user_id: user.id })
+          .single();
+
+        if (limitError) {
+          console.error('Error checking project limit:', limitError);
+        }
+
+        const limitData = limitCheck as any;
+
+        if (limitData && !limitData.can_create_project) {
+          throw new Error(
+            `You've reached your plan limit of ${limitData.max_allowed} projects. Please upgrade to Pro for unlimited projects.`
+          );
+        }
+
+        // Use custom name and description if provided, otherwise use current project values
+        const finalName = customName || currentProject.name;
+        const finalDescription = customDescription || currentProject.description;
+
+        // Create a new project in the database
+        const { data: newProject, error: createError } = await supabase
+          .from('projects')
+          .insert({
+            user_id: user.id,
+            name: finalName,
+            description: finalDescription,
+            slug: finalName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '') + `-${Date.now()}`,
+            status: 'draft',
+            element_count: elements.length,
+            seo_settings: currentProject.seo_settings || {},
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          throw new Error(`Failed to create project: ${createError.message}`);
+        }
+
+        projectId = newProject.id;
+        console.log('New project created:', projectId);
+
+        // Update elements to reference the new project ID
+        elements.forEach(el => {
+          el.project_id = projectId;
+        });
+      }
+
       console.log('Starting manual save...', {
-        projectId: currentProject.id,
+        projectId: projectId,
         userId: user.id,
         elements: elements.length,
-        elementTypes: elements.map(el => el.type)
+        elementTypes: elements.map(el => el.type),
+        isNewProject: isTempProject
       });
 
       // Validate elements before saving
@@ -130,8 +214,8 @@ export const Toolbar = ({
         uniqueTypes: uniqueElements.map(el => el.type)
       });
 
-      // Verify user owns the project
-      if (currentProject.user_id !== user.id) {
+      // Verify user owns the project (skip for new temp projects)
+      if (!isTempProject && currentProject.user_id !== user.id) {
         throw new Error('You do not have permission to edit this project');
       }
 
@@ -141,7 +225,7 @@ export const Toolbar = ({
       const { error: deleteError, count } = await supabase
         .from('elements')
         .delete({ count: 'exact' })
-        .eq('project_id', currentProject.id);
+        .eq('project_id', projectId);
 
       if (deleteError) {
         console.error('Delete error:', deleteError);
@@ -188,7 +272,7 @@ export const Toolbar = ({
           element_count: uniqueElements.length,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', currentProject.id)
+        .eq('id', projectId)
         .select();
 
       if (projectError) {
@@ -201,7 +285,7 @@ export const Toolbar = ({
       // Create version snapshot
       console.log('Creating version snapshot...');
       try {
-        const versionResponse = await fetch(`/api/projects/${currentProject.id}/versions`, {
+        const versionResponse = await fetch(`/api/projects/${projectId}/versions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -227,6 +311,12 @@ export const Toolbar = ({
         error: null,
       });
       console.log('Save completed successfully!');
+
+      // If this was a temporary project, redirect to the actual project edit page
+      if (isTempProject) {
+        console.log('Redirecting to project edit page...');
+        window.location.href = `/projects/${projectId}/edit`;
+      }
     } catch (error) {
       console.error('Save failed with error:', error);
       console.error('Error details:', {
@@ -495,7 +585,7 @@ export const Toolbar = ({
         {!isGuestMode && (
           <Button
             size="sm"
-            onClick={handleSave}
+            onClick={() => handleSave()}
             className="hidden md:flex"
             disabled={isSaving}
           >
@@ -548,6 +638,61 @@ export const Toolbar = ({
           onClose={() => setVersionHistoryOpen(false)}
         />
       )}
+
+      {/* Project Name Dialog (for temporary projects) */}
+      <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save Your Project</DialogTitle>
+            <DialogDescription>
+              Give your project a name before saving it to your dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="project-name">Project Name *</Label>
+              <Input
+                id="project-name"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                placeholder="My Awesome Landing Page"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="project-description">Description (Optional)</Label>
+              <Input
+                id="project-description"
+                value={newProjectDescription}
+                onChange={(e) => setNewProjectDescription(e.target.value)}
+                placeholder="A brief description of your project"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setNameDialogOpen(false)}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!newProjectName.trim()) {
+                  alert('Please enter a project name');
+                  return;
+                }
+                setNameDialogOpen(false);
+                handleSave(newProjectName.trim(), newProjectDescription.trim());
+              }}
+              disabled={isSaving}
+            >
+              {isSaving ? 'Saving...' : 'Save Project'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

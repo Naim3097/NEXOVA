@@ -292,6 +292,10 @@ function generateBodyContent(elements: Element[]): string {
         return generatePaymentButtonHTML(element);
       case 'footer':
         return generateFooterHTML(element);
+      case 'lead_form':
+        return generateLeadFormHTML(element);
+      case 'whatsapp_button':
+        return generateWhatsAppButtonHTML(element);
       default:
         return '';
     }
@@ -1798,6 +1802,375 @@ function generateFooterHTML(element: Element): string {
     </div>
   </div>
 </footer>`;
+}
+
+/**
+ * Generate Lead Form HTML
+ */
+function generateLeadFormHTML(element: Element): string {
+  const {
+    title = 'Get In Touch',
+    description = 'Fill out the form below and we\'ll get back to you soon.',
+    nameLabel = 'Your Name',
+    emailLabel = 'Email Address',
+    phoneLabel = 'Phone Number (optional)',
+    messageLabel = 'Message (optional)',
+    submitButtonText = 'Submit',
+    submitButtonColor = '#2563eb',
+    successMessage = 'Thank you! We\'ll be in touch soon.',
+    fields = {
+      showPhone: true,
+      showMessage: true,
+      phoneRequired: false,
+      messageRequired: false,
+    },
+    bgColor = '#ffffff',
+    google_sheets_enabled = false,
+    google_sheets_url = '',
+  } = element.props;
+
+  const sanitizedId = sanitizeId(element.id);
+  const formId = `lead-form-${sanitizedId}`;
+
+  return `
+<section style="background-color: ${bgColor}; padding: 4rem 1rem;" id="${element.type}-${element.order}">
+  <div class="container" style="max-width: 42rem; margin: 0 auto;">
+    <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2.5rem;">
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 2rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${title}</h2>
+        ${description ? `<p style="color: #6b7280; font-size: 1rem;">${description}</p>` : ''}
+      </div>
+
+      <!-- Form -->
+      <form id="${formId}" onsubmit="return submitLeadForm_${sanitizedId}(event)">
+        <!-- Name Field -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
+            ${nameLabel} <span style="color: #dc2626;">*</span>
+          </label>
+          <input
+            type="text"
+            id="name-${sanitizedId}"
+            name="name"
+            required
+            placeholder="John Doe"
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+            onfocus="this.style.borderColor='#2563eb'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+        </div>
+
+        <!-- Email Field -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
+            ${emailLabel} <span style="color: #dc2626;">*</span>
+          </label>
+          <input
+            type="email"
+            id="email-${sanitizedId}"
+            name="email"
+            required
+            placeholder="john@example.com"
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+            onfocus="this.style.borderColor='#2563eb'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+          <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">We'll never share your email with anyone else.</p>
+        </div>
+
+        <!-- Phone Field (conditional) -->
+        ${fields.showPhone ? `
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
+            ${phoneLabel}${fields.phoneRequired ? ' <span style="color: #dc2626;">*</span>' : ''}
+          </label>
+          <input
+            type="tel"
+            id="phone-${sanitizedId}"
+            name="phone"
+            ${fields.phoneRequired ? 'required' : ''}
+            placeholder="+60123456789"
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+            onfocus="this.style.borderColor='#2563eb'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+        </div>
+        ` : ''}
+
+        <!-- Message Field (conditional) -->
+        ${fields.showMessage ? `
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
+            ${messageLabel}${fields.messageRequired ? ' <span style="color: #dc2626;">*</span>' : ''}
+          </label>
+          <textarea
+            id="message-${sanitizedId}"
+            name="message"
+            ${fields.messageRequired ? 'required' : ''}
+            rows="4"
+            placeholder="Tell us more about your inquiry..."
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; resize: vertical; transition: border-color 0.2s;"
+            onfocus="this.style.borderColor='#2563eb'"
+            onblur="this.style.borderColor='#d1d5db'"
+          ></textarea>
+        </div>
+        ` : ''}
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          id="submit-${sanitizedId}"
+          style="width: 100%; padding: 0.875rem; background-color: ${submitButtonColor}; color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"
+          onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)'"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px -1px rgba(0, 0, 0, 0.1)'"
+        >
+          ${submitButtonText}
+        </button>
+
+        <!-- Status Messages -->
+        <div id="status-${sanitizedId}" style="margin-top: 1rem; display: none; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.875rem;"></div>
+      </form>
+
+      <!-- Privacy Note -->
+      <p style="text-align: center; font-size: 0.75rem; color: #9ca3af; margin-top: 1.5rem;">
+        🔒 Your information is secure and will never be shared.
+      </p>
+    </div>
+  </div>
+
+  <!-- Lead Form JavaScript -->
+  <script>
+    (function() {
+      window.submitLeadForm_${sanitizedId} = async function(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('${formId}');
+        const submitBtn = document.getElementById('submit-${sanitizedId}');
+        const statusDiv = document.getElementById('status-${sanitizedId}');
+
+        // Get form data
+        const name = document.getElementById('name-${sanitizedId}').value;
+        const email = document.getElementById('email-${sanitizedId}').value;
+        const phone = ${fields.showPhone ? `document.getElementById('phone-${sanitizedId}').value` : `''`};
+        const message = ${fields.showMessage ? `document.getElementById('message-${sanitizedId}').value` : `''`};
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.style.opacity = '0.7';
+        submitBtn.style.cursor = 'not-allowed';
+
+        try {
+          // Submit to API
+          const response = await fetch('/api/leads/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              project_id: window.__PROJECT_ID__,
+              element_id: '${element.id}',
+              customer_name: name,
+              customer_email: email,
+              customer_phone: phone,
+              message: message,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Success
+            statusDiv.style.display = 'block';
+            statusDiv.style.backgroundColor = '#d1fae5';
+            statusDiv.style.color = '#065f46';
+            statusDiv.style.borderLeft = '4px solid #10b981';
+            statusDiv.textContent = '${successMessage}';
+
+            // Reset form
+            form.reset();
+
+            // Track analytics
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'generate_lead', {
+                event_category: 'Lead Form',
+                event_label: '${element.id}',
+              });
+            }
+
+            // Scroll to success message
+            statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            // Error
+            throw new Error(data.error || 'Submission failed');
+          }
+        } catch (error) {
+          console.error('Lead submission error:', error);
+
+          statusDiv.style.display = 'block';
+          statusDiv.style.backgroundColor = '#fee2e2';
+          statusDiv.style.color = #991b1b';
+          statusDiv.style.borderLeft = '4px solid #ef4444';
+          statusDiv.textContent = error.message === 'You have already submitted this form'
+            ? 'You have already submitted this form. Thank you!'
+            : 'Sorry, there was an error submitting the form. Please try again.';
+        } finally {
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.textContent = '${submitButtonText}';
+          submitBtn.style.opacity = '1';
+          submitBtn.style.cursor = 'pointer';
+        }
+      };
+    })();
+  </script>
+</section>`;
+}
+
+/**
+ * Generate WhatsApp button HTML
+ */
+function generateWhatsAppButtonHTML(element: Element): string {
+  const {
+    phoneNumber = '60123456789',
+    message = '',
+    buttonText = 'Chat on WhatsApp',
+    buttonColor = '#25D366',
+    buttonSize = 'md',
+    position = 'fixed',
+    fixedPosition = 'bottom-right',
+    showIcon = true,
+    customIcon = '',
+    tooltipText = 'Need help? Chat with us!',
+  } = element.props;
+
+  // Clean phone number (remove all non-digit characters)
+  const cleanPhone = phoneNumber.replace(/\D/g, '');
+
+  // Encode the message for URL
+  const encodedMessage = message ? encodeURIComponent(message) : '';
+
+  // Construct WhatsApp URL
+  const whatsappUrl = `https://wa.me/${cleanPhone}${encodedMessage ? `?text=${encodedMessage}` : ''}`;
+
+  // Size classes
+  const sizeStyles = {
+    sm: 'padding: 0.5rem 1rem; font-size: 0.875rem;',
+    md: 'padding: 0.75rem 1.5rem; font-size: 1rem;',
+    lg: 'padding: 1rem 2rem; font-size: 1.125rem;',
+  };
+
+  // Icon size
+  const iconSizes = {
+    sm: '16px',
+    md: '20px',
+    lg: '24px',
+  };
+
+  // Position classes for fixed
+  const positionStyles = {
+    'bottom-right': 'bottom: 1.5rem; right: 1.5rem;',
+    'bottom-left': 'bottom: 1.5rem; left: 1.5rem;',
+    'top-right': 'top: 1.5rem; right: 1.5rem;',
+    'top-left': 'top: 1.5rem; left: 1.5rem;',
+  };
+
+  const buttonStyle = `
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    ${sizeStyles[buttonSize as keyof typeof sizeStyles]}
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    background-color: ${buttonColor};
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: ${position === 'fixed' ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : 'none'};
+    ${position === 'fixed' ? 'z-index: 9999;' : ''}
+  `;
+
+  const containerStyle = position === 'fixed'
+    ? `position: fixed; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
+    : 'display: inline-block;';
+
+  // WhatsApp icon SVG
+  const whatsappIcon = `<svg width="${iconSizes[buttonSize as keyof typeof iconSizes]}" height="${iconSizes[buttonSize as keyof typeof iconSizes]}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>`;
+
+  const sanitizedId = sanitizeId(element.id);
+
+  return `
+<div id="${element.type}-${element.order}" style="${containerStyle}">
+  ${position === 'fixed' && tooltipText ? `
+  <div id="wa-tooltip-${sanitizedId}" style="
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-0.75rem);
+    white-space: nowrap;
+    background-color: #1f2937;
+    color: #ffffff;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  ">
+    ${tooltipText}
+    <div style="
+      position: absolute;
+      bottom: -0.25rem;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 0.5rem;
+      height: 0.5rem;
+      background-color: #1f2937;
+    "></div>
+  </div>
+  ` : ''}
+
+  <a
+    href="${whatsappUrl}"
+    target="_blank"
+    rel="noopener noreferrer"
+    id="wa-btn-${sanitizedId}"
+    style="${buttonStyle}"
+    onmouseover="this.style.transform='scale(1.05)'; ${position === 'fixed' && tooltipText ? `document.getElementById('wa-tooltip-${sanitizedId}').style.opacity='1';` : ''}"
+    onmouseout="this.style.transform='scale(1)'; ${position === 'fixed' && tooltipText ? `document.getElementById('wa-tooltip-${sanitizedId}').style.opacity='0';` : ''}"
+    onclick="if (typeof gtag !== 'undefined') { gtag('event', 'whatsapp_click', { event_category: 'WhatsApp', event_label: '${element.id}' }); }"
+  >
+    ${showIcon ? (customIcon ? `<img src="${customIcon}" alt="WhatsApp" style="width: ${iconSizes[buttonSize as keyof typeof iconSizes]}; height: ${iconSizes[buttonSize as keyof typeof iconSizes]};">` : whatsappIcon) : ''}
+    <span>${buttonText}</span>
+    ${position === 'fixed' ? `
+    <span style="
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background-color: ${buttonColor};
+      opacity: 0.2;
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    "></span>
+    ` : ''}
+  </a>
+</div>
+
+${position === 'fixed' ? `
+<style>
+  @keyframes ping {
+    75%, 100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+</style>
+` : ''}`;
 }
 
 /**

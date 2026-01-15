@@ -11,6 +11,7 @@ import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle, CreditCard, PlayCir
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import { TestCheckoutModal } from '@/components/payment/TestCheckoutModal';
+import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
 
 export default function PaymentSettingsPage() {
   const router = useRouter();
@@ -339,6 +340,11 @@ export default function PaymentSettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Google Sheets Integration Section */}
+      <div className="mt-8">
+        <GoogleSheetsIntegration />
+      </div>
 
       {/* Test Checkout Modal */}
       <TestCheckoutModal

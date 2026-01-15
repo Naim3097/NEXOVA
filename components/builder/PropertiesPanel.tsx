@@ -1919,6 +1919,386 @@ export const PropertiesPanel = () => {
           </>
         );
 
+      case 'lead_form':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">Form Content</div>
+
+              <div>
+                <Label htmlFor="title">Form Title</Label>
+                <Input
+                  id="title"
+                  value={props.title || ''}
+                  onChange={(e) => handlePropChange('title', e.target.value)}
+                  placeholder="Get In Touch"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <textarea
+                  id="description"
+                  value={props.description || ''}
+                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  placeholder="Fill out the form below and we'll get back to you soon."
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  rows={2}
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Field Labels</div>
+
+              <div>
+                <Label htmlFor="nameLabel">Name Field Label</Label>
+                <Input
+                  id="nameLabel"
+                  value={props.nameLabel || ''}
+                  onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="emailLabel">Email Field Label</Label>
+                <Input
+                  id="emailLabel"
+                  value={props.emailLabel || ''}
+                  onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                  placeholder="Email Address"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="phoneLabel">Phone Field Label</Label>
+                <Input
+                  id="phoneLabel"
+                  value={props.phoneLabel || ''}
+                  onChange={(e) => handlePropChange('phoneLabel', e.target.value)}
+                  placeholder="Phone Number (optional)"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="messageLabel">Message Field Label</Label>
+                <Input
+                  id="messageLabel"
+                  value={props.messageLabel || ''}
+                  onChange={(e) => handlePropChange('messageLabel', e.target.value)}
+                  placeholder="Message (optional)"
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Field Configuration</div>
+
+              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showPhone" className="cursor-pointer">Show Phone Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showPhone"
+                    checked={props.fields?.showPhone ?? true}
+                    onChange={(e) => handlePropChange('fields', { ...props.fields, showPhone: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.fields?.showPhone && (
+                  <div className="flex items-center justify-between pl-4">
+                    <Label htmlFor="phoneRequired" className="cursor-pointer text-sm">Phone Required</Label>
+                    <input
+                      type="checkbox"
+                      id="phoneRequired"
+                      checked={props.fields?.phoneRequired ?? false}
+                      onChange={(e) => handlePropChange('fields', { ...props.fields, phoneRequired: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showMessage" className="cursor-pointer">Show Message Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showMessage"
+                    checked={props.fields?.showMessage ?? true}
+                    onChange={(e) => handlePropChange('fields', { ...props.fields, showMessage: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.fields?.showMessage && (
+                  <div className="flex items-center justify-between pl-4">
+                    <Label htmlFor="messageRequired" className="cursor-pointer text-sm">Message Required</Label>
+                    <input
+                      type="checkbox"
+                      id="messageRequired"
+                      checked={props.fields?.messageRequired ?? false}
+                      onChange={(e) => handlePropChange('fields', { ...props.fields, messageRequired: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+
+              <div>
+                <Label htmlFor="submitButtonText">Button Text</Label>
+                <Input
+                  id="submitButtonText"
+                  value={props.submitButtonText || ''}
+                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  placeholder="Submit"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="submitButtonColor">Button Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="submitButtonColor"
+                    type="color"
+                    value={props.submitButtonColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.submitButtonColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    placeholder="#2563eb"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="successMessage">Success Message</Label>
+                <Input
+                  id="successMessage"
+                  value={props.successMessage || ''}
+                  onChange={(e) => handlePropChange('successMessage', e.target.value)}
+                  placeholder="Thank you! We'll be in touch soon."
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Google Sheets Integration</div>
+
+              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="google_sheets_enabled" className="cursor-pointer">Enable Google Sheets</Label>
+                  <input
+                    type="checkbox"
+                    id="google_sheets_enabled"
+                    checked={props.google_sheets_enabled ?? false}
+                    onChange={(e) => handlePropChange('google_sheets_enabled', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.google_sheets_enabled && (
+                  <div>
+                    <Label htmlFor="google_sheets_url">Google Sheets URL or ID</Label>
+                    <Input
+                      id="google_sheets_url"
+                      value={props.google_sheets_url || ''}
+                      onChange={(e) => handlePropChange('google_sheets_url', e.target.value)}
+                      placeholder="https://docs.google.com/spreadsheets/d/..."
+                    />
+                    <p className="text-xs text-gray-600 mt-1">
+                      Share your Google Sheet with: {process.env.NEXT_PUBLIC_GOOGLE_SERVICE_ACCOUNT_EMAIL || 'service account email not configured'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="bgColor-leadform">Background Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bgColor-leadform"
+                    type="color"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    placeholder="#ffffff"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        );
+
+      case 'whatsapp_button':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">WhatsApp Configuration</div>
+
+              <div>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  value={props.phoneNumber || ''}
+                  onChange={(e) => handlePropChange('phoneNumber', e.target.value)}
+                  placeholder="60123456789"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Include country code (e.g., 60 for Malaysia)
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="message">Pre-filled Message</Label>
+                <textarea
+                  id="message"
+                  value={props.message || ''}
+                  onChange={(e) => handlePropChange('message', e.target.value)}
+                  placeholder="Hi! I'm interested in your product."
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  rows={2}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Message that will be pre-filled when chat opens (optional)
+                </p>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Button Style</div>
+
+              <div>
+                <Label htmlFor="buttonText">Button Text</Label>
+                <Input
+                  id="buttonText"
+                  value={props.buttonText || ''}
+                  onChange={(e) => handlePropChange('buttonText', e.target.value)}
+                  placeholder="Chat on WhatsApp"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="buttonColor">Button Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="buttonColor"
+                    type="color"
+                    value={props.buttonColor || '#25D366'}
+                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.buttonColor || '#25D366'}
+                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    placeholder="#25D366"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="buttonSize">Button Size</Label>
+                <select
+                  id="buttonSize"
+                  value={props.buttonSize || 'md'}
+                  onChange={(e) => handlePropChange('buttonSize', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="sm">Small</option>
+                  <option value="md">Medium</option>
+                  <option value="lg">Large</option>
+                </select>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Button Position</div>
+
+              <div>
+                <Label htmlFor="position">Position Type</Label>
+                <select
+                  id="position"
+                  value={props.position || 'fixed'}
+                  onChange={(e) => handlePropChange('position', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="fixed">Fixed (Floating)</option>
+                  <option value="inline">Inline</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Fixed: Button floats on the page. Inline: Button appears in the content flow.
+                </p>
+              </div>
+
+              {props.position === 'fixed' && (
+                <div>
+                  <Label htmlFor="fixedPosition">Fixed Position</Label>
+                  <select
+                    id="fixedPosition"
+                    value={props.fixedPosition || 'bottom-right'}
+                    onChange={(e) => handlePropChange('fixedPosition', e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Icon & Tooltip</div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="showIcon" className="cursor-pointer">Show Icon</Label>
+                <input
+                  type="checkbox"
+                  id="showIcon"
+                  checked={props.showIcon ?? true}
+                  onChange={(e) => handlePropChange('showIcon', e.target.checked)}
+                  className="w-4 h-4"
+                />
+              </div>
+
+              {props.showIcon && (
+                <div>
+                  <Label htmlFor="customIcon">Custom Icon URL (optional)</Label>
+                  <Input
+                    id="customIcon"
+                    value={props.customIcon || ''}
+                    onChange={(e) => handlePropChange('customIcon', e.target.value)}
+                    placeholder="https://example.com/icon.png"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Leave blank to use default WhatsApp icon
+                  </p>
+                </div>
+              )}
+
+              {props.position === 'fixed' && (
+                <div>
+                  <Label htmlFor="tooltipText">Tooltip Text</Label>
+                  <Input
+                    id="tooltipText"
+                    value={props.tooltipText || ''}
+                    onChange={(e) => handlePropChange('tooltipText', e.target.value)}
+                    placeholder="Need help? Chat with us!"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Shows on hover for fixed buttons
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        );
+
       default:
         return (
           <>

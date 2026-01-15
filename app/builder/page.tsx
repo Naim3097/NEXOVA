@@ -24,27 +24,28 @@ export default function BuilderPage() {
 
   useEffect(() => {
     if (!loading) {
+      // Create a mock project for both guest and logged-in users
+      // This allows elements to be added when using the builder directly
+      const mockProject: Project = {
+        id: user ? `temp-project-${user.id}` : 'guest-project',
+        user_id: user?.id || 'guest',
+        name: 'Untitled Project',
+        slug: user ? `temp-project-${user.id}` : 'guest-project',
+        description: null,
+        status: 'draft',
+        element_count: 0,
+        current_version: 1,
+        published_url: null,
+        seo_settings: {} as any,
+        integrations: {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setCurrentProject(mockProject);
+
       if (!user) {
         setIsGuestMode(true);
         setShowGuestBanner(true);
-
-        // Create a mock guest project so elements can be added
-        const guestProject: Project = {
-          id: 'guest-project',
-          user_id: 'guest',
-          name: 'Untitled Project',
-          slug: 'guest-project',
-          description: null,
-          status: 'draft',
-          element_count: 0,
-          current_version: 1,
-          published_url: null,
-          seo_settings: {} as any,
-          integrations: {},
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setCurrentProject(guestProject);
       }
     }
   }, [user, loading, setCurrentProject]);

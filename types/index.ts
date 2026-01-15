@@ -54,7 +54,9 @@ export type ElementType =
   | 'cta'
   | 'payment_button'
   | 'footer'
-  | 'pricing';
+  | 'pricing'
+  | 'lead_form'
+  | 'whatsapp_button';
 
 export interface Template {
   id: string;

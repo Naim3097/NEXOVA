@@ -22,6 +22,8 @@ import {
   Columns,
   DollarSign,
   LayoutGrid,
+  FileText,
+  MessageCircle,
 } from 'lucide-react';
 import type { ElementType } from '@/types';
 
@@ -283,6 +285,50 @@ const elementTemplates: ElementTemplate[] = [
           productId: 'plan_enterprise',
         },
       ],
+    },
+  },
+  {
+    type: 'lead_form',
+    label: 'Lead Form',
+    icon: <FileText className="w-5 h-5" />,
+    description: 'Collect customer information with Google Sheets integration',
+    defaultProps: {
+      title: 'Get In Touch',
+      description: "Fill out the form below and we'll get back to you soon.",
+      nameLabel: 'Your Name',
+      emailLabel: 'Email Address',
+      phoneLabel: 'Phone Number (optional)',
+      messageLabel: 'Message (optional)',
+      submitButtonText: 'Submit',
+      submitButtonColor: '#2563eb',
+      successMessage: 'Thank you! We\'ll be in touch soon.',
+      fields: {
+        showPhone: true,
+        showMessage: true,
+        phoneRequired: false,
+        messageRequired: false,
+      },
+      bgColor: '#ffffff',
+      google_sheets_enabled: false,
+      google_sheets_url: '',
+    },
+  },
+  {
+    type: 'whatsapp_button',
+    label: 'WhatsApp Button',
+    icon: <MessageCircle className="w-5 h-5" />,
+    description: 'Floating or inline WhatsApp click-to-chat button',
+    defaultProps: {
+      phoneNumber: '60123456789', // Malaysia format example
+      message: 'Hi! I\'m interested in your product.',
+      buttonText: 'Chat on WhatsApp',
+      buttonColor: '#25D366', // WhatsApp green
+      buttonSize: 'md',
+      position: 'fixed', // 'fixed' or 'inline'
+      fixedPosition: 'bottom-right', // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+      showIcon: true,
+      customIcon: '',
+      tooltipText: 'Need help? Chat with us!',
     },
   },
   {

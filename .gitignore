@@ -26,6 +26,15 @@ yarn-error.log*
 .env
 .env*.local
 
+# Google Service Account credentials (never commit these!)
+*-medley-*.json
+*.iam.gserviceaccount.com.json
+service-account*.json
+
+# Sensitive setup scripts
+vercel-env-setup.sh
+*-env-setup.sh
+
 # Vercel
 .vercel
 

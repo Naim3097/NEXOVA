@@ -9,3 +9,5 @@ export { CTAElement } from './CTA';
 export { PaymentButtonElement } from './PaymentButton';
 export { FooterElement } from './Footer';
 export { PricingElement } from './Pricing';
+export { LeadFormElement } from './LeadForm';
+export { WhatsAppButtonElement } from './WhatsAppButton';
