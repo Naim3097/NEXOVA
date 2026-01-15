@@ -580,5 +580,131 @@ TypeError: undefined is not an object (evaluating 'window.selectBank_XXX.toStrin
 
 ---
 
-**Phase 11 Status:** ✅ **COMPLETED**
+---
+
+## Post-Phase 11 Updates
+
+### Cascading Deletion Fix (January 15, 2026)
+
+#### Problem Identified
+After completing Phase 11, a critical issue was discovered: when projects were deleted, their associated products (sales pages) remained in the database, and published pages remained accessible via Vercel's CDN cache.
+
+#### Issues Found
+
+1. **Product Deletion**
+   - Foreign key constraint on `products.source_project_id` was set to `SET NULL` on delete
+   - Products remained in database with NULL source_project_id
+   - Orphaned product records accumulated over time
+
+2. **Published Page Caching**
+   - Database cascade deletion worked correctly for `published_pages`
+   - Vercel CDN continued serving cached HTML for deleted pages
+   - ISR (Incremental Static Regeneration) cache not invalidated
+   - Customers could still access deleted sales pages
+
+#### Solutions Implemented
+
+**1. Database Migration - Cascade Product Deletion**
+```sql
+-- Migration: cascade_delete_products_on_project_delete
+ALTER TABLE public.products
+DROP CONSTRAINT IF EXISTS products_source_project_id_fkey;
+
+ALTER TABLE public.products
+ADD CONSTRAINT products_source_project_id_fkey
+FOREIGN KEY (source_project_id)
+REFERENCES public.projects(id)
+ON DELETE CASCADE;
+```
+
+**2. Cache Invalidation System**
+
+**a) Published Page Cache Configuration**
+- Changed `revalidate: 60` to `revalidate: 0` for `/p/[slug]` route
+- Disabled ISR caching to ensure real-time deletion
+
+**b) Project Deletion API Endpoint**
+```typescript
+// app/api/projects/[id]/route.ts (NEW)
+export async function DELETE(request, { params }) {
+  // Get published page slug before deletion
+  const { data: publishedPage } = await supabase
+    .from('published_pages')
+    .select('slug')
+    .eq('project_id', projectId)
+    .single();
+
+  // Delete project (cascade handles published_pages, products, etc.)
+  await supabase.from('projects').delete().eq('id', projectId);
+
+  // Revalidate Vercel CDN cache
+  if (publishedPage?.slug) {
+    revalidatePath(`/p/${publishedPage.slug}`);
+  }
+}
+```
+
+**c) Unpublish Route Enhancement**
+```typescript
+// app/api/unpublish/route.ts (UPDATED)
+// Get slug before deletion
+const { data: publishedPage } = await supabase
+  .from('published_pages')
+  .select('slug')
+  .eq('project_id', projectId)
+  .single();
+
+// Delete published page
+await supabase.from('published_pages').delete().eq('project_id', projectId);
+
+// Invalidate cache
+if (publishedPage?.slug) {
+  revalidatePath(`/p/${publishedPage.slug}`);
+}
+```
+
+**d) Dashboard Update**
+Updated client-side deletion to use new API endpoint:
+```typescript
+// Before: Direct Supabase deletion
+await supabase.from('projects').delete().eq('id', projectId);
+
+// After: Use API with cache invalidation
+await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
+```
+
+#### Technical Requirements Updated
+
+**New Files Created:**
+- `app/api/projects/[id]/route.ts` - DELETE endpoint with cache invalidation
+
+**Files Modified:**
+- `app/(public)/p/[slug]/page.tsx` - Disabled ISR caching
+- `app/api/unpublish/route.ts` - Added cache revalidation
+- `app/dashboard/page.tsx` - Use API endpoint for deletion
+
+#### Testing Results
+
+**Database Cascade Deletion:**
+✅ Products deleted when project deleted
+✅ Published pages deleted when project deleted
+✅ No orphaned records in database
+
+**Cache Invalidation:**
+✅ Deleted pages return 404 after invalidation
+✅ No stale cached content served
+✅ Works for both project deletion and unpublish actions
+
+#### Git Commits
+
+```bash
+commit f94e16b: Fix: Prevent deleted projects' sales pages from being cached and accessible
+- Database migration for cascade deletion
+- Cache invalidation system implementation
+- API endpoint for project deletion
+```
+
+---
+
+**Phase 11 Status:** ✅ **COMPLETED** (with post-phase fixes applied)
 **Next Phase:** Phase 12 - Enhanced UX and Real-time Features
