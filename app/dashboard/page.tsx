@@ -50,13 +50,15 @@ function DashboardContent() {
     setDeletingId(projectId);
 
     try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', projectId)
-        .eq('user_id', user?.id); // Ensure user can only delete their own projects
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete project');
+      }
 
       // Remove from local state
       setProjects((prev) => prev.filter((p) => p.id !== projectId));

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function POST(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     // Authenticate user
     const supabase = await createClient();
@@ -15,20 +18,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { projectId } = body;
+    const projectId = params.id;
 
-    if (!projectId) {
-      return NextResponse.json(
-        { error: 'Project ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Verify project ownership
+    // Get project details including published page slug before deletion
     const { data: project, error: projectError } = await supabase
       .from('projects')
-      .select('user_id')
+      .select('user_id, slug')
       .eq('id', projectId)
       .single();
 
@@ -39,6 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify ownership
     if (project.user_id !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden. You do not own this project.' },
@@ -46,24 +42,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get published page slug before deletion for cache revalidation
+    // Get published page slug to revalidate cache
     const { data: publishedPage } = await supabase
       .from('published_pages')
       .select('slug')
       .eq('project_id', projectId)
       .single();
 
-    // Delete from published_pages
+    // Delete the project (cascade will handle published_pages, products, etc.)
     const { error: deleteError } = await supabase
-      .from('published_pages')
+      .from('projects')
       .delete()
-      .eq('project_id', projectId);
+      .eq('id', projectId)
+      .eq('user_id', user.id);
 
     if (deleteError) {
       console.error('Delete error:', deleteError);
+      return NextResponse.json(
+        { error: 'Failed to delete project' },
+        { status: 500 }
+      );
     }
 
-    // Revalidate the published page cache
+    // Revalidate the published page cache if it existed
     if (publishedPage?.slug) {
       try {
         revalidatePath(`/p/${publishedPage.slug}`);
@@ -73,32 +74,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update project status
-    const { error: updateError } = await supabase
-      .from('projects')
-      .update({
-        status: 'draft',
-        published_url: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', projectId);
-
-    if (updateError) {
-      return NextResponse.json(
-        { error: 'Failed to unpublish project' },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json({
       success: true,
-      message: 'Project unpublished successfully'
+      message: 'Project deleted successfully'
     });
 
   } catch (error) {
-    console.error('Unpublish error:', error);
+    console.error('Delete project error:', error);
     return NextResponse.json(
-      { error: 'Failed to unpublish project' },
+      { error: 'Failed to delete project' },
       { status: 500 }
     );
   }
