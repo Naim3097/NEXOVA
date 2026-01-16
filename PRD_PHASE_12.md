@@ -111,40 +111,74 @@ Users can customize:
 
 ---
 
-## 3. Google OAuth Integration (Foundation)
+## 3. Google OAuth Integration (DEPLOYED)
 
 ### Objective
 Enable per-user Google Sheets integration via OAuth instead of shared service account, allowing each user to connect their own Google account.
 
 ### Implementation Status
-**Completed - Not Yet Deployed**
-
-The OAuth implementation is fully built but deferred for production deployment. Components include:
+**✅ Completed and Deployed to Production**
 
 #### 3.1 Database Schema
 - `user_integrations` table with RLS policies
 - Stores encrypted OAuth tokens per user
 - Supports multiple integration types (Google Sheets, Drive, etc.)
+- Token expiry tracking and automatic refresh
 
 #### 3.2 OAuth Flow
 - Authorization initiation endpoint
-- Callback handler with state verification
+- Callback handler with state verification (CSRF protection)
 - Token encryption using AES-256-GCM
-- Automatic token refresh logic
+- Automatic token refresh logic with fallback
 - Secure cookie-based state management
+- Proper SSR authentication using `@supabase/ssr`
 
-#### 3.3 API Routes
-- `/api/oauth/google/connect` - Initiate flow
-- `/api/oauth/google/callback` - Handle callback
-- `/api/oauth/google/disconnect` - Revoke access
+#### 3.3 API Routes (All Deployed)
+- `/api/oauth/google/connect` - Initiate OAuth flow (redirects to Google)
+- `/api/oauth/google/callback` - Handle OAuth callback and store tokens
+- `/api/oauth/google/disconnect` - Revoke access and delete tokens
+- `/api/oauth/google/test-config` - Debug endpoint to verify OAuth configuration
+- `/api/oauth/google/test-sheet-access` - Test endpoint to verify sheet access
 
 #### 3.4 Integration UI
-- Connection status display
-- One-click connect/disconnect
-- Connected account information
-- Clear setup instructions
+- Connection status display in settings
+- One-click connect/disconnect buttons
+- Connected account information display
+- Google account email shown when connected
+- Clear setup instructions and documentation
 
-**Note**: This feature is built and ready but requires production OAuth credentials and testing before deployment.
+#### 3.5 Lead Form Google Sheets Integration
+- **Automatic Sync**: When enabled, leads automatically sync to user's Google Sheet
+- **Sheet URL Configuration**: Users paste their Google Sheet URL in lead form properties
+- **Per-User Authentication**: Each user's OAuth token is used for their own sheets
+- **Fallback Support**: Falls back to service account if OAuth not configured
+- **Error Handling**: Silent failures don't block lead submission
+- **Auto-Headers**: Automatically creates header row if sheet is empty
+- **Header Formatting**: Bold, dark background with white text
+- **Data Structure**: Timestamp, Name, Email, Phone, Message, Status, IP Address, Referrer
+
+#### 3.6 Production Deployment Issues Resolved
+- **Authentication Fix**: Updated OAuth routes to use `createServerClient` from `@supabase/ssr` with proper cookie handling
+- **Environment Variables**: Fixed newline character issues in OAuth credentials by using `printf` instead of `echo` in Vercel CLI
+- **Google 400 Error**: Resolved "malformed request" error caused by `\n` in `client_id` parameter
+- **JavaScript Syntax**: Fixed template literal issues and emoji characters in generated form HTML
+- **Form Success Message**: Fixed missing quote in CSS color property causing JavaScript crash
+- **Debugging**: Added comprehensive logging to track Google Sheets sync attempts and failures
+
+#### 3.7 Testing & Debugging Tools
+- Test config endpoint shows OAuth configuration (client ID, redirect URI, auth URL)
+- Test sheet access endpoint verifies user can access their Google Sheet
+- Browser console logging shows sync success/failure in real-time
+- Server-side logging tracks sheet configuration and sync attempts
+- Debug info returned in API responses for troubleshooting
+
+### Current Status
+- ✅ OAuth flow working in production
+- ✅ Users can connect Google accounts
+- ✅ Lead forms can sync to Google Sheets
+- ✅ Comprehensive error handling and logging
+- ✅ Test endpoints for debugging
+- ⚠️ Awaiting user testing confirmation for full functionality verification
 
 ---
 
@@ -184,7 +218,19 @@ supabase/
     20260116000000_add_google_oauth_integration.sql  # OAuth schema
 ```
 
-### 4.2 WhatsApp Button Props Interface
+### 4.2 Google OAuth Environment Variables
+Required environment variables for production:
+```env
+GOOGLE_OAUTH_CLIENT_ID=<from Google Cloud Console>
+GOOGLE_OAUTH_CLIENT_SECRET=<from Google Cloud Console>
+GOOGLE_OAUTH_REDIRECT_URI=https://ide-page-builder.vercel.app/api/oauth/google/callback
+OAUTH_ENCRYPTION_KEY=<32-byte random string for AES-256>
+NEXT_PUBLIC_APP_URL=https://ide-page-builder.vercel.app
+```
+
+**Important**: Use `printf` instead of `echo` when adding env vars via Vercel CLI to avoid newline characters.
+
+### 4.3 WhatsApp Button Props Interface
 ```typescript
 interface WhatsAppButtonProps {
   phoneNumber: string;
@@ -200,7 +246,7 @@ interface WhatsAppButtonProps {
 }
 ```
 
-### 4.3 Default WhatsApp Button Configuration
+### 4.4 Default WhatsApp Button Configuration
 - Phone: 60123456789 (Malaysia format example)
 - Message: "Hi! I'm interested in your product."
 - Button Text: "Chat on WhatsApp"
