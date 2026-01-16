@@ -1,38 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 import { getAuthorizationUrl } from '@/lib/oauth/google-oauth';
 import crypto from 'crypto';
+import { cookies } from 'next/headers';
 
 /**
  * Initiate Google OAuth flow
  * This endpoint starts the OAuth process by redirecting to Google
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Get user from session
-    const supabase = createClient(
+    // Create Supabase client with proper cookie handling for server-side auth
+    const cookieStore = cookies();
+
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          },
+        },
+      }
     );
 
-    // Get auth token from cookie
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '') ||
-                  request.cookies.get('sb-access-token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
-    }
-
-    // Verify token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Get authenticated user from session
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('Auth error in OAuth connect:', authError);
       return NextResponse.json(
-        { error: 'Invalid authentication' },
+        { error: 'Not authenticated' },
         { status: 401 }
       );
     }
