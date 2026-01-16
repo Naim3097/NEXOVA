@@ -12,15 +12,23 @@ import {
   FileText,
   User,
   ChevronLeft,
+  Home,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const navigation = [
   {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: Home,
+    description: 'Overview & projects',
+  },
+  {
     name: 'Builder',
     href: '/builder',
-    icon: LayoutTemplate,
+    icon: Layers,
     description: 'Visual page builder',
   },
   {
@@ -31,13 +39,13 @@ const navigation = [
   },
   {
     name: 'Analytics',
-    href: '/analytics',
+    href: '/dashboard/analytics',
     icon: TrendingUp,
     description: 'Track performance',
   },
   {
     name: 'Payments',
-    href: '/payments',
+    href: '/dashboard/settings/payments',
     icon: CreditCard,
     description: 'Payment settings',
   },
@@ -49,15 +57,9 @@ const navigation = [
   },
   {
     name: 'Integrations',
-    href: '/integrations',
+    href: '/dashboard/integrations',
     icon: Zap,
     description: 'Connect tools',
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
-    description: 'Account settings',
   },
 ];
 

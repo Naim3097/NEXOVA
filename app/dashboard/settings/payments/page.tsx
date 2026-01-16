@@ -11,7 +11,6 @@ import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle, CreditCard, PlayCir
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import { TestCheckoutModal } from '@/components/payment/TestCheckoutModal';
-import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
 
 export default function PaymentSettingsPage() {
   const router = useRouter();
@@ -45,7 +44,7 @@ export default function PaymentSettingsPage() {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('leanx_api_key, leanx_collection_uuid, leanx_secret_key, leanx_merchant_id, leanx_enabled')
+          .select('leanx_api_key, leanx_collection_uuid, leanx_secret_key, leanx_merchant_id, leanx_enabled, leanx_environment')
           .eq('id', user.id)
           .single();
 
@@ -58,6 +57,7 @@ export default function PaymentSettingsPage() {
             leanx_secret_key: profile.leanx_secret_key || '',
             leanx_merchant_id: profile.leanx_merchant_id || '',
             leanx_enabled: profile.leanx_enabled || false,
+            leanx_environment: (profile.leanx_environment as 'test' | 'live') || 'live',
           });
         }
       } catch (error) {
@@ -93,6 +93,7 @@ export default function PaymentSettingsPage() {
           leanx_secret_key: formData.leanx_secret_key || null,
           leanx_merchant_id: formData.leanx_merchant_id || null,
           leanx_enabled: formData.leanx_enabled,
+          leanx_environment: formData.leanx_environment,
         })
         .eq('id', user.id);
 
@@ -340,11 +341,6 @@ export default function PaymentSettingsPage() {
           </p>
         </CardContent>
       </Card>
-
-      {/* Google Sheets Integration Section */}
-      <div className="mt-8">
-        <GoogleSheetsIntegration />
-      </div>
 
       {/* Test Checkout Modal */}
       <TestCheckoutModal

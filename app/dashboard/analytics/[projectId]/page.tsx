@@ -65,14 +65,44 @@ export default function AnalyticsPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/analytics/stats?projectId=${projectId}&days=${dateRange}`);
+      // Fetch from GA4 API with date range mapping
+      const dateRangeParam = dateRange === '7' ? '7d' : dateRange === '30' ? '30d' : '90d';
+      const response = await fetch(`/api/analytics/ga4?projectId=${projectId}&dateRange=${dateRangeParam}`);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch analytics');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch analytics');
       }
 
-      const data = await response.json();
-      setStats(data);
+      const ga4Data = await response.json();
+
+      // Transform GA4 data to match existing interface
+      const transformedStats: AnalyticsStats = {
+        pageViews: ga4Data.data.overview.totalPageViews,
+        uniqueVisitors: ga4Data.data.overview.totalUsers,
+        formSubmissions: ga4Data.data.overview.conversions || 0,
+        buttonClicks: 0, // Not tracked in GA4 by default
+        conversionRate: ga4Data.data.overview.totalUsers > 0
+          ? ((ga4Data.data.overview.conversions || 0) / ga4Data.data.overview.totalUsers) * 100
+          : 0,
+        trafficOverTime: ga4Data.data.dailyStats.map((day: any) => ({
+          date: day.date,
+          page_views: day.pageViews,
+          unique_visitors: day.users,
+        })),
+        deviceBreakdown: {}, // GA4 doesn't return device data in our current setup
+        topSources: ga4Data.data.trafficSources.map((source: any) => ({
+          source: source.source,
+          count: source.sessions,
+        })),
+        dateRange: {
+          start: new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000).toISOString(),
+          end: new Date().toISOString(),
+          days: parseInt(dateRange),
+        },
+      };
+
+      setStats(transformedStats);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {

@@ -71,9 +71,12 @@ export const AnnouncementBarElement = React.memo(
 
     if (isClosed) return null;
 
+    const isBuilderMode = isSelected !== undefined;
+    const zIndexClass = isSticky ? (isBuilderMode ? 'z-10' : 'z-50') : '';
+
     return (
       <div
-        className={`${baseClasses} ${isSticky ? 'sticky top-0 z-50' : ''} py-3 px-4 cursor-pointer`}
+        className={`${baseClasses} ${isSticky ? 'sticky top-0' : ''} ${zIndexClass} py-3 px-4 cursor-pointer`}
         style={{ backgroundColor: bgColor, color: textColor }}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}

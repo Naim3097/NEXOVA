@@ -48,6 +48,7 @@ import Link from 'next/link';
 import { PublishDialog } from './PublishDialog';
 import { SEOSettingsDialog } from '@/components/seo/SEOSettingsDialog';
 import { VersionHistorySidebar } from '@/components/versions/VersionHistorySidebar';
+import { ProjectTrackingPixelsDialog } from './ProjectTrackingPixelsDialog';
 
 interface ToolbarProps {
   projectId?: string;
@@ -75,6 +76,7 @@ export const Toolbar = ({
   const [saveState, setSaveState] = useAtom(saveStateAtom);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
+  const [trackingPixelsDialogOpen, setTrackingPixelsDialogOpen] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -530,23 +532,7 @@ export const Toolbar = ({
             <ChevronDown className="w-3 h-3 ml-1" />
           </Button>
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-              <Link
-                href={`/dashboard/analytics/${currentProject?.id}`}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                onClick={() => setMenuOpen(false)}
-              >
-                <BarChart3 className="w-4 h-4" />
-                Analytics
-              </Link>
-              <Link
-                href={`/dashboard/forms/${currentProject?.id}`}
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                onClick={() => setMenuOpen(false)}
-              >
-                <FileText className="w-4 h-4" />
-                Form Submissions
-              </Link>
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[60]">
               <button
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
                 onClick={() => {
@@ -556,6 +542,16 @@ export const Toolbar = ({
               >
                 <Search className="w-4 h-4" />
                 SEO Settings
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setTrackingPixelsDialogOpen(true);
+                }}
+              >
+                <BarChart3 className="w-4 h-4" />
+                Tracking Pixels
               </button>
               <button
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
@@ -627,6 +623,15 @@ export const Toolbar = ({
           projectId={currentProject.id}
           currentSettings={currentProject.seo_settings}
           onSave={handleSaveSEO}
+        />
+      )}
+
+      {/* Tracking Pixels Dialog */}
+      {currentProject && !isGuestMode && (
+        <ProjectTrackingPixelsDialog
+          open={trackingPixelsDialogOpen}
+          onOpenChange={setTrackingPixelsDialogOpen}
+          projectId={currentProject.id}
         />
       )}
 

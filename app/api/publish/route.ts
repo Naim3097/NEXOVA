@@ -93,13 +93,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate HTML
-    const html = generateHTML(project as Project, (elements || []) as Element[]);
-
-    // Get user profile to check subscription plan
+    // Get user profile to fetch tracking pixels and subscription plan
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('subscription_plan, subdomain')
+      .select('subscription_plan, subdomain, tracking_pixels')
       .eq('id', project.user_id)
       .single();
 
@@ -109,6 +106,13 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Determine tracking pixels configuration
+    // Use project-specific override if exists, otherwise use account defaults
+    const trackingPixels = (project as any).tracking_pixels_override || profile.tracking_pixels || null;
+
+    // Generate HTML with tracking pixels
+    const html = generateHTML(project as Project, (elements || []) as Element[], trackingPixels);
 
     // Generate unique slug if not exists
     let slug = project.slug;

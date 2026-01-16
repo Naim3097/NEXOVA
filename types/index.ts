@@ -13,6 +13,7 @@ export interface Profile {
   leanx_secret_key: string | null;
   leanx_merchant_id: string | null;
   leanx_enabled: boolean;
+  leanx_environment: 'test' | 'live';
   created_at: string;
   updated_at: string;
 }

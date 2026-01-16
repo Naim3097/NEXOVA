@@ -1,5 +1,6 @@
 import type { Project, Element, SEOSettings } from '@/types';
 import { generateTrackingScript } from '@/lib/analytics/tracking-script';
+import { generateTrackingPixelScripts, type TrackingPixelsConfig } from '@/lib/tracking/pixel-scripts';
 
 /**
  * Sanitize element ID for use in JavaScript identifiers
@@ -44,7 +45,8 @@ function getIconSVG(iconName: string): string {
  */
 export function generateHTML(
   project: Project,
-  elements: Element[]
+  elements: Element[],
+  trackingPixels?: TrackingPixelsConfig | null
 ): string {
   // Provide default empty object if seo_settings is null/undefined
   const seo_settings = project.seo_settings || {};
@@ -52,7 +54,7 @@ export function generateHTML(
   return `<!DOCTYPE html>
 <html lang="${seo_settings.language || 'en'}">
 <head>
-  ${generateHeadContent(project, seo_settings)}
+  ${generateHeadContent(project, seo_settings, trackingPixels)}
 </head>
 <body>
   <!-- Global project configuration -->
@@ -89,7 +91,8 @@ export function generateHTML(
  */
 function generateHeadContent(
   project: Project,
-  seo: SEOSettings
+  seo: SEOSettings,
+  trackingPixels?: TrackingPixelsConfig | null
 ): string {
   return `
   <meta charset="UTF-8">
@@ -118,6 +121,9 @@ function generateHeadContent(
 
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Tracking Pixels -->
+  ${trackingPixels ? generateTrackingPixelScripts(trackingPixels) : ''}
 
   <!-- Styles -->
   ${generateStyles()}
@@ -2109,7 +2115,7 @@ function generateWhatsAppButtonHTML(element: Element): string {
 
   const containerStyle = position === 'fixed'
     ? `position: fixed; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
-    : 'display: inline-block;';
+    : 'padding: 5rem 1rem; text-align: center;';
 
   // WhatsApp icon SVG
   const whatsappIcon = `<svg width="${iconSizes[buttonSize as keyof typeof iconSizes]}" height="${iconSizes[buttonSize as keyof typeof iconSizes]}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2119,19 +2125,20 @@ function generateWhatsAppButtonHTML(element: Element): string {
   const sanitizedId = sanitizeId(element.id);
 
   return `
-<div id="${element.type}-${element.order}" style="${containerStyle}">
+<section id="${element.type}-${element.order}" style="${containerStyle}">
   ${position === 'inline' && showHeadline ? `
   <div style="
-    text-align: center;
-    margin-bottom: 1rem;
+    max-width: 42rem;
+    margin: 0 auto 2rem auto;
   ">
-    <h3 style="
-      font-size: 1.25rem;
-      font-weight: 600;
-      line-height: 1.3;
+    <h2 style="
+      font-size: 2.5rem;
+      font-weight: bold;
+      line-height: 1.2;
       color: ${headlineColor};
-      margin: 0;
-    ">${headlineText}</h3>
+      margin: 0 0 1rem 0;
+      text-align: center;
+    ">${headlineText}</h2>
   </div>
   ` : ''}
 
@@ -2187,7 +2194,7 @@ function generateWhatsAppButtonHTML(element: Element): string {
     "></span>
     ` : ''}
   </a>
-</div>
+</section>
 
 ${position === 'fixed' ? `
 <style>

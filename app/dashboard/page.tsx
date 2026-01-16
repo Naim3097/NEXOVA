@@ -74,9 +74,9 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+    <div className="min-h-screen">
+      <header className="bg-white border-b sticky top-0 z-10">
+        <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <Button variant="outline" onClick={signOut}>
             Sign out
@@ -84,7 +84,7 @@ function DashboardContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid gap-6">
           <Card>
             <CardHeader>

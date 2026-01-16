@@ -5,7 +5,6 @@ import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ProductModal from '@/components/dashboard/ProductModal';
-import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
 
 interface Product {
   id: string;
@@ -32,7 +31,6 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -79,13 +77,7 @@ export default function ProductsPage() {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <BuilderSidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
-
-      <div className="flex-1 overflow-auto bg-gray-50 p-8">
+    <div className="flex-1 overflow-auto bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center justify-between">
@@ -294,13 +286,12 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <ProductModal
-          product={editingProduct}
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          onSave={fetchProducts}
-        />
-      </div>
+      <ProductModal
+        product={editingProduct}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={fetchProducts}
+      />
     </div>
   );
 }
