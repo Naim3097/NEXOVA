@@ -1989,13 +1989,13 @@ function generateLeadFormHTML(element: Element): string {
             statusDiv.style.backgroundColor = '#d1fae5';
             statusDiv.style.color = '#065f46';
             statusDiv.style.borderLeft = '4px solid #10b981';
-            statusDiv.textContent = '${successMessage}';
+            statusDiv.textContent = '${successMessage.replace(/'/g, "\\'")}';
 
             // Log Google Sheets sync status
             if (data.google_sheets_synced) {
-              console.log('✅ Successfully synced to Google Sheets');
+              console.log('Successfully synced to Google Sheets');
             } else {
-              console.warn('⚠️ Failed to sync to Google Sheets', data.debug);
+              console.warn('Failed to sync to Google Sheets', data.debug);
             }
 
             // Reset form
