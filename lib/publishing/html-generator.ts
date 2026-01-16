@@ -1980,6 +1980,9 @@ function generateLeadFormHTML(element: Element): string {
 
           const data = await response.json();
 
+          // Log response for debugging
+          console.log('Lead submission response:', data);
+
           if (response.ok) {
             // Success
             statusDiv.style.display = 'block';
@@ -1987,6 +1990,13 @@ function generateLeadFormHTML(element: Element): string {
             statusDiv.style.color = '#065f46';
             statusDiv.style.borderLeft = '4px solid #10b981';
             statusDiv.textContent = '${successMessage}';
+
+            // Log Google Sheets sync status
+            if (data.google_sheets_synced) {
+              console.log('✅ Successfully synced to Google Sheets');
+            } else {
+              console.warn('⚠️ Failed to sync to Google Sheets', data.debug);
+            }
 
             // Reset form
             form.reset();

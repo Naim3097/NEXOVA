@@ -126,7 +126,15 @@ export async function POST(request: NextRequest) {
 
     // Google Sheets integration (if enabled)
     let sheetsResult = null;
+    let sheetsDebugInfo: any = null;
     const props = element.props;
+
+    console.log('Google Sheets config:', {
+      enabled: props.google_sheets_enabled,
+      hasUrl: !!props.google_sheets_url,
+      url: props.google_sheets_url?.substring(0, 50) + '...',
+      userId: project.user_id,
+    });
 
     if (props.google_sheets_enabled && props.google_sheets_url) {
       try {
@@ -147,12 +155,32 @@ export async function POST(request: NextRequest) {
 
         if (!sheetsResult.success) {
           console.error('Google Sheets append failed:', sheetsResult.error);
+          sheetsDebugInfo = {
+            attempted: true,
+            success: false,
+            error: sheetsResult.error,
+          };
           // Don't fail the whole request, just log it
+        } else {
+          sheetsDebugInfo = {
+            attempted: true,
+            success: true,
+          };
         }
       } catch (sheetError) {
         console.error('Google Sheets error:', sheetError);
+        sheetsDebugInfo = {
+          attempted: true,
+          success: false,
+          error: sheetError instanceof Error ? sheetError.message : 'Unknown error',
+        };
         // Don't fail the whole request
       }
+    } else {
+      sheetsDebugInfo = {
+        attempted: false,
+        reason: !props.google_sheets_enabled ? 'Not enabled' : 'No URL configured',
+      };
     }
 
     // Track analytics event
@@ -180,6 +208,7 @@ export async function POST(request: NextRequest) {
       message: 'Thank you! Your information has been submitted.',
       lead_id: lead.id,
       google_sheets_synced: sheetsResult?.success || false,
+      debug: process.env.NODE_ENV === 'development' ? sheetsDebugInfo : undefined,
     });
 
   } catch (error) {
