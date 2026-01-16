@@ -86,8 +86,12 @@ export const WhatsAppButtonElement: React.FC<WhatsAppButtonElementProps> = ({
     ${position === 'fixed' ? 'shadow-2xl z-50' : ''}
   `;
 
+  // In builder mode, use absolute positioning instead of fixed
+  // to keep the button inside the canvas
+  const isBuilderMode = isSelected !== undefined;
+
   const containerClasses = position === 'fixed'
-    ? `fixed ${positionClasses[fixedPosition]} z-50`
+    ? `${isBuilderMode ? 'absolute' : 'fixed'} ${positionClasses[fixedPosition]} z-50`
     : 'inline-block';
 
   return (

@@ -249,7 +249,7 @@ export const Canvas = () => {
       {/* Canvas container with viewport simulation */}
       <div className="min-h-full flex items-start justify-center p-8">
         <div
-          className="bg-white shadow-2xl transition-all duration-300 ease-in-out"
+          className="bg-white shadow-2xl transition-all duration-300 ease-in-out relative"
           style={{
             width: viewportWidths[viewportMode],
             minHeight: '100vh',
