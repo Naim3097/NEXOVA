@@ -2295,6 +2295,60 @@ export const PropertiesPanel = () => {
                   </p>
                 </div>
               )}
+
+              {props.position === 'inline' && (
+                <>
+                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Headline</div>
+
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="showHeadline" className="cursor-pointer">Show Headline</Label>
+                    <input
+                      type="checkbox"
+                      id="showHeadline"
+                      checked={props.showHeadline ?? true}
+                      onChange={(e) => handlePropChange('showHeadline', e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                  </div>
+
+                  {props.showHeadline && (
+                    <>
+                      <div>
+                        <Label htmlFor="headlineText">Headline Text</Label>
+                        <Input
+                          id="headlineText"
+                          value={props.headlineText || ''}
+                          onChange={(e) => handlePropChange('headlineText', e.target.value)}
+                          placeholder="Want to know more about this product?"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Text displayed above the button
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="headlineColor">Headline Color</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="headlineColor"
+                            type="color"
+                            value={props.headlineColor || '#1f2937'}
+                            onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                            className="w-20 h-10 p-1"
+                          />
+                          <Input
+                            type="text"
+                            value={props.headlineColor || '#1f2937'}
+                            onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                            placeholder="#1f2937"
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </>
         );

@@ -2053,6 +2053,9 @@ function generateWhatsAppButtonHTML(element: Element): string {
     showIcon = true,
     customIcon = '',
     tooltipText = 'Need help? Chat with us!',
+    showHeadline = false,
+    headlineText = 'Want to know more about this product?',
+    headlineColor = '#1f2937',
   } = element.props;
 
   // Clean phone number (remove all non-digit characters)
@@ -2117,6 +2120,21 @@ function generateWhatsAppButtonHTML(element: Element): string {
 
   return `
 <div id="${element.type}-${element.order}" style="${containerStyle}">
+  ${position === 'inline' && showHeadline ? `
+  <div style="
+    text-align: center;
+    margin-bottom: 1rem;
+  ">
+    <h3 style="
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: ${headlineColor};
+      margin: 0;
+    ">${headlineText}</h3>
+  </div>
+  ` : ''}
+
   ${position === 'fixed' && tooltipText ? `
   <div id="wa-tooltip-${sanitizedId}" style="
     position: absolute;

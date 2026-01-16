@@ -329,6 +329,9 @@ const elementTemplates: ElementTemplate[] = [
       showIcon: true,
       customIcon: '',
       tooltipText: 'Need help? Chat with us!',
+      showHeadline: true,
+      headlineText: 'Want to know more about this product?',
+      headlineColor: '#1f2937',
     },
   },
   {

@@ -12,6 +12,9 @@ export interface WhatsAppButtonProps {
   showIcon: boolean;
   customIcon?: string; // URL to custom icon
   tooltipText?: string;
+  showHeadline?: boolean; // Show headline above button
+  headlineText?: string; // Headline text
+  headlineColor?: string; // Headline text color
 }
 
 interface WhatsAppButtonElementProps {
@@ -40,6 +43,9 @@ export const WhatsAppButtonElement: React.FC<WhatsAppButtonElementProps> = ({
     showIcon,
     customIcon,
     tooltipText,
+    showHeadline = false,
+    headlineText = 'Want to know more about this product?',
+    headlineColor = '#1f2937',
   } = props;
 
   // Generate WhatsApp link
@@ -101,6 +107,18 @@ export const WhatsAppButtonElement: React.FC<WhatsAppButtonElementProps> = ({
       onMouseEnter={() => onHover?.(true)}
       onMouseLeave={() => onHover?.(false)}
     >
+      {/* Headline (only for inline position) */}
+      {position === 'inline' && showHeadline && (
+        <div className="text-center mb-4">
+          <h3
+            className="text-xl font-semibold leading-tight"
+            style={{ color: headlineColor }}
+          >
+            {headlineText}
+          </h3>
+        </div>
+      )}
+
       {/* Tooltip (only for fixed position) */}
       {position === 'fixed' && tooltipText && (
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-900 text-white text-sm px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
