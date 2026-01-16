@@ -52,6 +52,14 @@ export async function GET() {
     // Generate authorization URL
     const authUrl = getAuthorizationUrl(state);
 
+    // Debug logging
+    console.log('OAuth Debug Info:', {
+      clientId: process.env.GOOGLE_OAUTH_CLIENT_ID?.substring(0, 20) + '...',
+      redirectUri: process.env.GOOGLE_OAUTH_REDIRECT_URI,
+      appUrl: process.env.NEXT_PUBLIC_APP_URL,
+      authUrlPreview: authUrl.substring(0, 200) + '...'
+    });
+
     // Create response with state cookie
     const response = NextResponse.redirect(authUrl);
     response.cookies.set('oauth_state', state, {
