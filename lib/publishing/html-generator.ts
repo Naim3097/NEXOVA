@@ -2010,7 +2010,7 @@ function generateLeadFormHTML(element: Element): string {
 
           statusDiv.style.display = 'block';
           statusDiv.style.backgroundColor = '#fee2e2';
-          statusDiv.style.color = #991b1b';
+          statusDiv.style.color = '#991b1b';
           statusDiv.style.borderLeft = '4px solid #ef4444';
           statusDiv.textContent = error.message === 'You have already submitted this form'
             ? 'You have already submitted this form. Thank you!'
