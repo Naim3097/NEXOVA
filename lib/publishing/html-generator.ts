@@ -302,6 +302,8 @@ function generateBodyContent(elements: Element[]): string {
         return generateLeadFormHTML(element);
       case 'whatsapp_button':
         return generateWhatsAppButtonHTML(element);
+      case 'form_with_payment':
+        return generateFormWithPaymentHTML(element);
       default:
         return '';
     }
@@ -2206,6 +2208,366 @@ ${position === 'fixed' ? `
   }
 </style>
 ` : ''}`;
+}
+
+/**
+ * Generate Form with Payment HTML
+ */
+function generateFormWithPaymentHTML(element: Element): string {
+  const {
+    title = 'Order Form',
+    description = '',
+    nameLabel = 'Name',
+    mobileLabel = 'Mobile Number',
+    emailLabel = 'Email',
+    showName = true,
+    showMobile = true,
+    showEmail = true,
+    nameRequired = true,
+    mobileRequired = true,
+    emailRequired = true,
+    defaultCountryCode = 'MY',
+    products = [],
+    currency = 'MYR',
+    submitButtonText = 'Complete Payment',
+    submitButtonColor = '#ef4444',
+    bgColor = '#ffffff',
+    termsUrl = '#',
+    policyUrl = '#',
+    contactUrl = '#',
+    companyName = 'Your Company Name',
+    companyRegistration = 'Company Registration Number',
+  } = element.props;
+
+  const sanitizedId = sanitizeId(element.id);
+  const formId = `payment-form-${sanitizedId}`;
+
+  // Country codes mapping
+  const countryCodes: Record<string, { dial: string; flag: string }> = {
+    MY: { dial: '+60', flag: '🇲🇾' },
+    SG: { dial: '+65', flag: '🇸🇬' },
+    ID: { dial: '+62', flag: '🇮🇩' },
+    TH: { dial: '+66', flag: '🇹🇭' },
+    PH: { dial: '+63', flag: '🇵🇭' },
+    VN: { dial: '+84', flag: '🇻🇳' },
+    US: { dial: '+1', flag: '🇺🇸' },
+    GB: { dial: '+44', flag: '🇬🇧' },
+  };
+
+  const selectedCountry = countryCodes[defaultCountryCode] || countryCodes['MY'];
+
+  // Format currency helper
+  const formatCurrency = (value: number) => {
+    if (currency === 'MYR') {
+      return `RM ${value.toFixed(2)}`;
+    }
+    return `${currency} ${value.toFixed(2)}`;
+  };
+
+  // Generate products HTML
+  const productsHTML = products.map((product: any) => {
+    const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+
+    const stockStatusHTML = isOutOfStock
+      ? '<span style="color: #ef4444; font-weight: 500; font-size: 0.875rem;">Out of Stock</span>'
+      : `
+        <div style="display: flex; align-items: center; gap: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+          <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', -1)" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <span id="qty-${sanitizedId}-${product.id}" style="width: 2rem; text-align: center; font-weight: 500;">0</span>
+          <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', 1, ${product.stock || 999})" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+      `;
+
+    const amountHTML = isOutOfStock
+      ? '<span style="color: #9ca3af;">-</span>'
+      : `<span id="amount-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>`;
+
+    return `
+      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: center;">
+        <div>
+          <div style="font-weight: 500; color: #111827;">${product.name}</div>
+          <div style="color: #3b82f6; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+        </div>
+        <div style="display: flex; justify-content: center;">${stockStatusHTML}</div>
+        <div style="text-align: right; color: #111827; font-weight: 500;">${amountHTML}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Products data for JavaScript
+  const productsDataJS = JSON.stringify(products.map((product: any) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    stock: product.stock,
+    currency: product.currency || currency,
+  })));
+
+  return `
+<section style="background-color: ${bgColor}; padding: 2rem 1rem;" id="${element.type}-${element.order}">
+  <div class="container" style="max-width: 42rem; margin: 0 auto;">
+    ${title || description ? `
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      ${title ? `<h2 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${title}</h2>` : ''}
+      ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
+    </div>
+    ` : ''}
+
+    <form id="${formId}" onsubmit="return submitPaymentForm_${sanitizedId}(event)">
+      <!-- Customer Fields -->
+      <div style="margin-bottom: 1.5rem;">
+        ${showName ? `
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+            ${nameLabel}${nameRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+          </label>
+          <input type="text" id="name-${sanitizedId}" name="name" ${nameRequired ? 'required' : ''}
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;"
+            placeholder="Enter your name">
+        </div>
+        ` : ''}
+
+        ${showMobile ? `
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+            ${mobileLabel}${mobileRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+          </label>
+          <div style="display: flex;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid #d1d5db; border-right: none; border-radius: 0.5rem 0 0 0.5rem; background: #f9fafb;">
+              <span style="font-size: 1.125rem;">${selectedCountry.flag}</span>
+              <span style="color: #6b7280; font-size: 0.75rem;">▼</span>
+            </div>
+            <input type="tel" id="mobile-${sanitizedId}" name="mobile" ${mobileRequired ? 'required' : ''}
+              style="flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0 0.5rem 0.5rem 0; font-size: 1rem; box-sizing: border-box;"
+              placeholder="012-345 6789">
+          </div>
+        </div>
+        ` : ''}
+
+        ${showEmail ? `
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+            ${emailLabel}${emailRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+          </label>
+          <input type="email" id="email-${sanitizedId}" name="email" ${emailRequired ? 'required' : ''}
+            style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;"
+            placeholder="your@email.com">
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Products Table -->
+      ${products.length > 0 ? `
+      <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+          <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
+          <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Qty</div>
+          <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Amount</div>
+        </div>
+        ${productsHTML}
+      </div>
+      ` : `
+      <div style="border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
+        <p style="color: #6b7280;">No products configured.</p>
+      </div>
+      `}
+
+      <!-- Total Amount -->
+      <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 1.125rem; font-weight: bold; color: #111827;">
+          <span>Total Amount:</span>
+          <span id="total-${sanitizedId}">${formatCurrency(0)}</span>
+        </div>
+        <p id="empty-msg-${sanitizedId}" style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
+      </div>
+
+      <!-- Security Badge -->
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; margin-bottom: 1.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+        <span>Your payment is secured & encrypted</span>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="submit-btn-${sanitizedId}"
+        style="width: 100%; padding: 1rem; background-color: ${submitButtonColor}; color: white; border: none; border-radius: 0.5rem; font-size: 1.125rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+        ${submitButtonText}
+      </button>
+
+      <!-- Status Messages -->
+      <div id="status-${sanitizedId}" style="margin-top: 1rem; display: none; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.875rem;"></div>
+    </form>
+
+    <!-- Footer Links -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.5rem; font-size: 0.875rem;">
+      <a href="${termsUrl}" style="color: #3b82f6; text-decoration: none;">Terms & Conditions</a>
+      <span style="color: #d1d5db;">|</span>
+      <a href="${policyUrl}" style="color: #3b82f6; text-decoration: none;">Policy</a>
+      <span style="color: #d1d5db;">|</span>
+      <a href="${contactUrl}" style="color: #3b82f6; text-decoration: none;">Contact Us</a>
+    </div>
+
+    <!-- Company Info -->
+    <div style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 1rem;">
+      <p>&copy; ${new Date().getFullYear()} ${companyName}.</p>
+      <p>${companyRegistration}</p>
+    </div>
+  </div>
+
+  <!-- Form with Payment JavaScript -->
+  <script>
+    (function() {
+      const products_${sanitizedId} = ${productsDataJS};
+      const quantities_${sanitizedId} = {};
+      const currencyCode_${sanitizedId} = '${currency}';
+
+      // Initialize quantities
+      products_${sanitizedId}.forEach(product => {
+        quantities_${sanitizedId}[product.id] = 0;
+      });
+
+      function formatCurrency_${sanitizedId}(value) {
+        if (currencyCode_${sanitizedId} === 'MYR') {
+          return 'RM ' + value.toFixed(2);
+        }
+        return currencyCode_${sanitizedId} + ' ' + value.toFixed(2);
+      }
+
+      window.updateQty_${sanitizedId} = function(productId, delta, maxStock) {
+        const product = products_${sanitizedId}.find(p => p.id === productId);
+        if (!product) return;
+
+        // Check stock
+        if (product.stock !== undefined && product.stock <= 0) return;
+
+        const current = quantities_${sanitizedId}[productId] || 0;
+        let newQty = Math.max(0, current + delta);
+
+        // Respect stock limit
+        if (maxStock !== undefined && newQty > maxStock) {
+          newQty = maxStock;
+        }
+
+        quantities_${sanitizedId}[productId] = newQty;
+
+        // Update quantity display
+        const qtyEl = document.getElementById('qty-${sanitizedId}-' + productId);
+        if (qtyEl) qtyEl.textContent = newQty;
+
+        // Update amount display
+        const amountEl = document.getElementById('amount-${sanitizedId}-' + productId);
+        if (amountEl) amountEl.textContent = formatCurrency_${sanitizedId}(product.price * newQty);
+
+        updateTotal_${sanitizedId}();
+      };
+
+      function updateTotal_${sanitizedId}() {
+        let total = 0;
+        products_${sanitizedId}.forEach(product => {
+          if (product.stock === undefined || product.stock > 0) {
+            total += product.price * (quantities_${sanitizedId}[product.id] || 0);
+          }
+        });
+
+        document.getElementById('total-${sanitizedId}').textContent = formatCurrency_${sanitizedId}(total);
+
+        const emptyMsg = document.getElementById('empty-msg-${sanitizedId}');
+        if (emptyMsg) {
+          emptyMsg.style.display = total === 0 ? 'block' : 'none';
+        }
+      }
+
+      window.submitPaymentForm_${sanitizedId} = async function(event) {
+        event.preventDefault();
+
+        const submitBtn = document.getElementById('submit-btn-${sanitizedId}');
+        const statusDiv = document.getElementById('status-${sanitizedId}');
+
+        // Calculate total and collect order items
+        let total = 0;
+        const orderItems = [];
+        products_${sanitizedId}.forEach(product => {
+          const qty = quantities_${sanitizedId}[product.id] || 0;
+          if (qty > 0 && (product.stock === undefined || product.stock > 0)) {
+            const amount = product.price * qty;
+            total += amount;
+            orderItems.push({
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              quantity: qty,
+              amount: amount
+            });
+          }
+        });
+
+        if (orderItems.length === 0) {
+          statusDiv.style.display = 'block';
+          statusDiv.style.backgroundColor = '#fef2f2';
+          statusDiv.style.color = '#991b1b';
+          statusDiv.style.borderLeft = '4px solid #ef4444';
+          statusDiv.textContent = 'Please select at least one item.';
+          return false;
+        }
+
+        // Get form data
+        const name = document.getElementById('name-${sanitizedId}')?.value || '';
+        const mobile = document.getElementById('mobile-${sanitizedId}')?.value || '';
+        const email = document.getElementById('email-${sanitizedId}')?.value || '';
+
+        // Build product name for payment
+        const productName = orderItems.map(item => item.name + ' x' + item.quantity).join(', ');
+
+        // Disable button
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.style.opacity = '0.7';
+
+        try {
+          // Use the same payment API as payment_button
+          const response = await fetch('/api/payments/create-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project_id: window.__PROJECT_ID__,
+              product_id: orderItems[0].id,
+              product_name: productName,
+              product_price: total.toFixed(2),
+              payment_service_id: 1, // FPX
+              customer_name: name,
+              customer_email: email,
+              customer_phone: mobile,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.redirect_url) {
+            // Redirect to payment
+            window.location.href = data.redirect_url;
+          } else {
+            throw new Error(data.error || 'Failed to create payment');
+          }
+        } catch (error) {
+          statusDiv.style.display = 'block';
+          statusDiv.style.backgroundColor = '#fef2f2';
+          statusDiv.style.color = '#991b1b';
+          statusDiv.style.borderLeft = '4px solid #ef4444';
+          statusDiv.textContent = error.message || 'An error occurred. Please try again.';
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = '${submitButtonText}';
+          submitBtn.style.opacity = '1';
+        }
+
+        return false;
+      };
+    })();
+  </script>
+</section>`;
 }
 
 /**

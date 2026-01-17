@@ -2353,6 +2353,351 @@ export const PropertiesPanel = () => {
           </>
         );
 
+      case 'form_with_payment':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">Form Header</div>
+
+              <div>
+                <Label htmlFor="title">Form Title</Label>
+                <Input
+                  id="title"
+                  value={props.title || ''}
+                  onChange={(e) => handlePropChange('title', e.target.value)}
+                  placeholder="Order Form"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description (optional)</Label>
+                <textarea
+                  id="description"
+                  value={props.description || ''}
+                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  placeholder="Fill in the form to complete your order"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  rows={2}
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Customer Fields</div>
+
+              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showName" className="cursor-pointer">Show Name Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showName"
+                    checked={props.showName ?? true}
+                    onChange={(e) => handlePropChange('showName', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showName && (
+                  <>
+                    <div className="pl-4">
+                      <Label htmlFor="nameLabel" className="text-xs">Name Label</Label>
+                      <Input
+                        id="nameLabel"
+                        value={props.nameLabel || ''}
+                        onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                        placeholder="Name"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pl-4">
+                      <Label htmlFor="nameRequired" className="cursor-pointer text-sm">Name Required</Label>
+                      <input
+                        type="checkbox"
+                        id="nameRequired"
+                        checked={props.nameRequired ?? true}
+                        onChange={(e) => handlePropChange('nameRequired', e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                  <Label htmlFor="showMobile" className="cursor-pointer">Show Mobile Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showMobile"
+                    checked={props.showMobile ?? true}
+                    onChange={(e) => handlePropChange('showMobile', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showMobile && (
+                  <>
+                    <div className="pl-4">
+                      <Label htmlFor="mobileLabel" className="text-xs">Mobile Label</Label>
+                      <Input
+                        id="mobileLabel"
+                        value={props.mobileLabel || ''}
+                        onChange={(e) => handlePropChange('mobileLabel', e.target.value)}
+                        placeholder="Mobile Number"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pl-4">
+                      <Label htmlFor="mobileRequired" className="cursor-pointer text-sm">Mobile Required</Label>
+                      <input
+                        type="checkbox"
+                        id="mobileRequired"
+                        checked={props.mobileRequired ?? true}
+                        onChange={(e) => handlePropChange('mobileRequired', e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <div className="pl-4">
+                      <Label htmlFor="defaultCountryCode" className="text-xs">Default Country</Label>
+                      <select
+                        id="defaultCountryCode"
+                        value={props.defaultCountryCode || 'MY'}
+                        onChange={(e) => handlePropChange('defaultCountryCode', e.target.value)}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                      >
+                        <option value="MY">Malaysia (+60)</option>
+                        <option value="SG">Singapore (+65)</option>
+                        <option value="ID">Indonesia (+62)</option>
+                        <option value="TH">Thailand (+66)</option>
+                        <option value="PH">Philippines (+63)</option>
+                        <option value="VN">Vietnam (+84)</option>
+                        <option value="US">USA (+1)</option>
+                        <option value="GB">UK (+44)</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                  <Label htmlFor="showEmail" className="cursor-pointer">Show Email Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showEmail"
+                    checked={props.showEmail ?? true}
+                    onChange={(e) => handlePropChange('showEmail', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showEmail && (
+                  <>
+                    <div className="pl-4">
+                      <Label htmlFor="emailLabel" className="text-xs">Email Label</Label>
+                      <Input
+                        id="emailLabel"
+                        value={props.emailLabel || ''}
+                        onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                        placeholder="Email"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pl-4">
+                      <Label htmlFor="emailRequired" className="cursor-pointer text-sm">Email Required</Label>
+                      <input
+                        type="checkbox"
+                        id="emailRequired"
+                        checked={props.emailRequired ?? true}
+                        onChange={(e) => handlePropChange('emailRequired', e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Products</div>
+
+              {/* Product Selector from Database (same as Payment Button) */}
+              {currentProject && (
+                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Select products from your inventory or{' '}
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      manage products
+                    </a>
+                  </p>
+                  <ProductSelector
+                    onSelect={(product) => {
+                      const newProducts = [...(props.products || []), {
+                        id: product.id,
+                        name: product.name,
+                        description: product.description || '',
+                        price: product.base_price,
+                        currency: product.currency,
+                        image: product.image_url || '',
+                        stock: product.stock,
+                        featured: false,
+                      }];
+                      handlePropChange('products', newProducts);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Products List (Read-only with remove option) */}
+              {currentProject && (props.products || []).length > 0 && (
+                <div className="border border-gray-300 rounded-md p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products</h4>
+                  <div className="space-y-2">
+                    {(props.products || []).map((product: any, index: number) => (
+                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                        <div className="flex items-center gap-2 flex-1">
+                          {product.image && (
+                            <img src={product.image} alt={product.name} className="w-8 h-8 object-cover rounded" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {product.currency || 'RM'} {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                              {product.stock !== undefined && ` • Stock: ${product.stock}`}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
+                            handlePropChange('products', newProducts);
+                          }}
+                          className="text-xs text-red-600 hover:text-red-800 ml-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    To edit product details, go to the{' '}
+                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                      Products page
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+
+              <div>
+                <Label htmlFor="submitButtonText">Button Text</Label>
+                <Input
+                  id="submitButtonText"
+                  value={props.submitButtonText || ''}
+                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  placeholder="Complete Payment"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="submitButtonColor">Button Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="submitButtonColor"
+                    type="color"
+                    value={props.submitButtonColor || '#ef4444'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.submitButtonColor || '#ef4444'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    placeholder="#ef4444"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Footer Links</div>
+
+              <div>
+                <Label htmlFor="termsUrl">Terms & Conditions URL</Label>
+                <Input
+                  id="termsUrl"
+                  value={props.termsUrl || ''}
+                  onChange={(e) => handlePropChange('termsUrl', e.target.value)}
+                  placeholder="#terms"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="policyUrl">Policy URL</Label>
+                <Input
+                  id="policyUrl"
+                  value={props.policyUrl || ''}
+                  onChange={(e) => handlePropChange('policyUrl', e.target.value)}
+                  placeholder="#policy"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="contactUrl">Contact Us URL</Label>
+                <Input
+                  id="contactUrl"
+                  value={props.contactUrl || ''}
+                  onChange={(e) => handlePropChange('contactUrl', e.target.value)}
+                  placeholder="#contact"
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Company Info</div>
+
+              <div>
+                <Label htmlFor="companyName">Company Name</Label>
+                <Input
+                  id="companyName"
+                  value={props.companyName || ''}
+                  onChange={(e) => handlePropChange('companyName', e.target.value)}
+                  placeholder="Your Company Name"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="companyRegistration">Company Registration</Label>
+                <Input
+                  id="companyRegistration"
+                  value={props.companyRegistration || ''}
+                  onChange={(e) => handlePropChange('companyRegistration', e.target.value)}
+                  placeholder="Company Registration Number"
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Styling</div>
+
+              <div>
+                <Label htmlFor="bgColor-form-payment">Background Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bgColor-form-payment"
+                    type="color"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    placeholder="#ffffff"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        );
+
       default:
         return (
           <>

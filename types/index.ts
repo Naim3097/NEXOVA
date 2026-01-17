@@ -57,7 +57,8 @@ export type ElementType =
   | 'footer'
   | 'pricing'
   | 'lead_form'
-  | 'whatsapp_button';
+  | 'whatsapp_button'
+  | 'form_with_payment';
 
 export interface Template {
   id: string;
@@ -410,3 +411,6 @@ export interface BumpOfferData {
   discountedPrice: number;
   discount: number; // Percentage
 }
+
+// Form with Payment Element Types
+// Uses the same Product type as PaymentButton for consistency

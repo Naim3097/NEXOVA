@@ -13,6 +13,7 @@ import {
   leftSidebarOpenAtom,
   rightSidebarOpenAtom,
   elementsAtom,
+  loadProjectAtom,
 } from '@/store/builder';
 import { profileAtom } from '@/store/auth';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,7 @@ import { PublishDialog } from './PublishDialog';
 import { SEOSettingsDialog } from '@/components/seo/SEOSettingsDialog';
 import { VersionHistorySidebar } from '@/components/versions/VersionHistorySidebar';
 import { ProjectTrackingPixelsDialog } from './ProjectTrackingPixelsDialog';
+import { ProjectSettingsDialog, ImportedProjectData } from './ProjectSettingsDialog';
 
 interface ToolbarProps {
   projectId?: string;
@@ -73,11 +75,13 @@ export const Toolbar = ({
   const canRedo = useAtomValue(canRedoAtom);
   const undo = useSetAtom(undoAtom);
   const redo = useSetAtom(redoAtom);
+  const loadProject = useSetAtom(loadProjectAtom);
   const [saveState, setSaveState] = useAtom(saveStateAtom);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
   const [trackingPixelsDialogOpen, setTrackingPixelsDialogOpen] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
+  const [projectSettingsOpen, setProjectSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [nameDialogOpen, setNameDialogOpen] = useState(false);
@@ -406,6 +410,45 @@ export const Toolbar = ({
     }
   };
 
+  // Handle template import
+  const handleImportTemplate = async (data: ImportedProjectData) => {
+    if (!currentProject) return;
+
+    // Create new elements with proper IDs and project reference
+    const newElements = data.elements.map((el, index) => ({
+      id: crypto.randomUUID(),
+      project_id: currentProject.id,
+      type: el.type as any,
+      order: index,
+      props: el.props,
+      version: 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
+
+    // Update the project with imported SEO settings if available
+    const updatedProject = {
+      ...currentProject,
+      name: data.project.name || currentProject.name,
+      description: data.project.description || currentProject.description,
+      seo_settings: data.project.seo_settings || currentProject.seo_settings,
+      element_count: newElements.length,
+    };
+
+    // Load the imported project data into state
+    loadProject({
+      project: updatedProject,
+      elements: newElements,
+    });
+
+    // Mark as unsaved so user can save the imported content
+    setSaveState({
+      status: 'unsaved',
+      lastSaved: null,
+      error: null,
+    });
+  };
+
   return (
     <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4">
       {/* Left section - Project info */}
@@ -557,7 +600,7 @@ export const Toolbar = ({
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
                 onClick={() => {
                   setMenuOpen(false);
-                  // TODO: Open settings modal
+                  setProjectSettingsOpen(true);
                 }}
               >
                 <Settings className="w-4 h-4" />
@@ -641,6 +684,15 @@ export const Toolbar = ({
           projectId={currentProject.id}
           open={versionHistoryOpen}
           onClose={() => setVersionHistoryOpen(false)}
+        />
+      )}
+
+      {/* Project Settings Dialog (Import/Export) */}
+      {currentProject && !isGuestMode && (
+        <ProjectSettingsDialog
+          open={projectSettingsOpen}
+          onOpenChange={setProjectSettingsOpen}
+          onImport={handleImportTemplate}
         />
       )}
 

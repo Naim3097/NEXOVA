@@ -22,6 +22,7 @@ import {
   PricingElement,
   LeadFormElement,
   WhatsAppButtonElement,
+  FormWithPaymentElement,
 } from './elements';
 import {
   DndContext,
@@ -206,6 +207,9 @@ export const Canvas = () => {
         break;
       case 'whatsapp_button':
         elementContent = <WhatsAppButtonElement props={element.props as any} {...commonProps} />;
+        break;
+      case 'form_with_payment':
+        elementContent = <FormWithPaymentElement props={element.props as any} {...commonProps} />;
         break;
       case 'footer':
         elementContent = <FooterElement props={element.props as any} {...commonProps} />;
