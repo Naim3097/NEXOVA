@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
-import { BarChart3, Save, Eye, EyeOff, Info } from 'lucide-react';
+import { BarChart3, Save, Eye, EyeOff, Info, CheckCircle, ExternalLink, Loader2, Unlink } from 'lucide-react';
 
 interface TrackingPixelsConfig {
   facebook: {
@@ -55,15 +56,39 @@ const defaultConfig: TrackingPixelsConfig = {
 
 export function TrackingPixelsIntegration() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<TrackingPixelsConfig>(defaultConfig);
   const [showFacebookPixel, setShowFacebookPixel] = useState(false);
   const [showTikTokPixel, setShowTikTokPixel] = useState(false);
+  const [ga4Connected, setGa4Connected] = useState(false);
+  const [ga4Connecting, setGa4Connecting] = useState(false);
+  const [ga4PropertyId, setGa4PropertyId] = useState<string | null>(null);
 
   useEffect(() => {
     loadConfig();
-  }, []);
+    loadGa4Status();
+
+    // Check for OAuth callback success/error
+    const ga4ConnectedParam = searchParams.get('ga4_connected');
+    const errorParam = searchParams.get('error');
+
+    if (ga4ConnectedParam === 'true') {
+      toast({
+        title: 'Success',
+        description: 'Google Analytics connected successfully!',
+      });
+      setGa4Connected(true);
+      loadGa4Status();
+    } else if (errorParam) {
+      toast({
+        title: 'Connection Failed',
+        description: `Failed to connect Google Analytics: ${errorParam}`,
+        variant: 'destructive',
+      });
+    }
+  }, [searchParams]);
 
   const loadConfig = async () => {
     try {
@@ -90,6 +115,85 @@ export function TrackingPixelsIntegration() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadGa4Status = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('ga4_connected, ga4_property_id')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      setGa4Connected(profile?.ga4_connected || false);
+      setGa4PropertyId(profile?.ga4_property_id || null);
+    } catch (error) {
+      console.error('Error loading GA4 status:', error);
+    }
+  };
+
+  const connectGa4 = async () => {
+    try {
+      setGa4Connecting(true);
+      const response = await fetch('/api/integrations/ga4/auth', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to initiate GA4 connection');
+      }
+
+      const { authUrl } = await response.json();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Error connecting GA4:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to initiate Google Analytics connection',
+        variant: 'destructive',
+      });
+      setGa4Connecting(false);
+    }
+  };
+
+  const disconnectGa4 = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ga4_connected: false,
+          ga4_property_id: null,
+          ga4_access_token: null,
+          ga4_refresh_token: null,
+          ga4_token_expiry: null,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setGa4Connected(false);
+      setGa4PropertyId(null);
+
+      toast({
+        title: 'Disconnected',
+        description: 'Google Analytics has been disconnected',
+      });
+    } catch (error) {
+      console.error('Error disconnecting GA4:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to disconnect Google Analytics',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -408,7 +512,8 @@ export function TrackingPixelsIntegration() {
         </div>
 
         {config.google_analytics.enabled && (
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="p-6 space-y-6">
+            {/* Tracking Pixel Section */}
             <div>
               <Label htmlFor="ga4-measurement-id">Measurement ID *</Label>
               <Input
@@ -423,8 +528,71 @@ export function TrackingPixelsIntegration() {
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Found in Google Analytics 4 property settings
+                Found in Google Analytics 4 property settings. This embeds tracking on your published pages.
               </p>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-900">Analytics Dashboard Connection</h4>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Connect your Google account to view analytics data directly in your dashboard.
+                  </p>
+                </div>
+                {ga4Connected ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="text-sm font-medium">Connected</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={disconnectGa4}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Unlink className="w-4 h-4 mr-1" />
+                      Disconnect
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={connectGa4}
+                    disabled={ga4Connecting}
+                    className="bg-[#4285F4] hover:bg-[#3367D6] text-white"
+                  >
+                    {ga4Connecting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Connect Google Account
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {ga4Connected && ga4PropertyId && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    <span className="font-medium">Property ID:</span> {ga4PropertyId}
+                  </p>
+                </div>
+              )}
+
+              {!ga4Connected && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    Connecting allows you to view traffic, conversions, and user behavior in the Analytics dashboard without leaving this app.
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         )}
