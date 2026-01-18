@@ -1175,11 +1175,15 @@ export const PropertiesPanel = () => {
                       handlePropChange('menuItems', [...(props.menuItems || []), newMenuItem]);
                     }}
                     className="h-7 text-xs"
+                    disabled={(props.menuItems?.length || 0) >= 3}
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Add
                   </Button>
                 </div>
+                {(props.menuItems?.length || 0) >= 3 && (
+                  <p className="text-xs text-amber-600 mb-2">Maximum 3 menu items allowed</p>
+                )}
 
                 <div className="space-y-2">
                   {(!props.menuItems || props.menuItems.length === 0) ? (
@@ -1275,13 +1279,20 @@ export const PropertiesPanel = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="ctaUrl">CTA URL</Label>
-                      <Input
+                      <Label htmlFor="ctaUrl">Link to Section</Label>
+                      <select
                         id="ctaUrl"
-                        value={props.ctaButton.url || ''}
+                        value={props.ctaButton.url || '#'}
                         onChange={(e) => handlePropChange('ctaButton', { ...props.ctaButton, url: e.target.value })}
-                        placeholder="#"
-                      />
+                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                      >
+                        <option value="#">Top of Page</option>
+                        {sectionOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </>
                 )}
