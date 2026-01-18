@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
 import { TrackingPixelsIntegration } from '@/components/integrations/TrackingPixelsIntegration';
-import { GoogleAnalyticsIntegration } from '@/components/integrations/GoogleAnalyticsIntegration';
 
 export default function IntegrationsPage() {
   const router = useRouter();
@@ -38,14 +37,9 @@ export default function IntegrationsPage() {
         </div>
       </div>
 
-      {/* Tracking Pixels */}
+      {/* Tracking Pixels (includes GA4) */}
       <div className="mb-8">
         <TrackingPixelsIntegration />
-      </div>
-
-      {/* Google Analytics Integration */}
-      <div className="mb-8">
-        <GoogleAnalyticsIntegration />
       </div>
 
       {/* Google Sheets Integration */}
