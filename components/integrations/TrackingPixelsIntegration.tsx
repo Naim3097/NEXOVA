@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
-import { BarChart3, Save, Eye, EyeOff, Info, CheckCircle, ExternalLink, Loader2, Unlink } from 'lucide-react';
+import { BarChart3, Save, Eye, EyeOff, Info, CheckCircle, ExternalLink, Loader2, Unlink, ChevronDown } from 'lucide-react';
 
 interface TrackingPixelsConfig {
   facebook: {
@@ -66,6 +66,14 @@ function TrackingPixelsContent() {
   const [ga4Connected, setGa4Connected] = useState(false);
   const [ga4Connecting, setGa4Connecting] = useState(false);
   const [ga4PropertyId, setGa4PropertyId] = useState<string | null>(null);
+  const [ga4Properties, setGa4Properties] = useState<Array<{
+    id: string;
+    name: string;
+    displayName: string;
+    accountName: string;
+  }>>([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
+  const [showPropertySelector, setShowPropertySelector] = useState(false);
 
   useEffect(() => {
     loadConfig();
@@ -185,6 +193,7 @@ function TrackingPixelsContent() {
 
       setGa4Connected(false);
       setGa4PropertyId(null);
+      setGa4Properties([]);
 
       toast({
         title: 'Disconnected',
@@ -195,6 +204,59 @@ function TrackingPixelsContent() {
       toast({
         title: 'Error',
         description: 'Failed to disconnect Google Analytics',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const loadGa4Properties = async () => {
+    try {
+      setLoadingProperties(true);
+      const response = await fetch('/api/integrations/ga4/properties');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch properties');
+      }
+
+      const data = await response.json();
+      setGa4Properties(data.properties || []);
+      setShowPropertySelector(true);
+    } catch (error) {
+      console.error('Error loading GA4 properties:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load GA4 properties',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingProperties(false);
+    }
+  };
+
+  const selectGa4Property = async (propertyId: string) => {
+    try {
+      const response = await fetch('/api/integrations/ga4/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ propertyId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update property');
+      }
+
+      setGa4PropertyId(propertyId);
+      setShowPropertySelector(false);
+
+      toast({
+        title: 'Property Updated',
+        description: 'GA4 property has been updated successfully',
+      });
+    } catch (error) {
+      console.error('Error selecting GA4 property:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update GA4 property',
         variant: 'destructive',
       });
     }
@@ -582,10 +644,68 @@ function TrackingPixelsContent() {
               </div>
 
               {ga4Connected && ga4PropertyId && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800">
-                    <span className="font-medium">Property ID:</span> {ga4PropertyId}
-                  </p>
+                <div className="mt-4 space-y-3">
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-green-800">
+                        <span className="font-medium">Property ID:</span> {ga4PropertyId}
+                      </p>
+                      {ga4Properties.length > 0 && (
+                        <p className="text-xs text-green-600 mt-1">
+                          {ga4Properties.find(p => p.id === ga4PropertyId)?.displayName || 'Selected property'}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={loadGa4Properties}
+                      disabled={loadingProperties}
+                      className="text-green-700 border-green-300 hover:bg-green-100"
+                    >
+                      {loadingProperties ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4 mr-1" />
+                          Change
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Property Selector Dropdown */}
+                  {showPropertySelector && ga4Properties.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="bg-gray-50 px-3 py-2 border-b">
+                        <p className="text-sm font-medium text-gray-700">Select a GA4 Property</p>
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {ga4Properties.map((property) => (
+                          <button
+                            key={property.id}
+                            onClick={() => selectGa4Property(property.id)}
+                            className={`w-full text-left px-3 py-2 hover:bg-gray-50 border-b last:border-b-0 transition-colors ${
+                              property.id === ga4PropertyId ? 'bg-blue-50' : ''
+                            }`}
+                          >
+                            <p className="text-sm font-medium text-gray-900">{property.displayName}</p>
+                            <p className="text-xs text-gray-500">{property.accountName} • {property.id}</p>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="bg-gray-50 px-3 py-2 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowPropertySelector(false)}
+                          className="w-full"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
