@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,7 +54,8 @@ const defaultConfig: TrackingPixelsConfig = {
   },
 };
 
-export function TrackingPixelsIntegration() {
+// Inner component that uses useSearchParams
+function TrackingPixelsContent() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,9 @@ export function TrackingPixelsIntegration() {
   useEffect(() => {
     loadConfig();
     loadGa4Status();
+  }, []);
 
+  useEffect(() => {
     // Check for OAuth callback success/error
     const ga4ConnectedParam = searchParams.get('ga4_connected');
     const errorParam = searchParams.get('error');
@@ -88,7 +91,7 @@ export function TrackingPixelsIntegration() {
         variant: 'destructive',
       });
     }
-  }, [searchParams]);
+  }, [searchParams, toast]);
 
   const loadConfig = async () => {
     try {
@@ -598,5 +601,27 @@ export function TrackingPixelsIntegration() {
         )}
       </Card>
     </div>
+  );
+}
+
+// Loading fallback component
+function TrackingPixelsLoading() {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Main exported component wrapped in Suspense
+export function TrackingPixelsIntegration() {
+  return (
+    <Suspense fallback={<TrackingPixelsLoading />}>
+      <TrackingPixelsContent />
+    </Suspense>
   );
 }
