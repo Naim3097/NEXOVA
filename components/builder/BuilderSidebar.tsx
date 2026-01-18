@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   Home,
   Layers,
+  Globe,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -60,6 +61,12 @@ const navigation = [
     href: '/dashboard/integrations',
     icon: Zap,
     description: 'Connect tools',
+  },
+  {
+    name: 'Subdomain',
+    href: '/dashboard/settings/subdomain',
+    icon: Globe,
+    description: 'Custom URL',
   },
 ];
 
