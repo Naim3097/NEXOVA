@@ -33,23 +33,23 @@ export function Features() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
                 key={index}
-                className="relative rounded-lg border border-gray-200 bg-white p-8 hover:shadow-lg transition-shadow"
+                className="relative rounded-lg border border-gray-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow"
               >
-                <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-100">
-                    <Icon className="w-6 h-6 text-gray-900" />
+                <div className="mb-3 sm:mb-4">
+                  <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gray-100">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   {feature.description}
                 </p>
               </div>
