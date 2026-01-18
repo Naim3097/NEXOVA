@@ -222,6 +222,11 @@ function DashboardContent() {
                     Payment Settings
                   </Button>
                 </Link>
+                <Link href="/dashboard/settings/subdomain">
+                  <Button variant="outline" className="w-full">
+                    Subdomain Settings
+                  </Button>
+                </Link>
               </div>
               <p className="text-xs text-muted-foreground mt-4">
                 Note: Analytics and Forms are available per project in the editor
