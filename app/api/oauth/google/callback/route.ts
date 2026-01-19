@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       console.error('OAuth error:', error);
       return NextResponse.redirect(
         new URL(
-          `/dashboard/settings/payments?oauth_error=${encodeURIComponent(error)}`,
+          `/dashboard/integrations?oauth_error=${encodeURIComponent(error)}`,
           request.url
         )
       );
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     if (!code || !state) {
       return NextResponse.redirect(
         new URL(
-          '/dashboard/settings/payments?oauth_error=missing_parameters',
+          '/dashboard/integrations?oauth_error=missing_parameters',
           request.url
         )
       );
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       console.error('State mismatch:', { cookie: stateCookie, param: state });
       return NextResponse.redirect(
         new URL(
-          '/dashboard/settings/payments?oauth_error=invalid_state',
+          '/dashboard/integrations?oauth_error=invalid_state',
           request.url
         )
       );
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return NextResponse.redirect(
         new URL(
-          '/dashboard/settings/payments?oauth_error=invalid_state',
+          '/dashboard/integrations?oauth_error=invalid_state',
           request.url
         )
       );
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     // Clear state cookie
     const response = NextResponse.redirect(
-      new URL('/dashboard/settings/payments?oauth_success=true', request.url)
+      new URL('/dashboard/integrations?oauth_success=true', request.url)
     );
     response.cookies.delete('oauth_state');
 
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(
       new URL(
-        `/dashboard/settings/payments?oauth_error=${encodeURIComponent(errorMessage)}`,
+        `/dashboard/integrations?oauth_error=${encodeURIComponent(errorMessage)}`,
         request.url
       )
     );
