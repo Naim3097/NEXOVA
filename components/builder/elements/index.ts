@@ -12,3 +12,4 @@ export { PricingElement } from './Pricing';
 export { LeadFormElement } from './LeadForm';
 export { WhatsAppButtonElement } from './WhatsAppButton';
 export { FormWithPaymentElement } from './FormWithPayment';
+export { BookingFormElement } from './BookingForm';

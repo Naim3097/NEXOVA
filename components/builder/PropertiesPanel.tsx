@@ -2364,6 +2364,358 @@ export const PropertiesPanel = () => {
           </>
         );
 
+      case 'booking_form':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">Booking Form Header</div>
+
+              <div>
+                <Label htmlFor="title">Form Title</Label>
+                <Input
+                  id="title"
+                  value={props.title || ''}
+                  onChange={(e) => handlePropChange('title', e.target.value)}
+                  placeholder="Book an Appointment"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <textarea
+                  id="description"
+                  value={props.description || ''}
+                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  placeholder="Select your preferred date and time slot"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  rows={2}
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Service Details</div>
+
+              <div>
+                <Label htmlFor="serviceName">Service Name</Label>
+                <Input
+                  id="serviceName"
+                  value={props.serviceName || ''}
+                  onChange={(e) => handlePropChange('serviceName', e.target.value)}
+                  placeholder="Consultation"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="servicePrice">Service Price</Label>
+                <Input
+                  id="servicePrice"
+                  type="number"
+                  value={props.servicePrice || 0}
+                  onChange={(e) => handlePropChange('servicePrice', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-500 mt-1">Set to 0 for free services</p>
+              </div>
+
+              <div>
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  value={props.duration || 60}
+                  onChange={(e) => handlePropChange('duration', parseInt(e.target.value) || 60)}
+                  placeholder="60"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="currency">Currency</Label>
+                <select
+                  id="currency"
+                  value={props.currency || 'MYR'}
+                  onChange={(e) => handlePropChange('currency', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="MYR">MYR (RM)</option>
+                  <option value="SGD">SGD ($)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="IDR">IDR (Rp)</option>
+                </select>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Time Slots Configuration</div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="startTime">Start Time</Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={props.startTime || '09:00'}
+                    onChange={(e) => handlePropChange('startTime', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="endTime">End Time</Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={props.endTime || '18:00'}
+                    onChange={(e) => handlePropChange('endTime', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="slotDuration">Slot Duration (minutes)</Label>
+                <select
+                  id="slotDuration"
+                  value={props.slotDuration || 60}
+                  onChange={(e) => handlePropChange('slotDuration', parseInt(e.target.value))}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value={15}>15 minutes</option>
+                  <option value={30}>30 minutes</option>
+                  <option value={45}>45 minutes</option>
+                  <option value={60}>1 hour</option>
+                  <option value={90}>1.5 hours</option>
+                  <option value={120}>2 hours</option>
+                </select>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Available Days</div>
+              <div className="space-y-2 border border-gray-200 rounded-md p-3 bg-gray-50">
+                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
+                  <div key={day} className="flex items-center justify-between">
+                    <Label htmlFor={`day-${index}`} className="cursor-pointer">{day}</Label>
+                    <input
+                      type="checkbox"
+                      id={`day-${index}`}
+                      checked={(props.availableDays || [1, 2, 3, 4, 5]).includes(index)}
+                      onChange={(e) => {
+                        const currentDays = props.availableDays || [1, 2, 3, 4, 5];
+                        if (e.target.checked) {
+                          handlePropChange('availableDays', [...currentDays, index].sort());
+                        } else {
+                          handlePropChange('availableDays', currentDays.filter((d: number) => d !== index));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Customer Fields</div>
+
+              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showName" className="cursor-pointer">Show Name Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showName"
+                    checked={props.showName ?? true}
+                    onChange={(e) => handlePropChange('showName', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showName && (
+                  <div className="pl-4">
+                    <Label htmlFor="nameLabel" className="text-xs">Name Label</Label>
+                    <Input
+                      id="nameLabel"
+                      value={props.nameLabel || ''}
+                      onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                      placeholder="Full Name"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showPhone" className="cursor-pointer">Show Phone Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showPhone"
+                    checked={props.showPhone ?? true}
+                    onChange={(e) => handlePropChange('showPhone', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showPhone && (
+                  <div className="pl-4">
+                    <Label htmlFor="phoneLabel" className="text-xs">Phone Label</Label>
+                    <Input
+                      id="phoneLabel"
+                      value={props.phoneLabel || ''}
+                      onChange={(e) => handlePropChange('phoneLabel', e.target.value)}
+                      placeholder="Phone Number"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showEmail" className="cursor-pointer">Show Email Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showEmail"
+                    checked={props.showEmail ?? true}
+                    onChange={(e) => handlePropChange('showEmail', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showEmail && (
+                  <div className="pl-4">
+                    <Label htmlFor="emailLabel" className="text-xs">Email Label</Label>
+                    <Input
+                      id="emailLabel"
+                      value={props.emailLabel || ''}
+                      onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                      placeholder="Email"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="defaultCountryCode">Default Country Code</Label>
+                <select
+                  id="defaultCountryCode"
+                  value={props.defaultCountryCode || 'MY'}
+                  onChange={(e) => handlePropChange('defaultCountryCode', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="MY">🇲🇾 Malaysia (+60)</option>
+                  <option value="SG">🇸🇬 Singapore (+65)</option>
+                  <option value="ID">🇮🇩 Indonesia (+62)</option>
+                  <option value="TH">🇹🇭 Thailand (+66)</option>
+                  <option value="PH">🇵🇭 Philippines (+63)</option>
+                  <option value="VN">🇻🇳 Vietnam (+84)</option>
+                  <option value="US">🇺🇸 United States (+1)</option>
+                  <option value="GB">🇬🇧 United Kingdom (+44)</option>
+                </select>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+
+              <div>
+                <Label htmlFor="submitButtonText">Button Text</Label>
+                <Input
+                  id="submitButtonText"
+                  value={props.submitButtonText || ''}
+                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  placeholder="Confirm Booking"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="submitButtonColor">Button Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="submitButtonColor"
+                    type="color"
+                    value={props.submitButtonColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.submitButtonColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    placeholder="#2563eb"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="requirePayment" className="cursor-pointer">Require Payment</Label>
+                <input
+                  type="checkbox"
+                  id="requirePayment"
+                  checked={props.requirePayment ?? false}
+                  onChange={(e) => handlePropChange('requirePayment', e.target.checked)}
+                  className="w-4 h-4"
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Google Sheets Integration</div>
+
+              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="google_sheets_enabled" className="cursor-pointer">Enable Google Sheets</Label>
+                  <input
+                    type="checkbox"
+                    id="google_sheets_enabled"
+                    checked={props.google_sheets_enabled ?? false}
+                    onChange={(e) => handlePropChange('google_sheets_enabled', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.google_sheets_enabled && (
+                  <div>
+                    <Label htmlFor="google_sheets_url">Google Sheets URL or ID</Label>
+                    <Input
+                      id="google_sheets_url"
+                      value={props.google_sheets_url || ''}
+                      onChange={(e) => handlePropChange('google_sheets_url', e.target.value)}
+                      placeholder="https://docs.google.com/spreadsheets/d/..."
+                    />
+                    <p className="text-xs text-gray-600 mt-1">
+                      Connect your Google account in Integrations to enable this feature.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Footer Links</div>
+
+              <div>
+                <Label htmlFor="termsUrl">Terms & Conditions URL</Label>
+                <Input
+                  id="termsUrl"
+                  value={props.termsUrl || ''}
+                  onChange={(e) => handlePropChange('termsUrl', e.target.value)}
+                  placeholder="#"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="policyUrl">Privacy Policy URL</Label>
+                <Input
+                  id="policyUrl"
+                  value={props.policyUrl || ''}
+                  onChange={(e) => handlePropChange('policyUrl', e.target.value)}
+                  placeholder="#"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="bgColor-booking">Background Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bgColor-booking"
+                    type="color"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    placeholder="#ffffff"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        );
+
       case 'form_with_payment':
         return (
           <>

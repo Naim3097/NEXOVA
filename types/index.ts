@@ -58,7 +58,8 @@ export type ElementType =
   | 'pricing'
   | 'lead_form'
   | 'whatsapp_button'
-  | 'form_with_payment';
+  | 'form_with_payment'
+  | 'booking_form';
 
 export interface Template {
   id: string;

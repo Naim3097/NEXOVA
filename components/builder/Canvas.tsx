@@ -23,6 +23,7 @@ import {
   LeadFormElement,
   WhatsAppButtonElement,
   FormWithPaymentElement,
+  BookingFormElement,
 } from './elements';
 import {
   DndContext,
@@ -170,6 +171,7 @@ export const Canvas = () => {
       onSelect: () => setSelectedId(element.id),
       onHover: (hovering: boolean) =>
         setHoveredId(hovering ? element.id : null),
+      viewportMode,
     };
 
     let elementContent: React.ReactNode;
@@ -210,6 +212,9 @@ export const Canvas = () => {
         break;
       case 'form_with_payment':
         elementContent = <FormWithPaymentElement props={element.props as any} {...commonProps} />;
+        break;
+      case 'booking_form':
+        elementContent = <BookingFormElement props={element.props as any} {...commonProps} />;
         break;
       case 'footer':
         elementContent = <FooterElement props={element.props as any} {...commonProps} />;
