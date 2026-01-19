@@ -654,7 +654,7 @@ export default function SubdomainSettingsPage() {
       }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#4ECDC4]">How to use my own domain?</DialogTitle>
+            <DialogTitle>How to use my own domain?</DialogTitle>
             <DialogDescription>
               In order to point your page to your own domain, you&apos;ll need to update your zone record in your hosting control panel.
             </DialogDescription>
@@ -778,14 +778,14 @@ export default function SubdomainSettingsPage() {
                 </Label>
               </div>
 
-              <div className="p-3 bg-[#4ECDC4]/10 border border-[#4ECDC4]/30 rounded-lg">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-start gap-2">
                   <Checkbox
                     id="understoodWarning"
                     checked={understoodWarning}
                     onCheckedChange={(checked: boolean | 'indeterminate') => setUnderstoodWarning(checked === true)}
                   />
-                  <Label htmlFor="understoodWarning" className="text-sm cursor-pointer text-[#4ECDC4]">
+                  <Label htmlFor="understoodWarning" className="text-sm cursor-pointer text-blue-900">
                     By choosing to use your own domain name, you can&apos;t revert back to our {appDomain.split('.')[0]}.app subdomain.
                     <br />
                     <span className="font-medium">I understood and agree</span>
@@ -816,7 +816,6 @@ export default function SubdomainSettingsPage() {
                 !understoodWarning ||
                 (customDomainAvailability !== null && !customDomainAvailability.available)
               }
-              className="bg-[#4ECDC4] hover:bg-[#45b8b0]"
             >
               {savingCustomDomain ? (
                 <>
