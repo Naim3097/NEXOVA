@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Info, AlertTriangle, Copy } from 'lucide-react';
+import { ArrowLeft, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Info, AlertTriangle, Copy, RefreshCw } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+
+interface DnsRecord {
+  type: string;
+  name: string;
+  value: string;
+}
 
 export default function SubdomainSettingsPage() {
   const router = useRouter();
@@ -39,9 +45,16 @@ export default function SubdomainSettingsPage() {
   const [ownsDomain, setOwnsDomain] = useState(false);
   const [hasDnsAccess, setHasDnsAccess] = useState(false);
   const [understoodWarning, setUnderstoodWarning] = useState(false);
+  const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
+  const [verifyingDns, setVerifyingDns] = useState(false);
 
   const appDomain = process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '') || 'ide-page-builder.vercel.app';
-  const serverIP = '143.198.214.244'; // Your server IP for A record
+
+  // Default DNS records to show before domain is added to Vercel
+  const defaultDnsRecords: DnsRecord[] = [
+    { type: 'A', name: '@', value: '76.76.21.21' },
+    { type: 'CNAME', name: 'www', value: 'cname.vercel-dns.com' },
+  ];
 
   useEffect(() => {
     loadSettings();
@@ -66,11 +79,55 @@ export default function SubdomainSettingsPage() {
       if (customDomainData.success) {
         setCurrentCustomDomain(customDomainData.customDomain);
         setCustomDomainVerified(customDomainData.verified);
+        if (customDomainData.dnsRecords) {
+          setDnsRecords(customDomainData.dnsRecords);
+        }
       }
     } catch (error) {
       console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const verifyDns = async () => {
+    if (!currentCustomDomain) return;
+
+    try {
+      setVerifyingDns(true);
+      const response = await fetch('/api/custom-domain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: currentCustomDomain, action: 'verify' }),
+      });
+
+      const data = await response.json();
+
+      if (data.verified) {
+        setCustomDomainVerified(true);
+        toast({
+          title: 'Domain Verified!',
+          description: 'Your custom domain is now active and ready to use.',
+        });
+      } else {
+        toast({
+          title: 'DNS Not Ready',
+          description: data.error || 'Please ensure your DNS records are configured correctly. It may take up to 48 hours for DNS changes to propagate.',
+          variant: 'destructive',
+        });
+      }
+
+      // Reload to get updated DNS records
+      await loadSettings();
+    } catch (error) {
+      console.error('Error verifying DNS:', error);
+      toast({
+        title: 'Verification Failed',
+        description: 'Unable to verify DNS configuration. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setVerifyingDns(false);
     }
   };
 
@@ -349,7 +406,7 @@ export default function SubdomainSettingsPage() {
       {/* Current Custom Domain Status */}
       {currentCustomDomain && (
         <Card className="mb-6 border-purple-200 bg-purple-50">
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {customDomainVerified ? (
@@ -368,21 +425,80 @@ export default function SubdomainSettingsPage() {
                     {currentCustomDomain}
                     <ExternalLink className="w-3 h-3" />
                   </a>
-                  {!customDomainVerified && (
+                  {customDomainVerified ? (
+                    <p className="text-xs text-green-600 mt-1">Domain verified and active</p>
+                  ) : (
                     <p className="text-xs text-amber-600 mt-1">DNS verification pending</p>
                   )}
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRemoveCustomDomain}
-                disabled={savingCustomDomain}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                Remove
-              </Button>
+              <div className="flex gap-2">
+                {!customDomainVerified && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={verifyDns}
+                    disabled={verifyingDns}
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+                  >
+                    {verifyingDns ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                    )}
+                    Verify DNS
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRemoveCustomDomain}
+                  disabled={savingCustomDomain}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  Remove
+                </Button>
+              </div>
             </div>
+
+            {/* DNS Records for existing domain */}
+            {!customDomainVerified && dnsRecords.length > 0 && (
+              <div className="border rounded-lg overflow-hidden bg-white">
+                <div className="px-4 py-2 bg-gray-50 border-b">
+                  <p className="text-sm font-medium text-gray-700">Required DNS Records</p>
+                </div>
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">Type</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">Name</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dnsRecords.map((record, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="px-4 py-3 font-medium">{record.type}</td>
+                        <td className="px-4 py-3 font-mono text-sm">{record.name}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm truncate max-w-[200px]">{record.value}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0 shrink-0"
+                              onClick={() => copyToClipboard(record.value)}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -560,33 +676,45 @@ export default function SubdomainSettingsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">TYPE</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">NAME</th>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">VALUE</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-t">
-                    <td className="px-4 py-3 font-medium">A</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono">{serverIP}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={() => copyToClipboard(serverIP)}
-                        >
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
+                  {defaultDnsRecords.map((record, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-3 font-medium">{record.type}</td>
+                      <td className="px-4 py-3 font-mono text-sm">{record.name}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm">{record.value}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => copyToClipboard(record.value)}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
-            <p className="text-sm text-gray-600">
-              Create a new A record and add the value in the above table in your zone record entry. After the domain record is created in your site DNS manager, you can check via the button below whether the domain have been pointed to our server.
-            </p>
+            <div className="text-sm text-gray-600 space-y-2">
+              <p>
+                <strong>For root domains</strong> (e.g., example.com): Create an <code className="bg-gray-100 px-1 rounded">A</code> record pointing to <code className="bg-gray-100 px-1 rounded">76.76.21.21</code>
+              </p>
+              <p>
+                <strong>For subdomains</strong> (e.g., www.example.com): Create a <code className="bg-gray-100 px-1 rounded">CNAME</code> record pointing to <code className="bg-gray-100 px-1 rounded">cname.vercel-dns.com</code>
+              </p>
+              <p>
+                After configuring DNS, click OK to save. You can verify your domain configuration on the settings page.
+              </p>
+            </div>
 
             {/* Domain Input */}
             <div>

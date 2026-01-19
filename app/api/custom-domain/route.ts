@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import {
+  addDomainToVercel,
+  removeDomainFromVercel,
+  verifyDomainOnVercel,
+  getDomainStatus,
+} from '@/lib/vercel-domains';
 
 // GET: Get current custom domain settings
 export async function GET() {
@@ -21,10 +27,70 @@ export async function GET() {
       throw error;
     }
 
+    // If user has a custom domain, get its status from Vercel
+    let vercelStatus = null;
+    let dnsRecords = null;
+
+    if (profile?.custom_domain) {
+      const status = await getDomainStatus(profile.custom_domain);
+      vercelStatus = {
+        exists: status.exists,
+        verified: status.verified,
+        verification: status.verification,
+        misconfigured: status.config?.misconfigured,
+      };
+
+      // Build DNS records to show user
+      if (status.exists) {
+        const isApex = !profile.custom_domain.includes('.') ||
+          profile.custom_domain.split('.').length === 2;
+
+        dnsRecords = [];
+
+        if (isApex) {
+          dnsRecords.push({
+            type: 'A',
+            name: '@',
+            value: '76.76.21.21',
+          });
+        } else {
+          const parts = profile.custom_domain.split('.');
+          const subdomain = parts[0];
+          dnsRecords.push({
+            type: 'CNAME',
+            name: subdomain,
+            value: 'cname.vercel-dns.com',
+          });
+        }
+
+        // Add TXT verification if not verified
+        if (!status.verified && status.verification && status.verification.length > 0) {
+          const txtVerification = status.verification.find(v => v.type === 'TXT');
+          if (txtVerification) {
+            dnsRecords.push({
+              type: 'TXT',
+              name: '_vercel',
+              value: txtVerification.value,
+            });
+          }
+        }
+      }
+
+      // Update verified status in database if it changed
+      if (status.verified !== profile.custom_domain_verified) {
+        await supabase
+          .from('profiles')
+          .update({ custom_domain_verified: status.verified })
+          .eq('id', user.id);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       customDomain: profile?.custom_domain || null,
-      verified: profile?.custom_domain_verified || false,
+      verified: vercelStatus?.verified || profile?.custom_domain_verified || false,
+      vercelStatus,
+      dnsRecords,
     });
   } catch (error) {
     console.error('Error fetching custom domain:', error);
@@ -35,7 +101,7 @@ export async function GET() {
   }
 }
 
-// POST: Check if custom domain is available
+// POST: Check if custom domain is available and add to Vercel
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient();
@@ -45,8 +111,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { domain } = await request.json();
+    const { domain, action } = await request.json();
 
+    // Handle verify action
+    if (action === 'verify') {
+      if (!domain) {
+        return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
+      }
+
+      const verifyResult = await verifyDomainOnVercel(domain);
+
+      if (verifyResult.verified) {
+        // Update database
+        await supabase
+          .from('profiles')
+          .update({ custom_domain_verified: true })
+          .eq('id', user.id);
+      }
+
+      return NextResponse.json({
+        success: verifyResult.success,
+        verified: verifyResult.verified,
+        error: verifyResult.error,
+      });
+    }
+
+    // Default action: check availability
     if (!domain) {
       return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
     }
@@ -60,7 +150,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check if domain is already taken by another user
+    // Check if domain is already taken by another user in our database
     const { data: existing, error } = await supabase
       .from('profiles')
       .select('id')
@@ -72,9 +162,16 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
+    if (existing) {
+      return NextResponse.json({
+        available: false,
+        error: 'This domain is already registered by another user.',
+      });
+    }
+
     return NextResponse.json({
-      available: !existing,
-      error: existing ? 'This domain is already registered by another user.' : null,
+      available: true,
+      error: null,
     });
   } catch (error) {
     console.error('Error checking domain:', error);
@@ -85,7 +182,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Save custom domain
+// PUT: Save custom domain (add to Vercel and save to database)
 export async function PUT(request: NextRequest) {
   try {
     const supabase = createClient();
@@ -97,6 +194,13 @@ export async function PUT(request: NextRequest) {
 
     const { domain } = await request.json();
 
+    // Get current domain to remove from Vercel if changing
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('custom_domain')
+      .eq('id', user.id)
+      .single();
+
     if (domain) {
       // Validate domain format
       const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}$/;
@@ -106,7 +210,7 @@ export async function PUT(request: NextRequest) {
         }, { status: 400 });
       }
 
-      // Check if domain is already taken
+      // Check if domain is already taken by another user
       const { data: existing } = await supabase
         .from('profiles')
         .select('id')
@@ -119,26 +223,67 @@ export async function PUT(request: NextRequest) {
           error: 'This domain is already registered by another user.',
         }, { status: 400 });
       }
+
+      // Remove old domain from Vercel if exists
+      if (currentProfile?.custom_domain && currentProfile.custom_domain !== domain.toLowerCase()) {
+        await removeDomainFromVercel(currentProfile.custom_domain);
+      }
+
+      // Add new domain to Vercel
+      const vercelResult = await addDomainToVercel(domain.toLowerCase());
+
+      if (!vercelResult.success) {
+        return NextResponse.json({
+          error: vercelResult.error || 'Failed to add domain to Vercel.',
+        }, { status: 400 });
+      }
+
+      // Update database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          custom_domain: domain.toLowerCase(),
+          custom_domain_verified: vercelResult.domain?.verified || false,
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        // Try to rollback Vercel domain
+        await removeDomainFromVercel(domain.toLowerCase());
+        throw updateError;
+      }
+
+      return NextResponse.json({
+        success: true,
+        customDomain: domain.toLowerCase(),
+        verified: vercelResult.domain?.verified || false,
+        dnsRecords: vercelResult.dnsRecords,
+        verification: vercelResult.domain?.verification,
+      });
+    } else {
+      // Removing domain
+      if (currentProfile?.custom_domain) {
+        await removeDomainFromVercel(currentProfile.custom_domain);
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          custom_domain: null,
+          custom_domain_verified: false,
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return NextResponse.json({
+        success: true,
+        customDomain: null,
+        verified: false,
+      });
     }
-
-    // Update custom domain (reset verification status when domain changes)
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        custom_domain: domain ? domain.toLowerCase() : null,
-        custom_domain_verified: false,
-      })
-      .eq('id', user.id);
-
-    if (updateError) {
-      throw updateError;
-    }
-
-    return NextResponse.json({
-      success: true,
-      customDomain: domain ? domain.toLowerCase() : null,
-      verified: false,
-    });
   } catch (error) {
     console.error('Error updating custom domain:', error);
     return NextResponse.json(
@@ -158,6 +303,23 @@ export async function DELETE() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get current domain to remove from Vercel
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('custom_domain')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.custom_domain) {
+      // Remove from Vercel
+      const removeResult = await removeDomainFromVercel(profile.custom_domain);
+      if (!removeResult.success) {
+        console.error('Failed to remove domain from Vercel:', removeResult.error);
+        // Continue anyway to clear database
+      }
+    }
+
+    // Clear from database
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
