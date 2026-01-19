@@ -2577,6 +2577,41 @@ export const PropertiesPanel = () => {
                     />
                   </div>
                 )}
+
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="showRemark" className="cursor-pointer">Show Remarks/Notes Field</Label>
+                  <input
+                    type="checkbox"
+                    id="showRemark"
+                    checked={props.showRemark ?? true}
+                    onChange={(e) => handlePropChange('showRemark', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.showRemark && (
+                  <div className="pl-4 space-y-2">
+                    <div>
+                      <Label htmlFor="remarkLabel" className="text-xs">Remark Label</Label>
+                      <Input
+                        id="remarkLabel"
+                        value={props.remarkLabel || ''}
+                        onChange={(e) => handlePropChange('remarkLabel', e.target.value)}
+                        placeholder="Notes / Remarks"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="remarkRequired" className="text-xs cursor-pointer">Required</Label>
+                      <input
+                        type="checkbox"
+                        id="remarkRequired"
+                        checked={props.remarkRequired ?? false}
+                        onChange={(e) => handlePropChange('remarkRequired', e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

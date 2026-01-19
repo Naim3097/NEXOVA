@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Phone, Mail, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, Shield, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 
 interface TimeSlot {
   id: string;
@@ -15,12 +15,15 @@ interface BookingFormElementProps {
     nameLabel?: string;
     phoneLabel?: string;
     emailLabel?: string;
+    remarkLabel?: string;
     showName?: boolean;
     showPhone?: boolean;
     showEmail?: boolean;
+    showRemark?: boolean;
     nameRequired?: boolean;
     phoneRequired?: boolean;
     emailRequired?: boolean;
+    remarkRequired?: boolean;
     defaultCountryCode?: string;
     // Booking settings
     serviceName?: string;
@@ -107,12 +110,15 @@ export const BookingFormElement = React.memo(
       nameLabel = 'Full Name',
       phoneLabel = 'Phone Number',
       emailLabel = 'Email',
+      remarkLabel = 'Notes / Remarks',
       showName = true,
       showPhone = true,
       showEmail = true,
+      showRemark = true,
       nameRequired = true,
       phoneRequired = true,
       emailRequired = true,
+      remarkRequired = false,
       defaultCountryCode = 'MY',
       serviceName = 'Consultation',
       servicePrice = 0,
@@ -335,6 +341,25 @@ export const BookingFormElement = React.memo(
                       type="email"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="your@email.com"
+                      disabled
+                    />
+                  </div>
+                )}
+
+                {/* Remark/Notes Field */}
+                {showRemark && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        {remarkLabel}
+                        {remarkRequired && <span className="text-red-500">*</span>}
+                      </div>
+                    </label>
+                    <textarea
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      placeholder="Any special requests or notes..."
+                      rows={3}
                       disabled
                     />
                   </div>

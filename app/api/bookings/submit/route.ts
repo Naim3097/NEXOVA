@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       customer_name,
       customer_phone,
       customer_email,
+      customer_remark,
       // Booking details
       booking_date,
       time_slot,
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest) {
         customer_name: customer_name.trim(),
         customer_email: customer_email.trim().toLowerCase(),
         customer_phone: customer_phone?.trim() || null,
+        customer_remark: customer_remark?.trim() || null,
         booking_date: booking_date,
         time_slot: time_slot,
         service_name: service_name || 'Booking',
@@ -164,7 +166,7 @@ export async function POST(request: NextRequest) {
             customer_name: customer_name.trim(),
             customer_email: customer_email.trim().toLowerCase(),
             customer_phone: customer_phone?.trim() || null,
-            message: `Booking: ${service_name || 'Appointment'} on ${booking_date} at ${time_slot}`,
+            message: `Booking: ${service_name || 'Appointment'} on ${booking_date} at ${time_slot}${customer_remark ? ` | Notes: ${customer_remark}` : ''}`,
             custom_fields: {
               booking_ref: bookingRef,
               booking_date: booking_date,
@@ -174,6 +176,7 @@ export async function POST(request: NextRequest) {
               duration: duration,
               payment_status: payment_status || 'not_required',
               transaction_id: transaction_id,
+              customer_remark: customer_remark || null,
             },
             ip_address: ip_address,
             user_agent: user_agent,
@@ -201,6 +204,7 @@ export async function POST(request: NextRequest) {
             customer_name,
             customer_email,
             customer_phone,
+            customer_remark,
             booking_date,
             time_slot,
             service_name,
@@ -239,6 +243,7 @@ export async function POST(request: NextRequest) {
         customer_name,
         customer_email,
         customer_phone,
+        customer_remark,
         booking_date,
         time_slot,
         service_name,
@@ -281,6 +286,7 @@ async function handleGoogleSheetsIntegration(
     customer_name: string;
     customer_email: string;
     customer_phone?: string;
+    customer_remark?: string;
     booking_date: string;
     time_slot: string;
     service_name?: string;
@@ -296,6 +302,7 @@ async function handleGoogleSheetsIntegration(
   }
 
   try {
+    const remarkPart = bookingData.customer_remark ? ` | Notes: ${bookingData.customer_remark}` : '';
     const result = await appendLeadToSheet(
       props.google_sheets_url,
       {
@@ -303,7 +310,7 @@ async function handleGoogleSheetsIntegration(
         name: bookingData.customer_name,
         email: bookingData.customer_email,
         phone: bookingData.customer_phone || '',
-        message: `Booking Ref: ${bookingData.bookingRef} | Service: ${bookingData.service_name || 'Appointment'} | Date: ${bookingData.booking_date} | Time: ${bookingData.time_slot} | Duration: ${bookingData.duration || 60}min | Price: ${bookingData.service_price || 0} | Payment: ${bookingData.payment_status || 'N/A'}`,
+        message: `Booking Ref: ${bookingData.bookingRef} | Service: ${bookingData.service_name || 'Appointment'} | Date: ${bookingData.booking_date} | Time: ${bookingData.time_slot} | Duration: ${bookingData.duration || 60}min | Price: ${bookingData.service_price || 0} | Payment: ${bookingData.payment_status || 'N/A'}${remarkPart}`,
         ip_address: bookingData.ip_address,
         referrer: bookingData.referrer,
       },
