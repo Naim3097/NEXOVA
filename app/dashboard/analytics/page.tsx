@@ -164,12 +164,23 @@ export default function AnalyticsOverviewPage() {
   if (!stats) return null;
 
   // Prepare traffic over time data
-  const trafficData = stats.dailyStats.map((item) => ({
-    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    Users: item.users,
-    Sessions: item.sessions,
-    'Page Views': item.pageViews,
-  }));
+  // GA4 returns dates in YYYYMMDD format, so we need to parse them correctly
+  const trafficData = stats.dailyStats.map((item) => {
+    let dateStr = item.date;
+    // Parse YYYYMMDD format from GA4
+    if (/^\d{8}$/.test(dateStr)) {
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      dateStr = `${year}-${month}-${day}`;
+    }
+    return {
+      date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      Users: item.users,
+      Sessions: item.sessions,
+      'Page Views': item.pageViews,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">

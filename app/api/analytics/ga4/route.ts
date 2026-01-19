@@ -65,20 +65,6 @@ export async function GET(request: NextRequest) {
     const dateRange = searchParams.get('dateRange') || '7d'; // 7d, 30d, 90d
     const projectId = searchParams.get('projectId');
 
-    // Generate cache key
-    const cacheKey = `ga4:${user.id}:${dateRange}:${projectId || 'all'}`;
-
-    // Check cache first (6-hour TTL for analytics data)
-    const cachedData = cache.get(cacheKey);
-    if (cachedData) {
-      return NextResponse.json({
-        success: true,
-        dateRange,
-        data: cachedData,
-        cached: true,
-      });
-    }
-
     // Get GA4 property ID from profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
@@ -91,6 +77,20 @@ export async function GET(request: NextRequest) {
         { error: 'Google Analytics not connected' },
         { status: 400 }
       );
+    }
+
+    // Generate cache key (includes property ID so cache is invalidated when property changes)
+    const cacheKey = `ga4:${user.id}:${profile.ga4_property_id}:${dateRange}:${projectId || 'all'}`;
+
+    // Check cache first (6-hour TTL for analytics data)
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      return NextResponse.json({
+        success: true,
+        dateRange,
+        data: cachedData,
+        cached: true,
+      });
     }
 
     // Get valid OAuth client

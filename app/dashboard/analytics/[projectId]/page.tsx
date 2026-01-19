@@ -180,11 +180,22 @@ export default function AnalyticsPage() {
   }));
 
   // Prepare traffic over time data for line chart
-  const trafficData = stats.trafficOverTime.map((item) => ({
-    date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    'Page Views': item.page_views,
-    'Unique Visitors': item.unique_visitors,
-  }));
+  // GA4 returns dates in YYYYMMDD format, so we need to parse them correctly
+  const trafficData = stats.trafficOverTime.map((item) => {
+    let dateStr = item.date;
+    // Parse YYYYMMDD format from GA4
+    if (/^\d{8}$/.test(dateStr)) {
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      dateStr = `${year}-${month}-${day}`;
+    }
+    return {
+      date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      'Page Views': item.page_views,
+      'Unique Visitors': item.unique_visitors,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
