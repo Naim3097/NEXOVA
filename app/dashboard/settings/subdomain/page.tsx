@@ -6,8 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Info } from 'lucide-react';
+import { ArrowLeft, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Info, AlertTriangle, Copy } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function SubdomainSettingsPage() {
   const router = useRouter();
@@ -19,23 +28,47 @@ export default function SubdomainSettingsPage() {
   const [newSubdomain, setNewSubdomain] = useState('');
   const [availability, setAvailability] = useState<{ available: boolean; error: string | null } | null>(null);
 
+  // Custom domain state
+  const [showCustomDomainDialog, setShowCustomDomainDialog] = useState(false);
+  const [customDomain, setCustomDomain] = useState('');
+  const [currentCustomDomain, setCurrentCustomDomain] = useState<string | null>(null);
+  const [customDomainVerified, setCustomDomainVerified] = useState(false);
+  const [customDomainAvailability, setCustomDomainAvailability] = useState<{ available: boolean; error: string | null } | null>(null);
+  const [checkingCustomDomain, setCheckingCustomDomain] = useState(false);
+  const [savingCustomDomain, setSavingCustomDomain] = useState(false);
+  const [ownsDomain, setOwnsDomain] = useState(false);
+  const [hasDnsAccess, setHasDnsAccess] = useState(false);
+  const [understoodWarning, setUnderstoodWarning] = useState(false);
+
   const appDomain = process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '') || 'ide-page-builder.vercel.app';
+  const serverIP = '143.198.214.244'; // Your server IP for A record
 
   useEffect(() => {
-    loadSubdomain();
+    loadSettings();
   }, []);
 
-  const loadSubdomain = async () => {
+  const loadSettings = async () => {
     try {
-      const response = await fetch('/api/subdomain');
-      const data = await response.json();
+      // Load both subdomain and custom domain settings
+      const [subdomainRes, customDomainRes] = await Promise.all([
+        fetch('/api/subdomain'),
+        fetch('/api/custom-domain'),
+      ]);
 
-      if (data.success) {
-        setCurrentSubdomain(data.subdomain);
-        setNewSubdomain(data.subdomain || '');
+      const subdomainData = await subdomainRes.json();
+      const customDomainData = await customDomainRes.json();
+
+      if (subdomainData.success) {
+        setCurrentSubdomain(subdomainData.subdomain);
+        setNewSubdomain(subdomainData.subdomain || '');
+      }
+
+      if (customDomainData.success) {
+        setCurrentCustomDomain(customDomainData.customDomain);
+        setCustomDomainVerified(customDomainData.verified);
       }
     } catch (error) {
-      console.error('Error loading subdomain:', error);
+      console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
     }
@@ -141,6 +174,125 @@ export default function SubdomainSettingsPage() {
     }
   };
 
+  // Custom domain functions
+  const checkCustomDomainAvailability = async () => {
+    if (!customDomain.trim()) {
+      setCustomDomainAvailability(null);
+      return;
+    }
+
+    try {
+      setCheckingCustomDomain(true);
+      const response = await fetch('/api/custom-domain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: customDomain.toLowerCase() }),
+      });
+
+      const data = await response.json();
+      setCustomDomainAvailability({ available: data.available, error: data.error });
+    } catch (error) {
+      console.error('Error checking custom domain:', error);
+      setCustomDomainAvailability({ available: false, error: 'Failed to check domain' });
+    } finally {
+      setCheckingCustomDomain(false);
+    }
+  };
+
+  const handleSaveCustomDomain = async () => {
+    if (!ownsDomain || !hasDnsAccess || !understoodWarning) {
+      toast({
+        title: 'Please confirm all requirements',
+        description: 'You must check all checkboxes to proceed',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setSavingCustomDomain(true);
+      const response = await fetch('/api/custom-domain', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: customDomain.toLowerCase() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save custom domain');
+      }
+
+      setCurrentCustomDomain(data.customDomain);
+      setCustomDomainVerified(false);
+      setShowCustomDomainDialog(false);
+      resetCustomDomainForm();
+
+      toast({
+        title: 'Custom Domain Saved',
+        description: 'Please configure your DNS settings to point to our server.',
+      });
+    } catch (error) {
+      console.error('Error saving custom domain:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to save custom domain',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingCustomDomain(false);
+    }
+  };
+
+  const handleRemoveCustomDomain = async () => {
+    if (!confirm('Are you sure you want to remove your custom domain? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setSavingCustomDomain(true);
+      const response = await fetch('/api/custom-domain', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove custom domain');
+      }
+
+      setCurrentCustomDomain(null);
+      setCustomDomainVerified(false);
+      toast({
+        title: 'Custom Domain Removed',
+        description: 'Your pages will now use the subdomain or path-based URLs',
+      });
+    } catch (error) {
+      console.error('Error removing custom domain:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to remove custom domain',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingCustomDomain(false);
+    }
+  };
+
+  const resetCustomDomainForm = () => {
+    setCustomDomain('');
+    setCustomDomainAvailability(null);
+    setOwnsDomain(false);
+    setHasDnsAccess(false);
+    setUnderstoodWarning(false);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: 'Copied!',
+      description: 'Value copied to clipboard',
+    });
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4 max-w-2xl">
@@ -170,7 +322,7 @@ export default function SubdomainSettingsPage() {
             <Globe className="w-7 h-7 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Subdomain Settings</h1>
+            <h1 className="text-3xl font-bold">Domain Settings</h1>
             <p className="text-muted-foreground mt-1">
               Customize your published page URL
             </p>
@@ -182,20 +334,61 @@ export default function SubdomainSettingsPage() {
       <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 mb-6">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="text-sm">
-          <p className="font-semibold mb-1">How subdomains work</p>
+          <p className="font-semibold mb-1">How domains work</p>
           <p className="opacity-90">
             With a subdomain, your published pages will be accessible at:<br />
             <code className="bg-blue-100 px-1 rounded">yourname.{appDomain}</code>
           </p>
           <p className="opacity-90 mt-2">
-            Without a subdomain, pages use path-based URLs:<br />
-            <code className="bg-blue-100 px-1 rounded">{appDomain}/p/your-page-slug</code>
+            With a custom domain, your pages will be accessible at:<br />
+            <code className="bg-blue-100 px-1 rounded">www.yourdomain.com</code>
           </p>
         </div>
       </div>
 
-      {/* Current Status */}
-      {currentSubdomain && (
+      {/* Current Custom Domain Status */}
+      {currentCustomDomain && (
+        <Card className="mb-6 border-purple-200 bg-purple-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {customDomainVerified ? (
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                ) : (
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                )}
+                <div>
+                  <p className="font-medium text-purple-900">Custom Domain</p>
+                  <a
+                    href={`https://${currentCustomDomain}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-purple-700 hover:underline flex items-center gap-1"
+                  >
+                    {currentCustomDomain}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  {!customDomainVerified && (
+                    <p className="text-xs text-amber-600 mt-1">DNS verification pending</p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRemoveCustomDomain}
+                disabled={savingCustomDomain}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                Remove
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Current Subdomain Status */}
+      {currentSubdomain && !currentCustomDomain && (
         <Card className="mb-6 border-green-200 bg-green-50">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -228,91 +421,287 @@ export default function SubdomainSettingsPage() {
         </Card>
       )}
 
+      {/* Use Custom Domain Button */}
+      {!currentCustomDomain && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Use Your Own Domain</CardTitle>
+            <CardDescription>
+              Point your own domain to your published pages
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => setShowCustomDomainDialog(true)}
+              variant="outline"
+              className="w-full"
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              Configure Custom Domain
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Subdomain Input */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{currentSubdomain ? 'Change Subdomain' : 'Claim Your Subdomain'}</CardTitle>
-          <CardDescription>
-            Choose a unique subdomain for your published pages
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="subdomain">Subdomain</Label>
-            <div className="flex items-center gap-2 mt-1">
-              <Input
-                id="subdomain"
-                value={newSubdomain}
-                onChange={(e) => {
-                  setNewSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-                  setAvailability(null);
-                }}
-                onBlur={checkAvailability}
-                placeholder="yourname"
-                className="flex-1"
-              />
-              <span className="text-sm text-gray-500 whitespace-nowrap">.{appDomain}</span>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Use lowercase letters, numbers, and hyphens (3-63 characters)
-            </p>
-          </div>
-
-          {/* Availability Status */}
-          {checking && (
-            <div className="flex items-center gap-2 text-gray-500">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Checking availability...</span>
-            </div>
-          )}
-
-          {!checking && availability && (
-            <div className={`flex items-center gap-2 ${availability.available ? 'text-green-600' : 'text-red-600'}`}>
-              {availability.available ? (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  <span className="text-sm">This subdomain is available!</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-4 h-4" />
-                  <span className="text-sm">{availability.error}</span>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Preview */}
-          {newSubdomain && newSubdomain.length >= 3 && (
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Preview URL</p>
-              <p className="text-sm font-mono text-gray-700">
-                https://{newSubdomain}.{appDomain}
+      {!currentCustomDomain && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{currentSubdomain ? 'Change Subdomain' : 'Claim Your Subdomain'}</CardTitle>
+            <CardDescription>
+              Choose a unique subdomain for your published pages
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="subdomain">Subdomain</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <Input
+                  id="subdomain"
+                  value={newSubdomain}
+                  onChange={(e) => {
+                    setNewSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                    setAvailability(null);
+                  }}
+                  onBlur={checkAvailability}
+                  placeholder="yourname"
+                  className="flex-1"
+                />
+                <span className="text-sm text-gray-500 whitespace-nowrap">.{appDomain}</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Use lowercase letters, numbers, and hyphens (3-63 characters)
               </p>
             </div>
-          )}
 
-          <Button
-            onClick={handleSave}
-            disabled={saving || checking || !newSubdomain || newSubdomain.length < 3 || (availability && !availability.available)}
-            className="w-full"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              currentSubdomain ? 'Update Subdomain' : 'Claim Subdomain'
+            {/* Availability Status */}
+            {checking && (
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Checking availability...</span>
+              </div>
             )}
-          </Button>
-        </CardContent>
-      </Card>
+
+            {!checking && availability && (
+              <div className={`flex items-center gap-2 ${availability.available ? 'text-green-600' : 'text-red-600'}`}>
+                {availability.available ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-sm">This subdomain is available!</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4" />
+                    <span className="text-sm">{availability.error}</span>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Preview */}
+            {newSubdomain && newSubdomain.length >= 3 && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500 mb-1">Preview URL</p>
+                <p className="text-sm font-mono text-gray-700">
+                  https://{newSubdomain}.{appDomain}
+                </p>
+              </div>
+            )}
+
+            <Button
+              onClick={handleSave}
+              disabled={saving || checking || !newSubdomain || newSubdomain.length < 3 || (availability !== null && !availability.available)}
+              className="w-full"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                currentSubdomain ? 'Update Subdomain' : 'Claim Subdomain'
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Note about republishing */}
       <p className="text-sm text-gray-500 text-center mt-4">
-        After setting your subdomain, you may need to republish your pages to update their URLs.
+        After setting your domain, you may need to republish your pages to update their URLs.
       </p>
+
+      {/* Custom Domain Dialog */}
+      <Dialog open={showCustomDomainDialog} onOpenChange={(open) => {
+        setShowCustomDomainDialog(open);
+        if (!open) resetCustomDomainForm();
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#4ECDC4]">How to use my own domain?</DialogTitle>
+            <DialogDescription>
+              In order to point your page to your own domain, you&apos;ll need to update your zone record in your hosting control panel.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Warning boxes */}
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+              <p>Unfortunately we can&apos;t help you with this settings as it is outside of our control. Please get help from your hosting provider</p>
+            </div>
+
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+              <p>If you changed to a new subdomain or domain, the old record will be deleted and be free up after 24hours before you can use it again.</p>
+            </div>
+
+            {/* DNS Record Table */}
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">TYPE</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">VALUE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t">
+                    <td className="px-4 py-3 font-medium">A</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">{serverIP}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => copyToClipboard(serverIP)}
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-sm text-gray-600">
+              Create a new A record and add the value in the above table in your zone record entry. After the domain record is created in your site DNS manager, you can check via the button below whether the domain have been pointed to our server.
+            </p>
+
+            {/* Domain Input */}
+            <div>
+              <Label htmlFor="customDomain">Full Domain Name (https://www.example.com)</Label>
+              <Input
+                id="customDomain"
+                value={customDomain}
+                onChange={(e) => {
+                  // Remove protocol if user pastes full URL
+                  let value = e.target.value.toLowerCase()
+                    .replace('https://', '')
+                    .replace('http://', '');
+                  setCustomDomain(value);
+                  setCustomDomainAvailability(null);
+                }}
+                onBlur={checkCustomDomainAvailability}
+                placeholder="URL"
+                className="mt-1"
+              />
+              {!customDomain && (
+                <p className="text-xs text-red-500 mt-1">Value is required</p>
+              )}
+            </div>
+
+            {/* Domain availability status */}
+            {checkingCustomDomain && (
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Checking domain...</span>
+              </div>
+            )}
+
+            {!checkingCustomDomain && customDomainAvailability && !customDomainAvailability.available && (
+              <div className="flex items-center gap-2 text-red-600">
+                <XCircle className="w-4 h-4" />
+                <span className="text-sm">{customDomainAvailability.error}</span>
+              </div>
+            )}
+
+            {/* Checkboxes */}
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="ownsDomain"
+                  checked={ownsDomain}
+                  onCheckedChange={(checked: boolean | 'indeterminate') => setOwnsDomain(checked === true)}
+                />
+                <Label htmlFor="ownsDomain" className="text-sm cursor-pointer">
+                  I possess this domain name
+                </Label>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="hasDnsAccess"
+                  checked={hasDnsAccess}
+                  onCheckedChange={(checked: boolean | 'indeterminate') => setHasDnsAccess(checked === true)}
+                />
+                <Label htmlFor="hasDnsAccess" className="text-sm cursor-pointer">
+                  I have an access to the DNS Manager to this domain name
+                </Label>
+              </div>
+
+              <div className="p-3 bg-[#4ECDC4]/10 border border-[#4ECDC4]/30 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="understoodWarning"
+                    checked={understoodWarning}
+                    onCheckedChange={(checked: boolean | 'indeterminate') => setUnderstoodWarning(checked === true)}
+                  />
+                  <Label htmlFor="understoodWarning" className="text-sm cursor-pointer text-[#4ECDC4]">
+                    By choosing to use your own domain name, you can&apos;t revert back to our {appDomain.split('.')[0]}.app subdomain.
+                    <br />
+                    <span className="font-medium">I understood and agree</span>
+                  </Label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCustomDomainDialog(false);
+                resetCustomDomainForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveCustomDomain}
+              disabled={
+                savingCustomDomain ||
+                checkingCustomDomain ||
+                !customDomain ||
+                !ownsDomain ||
+                !hasDnsAccess ||
+                !understoodWarning ||
+                (customDomainAvailability !== null && !customDomainAvailability.available)
+              }
+              className="bg-[#4ECDC4] hover:bg-[#45b8b0]"
+            >
+              {savingCustomDomain ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'OK'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

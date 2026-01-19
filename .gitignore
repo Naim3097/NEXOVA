@@ -41,3 +41,4 @@ vercel-env-setup.sh
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+.env.vercel.check
