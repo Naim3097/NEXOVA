@@ -303,11 +303,14 @@ export function generateBookingFormHTML(element: Element): string {
   html += '    if (isSelected) { style += "background: #3b82f6; color: white; font-weight: 600;"; }';
   html += '    else if (available) { style += "background: none; color: #111827;"; }';
   html += '    else { style += "background: none; color: #d1d5db;"; }';
-  html += '    if (available) { h += "<button type=\\"button\\" style=\\"" + style + "\\" onclick=\\"window.bookingCal_' + sanitizedId + '.sel(&#39;" + dateStr + "&#39;)\\">" + d + "</button>"; }';
+  html += '    if (available) { h += "<button type=\\"button\\" class=\\"cal-date-btn\\" data-date=\\"" + dateStr + "\\" style=\\"" + style + "\\">" + d + "</button>"; }';
   html += '    else { h += "<div style=\\"" + style + "\\">" + d + "</div>"; }';
   html += '  }';
   html += '  h += "</div>";';
   html += '  calendar.innerHTML = h;';
+  html += '  calendar.querySelectorAll(".cal-date-btn").forEach(function(btn) {';
+  html += '    btn.addEventListener("click", function() { selectDate(this.getAttribute("data-date")); });';
+  html += '  });';
   html += '}';
 
   html += 'function selectDate(dateStr) {';
