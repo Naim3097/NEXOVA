@@ -218,7 +218,7 @@ Variants: `grid`, `list`, `alternating`
 }
 ```
 
-Available icons: `check-circle`, `shield`, `zap`, `clock`, `star`, `heart`, `settings`, `droplet`, `wind`, `circle`, `award`, `dollar-sign`, `gift`, etc.
+Available icons: `check-circle`, `star`, `zap`, `shield`, `heart`, `award`, `sparkles`, `rocket`, `target`, `trending-up`, `clock`, `users`, `globe`, `lock`, `settings`, `dollar-sign`, `gift`, `thumbs-up`, `lightbulb`, `smartphone`, `droplet`, `wind`, `circle`
 
 ### testimonials
 
@@ -702,5 +702,7 @@ INSERT INTO templates (
 
 | Date | Change |
 |------|--------|
+| 2026-01-20 | Fixed features HTML generator - added subtitle, bgColor, list/alternating variants |
+| 2026-01-20 | Added missing icons: droplet, wind, circle |
 | 2026-01-20 | Added `booking_form` element support to HTML generator |
 | 2026-01-20 | Initial guide creation |
