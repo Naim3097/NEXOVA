@@ -1,6 +1,7 @@
 import type { Project, Element, SEOSettings } from '@/types';
 import { generateTrackingScript } from '@/lib/analytics/tracking-script';
 import { generateTrackingPixelScripts, type TrackingPixelsConfig } from '@/lib/tracking/pixel-scripts';
+import { generateBookingFormHTML } from './booking-form-generator';
 
 /**
  * Sanitize element ID for use in JavaScript identifiers
@@ -322,6 +323,8 @@ function generateBodyContent(elements: Element[]): string {
         return generateFormWithPaymentHTML(element);
       case 'product_carousel':
         return generateProductCarouselHTML(element);
+      case 'booking_form':
+        return generateBookingFormHTML(element);
       default:
         return '';
     }
