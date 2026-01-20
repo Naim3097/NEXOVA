@@ -97,14 +97,38 @@ export async function POST(request: NextRequest) {
     }
 
     // Get element configuration to check for Google Sheets
-    const { data: element, error: elementError } = await supabase
+    // Try to find element by ID first, then by type if ID fails (for template elements)
+    let element: any = null;
+    let elementError: any = null;
+
+    // First try exact ID match (for UUIDs)
+    const { data: elementById, error: errorById } = await supabase
       .from('elements')
-      .select('props')
+      .select('id, props')
       .eq('id', element_id)
       .eq('project_id', project_id)
       .single();
 
-    if (elementError || !element) {
+    if (elementById) {
+      element = elementById;
+    } else {
+      // Fallback: find booking_form element by type for this project
+      const { data: elementByType, error: errorByType } = await supabase
+        .from('elements')
+        .select('id, props')
+        .eq('type', 'booking_form')
+        .eq('project_id', project_id)
+        .limit(1)
+        .single();
+
+      if (elementByType) {
+        element = elementByType;
+      } else {
+        elementError = errorByType || errorById;
+      }
+    }
+
+    if (!element) {
       console.error('Element not found:', elementError);
       return NextResponse.json(
         { error: 'Booking form element not found' },
@@ -112,10 +136,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extract metadata
-    const ip_address = request.headers.get('x-forwarded-for') ||
-                       request.headers.get('x-real-ip') ||
-                       'unknown';
+    // Use the actual element ID from database
+    const actualElementId = element.id;
+
+    // Extract metadata - ensure valid IP or null for inet type columns
+    const rawIp = request.headers.get('x-forwarded-for') ||
+                  request.headers.get('x-real-ip') ||
+                  null;
+    // Extract first IP if multiple (x-forwarded-for can be comma-separated)
+    const ip_address = rawIp ? rawIp.split(',')[0].trim() : null;
     const user_agent = request.headers.get('user-agent') || '';
     const referrer = request.headers.get('referer') || '';
 
@@ -128,7 +157,7 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: project.user_id,
         project_id: project_id,
-        element_id: element_id,
+        element_id: actualElementId,
         booking_ref: bookingRef,
         customer_name: customer_name.trim(),
         customer_email: customer_email.trim().toLowerCase(),
@@ -162,7 +191,7 @@ export async function POST(request: NextRequest) {
           .insert({
             user_id: project.user_id,
             project_id: project_id,
-            element_id: element_id,
+            element_id: actualElementId,
             customer_name: customer_name.trim(),
             customer_email: customer_email.trim().toLowerCase(),
             customer_phone: customer_phone?.trim() || null,
@@ -217,7 +246,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Track analytics event
-        await trackAnalyticsEvent(supabase, project_id, element_id, lead?.id || bookingRef);
+        await trackAnalyticsEvent(supabase, project_id, actualElementId, lead?.id || bookingRef);
 
         return NextResponse.json({
           success: true,
@@ -256,7 +285,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Track analytics event
-    await trackAnalyticsEvent(supabase, project_id, element_id, booking?.id || bookingRef);
+    await trackAnalyticsEvent(supabase, project_id, actualElementId, booking?.id || bookingRef);
 
     return NextResponse.json({
       success: true,
