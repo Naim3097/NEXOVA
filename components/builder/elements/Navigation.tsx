@@ -9,10 +9,11 @@ interface NavigationElementProps {
   isHovered?: boolean;
   onSelect?: () => void;
   onHover?: (hovering: boolean) => void;
+  viewportMode?: 'desktop' | 'tablet' | 'mobile';
 }
 
 export const NavigationElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover }: NavigationElementProps) => {
+  ({ props, isSelected, isHovered, onSelect, onHover, viewportMode = 'desktop' }: NavigationElementProps) => {
     const {
       logo,
       logoText,
@@ -25,6 +26,10 @@ export const NavigationElement = React.memo(
     } = props;
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Determine if we should show mobile layout based on viewportMode
+    const isMobileView = viewportMode === 'mobile';
+    const isTabletView = viewportMode === 'tablet';
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -63,40 +68,40 @@ export const NavigationElement = React.memo(
               <span className="text-xl font-bold">{logoText}</span>
             </div>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8">
-              {layout === 'center' && <div className="flex-1" />}
+            {/* Desktop Menu - hidden on mobile viewport mode */}
+            {!isMobileView && (
+              <div className={`hidden md:flex items-center ${layout === 'center' ? 'gap-6' : 'gap-8'}`}>
+                {menuItems.map((item, index) => (
+                  <a
+                    key={index}
+                    href={item.url}
+                    className="hover:opacity-80 transition-opacity font-medium whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ color: textColor }}
+                  >
+                    {item.label}
+                  </a>
+                ))}
 
-              {menuItems.map((item, index) => (
-                <a
-                  key={index}
-                  href={item.url}
-                  className="hover:opacity-80 transition-opacity font-medium"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ color: textColor }}
-                >
-                  {item.label}
-                </a>
-              ))}
+                {ctaButton && (
+                  <Button
+                    size="sm"
+                    className="ml-2 whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      backgroundColor: textColor,
+                      color: bgColor,
+                    }}
+                  >
+                    {ctaButton.text}
+                  </Button>
+                )}
+              </div>
+            )}
 
-              {ctaButton && (
-                <Button
-                  size="sm"
-                  className="ml-4"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    backgroundColor: textColor,
-                    color: bgColor,
-                  }}
-                >
-                  {ctaButton.text}
-                </Button>
-              )}
-            </div>
-
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - show on mobile viewport mode OR when browser is mobile-sized */}
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-black/10 transition-colors"
+              className={`${isMobileView ? 'block' : 'md:hidden'} p-2 rounded-lg hover:bg-black/10 transition-colors`}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -110,9 +115,9 @@ export const NavigationElement = React.memo(
             </button>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - show when menu is open AND (mobile viewport mode OR browser is mobile-sized) */}
           {isMobileMenuOpen && (
-            <div className="md:hidden pb-4 border-t" style={{ borderColor: `${textColor}20` }}>
+            <div className={`${isMobileView ? 'block' : 'md:hidden'} pb-4 border-t`} style={{ borderColor: `${textColor}20` }}>
               <div className="flex flex-col gap-3 pt-4">
                 {menuItems.map((item, index) => (
                   <a

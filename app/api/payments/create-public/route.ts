@@ -151,11 +151,28 @@ export async function POST(request: NextRequest) {
       });
     } else {
       console.error('LeanX payment creation failed:', leanxData);
+
+      // Map LeanX error codes to user-friendly messages
+      let userFriendlyError = 'Payment creation failed. Please try again.';
+      const leanxError = leanxData.description || leanxData.message || '';
+
+      if (leanxError.includes('PAYMENT_SERVICE_NOT_ACTIVE') || leanxError.includes('not active')) {
+        userFriendlyError = 'This payment method is currently unavailable. Please select a different bank or try again later.';
+      } else if (leanxError.includes('INVALID') || leanxError.includes('invalid')) {
+        userFriendlyError = 'Invalid payment details. Please check your information and try again.';
+      } else if (leanxError.includes('INSUFFICIENT') || leanxError.includes('balance')) {
+        userFriendlyError = 'Insufficient balance or credit limit.';
+      } else if (leanxError.includes('TIMEOUT') || leanxError.includes('timeout')) {
+        userFriendlyError = 'Payment request timed out. Please try again.';
+      } else if (leanxError.includes('MAINTENANCE') || leanxError.includes('maintenance')) {
+        userFriendlyError = 'The payment system is under maintenance. Please try again later.';
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: leanxData.description || leanxData.message || 'Payment creation failed',
-          details: leanxData,
+          error: userFriendlyError,
+          details: process.env.NODE_ENV === 'development' ? leanxData : undefined,
         },
         { status: 400 }
       );

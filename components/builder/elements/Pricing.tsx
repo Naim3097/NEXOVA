@@ -9,10 +9,11 @@ interface PricingElementProps {
   isHovered?: boolean;
   onSelect?: () => void;
   onHover?: (hovering: boolean) => void;
+  viewportMode?: 'desktop' | 'tablet' | 'mobile';
 }
 
 export const PricingElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover }: PricingElementProps) => {
+  ({ props, isSelected, isHovered, onSelect, onHover, viewportMode = 'desktop' }: PricingElementProps) => {
     const {
       title,
       subtitle,
@@ -23,6 +24,13 @@ export const PricingElement = React.memo(
       bgColor = '#000000',
       enablePaymentIntegration = false
     } = props;
+
+    // Determine grid columns based on viewport mode
+    const getGridCols = () => {
+      if (viewportMode === 'mobile') return 'grid-cols-1';
+      if (viewportMode === 'tablet') return 'grid-cols-1 md:grid-cols-2';
+      return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+    };
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -71,13 +79,13 @@ export const PricingElement = React.memo(
 
           {/* Pricing Cards */}
           {layout === 'cards' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={`grid ${getGridCols()} gap-8`}>
               {plans.map((plan, index) => (
                 <div
                   key={index}
                   className={`bg-white rounded-2xl shadow-lg p-8 flex flex-col ${
                     plan.highlighted
-                      ? 'ring-2 ring-blue-500 transform scale-105'
+                      ? 'ring-2 ring-blue-500 shadow-xl'
                       : ''
                   }`}
                 >

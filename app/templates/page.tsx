@@ -60,6 +60,7 @@ export default function TemplatesPage() {
   const categories = [
     { value: 'all', label: 'All Templates' },
     { value: 'ebook', label: 'Ebook' },
+    { value: 'ecommerce', label: 'E-commerce' },
   ];
 
   // Filter by category

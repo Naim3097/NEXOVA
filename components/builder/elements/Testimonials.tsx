@@ -8,6 +8,7 @@ interface TestimonialsElementProps {
   isHovered?: boolean;
   onSelect?: () => void;
   onHover?: (hovering: boolean) => void;
+  viewportMode?: 'desktop' | 'tablet' | 'mobile';
 }
 
 export const TestimonialsElement = React.memo(
@@ -17,6 +18,7 @@ export const TestimonialsElement = React.memo(
     isHovered,
     onSelect,
     onHover,
+    viewportMode = 'desktop',
   }: TestimonialsElementProps) => {
     const {
       variant,
@@ -26,6 +28,19 @@ export const TestimonialsElement = React.memo(
       backgroundOpacity = 70,
       bgColor = '#000000'
     } = props;
+
+    // Determine grid columns based on viewport mode
+    const getGridCols = () => {
+      if (viewportMode === 'mobile') return 'grid-cols-1';
+      if (viewportMode === 'tablet') return 'grid-cols-1 md:grid-cols-2';
+      return 'grid-cols-1 md:grid-cols-3';
+    };
+
+    const getMasonryCols = () => {
+      if (viewportMode === 'mobile') return 'columns-1';
+      if (viewportMode === 'tablet') return 'columns-1 md:columns-2';
+      return 'columns-1 md:columns-3';
+    };
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -86,7 +101,7 @@ export const TestimonialsElement = React.memo(
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
               {title}
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className={`grid ${getGridCols()} gap-8`}>
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
                   {renderStars(testimonial.rating)}
@@ -195,7 +210,7 @@ export const TestimonialsElement = React.memo(
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
               {title}
             </h2>
-            <div className="columns-1 md:columns-3 gap-8 space-y-8">
+            <div className={`${getMasonryCols()} gap-8 space-y-8`}>
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}

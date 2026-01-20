@@ -59,10 +59,11 @@ interface FeaturesElementProps {
   isHovered?: boolean;
   onSelect?: () => void;
   onHover?: (hovering: boolean) => void;
+  viewportMode?: 'desktop' | 'tablet' | 'mobile';
 }
 
 export const FeaturesElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover }: FeaturesElementProps) => {
+  ({ props, isSelected, isHovered, onSelect, onHover, viewportMode = 'desktop' }: FeaturesElementProps) => {
     const {
       variant,
       title,
@@ -71,6 +72,13 @@ export const FeaturesElement = React.memo(
       backgroundOpacity = 70,
       bgColor = '#000000'
     } = props;
+
+    // Determine grid columns based on viewport mode
+    const getGridCols = () => {
+      if (viewportMode === 'mobile') return 'grid-cols-1';
+      if (viewportMode === 'tablet') return 'grid-cols-1 sm:grid-cols-2';
+      return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+    };
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -114,7 +122,7 @@ export const FeaturesElement = React.memo(
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12 text-gray-900 px-2">
               {title}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className={`grid ${getGridCols()} gap-4 sm:gap-6 lg:gap-8`}>
               {features.map((feature, index) => {
                 const IconComponent = getIconComponent(feature.icon || 'check-circle');
                 return (

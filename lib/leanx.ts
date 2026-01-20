@@ -168,7 +168,15 @@ export async function getLeanXBankList(
 
         // Normalize and add to collection
         if (extracted && extracted.length > 0) {
-          const tagged = extracted.map((b: any) => ({
+          // Filter for only active payment services
+          const activeBanks = extracted.filter((b: any) => {
+            // Check various possible status fields
+            const status = b.status || b.payment_status || b.payment_service_status || '';
+            const isActive = !status || status.toLowerCase() === 'active' || status === '1' || status === true;
+            return isActive && b.payment_service_id;
+          });
+
+          const tagged = activeBanks.map((b: any) => ({
             id: b.payment_service_id,
             // STRIP SUFFIX: Converts "Maybank2u B2B" -> "Maybank2u"
             name: (b.name || b.payment_service_name || '').replace(/ B2B$/i, '').trim(),
@@ -178,7 +186,7 @@ export async function getLeanXBankList(
           }));
           allBanks = [...allBanks, ...tagged];
 
-          console.log(`Found ${tagged.length} banks for ${combo.label}`);
+          console.log(`Found ${tagged.length} active banks for ${combo.label} (${extracted.length} total)`);
         }
 
       } catch (error) {
