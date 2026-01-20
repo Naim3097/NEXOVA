@@ -25,6 +25,7 @@ import {
   FileText,
   MessageCircle,
   CalendarCheck,
+  ShoppingBag,
 } from 'lucide-react';
 import type { ElementType } from '@/types';
 
@@ -403,6 +404,25 @@ const elementTemplates: ElementTemplate[] = [
       requirePayment: false,
       termsUrl: '#',
       policyUrl: '#',
+    },
+  },
+  {
+    type: 'product_carousel',
+    label: 'Product Showcase',
+    icon: <ShoppingBag className="w-5 h-5" />,
+    description: 'Display products from your inventory in a carousel or grid',
+    defaultProps: {
+      title: 'Our Products',
+      subtitle: 'Check out our latest collection',
+      products: [], // Products added from inventory via ProductSelector
+      layout: 'grid',
+      columns: 3,
+      showPrice: true,
+      showDescription: true,
+      cardStyle: 'shadow',
+      bgColor: '#ffffff',
+      textColor: '#1f2937',
+      priceColor: '#2563eb',
     },
   },
   {

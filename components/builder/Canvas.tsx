@@ -24,6 +24,7 @@ import {
   WhatsAppButtonElement,
   FormWithPaymentElement,
   BookingFormElement,
+  ProductCarouselElement,
 } from './elements';
 import {
   DndContext,
@@ -215,6 +216,9 @@ export const Canvas = () => {
         break;
       case 'booking_form':
         elementContent = <BookingFormElement props={element.props as any} {...commonProps} />;
+        break;
+      case 'product_carousel':
+        elementContent = <ProductCarouselElement props={element.props as any} {...commonProps} />;
         break;
       case 'footer':
         elementContent = <FooterElement props={element.props as any} {...commonProps} />;

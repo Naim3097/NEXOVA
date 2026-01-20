@@ -1,9 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Plus, Trash2, Upload, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/lib/supabase/auth-client';
+
+interface VariationOption {
+  value: string;
+  label: string;
+  priceAdjustment: number;
+  stock: number;
+  colorCode?: string;
+}
+
+interface Variation {
+  id: string;
+  name: string;
+  type: 'size' | 'color' | 'other';
+  options: VariationOption[];
+}
 
 interface Product {
   id: string;
@@ -17,6 +33,7 @@ interface Product {
   quantity_pricing: Array<{ min_qty: number; price: number }>;
   notes: string | null;
   status: 'active' | 'inactive';
+  variations?: Variation[];
 }
 
 interface ProductModalProps {
@@ -43,9 +60,24 @@ export default function ProductModal({
     quantity_pricing: [] as Array<{ min_qty: number; price: number }>,
     notes: '',
     status: 'active' as 'active' | 'inactive',
+    variations: [] as Variation[],
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Get user ID on mount
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUser();
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -60,6 +92,7 @@ export default function ProductModal({
         quantity_pricing: product.quantity_pricing || [],
         notes: product.notes || '',
         status: product.status,
+        variations: product.variations || [],
       });
     } else {
       // Reset for new product
@@ -74,10 +107,65 @@ export default function ProductModal({
         quantity_pricing: [],
         notes: '',
         status: 'active',
+        variations: [],
       });
     }
     setError('');
   }, [product, isOpen]);
+
+  // Handle image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be less than 5MB');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError('');
+
+      // Generate unique file name
+      const fileExt = file.name.split('.').pop();
+      const fileName = `products/${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      // Upload to Supabase storage
+      const { data, error: uploadError } = await supabase.storage
+        .from('project-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('project-images')
+        .getPublicUrl(data.path);
+
+      setFormData({ ...formData, image_url: publicUrl });
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to upload image');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,13 +233,85 @@ export default function ProductModal({
     });
   };
 
+  // Variation handlers
+  const addVariation = () => {
+    const newVariation: Variation = {
+      id: `var_${Date.now()}`,
+      name: '',
+      type: 'size',
+      options: [],
+    };
+    setFormData({
+      ...formData,
+      variations: [...formData.variations, newVariation],
+    });
+  };
+
+  const removeVariation = (index: number) => {
+    setFormData({
+      ...formData,
+      variations: formData.variations.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateVariation = (index: number, field: keyof Variation, value: any) => {
+    const updated = [...formData.variations];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({
+      ...formData,
+      variations: updated,
+    });
+  };
+
+  const addVariationOption = (variationIndex: number) => {
+    const updated = [...formData.variations];
+    const newOption: VariationOption = {
+      value: '',
+      label: '',
+      priceAdjustment: 0,
+      stock: 0,
+      colorCode: formData.variations[variationIndex].type === 'color' ? '#000000' : undefined,
+    };
+    updated[variationIndex].options = [...updated[variationIndex].options, newOption];
+    setFormData({
+      ...formData,
+      variations: updated,
+    });
+  };
+
+  const removeVariationOption = (variationIndex: number, optionIndex: number) => {
+    const updated = [...formData.variations];
+    updated[variationIndex].options = updated[variationIndex].options.filter((_, i) => i !== optionIndex);
+    setFormData({
+      ...formData,
+      variations: updated,
+    });
+  };
+
+  const updateVariationOption = (
+    variationIndex: number,
+    optionIndex: number,
+    field: keyof VariationOption,
+    value: any
+  ) => {
+    const updated = [...formData.variations];
+    updated[variationIndex].options[optionIndex] = {
+      ...updated[variationIndex].options[optionIndex],
+      [field]: value,
+    };
+    setFormData({
+      ...formData,
+      variations: updated,
+    });
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-xl font-bold">
             {product ? 'Edit Product' : 'Add Product'}
           </h2>
@@ -221,25 +381,76 @@ export default function ProductModal({
                 />
               </div>
 
+              {/* Image Upload */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Image
                 </label>
-                <Input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image_url: e.target.value })
-                  }
-                  placeholder="https://example.com/image.jpg"
-                />
-                {formData.image_url && (
-                  <img
-                    src={formData.image_url}
-                    alt="Preview"
-                    className="mt-2 h-20 w-20 object-cover rounded border"
-                  />
+                {formData.image_url ? (
+                  <div className="relative group w-full max-w-xs">
+                    <img
+                      src={formData.image_url}
+                      alt="Product"
+                      className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 bg-white rounded-full text-gray-700 hover:bg-gray-100"
+                        title="Replace image"
+                      >
+                        <Upload size={20} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                        className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600"
+                        title="Remove image"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => !uploading && fileInputRef.current?.click()}
+                    className={`w-full max-w-xs h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors ${uploading ? 'cursor-not-allowed opacity-50' : ''}`}
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-2" />
+                        <p className="text-sm text-gray-600">Uploading...</p>
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-600">Click to upload image</p>
+                        <p className="text-xs text-gray-500 mt-1">Max 5MB</p>
+                      </>
+                    )}
+                  </div>
                 )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                {/* URL Input as Alternative */}
+                <div className="mt-2">
+                  <p className="text-xs text-gray-500 mb-1">Or enter image URL:</p>
+                  <Input
+                    type="url"
+                    value={formData.image_url}
+                    onChange={(e) =>
+                      setFormData({ ...formData, image_url: e.target.value })
+                    }
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
               </div>
             </div>
 
@@ -299,6 +510,146 @@ export default function ProductModal({
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Product Variations */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">
+                  Variations (Optional)
+                </h3>
+                <Button
+                  type="button"
+                  onClick={addVariation}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Plus size={16} className="mr-1" />
+                  Add Variation
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Add product variations like sizes or colors
+              </p>
+              {formData.variations.length > 0 && (
+                <div className="space-y-4">
+                  {formData.variations.map((variation, vIndex) => (
+                    <div key={variation.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex gap-3 flex-1">
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Variation Name
+                            </label>
+                            <Input
+                              type="text"
+                              placeholder="e.g., Size, Color"
+                              value={variation.name}
+                              onChange={(e) => updateVariation(vIndex, 'name', e.target.value)}
+                            />
+                          </div>
+                          <div className="w-32">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Type
+                            </label>
+                            <select
+                              value={variation.type}
+                              onChange={(e) => updateVariation(vIndex, 'type', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                            >
+                              <option value="size">Size</option>
+                              <option value="color">Color</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeVariation(vIndex)}
+                          className="text-red-600 hover:text-red-800 ml-3"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+
+                      {/* Options */}
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">Options</span>
+                          <button
+                            type="button"
+                            onClick={() => addVariationOption(vIndex)}
+                            className="text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            + Add Option
+                          </button>
+                        </div>
+                        {variation.options.length > 0 ? (
+                          <div className="space-y-2">
+                            {variation.options.map((option, oIndex) => (
+                              <div key={oIndex} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
+                                {variation.type === 'color' && (
+                                  <input
+                                    type="color"
+                                    value={option.colorCode || '#000000'}
+                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'colorCode', e.target.value)}
+                                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                                  />
+                                )}
+                                <Input
+                                  type="text"
+                                  placeholder="Label (e.g., Small)"
+                                  value={option.label}
+                                  onChange={(e) => updateVariationOption(vIndex, oIndex, 'label', e.target.value)}
+                                  className="flex-1"
+                                />
+                                <Input
+                                  type="text"
+                                  placeholder="Value (e.g., S)"
+                                  value={option.value}
+                                  onChange={(e) => updateVariationOption(vIndex, oIndex, 'value', e.target.value)}
+                                  className="w-24"
+                                />
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs text-gray-500">+/-</span>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="0"
+                                    value={option.priceAdjustment}
+                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'priceAdjustment', parseFloat(e.target.value) || 0)}
+                                    className="w-20"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs text-gray-500">Stock:</span>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    placeholder="0"
+                                    value={option.stock}
+                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'stock', parseInt(e.target.value) || 0)}
+                                    className="w-20"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeVariationOption(vIndex, oIndex)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-500 py-2">No options added yet</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Quantity Pricing */}

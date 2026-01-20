@@ -59,7 +59,8 @@ export type ElementType =
   | 'lead_form'
   | 'whatsapp_button'
   | 'form_with_payment'
-  | 'booking_form';
+  | 'booking_form'
+  | 'product_carousel';
 
 export interface Template {
   id: string;
@@ -415,3 +416,46 @@ export interface BumpOfferData {
 
 // Form with Payment Element Types
 // Uses the same Product type as PaymentButton for consistency
+
+// Product Variation Types
+export interface ProductVariationOption {
+  value: string;
+  label: string;
+  priceAdjustment?: number; // Price increase/decrease for this option
+  stock?: number; // Stock for this specific option
+  colorCode?: string; // For color variations, the hex color code
+}
+
+export interface ProductVariation {
+  id: string;
+  name: string; // e.g., "Size", "Color"
+  type: 'size' | 'color' | 'other';
+  options: ProductVariationOption[];
+}
+
+// Product Carousel Types
+export interface ProductCarouselProps {
+  title: string;
+  subtitle?: string;
+  products: Array<{
+    id: string;
+    code: string;
+    name: string;
+    description: string | null;
+    image_url: string | null;
+    base_price: number;
+    currency: string;
+    status: 'active' | 'inactive';
+    variations?: ProductVariation[];
+  }>;
+  layout: 'carousel' | 'grid';
+  columns: 2 | 3 | 4;
+  showPrice: boolean;
+  showDescription: boolean;
+  cardStyle: 'minimal' | 'bordered' | 'shadow';
+  bgColor: string;
+  textColor: string;
+  priceColor: string;
+  backgroundImage?: string;
+  backgroundOpacity?: number;
+}

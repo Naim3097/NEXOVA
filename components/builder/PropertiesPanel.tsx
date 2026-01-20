@@ -3096,6 +3096,260 @@ export const PropertiesPanel = () => {
           </>
         );
 
+      case 'product_carousel':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">Header</div>
+
+              <div>
+                <Label htmlFor="title-carousel">Title</Label>
+                <Input
+                  id="title-carousel"
+                  value={props.title || ''}
+                  onChange={(e) => handlePropChange('title', e.target.value)}
+                  placeholder="Our Products"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="subtitle-carousel">Subtitle (optional)</Label>
+                <Input
+                  id="subtitle-carousel"
+                  value={props.subtitle || ''}
+                  onChange={(e) => handlePropChange('subtitle', e.target.value)}
+                  placeholder="Check out our latest collection"
+                />
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Layout</div>
+
+              <div>
+                <Label htmlFor="layout-carousel">Layout Style</Label>
+                <select
+                  id="layout-carousel"
+                  value={props.layout || 'grid'}
+                  onChange={(e) => handlePropChange('layout', e.target.value)}
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="grid">Grid</option>
+                  <option value="carousel">Carousel</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="columns-carousel">Columns</Label>
+                <select
+                  id="columns-carousel"
+                  value={props.columns || 3}
+                  onChange={(e) => handlePropChange('columns', parseInt(e.target.value))}
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                >
+                  <option value={2}>2 Columns</option>
+                  <option value={3}>3 Columns</option>
+                  <option value={4}>4 Columns</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="cardStyle-carousel">Card Style</Label>
+                <select
+                  id="cardStyle-carousel"
+                  value={props.cardStyle || 'shadow'}
+                  onChange={(e) => handlePropChange('cardStyle', e.target.value)}
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="minimal">Minimal</option>
+                  <option value="bordered">Bordered</option>
+                  <option value="shadow">Shadow</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="showPrice-carousel"
+                  checked={props.showPrice ?? true}
+                  onChange={(e) => handlePropChange('showPrice', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="showPrice-carousel" className="cursor-pointer">Show Price</Label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="showDescription-carousel"
+                  checked={props.showDescription ?? true}
+                  onChange={(e) => handlePropChange('showDescription', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="showDescription-carousel" className="cursor-pointer">Show Description</Label>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Products</div>
+
+              {/* Product Selector from Database */}
+              {currentProject && (
+                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Select products from your inventory or{' '}
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline font-medium"
+                    >
+                      manage products
+                    </a>
+                  </p>
+                  <ProductSelector
+                    onSelect={(product) => {
+                      const newProducts = [...(props.products || []), {
+                        id: product.id,
+                        code: product.code,
+                        name: product.name,
+                        description: product.description || '',
+                        base_price: product.base_price,
+                        currency: product.currency,
+                        image_url: product.image_url || '',
+                        status: product.status,
+                        variations: product.variations || [],
+                      }];
+                      handlePropChange('products', newProducts);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Products List */}
+              {currentProject && (props.products || []).length > 0 && (
+                <div className="border border-gray-300 rounded-md p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products ({(props.products || []).length})</h4>
+                  <div className="space-y-2">
+                    {(props.products || []).map((product: any, index: number) => (
+                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                        <div className="flex items-center gap-2 flex-1">
+                          {product.image_url && (
+                            <img src={product.image_url} alt={product.name} className="w-8 h-8 object-cover rounded" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {product.currency || 'RM'} {typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
+                            handlePropChange('products', newProducts);
+                          }}
+                          className="text-xs text-red-600 hover:text-red-800 ml-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Colors</div>
+
+              <div>
+                <Label htmlFor="bgColor-carousel">Background Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bgColor-carousel"
+                    type="color"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    placeholder="#ffffff"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="textColor-carousel">Text Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="textColor-carousel"
+                    type="color"
+                    value={props.textColor || '#1f2937'}
+                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.textColor || '#1f2937'}
+                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    placeholder="#1f2937"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="priceColor-carousel">Price Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="priceColor-carousel"
+                    type="color"
+                    value={props.priceColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('priceColor', e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.priceColor || '#2563eb'}
+                    onChange={(e) => handlePropChange('priceColor', e.target.value)}
+                    placeholder="#2563eb"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              {/* Background Image */}
+              {currentProject && (
+                <div className="mt-4">
+                  <Label>Background Image (optional)</Label>
+                  <ImageUpload
+                    value={props.backgroundImage || ''}
+                    onChange={(url) => handlePropChange('backgroundImage', url)}
+                    userId={currentProject.user_id}
+                    maxSizeMB={5}
+                  />
+                </div>
+              )}
+
+              {props.backgroundImage && (
+                <div>
+                  <Label htmlFor="backgroundOpacity-carousel">Background Overlay ({props.backgroundOpacity || 70}%)</Label>
+                  <input
+                    id="backgroundOpacity-carousel"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={props.backgroundOpacity || 70}
+                    onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </div>
+          </>
+        );
+
       default:
         return (
           <>

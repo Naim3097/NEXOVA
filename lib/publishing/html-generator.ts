@@ -251,6 +251,22 @@ function generateStyles(): string {
       .grid-cols-3 {
         grid-template-columns: repeat(1, 1fr);
       }
+
+      /* Responsive pricing and product grids */
+      .pricing-grid,
+      .products-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        padding: 0 0.5rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      /* Tablet: show 2 columns */
+      .pricing-grid,
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
     }
 
     /* Utility classes */
@@ -304,6 +320,8 @@ function generateBodyContent(elements: Element[]): string {
         return generateWhatsAppButtonHTML(element);
       case 'form_with_payment':
         return generateFormWithPaymentHTML(element);
+      case 'product_carousel':
+        return generateProductCarouselHTML(element);
       default:
         return '';
     }
@@ -673,9 +691,9 @@ function generatePaymentButtonHTML(element: Element): string {
     ${hasMultipleProducts ? `
       <!-- Multiple Products Grid -->
       <h2 style="font-size: 2.25rem; font-weight: bold; text-align: center; margin-bottom: 3rem; color: #111827;">Choose Your Product</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 70rem; margin: 0 auto;">
+      <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 70rem; margin: 0 auto;">
         ${displayProducts.map((product: any, index: number) => `
-          <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; ${product.featured ? 'transform: scale(1.05); border: 2px solid #fbbf24;' : ''}">
+          <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; ${product.featured ? 'border: 2px solid #fbbf24; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);' : ''}">
             ${product.featured ? `
             <div style="background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; text-align: center; padding: 0.5rem; font-weight: 600; font-size: 0.875rem;">
               ⭐ Most Popular
@@ -1405,7 +1423,8 @@ function generateNavigationHTML(element: Element): string {
   } = element.props;
 
   const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 40;' : '';
-  const justifyContent = layout === 'center' ? 'center' : 'space-between';
+  // Always use space-between for proper spacing between logo and nav items
+  const menuGap = layout === 'center' ? '1.5rem' : '2rem';
 
   return `
 <nav
@@ -1413,20 +1432,20 @@ function generateNavigationHTML(element: Element): string {
   style="background-color: ${bgColor}; color: ${textColor}; ${stickyStyle}"
 >
   <div style="max-width: 80rem; margin: 0 auto; padding: 0 1rem;">
-    <div style="display: flex; align-items: center; justify-content: ${justifyContent}; height: 4rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; height: 4rem;">
       <!-- Logo -->
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
         ${logo ? `<img src="${logo}" alt="${logoText}" style="height: 2rem;">` : ''}
         <span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>
       </div>
 
       <!-- Desktop Menu -->
-      <div id="menu-${element.id}" style="display: none; align-items: center; gap: 2rem;">
+      <div id="menu-${element.id}" style="display: none; align-items: center; gap: ${menuGap};">
         ${menuItems.map((item: any) => `
-          <a href="${item.url}" style="color: ${textColor}; text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${item.label}</a>
+          <a href="${item.url}" style="color: ${textColor}; text-decoration: none; font-weight: 500; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${item.label}</a>
         `).join('')}
         ${ctaButton ? `
-          <a href="${ctaButton.url}" class="button button-primary" style="padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
+          <a href="${ctaButton.url}" class="button button-primary" style="padding: 0.5rem 1.5rem; white-space: nowrap;">${ctaButton.text}</a>
         ` : ''}
       </div>
 
@@ -1503,9 +1522,9 @@ function generatePricingHTML(element: Element): string {
     </div>
 
     <!-- Pricing Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+    <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto;">
       ${plans.map((plan: any) => `
-        <div style="background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; display: flex; flex-direction: column; ${plan.highlighted ? 'border: 2px solid #3b82f6; transform: scale(1.05);' : ''}">
+        <div style="background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; display: flex; flex-direction: column; ${plan.highlighted ? 'border: 2px solid #3b82f6; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);' : ''}">
           ${plan.highlighted ? `
             <div style="background: #3b82f6; color: white; font-size: 0.875rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; align-self: flex-start; margin-bottom: 1rem;">Most Popular</div>
           ` : ''}
@@ -2057,7 +2076,6 @@ function generateWhatsAppButtonHTML(element: Element): string {
     buttonColor = '#25D366',
     buttonSize = 'md',
     position = 'fixed',
-    fixedPosition = 'bottom-right',
     showIcon = true,
     customIcon = '',
     tooltipText = 'Need help? Chat with us!',
@@ -2065,6 +2083,12 @@ function generateWhatsAppButtonHTML(element: Element): string {
     headlineText = 'Want to know more about this product?',
     headlineColor = '#1f2937',
   } = element.props;
+
+  // Ensure fixedPosition has a valid value (fallback to bottom-right if undefined/invalid)
+  const validPositions = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
+  const fixedPosition = validPositions.includes(element.props.fixedPosition)
+    ? element.props.fixedPosition
+    : 'bottom-right';
 
   // Clean phone number (remove all non-digit characters)
   const cleanPhone = phoneNumber.replace(/\D/g, '');
@@ -2115,9 +2139,13 @@ function generateWhatsAppButtonHTML(element: Element): string {
     ${position === 'fixed' ? 'z-index: 9999;' : ''}
   `;
 
+  // Use different container styles - fixed needs position !important to override CSS rules
   const containerStyle = position === 'fixed'
-    ? `position: fixed; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
+    ? `position: fixed !important; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
     : 'padding: 5rem 1rem; text-align: center;';
+
+  // Use div for fixed position to avoid section CSS rules
+  const containerTag = position === 'fixed' ? 'div' : 'section';
 
   // WhatsApp icon SVG
   const whatsappIcon = `<svg width="${iconSizes[buttonSize as keyof typeof iconSizes]}" height="${iconSizes[buttonSize as keyof typeof iconSizes]}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2127,7 +2155,7 @@ function generateWhatsAppButtonHTML(element: Element): string {
   const sanitizedId = sanitizeId(element.id);
 
   return `
-<section id="${element.type}-${element.order}" style="${containerStyle}">
+<${containerTag} id="${element.type}-${element.order}" style="${containerStyle}">
   ${position === 'inline' && showHeadline ? `
   <div style="
     max-width: 42rem;
@@ -2196,7 +2224,7 @@ function generateWhatsAppButtonHTML(element: Element): string {
     "></span>
     ` : ''}
   </a>
-</section>
+</${containerTag}>
 
 ${position === 'fixed' ? `
 <style>
@@ -2401,6 +2429,83 @@ function generateFormWithPaymentHTML(element: Element): string {
       <div id="status-${sanitizedId}" style="margin-top: 1rem; display: none; padding: 0.75rem; border-radius: 0.5rem; font-size: 0.875rem;"></div>
     </form>
 
+    <!-- Bank Selection Checkout Modal -->
+    <div id="checkout-modal-${sanitizedId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+          <!-- Modal Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+            <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Secure Checkout</h2>
+            <button onclick="closeCheckoutModal_${sanitizedId}()" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div style="padding: 1.5rem;">
+            <!-- Order Summary -->
+            <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Order Summary</h3>
+              <div id="modal-order-summary-${sanitizedId}">
+                <!-- Order items will be populated by JS -->
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid #d1d5db;">
+                <span style="font-weight: bold;">Total</span>
+                <span id="modal-total-${sanitizedId}" style="font-weight: bold;">${formatCurrency(0)}</span>
+              </div>
+            </div>
+
+            <!-- Bank Selection -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 1rem;">Select Your Bank</h3>
+
+              <!-- Loading State -->
+              <div id="banks-loading-${sanitizedId}" style="display: flex; align-items: center; justify-content: center; padding: 2rem;">
+                <div style="width: 2rem; height: 2rem; border: 3px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+              </div>
+
+              <!-- Error State -->
+              <div id="banks-error-${sanitizedId}" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 0.375rem; padding: 1rem; text-align: center;">
+                <p style="color: #dc2626; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Failed to load banks</p>
+                <button type="button" onclick="fetchBanks_${sanitizedId}()" style="font-size: 0.875rem; padding: 0.25rem 0.75rem; background: white; border: 1px solid #dc2626; color: #dc2626; border-radius: 0.25rem; cursor: pointer;">Retry</button>
+              </div>
+
+              <!-- Banks List -->
+              <div id="banks-list-${sanitizedId}" style="display: none;">
+                <!-- Banks will be dynamically inserted here -->
+              </div>
+
+              <input type="hidden" id="selected-bank-${sanitizedId}">
+              <p id="bank-error-${sanitizedId}" style="display: none; font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">Please select a bank</p>
+            </div>
+
+            <button
+              type="button"
+              id="proceed-payment-btn-${sanitizedId}"
+              onclick="proceedToPayment_${sanitizedId}()"
+              style="width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 1.125rem; cursor: pointer;"
+            >
+              Proceed to Secure Payment - <span id="modal-btn-total-${sanitizedId}">${formatCurrency(0)}</span>
+            </button>
+
+            <style>
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+            </style>
+
+            <div style="text-align: center; margin-top: 1rem;">
+              <p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0;">
+                <svg style="display: inline; width: 1rem; height: 1rem; vertical-align: middle;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                256-bit SSL Secure Payment
+              </p>
+              <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.25rem 0;">Powered by LeanX</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer Links -->
     <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.5rem; font-size: 0.875rem;">
       <a href="${termsUrl}" style="color: #3b82f6; text-decoration: none;">Terms & Conditions</a>
@@ -2480,10 +2585,224 @@ function generateFormWithPaymentHTML(element: Element): string {
         }
       }
 
+      // Bank selection state
+      let banks_${sanitizedId} = [];
+      let selectedBankId_${sanitizedId} = null;
+      let pendingOrderData_${sanitizedId} = null;
+
+      // Fetch banks from API
+      window.fetchBanks_${sanitizedId} = async function() {
+        const loadingEl = document.getElementById('banks-loading-${sanitizedId}');
+        const errorEl = document.getElementById('banks-error-${sanitizedId}');
+        const listEl = document.getElementById('banks-list-${sanitizedId}');
+
+        loadingEl.style.display = 'flex';
+        errorEl.style.display = 'none';
+        listEl.style.display = 'none';
+
+        try {
+          const response = await fetch('/api/payments/public-banks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: window.__PROJECT_ID__ })
+          });
+          const data = await response.json();
+
+          if (data.success && data.banks) {
+            banks_${sanitizedId} = data.banks;
+            renderBanks_${sanitizedId}(banks_${sanitizedId});
+            loadingEl.style.display = 'none';
+            listEl.style.display = 'block';
+          } else {
+            throw new Error(data.error || 'Failed to load banks');
+          }
+        } catch (error) {
+          console.error('Failed to fetch banks:', error);
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+        }
+      };
+
+      // Render banks list grouped by type
+      function renderBanks_${sanitizedId}(banksList) {
+        const listEl = document.getElementById('banks-list-${sanitizedId}');
+
+        var fpxBanks = banksList.filter(function(b) { return b.type === 'WEB_PAYMENT'; });
+        var ewalletBanks = banksList.filter(function(b) { return b.type === 'DIGITAL_PAYMENT'; });
+
+        var html = '';
+
+        // FPX / Online Banking Section
+        if (fpxBanks.length > 0) {
+          html += '<div style="margin-bottom: 1rem;">' +
+            '<h4 style="display: flex; align-items: center; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.5rem;">' +
+              '<svg style="width: 1rem; height: 1rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>' +
+              'Online Banking (FPX)' +
+            '</h4>' +
+            '<div>';
+
+          fpxBanks.forEach(function(bank) {
+            var logoHtml = bank.logo ?
+              '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
+              '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>';
+
+            html += '<button type="button" onclick="selectBank_${sanitizedId}(\\'' + bank.id + '\\')" id="form-bank-btn-${sanitizedId}-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;">' +
+              '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
+                logoHtml +
+                '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
+              '</div>' +
+              '<div id="form-bank-check-${sanitizedId}-' + bank.id + '" style="display: none; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center;">' +
+                '<svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="currentColor" viewBox="0 0 20 20">' +
+                  '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />' +
+                '</svg>' +
+              '</div>' +
+            '</button>';
+          });
+
+          html += '</div></div>';
+        }
+
+        // E-Wallets Section
+        if (ewalletBanks.length > 0) {
+          html += '<div style="margin-bottom: 1rem;">' +
+            '<h4 style="display: flex; align-items: center; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 0.5rem;">' +
+              '<svg style="width: 1rem; height: 1rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>' +
+              'E-Wallets' +
+            '</h4>' +
+            '<div>';
+
+          ewalletBanks.forEach(function(bank) {
+            var logoHtml = bank.logo ?
+              '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
+              '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>';
+
+            html += '<button type="button" onclick="selectBank_${sanitizedId}(\\'' + bank.id + '\\')" id="form-bank-btn-${sanitizedId}-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; margin-bottom: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;">' +
+              '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
+                logoHtml +
+                '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
+              '</div>' +
+              '<div id="form-bank-check-${sanitizedId}-' + bank.id + '" style="display: none; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center;">' +
+                '<svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="currentColor" viewBox="0 0 20 20">' +
+                  '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />' +
+                '</svg>' +
+              '</div>' +
+            '</button>';
+          });
+
+          html += '</div></div>';
+        }
+
+        listEl.innerHTML = html;
+      }
+
+      // Select bank
+      window.selectBank_${sanitizedId} = function(bankId) {
+        selectedBankId_${sanitizedId} = bankId;
+        document.getElementById('selected-bank-${sanitizedId}').value = bankId;
+        document.getElementById('bank-error-${sanitizedId}').style.display = 'none';
+
+        // Update UI
+        var allButtons = document.querySelectorAll('[id^="form-bank-btn-${sanitizedId}-"]');
+        allButtons.forEach(function(btn) {
+          var btnBankId = btn.id.replace('form-bank-btn-${sanitizedId}-', '');
+          var check = document.getElementById('form-bank-check-${sanitizedId}-' + btnBankId);
+          if (btnBankId === bankId) {
+            btn.style.borderColor = '#2563eb';
+            btn.style.background = '#eff6ff';
+            if (check) check.style.display = 'flex';
+          } else {
+            btn.style.borderColor = '#e5e7eb';
+            btn.style.background = 'white';
+            if (check) check.style.display = 'none';
+          }
+        });
+      };
+
+      // Open checkout modal
+      window.openCheckoutModal_${sanitizedId} = function(orderItems, total) {
+        const modal = document.getElementById('checkout-modal-${sanitizedId}');
+        const summaryEl = document.getElementById('modal-order-summary-${sanitizedId}');
+        const modalTotal = document.getElementById('modal-total-${sanitizedId}');
+        const btnTotal = document.getElementById('modal-btn-total-${sanitizedId}');
+
+        // Build order summary HTML
+        let summaryHTML = '';
+        orderItems.forEach(function(item) {
+          summaryHTML += '<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">' +
+            '<span>' + item.name + ' x' + item.quantity + '</span>' +
+            '<span style="font-weight: 600;">' + formatCurrency_${sanitizedId}(item.amount) + '</span>' +
+          '</div>';
+        });
+        summaryEl.innerHTML = summaryHTML;
+
+        // Update totals
+        modalTotal.textContent = formatCurrency_${sanitizedId}(total);
+        btnTotal.textContent = formatCurrency_${sanitizedId}(total);
+
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        // Fetch banks when modal opens
+        if (banks_${sanitizedId}.length === 0) {
+          fetchBanks_${sanitizedId}();
+        }
+      };
+
+      // Close checkout modal
+      window.closeCheckoutModal_${sanitizedId} = function() {
+        const modal = document.getElementById('checkout-modal-${sanitizedId}');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      };
+
+      // Proceed to payment
+      window.proceedToPayment_${sanitizedId} = async function() {
+        // Validate bank selection
+        if (!selectedBankId_${sanitizedId}) {
+          document.getElementById('bank-error-${sanitizedId}').style.display = 'block';
+          return;
+        }
+
+        const btn = document.getElementById('proceed-payment-btn-${sanitizedId}');
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+        btn.style.opacity = '0.7';
+
+        try {
+          const response = await fetch('/api/payments/create-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project_id: window.__PROJECT_ID__,
+              product_id: pendingOrderData_${sanitizedId}.orderItems[0].id,
+              product_name: pendingOrderData_${sanitizedId}.productName,
+              product_price: pendingOrderData_${sanitizedId}.total.toFixed(2),
+              payment_service_id: selectedBankId_${sanitizedId},
+              customer_name: pendingOrderData_${sanitizedId}.name,
+              customer_email: pendingOrderData_${sanitizedId}.email,
+              customer_phone: pendingOrderData_${sanitizedId}.mobile,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.redirect_url) {
+            window.location.href = data.redirect_url;
+          } else {
+            throw new Error(data.error || 'Failed to create payment');
+          }
+        } catch (error) {
+          btn.disabled = false;
+          btn.innerHTML = 'Proceed to Secure Payment - <span id="modal-btn-total-${sanitizedId}">' + formatCurrency_${sanitizedId}(pendingOrderData_${sanitizedId}.total) + '</span>';
+          btn.style.opacity = '1';
+
+          alert(error.message || 'An error occurred. Please try again.');
+        }
+      };
+
       window.submitPaymentForm_${sanitizedId} = async function(event) {
         event.preventDefault();
 
-        const submitBtn = document.getElementById('submit-btn-${sanitizedId}');
         const statusDiv = document.getElementById('status-${sanitizedId}');
 
         // Calculate total and collect order items
@@ -2521,50 +2840,99 @@ function generateFormWithPaymentHTML(element: Element): string {
         // Build product name for payment
         const productName = orderItems.map(item => item.name + ' x' + item.quantity).join(', ');
 
-        // Disable button
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-        submitBtn.style.opacity = '0.7';
+        // Store order data for later use
+        pendingOrderData_${sanitizedId} = {
+          orderItems,
+          total,
+          name,
+          mobile,
+          email,
+          productName
+        };
 
-        try {
-          // Use the same payment API as payment_button
-          const response = await fetch('/api/payments/create-public', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              project_id: window.__PROJECT_ID__,
-              product_id: orderItems[0].id,
-              product_name: productName,
-              product_price: total.toFixed(2),
-              payment_service_id: 1, // FPX
-              customer_name: name,
-              customer_email: email,
-              customer_phone: mobile,
-            }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.redirect_url) {
-            // Redirect to payment
-            window.location.href = data.redirect_url;
-          } else {
-            throw new Error(data.error || 'Failed to create payment');
-          }
-        } catch (error) {
-          statusDiv.style.display = 'block';
-          statusDiv.style.backgroundColor = '#fef2f2';
-          statusDiv.style.color = '#991b1b';
-          statusDiv.style.borderLeft = '4px solid #ef4444';
-          statusDiv.textContent = error.message || 'An error occurred. Please try again.';
-
-          submitBtn.disabled = false;
-          submitBtn.textContent = '${submitButtonText}';
-          submitBtn.style.opacity = '1';
-        }
+        // Open checkout modal with bank selection
+        openCheckoutModal_${sanitizedId}(orderItems, total);
 
         return false;
       };
+
+      // Check for payment status on page load (after redirect from payment gateway)
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderRef = urlParams.get('order');
+
+      if (orderRef) {
+        // Remove order param from URL without page reload
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        // Check payment status from database
+        fetch('/api/payments/check-status?order=' + orderRef)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'completed' || data.status === 'paid') {
+              showPaymentResult_${sanitizedId}('success', orderRef);
+            } else if (data.status === 'failed' || data.status === 'cancelled') {
+              showPaymentResult_${sanitizedId}('failed', orderRef);
+            } else {
+              // Payment is still pending/processing
+              showPaymentResult_${sanitizedId}('pending', orderRef);
+            }
+          })
+          .catch(error => {
+            console.error('Error checking payment status:', error);
+            showPaymentResult_${sanitizedId}('pending', orderRef);
+          });
+      }
+
+      // Show payment result modal
+      function showPaymentResult_${sanitizedId}(status, orderRef) {
+        // Create modal element
+        const modal = document.createElement('div');
+        modal.id = 'payment-result-modal-${sanitizedId}';
+        modal.style.cssText = 'position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; padding: 1rem;';
+
+        let icon, title, message, bgColor;
+
+        if (status === 'success') {
+          icon = '<svg style="width: 4rem; height: 4rem; color: #22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+          title = 'Payment Successful!';
+          message = 'Thank you for your purchase. Your order has been confirmed.';
+          bgColor = '#dcfce7';
+        } else if (status === 'failed') {
+          icon = '<svg style="width: 4rem; height: 4rem; color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+          title = 'Payment Cancelled';
+          message = 'Your payment was cancelled or failed. Please try again if you wish to complete your purchase.';
+          bgColor = '#fee2e2';
+        } else {
+          icon = '<svg style="width: 4rem; height: 4rem; color: #f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+          title = 'Payment Processing';
+          message = 'Your payment is being processed. You will receive a confirmation email shortly.';
+          bgColor = '#fef3c7';
+        }
+
+        modal.innerHTML = \`
+          <div style="background: white; border-radius: 0.75rem; max-width: 28rem; width: 100%; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div style="background: \${bgColor}; padding: 2rem; text-align: center;">
+              <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                \${icon}
+              </div>
+              <h2 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin: 0 0 0.5rem 0;">\${title}</h2>
+            </div>
+            <div style="padding: 1.5rem;">
+              <p style="color: #4b5563; text-align: center; margin: 0 0 1rem 0;">\${message}</p>
+              <div style="background: #f3f4f6; border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 1.5rem;">
+                <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.25rem 0; text-align: center;">Order Reference</p>
+                <p style="font-weight: 600; color: #111827; margin: 0; text-align: center; font-family: monospace;">\${orderRef}</p>
+              </div>
+              <button onclick="document.getElementById('payment-result-modal-${sanitizedId}').remove()" style="width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+                Close
+              </button>
+            </div>
+          </div>
+        \`;
+
+        document.body.appendChild(modal);
+      }
     })();
   </script>
 </section>`;
@@ -2616,4 +2984,127 @@ function generateAnalyticsScripts(project: Project): string {
   }
 
   return scripts.join('\n');
+}
+
+/**
+ * Generate Product Carousel HTML
+ */
+function generateProductCarouselHTML(element: Element): string {
+  const {
+    title = 'Our Products',
+    subtitle = '',
+    products = [],
+    layout = 'grid',
+    columns = 3,
+    showPrice = true,
+    showDescription = true,
+    cardStyle = 'shadow',
+    bgColor = '#ffffff',
+    textColor = '#1f2937',
+    priceColor = '#2563eb',
+    backgroundImage,
+    backgroundOpacity = 70,
+  } = element.props;
+
+  const sanitizedId = sanitizeId(element.id);
+
+  // Card style classes
+  const cardClasses = cardStyle === 'minimal'
+    ? 'background: white;'
+    : cardStyle === 'bordered'
+    ? 'background: white; border: 1px solid #e5e7eb;'
+    : 'background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);';
+
+  // Generate product cards HTML
+  const productsHTML = products.map((product: any, index: number) => {
+    const variationsHTML = product.variations && product.variations.length > 0
+      ? `<div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+          ${product.variations.map((variation: any) =>
+            variation.type === 'color'
+              ? `<div style="display: flex; gap: 4px;">
+                  ${variation.options.slice(0, 4).map((opt: any) =>
+                    `<div style="width: 16px; height: 16px; border-radius: 50%; border: 1px solid #d1d5db; background-color: ${opt.colorCode || '#ccc'};" title="${opt.label}"></div>`
+                  ).join('')}
+                  ${variation.options.length > 4 ? `<span style="font-size: 12px; color: #6b7280;">+${variation.options.length - 4}</span>` : ''}
+                </div>`
+              : `<span style="font-size: 12px; color: #6b7280;">${variation.options.length} ${variation.name.toLowerCase()}s</span>`
+          ).join('')}
+        </div>`
+      : '';
+
+    return `
+      <div style="${cardClasses} border-radius: 12px; overflow: hidden; transition: transform 0.2s;" class="product-card-${sanitizedId}">
+        <div style="aspect-ratio: 1; background: #f3f4f6; position: relative; overflow: hidden;">
+          ${product.image_url
+            ? `<img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />`
+            : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>`
+          }
+        </div>
+        <div style="padding: 16px;">
+          <h3 style="font-weight: 600; font-size: 18px; margin-bottom: 4px; color: ${textColor};">${product.name}</h3>
+          ${showDescription && product.description
+            ? `<p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px; color: ${textColor}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.description}</p>`
+            : ''
+          }
+          ${variationsHTML}
+          ${showPrice
+            ? `<p style="font-weight: 700; font-size: 18px; color: ${priceColor};">${product.currency} ${typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}</p>`
+            : ''
+          }
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Determine grid columns CSS
+  const gridCSS = `
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(${columns}, minmax(0, 1fr));
+  `;
+
+  const backgroundHTML = backgroundImage
+    ? `
+      <div style="position: absolute; inset: 0; background-image: url('${backgroundImage}'); background-size: cover; background-position: center;"></div>
+      <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+    `
+    : '';
+
+  return `
+    <section id="product-carousel-${sanitizedId}" style="position: relative; padding: 64px 16px; background-color: ${bgColor}; overflow: hidden;">
+      ${backgroundHTML}
+      <div style="position: relative; z-index: 10; max-width: 1280px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 48px;">
+          <h2 style="font-size: 30px; font-weight: 700; margin-bottom: 16px; color: ${textColor};">${title}</h2>
+          ${subtitle ? `<p style="font-size: 18px; opacity: 0.8; max-width: 672px; margin: 0 auto; color: ${textColor};">${subtitle}</p>` : ''}
+        </div>
+
+        ${products.length === 0
+          ? `<div style="text-align: center; padding: 48px; border: 2px dashed #d1d5db; border-radius: 8px;">
+              <p style="color: #6b7280; font-size: 18px;">No products to display</p>
+            </div>`
+          : `<div style="${gridCSS}">${productsHTML}</div>`
+        }
+      </div>
+      <style>
+        .product-card-${sanitizedId}:hover {
+          transform: scale(1.02);
+        }
+        @media (max-width: 768px) {
+          #product-carousel-${sanitizedId} > div > div:last-child {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
+        @media (max-width: 480px) {
+          #product-carousel-${sanitizedId} > div > div:last-child {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      </style>
+    </section>
+  `;
 }
