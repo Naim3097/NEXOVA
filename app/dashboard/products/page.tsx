@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import ProductModal from '@/components/dashboard/ProductModal';
 
 interface Product {
@@ -31,6 +32,8 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -63,9 +66,66 @@ export default function ProductsPage() {
 
       if (response.ok) {
         setProducts(products.filter((p) => p.id !== id));
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
       }
     } catch (error) {
       console.error('Error deleting product:', error);
+    }
+  };
+
+  // Bulk delete products
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    const count = selectedIds.size;
+    if (!confirm(`Are you sure you want to delete ${count} product${count > 1 ? 's' : ''}? This action cannot be undone.`)) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/products/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
+
+      if (response.ok) {
+        setProducts(products.filter((p) => !selectedIds.has(p.id)));
+        setSelectedIds(new Set());
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to delete products');
+      }
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      alert('Failed to delete products');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Toggle single selection
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Toggle select all (filtered products)
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map((p) => p.id)));
     }
   };
 
@@ -100,8 +160,8 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="mb-6">
-            <div className="relative">
+          <div className="mb-6 flex items-center gap-4">
+            <div className="relative flex-1">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 size={20}
@@ -114,6 +174,17 @@ export default function ProductsPage() {
                 className="pl-10"
               />
             </div>
+            {selectedIds.size > 0 && (
+              <Button
+                variant="destructive"
+                onClick={handleBulkDelete}
+                disabled={isDeleting}
+                className="flex items-center gap-2"
+              >
+                <Trash2 size={16} />
+                {isDeleting ? 'Deleting...' : `Delete (${selectedIds.size})`}
+              </Button>
+            )}
           </div>
 
           <div className="bg-white rounded-lg shadow">
@@ -151,6 +222,13 @@ export default function ProductsPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b">
                     <tr>
+                      <th className="px-4 py-3 text-left">
+                        <Checkbox
+                          checked={filteredProducts.length > 0 && selectedIds.size === filteredProducts.length}
+                          onCheckedChange={toggleSelectAll}
+                          aria-label="Select all products"
+                        />
+                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Code
                       </th>
@@ -176,7 +254,14 @@ export default function ProductsPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50">
+                      <tr key={product.id} className={`hover:bg-gray-50 ${selectedIds.has(product.id) ? 'bg-blue-50' : ''}`}>
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          <Checkbox
+                            checked={selectedIds.has(product.id)}
+                            onCheckedChange={() => toggleSelect(product.id)}
+                            aria-label={`Select ${product.name}`}
+                          />
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             {product.image_url && (
