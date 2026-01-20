@@ -36,6 +36,9 @@ function getIconSVG(iconName: string): string {
     'thumbs-up': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>',
     'lightbulb': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>',
     'smartphone': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+    'droplet': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.5c-3.04 0-5.5-2.46-5.5-5.5 0-3.04 5.5-12.5 5.5-12.5s5.5 9.46 5.5 12.5c0 3.04-2.46 5.5-5.5 5.5z"></path>',
+    'wind': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"></path>',
+    'circle': '<circle cx="12" cy="12" r="10" stroke-width="2" fill="none"></circle>',
   };
 
   return iconMap[iconName] || iconMap['check-circle'];
@@ -431,31 +434,100 @@ function generateFeaturesHTML(element: Element): string {
   const {
     variant,
     title,
+    subtitle,
     features,
     backgroundImage,
     backgroundOpacity = 70,
-    bgColor = '#000000'
+    bgColor = '#ffffff'
   } = element.props;
 
   if (variant === 'grid') {
     return `
-<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   ${backgroundImage ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
   ` : ''}
   <div class="container" style="position: relative; z-index: 10;">
-    <h2 class="text-center mb-12">${title}</h2>
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
+      ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
+    </div>
     <div class="grid grid-cols-3 gap-8">
       ${features.map((feature: any) => `
-        <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+        <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: white;">
           <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
             <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               ${getIconSVG(feature.icon || 'check-circle')}
             </svg>
           </div>
-          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${feature.title}</h3>
-          <p style="color: #666;">${feature.description}</p>
+          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">${feature.title}</h3>
+          <p style="color: #6b7280; margin: 0;">${feature.description}</p>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'list') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundImage ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  ` : ''}
+  <div style="max-width: 56rem; margin: 0 auto; position: relative; z-index: 10;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
+      ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      ${features.map((feature: any) => `
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
+            <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${getIconSVG(feature.icon || 'check-circle')}
+            </svg>
+          </div>
+          <div style="flex: 1;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">${feature.title}</h3>
+            <p style="color: #6b7280; margin: 0;">${feature.description}</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'alternating') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundImage ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  ` : ''}
+  <div style="max-width: 72rem; margin: 0 auto; position: relative; z-index: 10;">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
+      ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 5rem;">
+      ${features.map((feature: any, index: number) => `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; align-items: center;">
+          <div style="${index % 2 === 1 ? 'order: 2;' : ''}">
+            <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+              <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                ${getIconSVG(feature.icon || 'check-circle')}
+              </svg>
+            </div>
+            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #111827;">${feature.title}</h3>
+            <p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${feature.description}</p>
+          </div>
+          <div style="height: 16rem; background: #e5e7eb; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; ${index % 2 === 1 ? 'order: 1;' : ''}">
+            <span style="color: #9ca3af;">Feature illustration</span>
+          </div>
         </div>
       `).join('')}
     </div>
