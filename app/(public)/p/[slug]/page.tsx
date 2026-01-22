@@ -5,13 +5,13 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable ISR caching
 
 interface PublishedPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function PublishedPage({ params }: PublishedPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   // Create Supabase client for public access
   const supabase = createClient(
@@ -47,7 +47,7 @@ export default async function PublishedPage({ params }: PublishedPageProps) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PublishedPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   // Create Supabase client for public access
   const supabase = createClient(

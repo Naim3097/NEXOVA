@@ -4,13 +4,13 @@ import { notFound, redirect } from 'next/navigation';
 import type { Project, Element } from '@/types';
 
 interface PreviewPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function PreviewPage({ params }: PreviewPageProps) {
-  const { id } = params;
+  const { id } = await params;
 
   // Create authenticated Supabase client
   const supabase = createClient();

@@ -2,14 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 
 interface CustomDomainPageProps {
-  params: {
+  params: Promise<{
     hostname: string;
     slug?: string[];
-  };
+  }>;
 }
 
 export default async function CustomDomainPage({ params }: CustomDomainPageProps) {
-  const { hostname, slug } = params;
+  const { hostname, slug } = await params;
 
   // Decode hostname in case it was URL encoded
   const decodedHostname = decodeURIComponent(hostname).toLowerCase();
@@ -122,7 +122,7 @@ export default async function CustomDomainPage({ params }: CustomDomainPageProps
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: CustomDomainPageProps) {
-  const { hostname, slug } = params;
+  const { hostname, slug } = await params;
   const decodedHostname = decodeURIComponent(hostname).toLowerCase();
   const projectSlug = slug && slug.length > 0 ? slug[0] : null;
 

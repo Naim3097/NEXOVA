@@ -2,14 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound, redirect } from 'next/navigation';
 
 interface SubdomainPageProps {
-  params: {
+  params: Promise<{
     subdomain: string;
     slug?: string[];
-  };
+  }>;
 }
 
 export default async function SubdomainPage({ params }: SubdomainPageProps) {
-  const { subdomain, slug } = params;
+  const { subdomain, slug } = await params;
 
   // Create Supabase client for public access
   const supabase = createClient(
@@ -103,7 +103,7 @@ export default async function SubdomainPage({ params }: SubdomainPageProps) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: SubdomainPageProps) {
-  const { subdomain, slug } = params;
+  const { subdomain, slug } = await params;
   const projectSlug = slug && slug.length > 0 ? slug[0] : null;
 
   // Create Supabase client for public access
