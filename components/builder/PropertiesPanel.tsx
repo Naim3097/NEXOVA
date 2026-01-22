@@ -3214,6 +3214,104 @@ export const PropertiesPanel = () => {
                 </div>
               </div>
 
+              {/* Bump Offer Section - Only available with 2+ products */}
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Bump Offer (Upsell)</div>
+
+              {(props.products || []).length < 2 ? (
+                <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
+                  <p className="text-sm text-gray-600">
+                    Add at least 2 products to enable bump offer functionality.
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Current products: {(props.products || []).length}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="enableBumpOffer-form"
+                      checked={props.enableBumpOffer || false}
+                      onChange={(e) => {
+                        handlePropChange('enableBumpOffer', e.target.checked);
+                        if (!e.target.checked) {
+                          handlePropChange('bumpOfferProductId', null);
+                          handlePropChange('bumpOfferDiscount', 0);
+                          handlePropChange('bumpOfferDescription', '');
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="enableBumpOffer-form" className="cursor-pointer">
+                      Enable Bump Offer
+                    </Label>
+                  </div>
+
+                  {props.enableBumpOffer && (
+                    <div className="space-y-3 border border-yellow-200 rounded-md p-3 bg-yellow-50 mt-3">
+                      <div>
+                        <Label htmlFor="bumpOfferProductId">Select Bump Offer Product</Label>
+                        <select
+                          id="bumpOfferProductId"
+                          value={props.bumpOfferProductId || ''}
+                          onChange={(e) => handlePropChange('bumpOfferProductId', e.target.value)}
+                          className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                        >
+                          <option value="">-- Select a product --</option>
+                          {(props.products || []).map((product: any) => (
+                            <option key={product.id} value={product.id}>
+                              {product.name} - RM {product.price?.toFixed(2)}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-xs text-gray-500 mt-1">
+                          This product will be offered as an upsell before checkout
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="bumpOfferDiscount-form">Discount % (optional)</Label>
+                        <Input
+                          id="bumpOfferDiscount-form"
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={props.bumpOfferDiscount || 0}
+                          onChange={(e) => handlePropChange('bumpOfferDiscount', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                        />
+                        {props.bumpOfferProductId && props.bumpOfferDiscount > 0 && (
+                          <p className="text-xs text-green-600 mt-1">
+                            Discounted price: RM {(
+                              ((props.products || []).find((p: any) => p.id === props.bumpOfferProductId)?.price || 0) *
+                              (1 - (props.bumpOfferDiscount || 0) / 100)
+                            ).toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="bumpOfferDescription-form">Offer Description</Label>
+                        <textarea
+                          id="bumpOfferDescription-form"
+                          value={props.bumpOfferDescription || ''}
+                          onChange={(e) => handlePropChange('bumpOfferDescription', e.target.value)}
+                          placeholder="Get this exclusive offer at a special price!"
+                          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                          rows={2}
+                        />
+                      </div>
+
+                      <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
+                        <strong>How it works:</strong> When customer clicks Pay, the bump offer modal appears.
+                        If accepted, the product is added to their order. If skipped, they proceed to checkout normally.
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
               <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Footer Links</div>
 
               <div>
