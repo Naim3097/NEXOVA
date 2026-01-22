@@ -162,6 +162,11 @@ export async function generateMetadata({ params }: SubdomainPageProps) {
 
   const seo = project.seo_settings || {};
 
+  // Map non-standard OpenGraph types to valid Next.js types
+  // "product" is valid in OG protocol but not in Next.js metadata API
+  const validOgTypes = ['website', 'article', 'book', 'profile'];
+  const ogType = validOgTypes.includes(seo.ogType) ? seo.ogType : 'website';
+
   return {
     title: seo.title || project.name,
     description: seo.description || project.description,
@@ -169,7 +174,7 @@ export async function generateMetadata({ params }: SubdomainPageProps) {
       title: seo.ogTitle || seo.title || project.name,
       description: seo.ogDescription || seo.description || project.description,
       images: seo.ogImage ? [seo.ogImage] : [],
-      type: seo.ogType || 'website',
+      type: ogType,
     },
     twitter: {
       card: seo.twitterCard || 'summary_large_image',
