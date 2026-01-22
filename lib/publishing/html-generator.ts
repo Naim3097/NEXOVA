@@ -809,10 +809,9 @@ function generatePaymentButtonHTML(element: Element): string {
     buttonColor,
     buttonSize,
     enableBumpOffer,
-    bumpOfferName,
+    bumpOfferProductId,
     bumpOfferDescription,
-    bumpOfferAmount,
-    bumpOfferDiscount,
+    bumpOfferDiscount = 0,
     successMessage,
     failureMessage,
     bgColor,
@@ -821,6 +820,9 @@ function generatePaymentButtonHTML(element: Element): string {
     productDescription,
     amount,
     productImage,
+    // Legacy bump offer fields
+    bumpOfferName: legacyBumpOfferName,
+    bumpOfferAmount: legacyBumpOfferAmount,
   } = element.props;
 
   // Use products array or fall back to legacy single product
@@ -840,10 +842,19 @@ function generatePaymentButtonHTML(element: Element): string {
   const checkoutModalId = `checkout-modal-${element.id}`;
   const bumpModalId = `bump-modal-${element.id}`;
 
+  // Find bump offer product from products list (new system)
+  const bumpOfferProduct = enableBumpOffer && bumpOfferProductId
+    ? displayProducts.find((p: any) => p.id === bumpOfferProductId)
+    : null;
+
   // Calculate bump offer discounted price
-  const bumpDiscountedPrice = bumpOfferAmount && bumpOfferDiscount
-    ? bumpOfferAmount * (1 - bumpOfferDiscount / 100)
-    : bumpOfferAmount;
+  const bumpOriginalPrice = bumpOfferProduct?.price || legacyBumpOfferAmount || 0;
+  const bumpDiscountedPrice = bumpOfferDiscount > 0
+    ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
+    : bumpOriginalPrice;
+
+  // Get bump offer name (new system uses product name, legacy uses bumpOfferName)
+  const bumpOfferName = bumpOfferProduct?.name || legacyBumpOfferName || '';
 
   // Button size styles
   const sizeStyles: Record<string, string> = {
@@ -1095,54 +1106,67 @@ function generatePaymentButtonHTML(element: Element): string {
 
   ${enableBumpOffer && bumpOfferName ? `
   <!-- Bump Offer Modal -->
-  <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
     <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
-      <div style="background: white; border-radius: 0.5rem; max-width: 40rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
         <!-- Red Banner -->
-        <div style="background: #dc2626; color: white; text-align: center; padding: 0.75rem;">
-          <p style="font-weight: bold; margin: 0;">WAIT! YOUR ORDER IS NOT COMPLETE YET...</p>
+        <div style="background: #dc2626; color: white; text-align: center; padding: 0.75rem 1rem;">
+          <p style="font-weight: bold; margin: 0; font-size: 0.875rem;">WAIT! YOUR ORDER IS NOT COMPLETE YET...</p>
         </div>
 
-        <div style="padding: 2rem;">
-          <h2 style="font-size: 1.875rem; font-weight: bold; text-align: center; margin-bottom: 1rem;">Add This Special Offer?</h2>
-          <p style="text-align: center; color: #374151; font-size: 1.125rem; margin-bottom: 1.5rem;">${bumpOfferDescription}</p>
+        <div style="padding: 1.5rem;">
+          <h2 style="font-size: 1.5rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">Add This Special Offer?</h2>
+          <p style="text-align: center; color: #4b5563; font-size: 1rem; margin: 0 0 1.5rem 0;">${bumpOfferDescription || 'Get this exclusive offer at a special price!'}</p>
 
           <!-- Product Card -->
-          <div style="background: white; border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
-            <div style="background: #e5e7eb; border-radius: 0.5rem; height: 16rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-              <svg style="width: 5rem; height: 5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div style="background: #fefce8; border: 2px solid #fde047; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+            ${bumpOfferProduct?.image ? `
+            <div style="margin-bottom: 1rem; text-align: center;">
+              <img src="${bumpOfferProduct.image}" alt="${bumpOfferName}" style="max-width: 100%; max-height: 200px; border-radius: 0.375rem; object-fit: cover;">
+            </div>
+            ` : `
+            <div style="background: #e5e7eb; border-radius: 0.5rem; height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+              <svg style="width: 3rem; height: 3rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
+            `}
 
-            <h3 style="font-size: 1.25rem; font-weight: bold; text-align: center; margin-bottom: 1rem;">${bumpOfferName}</h3>
+            <h3 style="font-size: 1.125rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">${bumpOfferName}</h3>
 
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-              <p style="color: #6b7280; text-decoration: line-through; font-size: 1.125rem; margin-bottom: 0.25rem;">${formatCurrency(bumpOfferAmount || 0)}</p>
-              <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
-                <p style="font-size: 2.25rem; font-weight: bold; color: #dc2626; margin: 0;">${formatCurrency(bumpDiscountedPrice || 0)}</p>
-                ${bumpOfferDiscount ? `<span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>` : ''}
+            <div style="text-align: center; margin-bottom: 1rem;">
+              ${bumpOfferDiscount > 0 ? `
+              <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatCurrency(bumpOriginalPrice)}</p>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatCurrency(bumpDiscountedPrice)}</p>
+                <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
               </div>
+              ` : `
+              <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatCurrency(bumpOriginalPrice)}</p>
+              `}
             </div>
 
             <button
-              onclick="acceptBumpOffer('${element.id}')"
-              style="width: 100%; padding: 1rem; background: #16a34a; color: white; border: none; border-radius: 0.5rem; font-weight: bold; font-size: 1.125rem; cursor: pointer; margin-bottom: 1rem;"
+              type="button"
+              onclick="acceptBumpOffer_${sanitizedId}()"
+              style="width: 100%; padding: 0.875rem; background: #16a34a; color: white; border: none; border-radius: 0.5rem; font-weight: bold; font-size: 1rem; cursor: pointer;"
             >
               Yes! Add To My Order
             </button>
           </div>
 
+          <!-- Decline Link -->
           <div style="text-align: center;">
             <button
-              onclick="declineBumpOffer('${element.id}')"
-              style="background: none; border: none; color: #6b7280; text-decoration: underline; font-size: 0.875rem; cursor: pointer;"
+              type="button"
+              onclick="declineBumpOffer_${sanitizedId}()"
+              style="background: none; border: none; color: #6b7280; font-size: 0.875rem; text-decoration: underline; cursor: pointer;"
             >
-              No thanks, I'll pass on this discount
+              No thanks, I'll pass on this offer
             </button>
           </div>
 
-          <p style="font-size: 0.75rem; text-align: center; color: #9ca3af; margin-top: 1.5rem;">
+          <p style="font-size: 0.75rem; text-align: center; color: #9ca3af; margin: 1rem 0 0 0;">
             This is a one-time offer only available on this page.
           </p>
         </div>
@@ -1160,6 +1184,14 @@ function generatePaymentButtonHTML(element: Element): string {
       let bumpOfferAccepted = false;
       let banks = [];
       let selectedBankId = null;
+
+      // Bump offer state
+      const hasBumpOffer_${sanitizedId} = ${bumpOfferProduct ? 'true' : 'false'};
+      const bumpOfferProductId_${sanitizedId} = ${bumpOfferProduct ? `'${bumpOfferProductId}'` : 'null'};
+      const bumpOfferPrice_${sanitizedId} = ${bumpDiscountedPrice};
+      const bumpOfferOriginalPrice_${sanitizedId} = ${bumpOriginalPrice};
+      const bumpOfferName_${sanitizedId} = ${bumpOfferProduct ? `'${bumpOfferName}'` : 'null'};
+      let pendingProductData_${sanitizedId} = null;
 
       // Fetch banks from API
       window.fetchBanks_${sanitizedId} = async function() {
@@ -1310,27 +1342,68 @@ function generatePaymentButtonHTML(element: Element): string {
         });
       }
 
-      // Open checkout modal
-      document.getElementById('${buttonId}').addEventListener('click', function() {
-        document.getElementById('${checkoutModalId}').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-      });
+      // Open checkout modal - shows bump offer first if enabled
+      function showCheckoutOrBumpOffer_${sanitizedId}(productName, productPrice, productId) {
+        // Store pending product data
+        pendingProductData_${sanitizedId} = {
+          productName: productName,
+          productPrice: productPrice,
+          productId: productId
+        };
 
-      // Open checkout modal (global function for onclick handlers)
-      window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
-        document.getElementById(modalId).style.display = 'block';
+        // Reset bump offer state
+        bumpOfferAccepted = false;
+
+        // Show bump offer modal first if enabled and it's not the bump offer product itself
+        if (hasBumpOffer_${sanitizedId} && productId !== bumpOfferProductId_${sanitizedId}) {
+          document.getElementById('${bumpModalId}').style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          return;
+        }
+
+        // Otherwise go straight to checkout
+        openActualCheckoutModal_${sanitizedId}();
+      }
+
+      // Actually open the checkout modal
+      function openActualCheckoutModal_${sanitizedId}() {
+        document.getElementById('${checkoutModalId}').style.display = 'block';
         document.body.style.overflow = 'hidden';
 
         // Fetch banks when modal opens
         if (banks.length === 0) {
           window.fetchBanks_${sanitizedId}();
         }
+      }
+
+      // Open checkout modal
+      document.getElementById('${buttonId}')?.addEventListener('click', function() {
+        showCheckoutOrBumpOffer_${sanitizedId}('${displayProducts[0].name}', ${displayProducts[0].price || 0}, '${displayProducts[0].id || ''}');
+      });
+
+      // Open checkout modal (global function for onclick handlers)
+      window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+        showCheckoutOrBumpOffer_${sanitizedId}(productName, productPrice, productId);
       };
 
       // Close checkout modal
       window.closeCheckoutModal = function(modalId) {
         document.getElementById(modalId).style.display = 'none';
         document.body.style.overflow = 'auto';
+      };
+
+      // Accept bump offer
+      window.acceptBumpOffer_${sanitizedId} = function() {
+        bumpOfferAccepted = true;
+        document.getElementById('${bumpModalId}').style.display = 'none';
+        openActualCheckoutModal_${sanitizedId}();
+      };
+
+      // Decline bump offer
+      window.declineBumpOffer_${sanitizedId} = function() {
+        bumpOfferAccepted = false;
+        document.getElementById('${bumpModalId}').style.display = 'none';
+        openActualCheckoutModal_${sanitizedId}();
       };
 
       // Handle checkout form submission
@@ -1354,12 +1427,26 @@ function generatePaymentButtonHTML(element: Element): string {
         submitButton.innerHTML = '<span style="display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
 
         try {
+          // Calculate total with bump offer and shipping
+          let basePrice = pendingProductData_${sanitizedId}?.productPrice || ${displayProducts[0].price};
+          let totalPrice = basePrice;
+          let productNameWithBump = pendingProductData_${sanitizedId}?.productName || '${displayProducts[0].name}';
+
+          if (bumpOfferAccepted && hasBumpOffer_${sanitizedId}) {
+            totalPrice += bumpOfferPrice_${sanitizedId};
+            productNameWithBump += ' + ' + bumpOfferName_${sanitizedId} + ' (Bump Offer)';
+          }
+
+          if (addShipping) {
+            totalPrice += 10;
+          }
+
           // Build payment payload for public API
           const payload = {
             project_id: projectId,
-            product_id: '${displayProducts[0].id || ''}',
-            product_name: '${displayProducts[0].name}',
-            product_price: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
+            product_id: pendingProductData_${sanitizedId}?.productId || '${displayProducts[0].id || ''}',
+            product_name: productNameWithBump,
+            product_price: totalPrice,
             payment_service_id: bankId,
             customer_name: 'Customer',
             customer_email: email && email.trim() ? email.trim() : '',
@@ -1399,62 +1486,6 @@ function generatePaymentButtonHTML(element: Element): string {
         }
       });
 
-      ${enableBumpOffer && bumpOfferName ? `
-      // Accept bump offer
-      window.acceptBumpOffer = async function(elemId) {
-        bumpOfferAccepted = true;
-        document.getElementById('${bumpModalId}').style.display = 'none';
-
-        const cardNumber = document.getElementById('card-number-${element.id}').value.replace(/\\s/g, '');
-        const expiryDate = document.getElementById('expiry-date-${element.id}').value.replace(/\\//g, '');
-        const cvv = document.getElementById('cvv-${element.id}').value;
-
-        await processPayment(transactionId, cardNumber, expiryDate, cvv, true);
-      };
-
-      // Decline bump offer
-      window.declineBumpOffer = async function(elemId) {
-        bumpOfferAccepted = false;
-        document.getElementById('${bumpModalId}').style.display = 'none';
-
-        const cardNumber = document.getElementById('card-number-${element.id}').value.replace(/\\s/g, '');
-        const expiryDate = document.getElementById('expiry-date-${element.id}').value.replace(/\\//g, '');
-        const cvv = document.getElementById('cvv-${element.id}').value;
-
-        await processPayment(transactionId, cardNumber, expiryDate, cvv, false);
-      };
-      ` : ''}
-
-      // Process payment
-      async function processPayment(txnId, cardNumber, expiryDate, cvv, acceptedBump = false) {
-        try {
-          const response = await fetch('/api/payments/process', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              transactionId: txnId,
-              cardNumber: cardNumber,
-              expiryDate: expiryDate,
-              cvv: cvv
-            })
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            alert('${successMessage}');
-            // Reset form
-            document.getElementById('checkout-form-${element.id}').reset();
-          } else {
-            alert('${failureMessage}');
-          }
-        } catch (error) {
-          alert('${failureMessage}');
-          console.error('Payment processing error:', error);
-        } finally {
-          document.body.style.overflow = 'auto';
-        }
-      }
 
       // Check for order reference in URL (customer returned from payment)
       const urlParams = new URLSearchParams(window.location.search);
@@ -1684,10 +1715,34 @@ function generatePricingHTML(element: Element): string {
     backgroundImage,
     backgroundOpacity = 70,
     bgColor = '#000000',
-    enablePaymentIntegration = false
+    enablePaymentIntegration = false,
+    // Bump offer settings
+    enableBumpOffer = false,
+    bumpOfferPlanIndex = null,
+    bumpOfferDiscount = 0,
+    bumpOfferDescription = '',
   } = element.props;
 
-  const checkoutModalId = `pricing-checkout-modal-${element.id}`;
+  const sanitizedId = sanitizeId(element.id);
+  const checkoutModalId = `pricing-checkout-modal-${sanitizedId}`;
+  const bumpModalId = `pricing-bump-modal-${sanitizedId}`;
+
+  // Find bump offer plan
+  const bumpOfferPlan = enableBumpOffer && bumpOfferPlanIndex !== null && plans && plans[bumpOfferPlanIndex]
+    ? plans[bumpOfferPlanIndex]
+    : null;
+
+  // Calculate bump offer discounted price
+  const bumpOriginalPrice = bumpOfferPlan ? (parseFloat(bumpOfferPlan.price) || bumpOfferPlan.priceNumeric || 0) : 0;
+  const bumpDiscountedPrice = bumpOfferDiscount > 0
+    ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
+    : bumpOriginalPrice;
+
+  // Format currency helper for pricing
+  const formatPricingCurrency = (value: number, currencyCode: string = 'MYR') => {
+    if (currencyCode === 'MYR' || currencyCode === 'RM') return `RM ${value.toFixed(2)}`;
+    return `${currencyCode} ${value.toFixed(2)}`;
+  };
 
   if (layout === 'cards') {
     return `
@@ -1728,7 +1783,7 @@ function generatePricingHTML(element: Element): string {
           </ul>
           ${enablePaymentIntegration ? `
             <button
-              onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+              onclick="openPricingCheckout_${sanitizedId}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plans.indexOf(plan)}')"
               style="
                 width: 100%;
                 padding: 0.75rem 1.5rem;
@@ -1758,11 +1813,11 @@ function generatePricingHTML(element: Element): string {
 ${enablePaymentIntegration ? `
 <!-- Checkout Modal for Pricing -->
 <div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
-  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
     <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
       <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
         <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
-        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+        <button onclick="closePricingCheckout_${sanitizedId}()" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
       </div>
       <div style="padding: 1.5rem; text-align: center;">
         <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
@@ -1772,41 +1827,144 @@ ${enablePaymentIntegration ? `
   </div>
 </div>
 
+${bumpOfferPlan ? `
+<!-- Bump Offer Modal for Pricing -->
+<div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <!-- Red Banner -->
+      <div style="background: #dc2626; color: white; text-align: center; padding: 0.75rem 1rem;">
+        <p style="font-weight: bold; margin: 0; font-size: 0.875rem;">WAIT! YOUR ORDER IS NOT COMPLETE YET...</p>
+      </div>
+
+      <div style="padding: 1.5rem;">
+        <h2 style="font-size: 1.5rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">Add This Special Offer?</h2>
+        <p style="text-align: center; color: #4b5563; font-size: 1rem; margin: 0 0 1.5rem 0;">${bumpOfferDescription || 'Get this exclusive plan at a special price!'}</p>
+
+        <!-- Plan Card -->
+        <div style="background: #fefce8; border: 2px solid #fde047; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h3 style="font-size: 1.125rem; font-weight: bold; text-align: center; margin: 0 0 0.5rem 0; color: #111827;">${bumpOfferPlan.name}</h3>
+          ${bumpOfferPlan.description ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin: 0 0 1rem 0;">${bumpOfferPlan.description}</p>` : ''}
+
+          <div style="text-align: center; margin-bottom: 1rem;">
+            ${bumpOfferDiscount > 0 ? `
+            <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatPricingCurrency(bumpDiscountedPrice, bumpOfferPlan.currency || 'RM')}</p>
+              <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
+            </div>
+            ` : `
+            <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
+            `}
+          </div>
+
+          <button
+            type="button"
+            onclick="acceptPricingBumpOffer_${sanitizedId}()"
+            style="width: 100%; padding: 0.875rem; background: #16a34a; color: white; border: none; border-radius: 0.5rem; font-weight: bold; font-size: 1rem; cursor: pointer;"
+          >
+            Yes! Add To My Order
+          </button>
+        </div>
+
+        <!-- Decline Link -->
+        <div style="text-align: center;">
+          <button
+            type="button"
+            onclick="declinePricingBumpOffer_${sanitizedId}()"
+            style="background: none; border: none; color: #6b7280; font-size: 0.875rem; text-decoration: underline; cursor: pointer;"
+          >
+            No thanks, I'll pass on this offer
+          </button>
+        </div>
+
+        <p style="font-size: 0.75rem; text-align: center; color: #9ca3af; margin: 1rem 0 0 0;">
+          This is a one-time offer only available on this page.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+` : ''}
+
 <script>
-  // Define openCheckoutModal for pricing if not already defined
-  if (typeof window.openCheckoutModal === 'undefined') {
-    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+(function() {
+  // Pricing bump offer state
+  const hasBumpOffer_${sanitizedId} = ${bumpOfferPlan ? 'true' : 'false'};
+  const bumpOfferPlanIndex_${sanitizedId} = ${bumpOfferPlanIndex !== null ? bumpOfferPlanIndex : 'null'};
+  const bumpOfferPrice_${sanitizedId} = ${bumpDiscountedPrice};
+  const bumpOfferName_${sanitizedId} = ${bumpOfferPlan ? `'${bumpOfferPlan.name}'` : 'null'};
+  let pricingBumpOfferAccepted_${sanitizedId} = false;
+  let pendingPlanData_${sanitizedId} = null;
 
-        // Try to trigger bank fetching if available
-        // Look for any fetchBanks function and call it
-        for (let key in window) {
-          if (key.startsWith('fetchBanks_') && typeof window[key] === 'function') {
-            try {
-              window[key]();
-              break;
-            } catch (e) {
-              console.log('Could not fetch banks:', e);
-            }
-          }
-        }
-      }
+  // Open pricing checkout with bump offer check
+  window.openPricingCheckout_${sanitizedId} = function(planName, planPrice, planIndex) {
+    // Store pending plan data
+    pendingPlanData_${sanitizedId} = {
+      planName: planName,
+      planPrice: planPrice,
+      planIndex: planIndex
     };
+
+    // Reset bump offer state
+    pricingBumpOfferAccepted_${sanitizedId} = false;
+
+    // Show bump offer modal first if enabled and selected plan is not the bump offer itself
+    if (hasBumpOffer_${sanitizedId} && planIndex !== 'plan-' + bumpOfferPlanIndex_${sanitizedId}) {
+      document.getElementById('${bumpModalId}').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    // Otherwise try to open a payment button checkout modal if available
+    openActualPricingCheckout_${sanitizedId}();
+  };
+
+  // Actually open checkout
+  function openActualPricingCheckout_${sanitizedId}() {
+    // Try to find and use a payment button's checkout modal
+    if (typeof window.openCheckoutModal === 'function') {
+      let totalPrice = pendingPlanData_${sanitizedId}.planPrice;
+      let productName = pendingPlanData_${sanitizedId}.planName;
+
+      if (pricingBumpOfferAccepted_${sanitizedId} && hasBumpOffer_${sanitizedId}) {
+        totalPrice += bumpOfferPrice_${sanitizedId};
+        productName += ' + ' + bumpOfferName_${sanitizedId} + ' (Bump Offer)';
+      }
+
+      // Find any checkout modal on the page
+      const checkoutModals = document.querySelectorAll('[id^="checkout-modal-"]');
+      if (checkoutModals.length > 0) {
+        window.openCheckoutModal(checkoutModals[0].id, productName, totalPrice, pendingPlanData_${sanitizedId}.planIndex);
+        return;
+      }
+    }
+
+    // Fallback: show pricing's own checkout modal
+    document.getElementById('${checkoutModalId}').style.display = 'block';
+    document.body.style.overflow = 'hidden';
   }
 
-  // Define closeCheckoutModal if not already defined
-  if (typeof window.closeCheckoutModal === 'undefined') {
-    window.closeCheckoutModal = function(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-      }
-    };
-  }
+  // Close pricing checkout modal
+  window.closePricingCheckout_${sanitizedId} = function() {
+    document.getElementById('${checkoutModalId}').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  };
+
+  // Accept bump offer
+  window.acceptPricingBumpOffer_${sanitizedId} = function() {
+    pricingBumpOfferAccepted_${sanitizedId} = true;
+    document.getElementById('${bumpModalId}').style.display = 'none';
+    openActualPricingCheckout_${sanitizedId}();
+  };
+
+  // Decline bump offer
+  window.declinePricingBumpOffer_${sanitizedId} = function() {
+    pricingBumpOfferAccepted_${sanitizedId} = false;
+    document.getElementById('${bumpModalId}').style.display = 'none';
+    openActualPricingCheckout_${sanitizedId}();
+  };
+})();
 </script>
 ` : ''}`;
   } else {
@@ -1854,7 +2012,7 @@ ${enablePaymentIntegration ? `
               <td style="padding: 1rem;">
                 ${enablePaymentIntegration ? `
                   <button
-                    onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+                    onclick="openPricingCheckout_${sanitizedId}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${index}')"
                     style="
                       padding: 0.5rem 1.25rem;
                       background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'};
@@ -1880,13 +2038,13 @@ ${enablePaymentIntegration ? `
 </section>
 
 ${enablePaymentIntegration ? `
-<!-- Checkout Modal for Pricing -->
+<!-- Checkout Modal for Pricing Table -->
 <div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
-  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
     <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
       <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
         <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
-        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+        <button onclick="closePricingCheckout_${sanitizedId}()" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
       </div>
       <div style="padding: 1.5rem; text-align: center;">
         <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
@@ -1896,41 +2054,144 @@ ${enablePaymentIntegration ? `
   </div>
 </div>
 
+${bumpOfferPlan ? `
+<!-- Bump Offer Modal for Pricing Table -->
+<div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <!-- Red Banner -->
+      <div style="background: #dc2626; color: white; text-align: center; padding: 0.75rem 1rem;">
+        <p style="font-weight: bold; margin: 0; font-size: 0.875rem;">WAIT! YOUR ORDER IS NOT COMPLETE YET...</p>
+      </div>
+
+      <div style="padding: 1.5rem;">
+        <h2 style="font-size: 1.5rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">Add This Special Offer?</h2>
+        <p style="text-align: center; color: #4b5563; font-size: 1rem; margin: 0 0 1.5rem 0;">${bumpOfferDescription || 'Get this exclusive plan at a special price!'}</p>
+
+        <!-- Plan Card -->
+        <div style="background: #fefce8; border: 2px solid #fde047; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h3 style="font-size: 1.125rem; font-weight: bold; text-align: center; margin: 0 0 0.5rem 0; color: #111827;">${bumpOfferPlan.name}</h3>
+          ${bumpOfferPlan.description ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin: 0 0 1rem 0;">${bumpOfferPlan.description}</p>` : ''}
+
+          <div style="text-align: center; margin-bottom: 1rem;">
+            ${bumpOfferDiscount > 0 ? `
+            <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatPricingCurrency(bumpDiscountedPrice, bumpOfferPlan.currency || 'RM')}</p>
+              <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
+            </div>
+            ` : `
+            <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
+            `}
+          </div>
+
+          <button
+            type="button"
+            onclick="acceptPricingBumpOffer_${sanitizedId}()"
+            style="width: 100%; padding: 0.875rem; background: #16a34a; color: white; border: none; border-radius: 0.5rem; font-weight: bold; font-size: 1rem; cursor: pointer;"
+          >
+            Yes! Add To My Order
+          </button>
+        </div>
+
+        <!-- Decline Link -->
+        <div style="text-align: center;">
+          <button
+            type="button"
+            onclick="declinePricingBumpOffer_${sanitizedId}()"
+            style="background: none; border: none; color: #6b7280; font-size: 0.875rem; text-decoration: underline; cursor: pointer;"
+          >
+            No thanks, I'll pass on this offer
+          </button>
+        </div>
+
+        <p style="font-size: 0.75rem; text-align: center; color: #9ca3af; margin: 1rem 0 0 0;">
+          This is a one-time offer only available on this page.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+` : ''}
+
 <script>
-  // Define openCheckoutModal for pricing if not already defined
-  if (typeof window.openCheckoutModal === 'undefined') {
-    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+(function() {
+  // Pricing bump offer state (table layout)
+  const hasBumpOffer_${sanitizedId} = ${bumpOfferPlan ? 'true' : 'false'};
+  const bumpOfferPlanIndex_${sanitizedId} = ${bumpOfferPlanIndex !== null ? bumpOfferPlanIndex : 'null'};
+  const bumpOfferPrice_${sanitizedId} = ${bumpDiscountedPrice};
+  const bumpOfferName_${sanitizedId} = ${bumpOfferPlan ? `'${bumpOfferPlan.name}'` : 'null'};
+  let pricingBumpOfferAccepted_${sanitizedId} = false;
+  let pendingPlanData_${sanitizedId} = null;
 
-        // Try to trigger bank fetching if available
-        // Look for any fetchBanks function and call it
-        for (let key in window) {
-          if (key.startsWith('fetchBanks_') && typeof window[key] === 'function') {
-            try {
-              window[key]();
-              break;
-            } catch (e) {
-              console.log('Could not fetch banks:', e);
-            }
-          }
-        }
-      }
+  // Open pricing checkout with bump offer check
+  window.openPricingCheckout_${sanitizedId} = function(planName, planPrice, planIndex) {
+    // Store pending plan data
+    pendingPlanData_${sanitizedId} = {
+      planName: planName,
+      planPrice: planPrice,
+      planIndex: planIndex
     };
+
+    // Reset bump offer state
+    pricingBumpOfferAccepted_${sanitizedId} = false;
+
+    // Show bump offer modal first if enabled and selected plan is not the bump offer itself
+    if (hasBumpOffer_${sanitizedId} && planIndex !== 'plan-' + bumpOfferPlanIndex_${sanitizedId}) {
+      document.getElementById('${bumpModalId}').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    // Otherwise try to open a payment button checkout modal if available
+    openActualPricingCheckout_${sanitizedId}();
+  };
+
+  // Actually open checkout
+  function openActualPricingCheckout_${sanitizedId}() {
+    // Try to find and use a payment button's checkout modal
+    if (typeof window.openCheckoutModal === 'function') {
+      let totalPrice = pendingPlanData_${sanitizedId}.planPrice;
+      let productName = pendingPlanData_${sanitizedId}.planName;
+
+      if (pricingBumpOfferAccepted_${sanitizedId} && hasBumpOffer_${sanitizedId}) {
+        totalPrice += bumpOfferPrice_${sanitizedId};
+        productName += ' + ' + bumpOfferName_${sanitizedId} + ' (Bump Offer)';
+      }
+
+      // Find any checkout modal on the page
+      const checkoutModals = document.querySelectorAll('[id^="checkout-modal-"]');
+      if (checkoutModals.length > 0) {
+        window.openCheckoutModal(checkoutModals[0].id, productName, totalPrice, pendingPlanData_${sanitizedId}.planIndex);
+        return;
+      }
+    }
+
+    // Fallback: show pricing's own checkout modal
+    document.getElementById('${checkoutModalId}').style.display = 'block';
+    document.body.style.overflow = 'hidden';
   }
 
-  // Define closeCheckoutModal if not already defined
-  if (typeof window.closeCheckoutModal === 'undefined') {
-    window.closeCheckoutModal = function(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-      }
-    };
-  }
+  // Close pricing checkout modal
+  window.closePricingCheckout_${sanitizedId} = function() {
+    document.getElementById('${checkoutModalId}').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  };
+
+  // Accept bump offer
+  window.acceptPricingBumpOffer_${sanitizedId} = function() {
+    pricingBumpOfferAccepted_${sanitizedId} = true;
+    document.getElementById('${bumpModalId}').style.display = 'none';
+    openActualPricingCheckout_${sanitizedId}();
+  };
+
+  // Decline bump offer
+  window.declinePricingBumpOffer_${sanitizedId} = function() {
+    pricingBumpOfferAccepted_${sanitizedId} = false;
+    document.getElementById('${bumpModalId}').style.display = 'none';
+    openActualPricingCheckout_${sanitizedId}();
+  };
+})();
 </script>
 ` : ''}`;
   }
