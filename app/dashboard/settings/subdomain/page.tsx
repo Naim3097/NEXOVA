@@ -48,7 +48,11 @@ export default function SubdomainSettingsPage() {
   const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
   const [verifyingDns, setVerifyingDns] = useState(false);
 
-  const appDomain = process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '') || 'ide-page-builder.vercel.app';
+  // Single-level subdomain format: subdomain-ide-page-builder.vercel.app
+  const vercelAppSuffix = 'ide-page-builder.vercel.app';
+
+  // Helper to get full subdomain URL
+  const getFullSubdomainUrl = (subdomain: string) => `${subdomain}-${vercelAppSuffix}`;
 
   // Default DNS records to show before domain is added to Vercel
   const defaultDnsRecords: DnsRecord[] = [
@@ -180,7 +184,7 @@ export default function SubdomainSettingsPage() {
       toast({
         title: 'Subdomain Updated',
         description: data.subdomain
-          ? `Your pages will be available at ${data.subdomain}.${appDomain}`
+          ? `Your pages will be available at ${getFullSubdomainUrl(data.subdomain)}`
           : 'Subdomain has been removed',
       });
     } catch (error) {
@@ -394,7 +398,7 @@ export default function SubdomainSettingsPage() {
           <p className="font-semibold mb-1">How domains work</p>
           <p className="opacity-90">
             With a subdomain, your published pages will be accessible at:<br />
-            <code className="bg-blue-100 px-1 rounded">yourname.{appDomain}</code>
+            <code className="bg-blue-100 px-1 rounded">yourname-{vercelAppSuffix}</code>
           </p>
           <p className="opacity-90 mt-2">
             With a custom domain, your pages will be accessible at:<br />
@@ -513,12 +517,12 @@ export default function SubdomainSettingsPage() {
                 <div>
                   <p className="font-medium text-green-900">Active Subdomain</p>
                   <a
-                    href={`https://${currentSubdomain}.${appDomain}`}
+                    href={`https://${getFullSubdomainUrl(currentSubdomain)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-green-700 hover:underline flex items-center gap-1"
                   >
-                    {currentSubdomain}.{appDomain}
+                    {getFullSubdomainUrl(currentSubdomain)}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -583,7 +587,7 @@ export default function SubdomainSettingsPage() {
                   placeholder="yourname"
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-500 whitespace-nowrap">.{appDomain}</span>
+                <span className="text-sm text-gray-500 whitespace-nowrap">-{vercelAppSuffix}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Use lowercase letters, numbers, and hyphens (3-63 characters)
@@ -619,7 +623,7 @@ export default function SubdomainSettingsPage() {
               <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-500 mb-1">Preview URL</p>
                 <p className="text-sm font-mono text-gray-700">
-                  https://{newSubdomain}.{appDomain}
+                  https://{getFullSubdomainUrl(newSubdomain)}
                 </p>
               </div>
             )}
@@ -786,7 +790,7 @@ export default function SubdomainSettingsPage() {
                     onCheckedChange={(checked: boolean | 'indeterminate') => setUnderstoodWarning(checked === true)}
                   />
                   <Label htmlFor="understoodWarning" className="text-sm cursor-pointer text-blue-900">
-                    By choosing to use your own domain name, you can&apos;t revert back to our {appDomain.split('.')[0]}.app subdomain.
+                    By choosing to use your own domain name, you can&apos;t revert back to our {vercelAppSuffix} subdomain.
                     <br />
                     <span className="font-medium">I understood and agree</span>
                   </Label>

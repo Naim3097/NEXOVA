@@ -99,7 +99,9 @@ export function generateBookingFormHTML(element: Element): string {
   ).join('');
 
   // Build the HTML
-  let html = '<section id="booking-' + sanitizedId + '" style="background-color: ' + bgColor + '; padding: 2rem 1rem;">';
+  // Add both a unique ID and a simple "booking" anchor for easy navigation links
+  let html = '<a id="booking" style="display:block;position:relative;top:-80px;visibility:hidden;"></a>';
+  html += '<section id="booking-' + sanitizedId + '" style="background-color: ' + bgColor + '; padding: 2rem 1rem;">';
   html += '<div style="max-width: 48rem; margin: 0 auto;">';
 
   // Header
@@ -269,11 +271,18 @@ export function generateBookingFormHTML(element: Element): string {
   html += '  return currency + " " + value.toFixed(2);';
   html += '}';
 
+  html += 'function formatDateStr(date) {';
+  html += '  var y = date.getFullYear();';
+  html += '  var m = String(date.getMonth() + 1).padStart(2, "0");';
+  html += '  var d = String(date.getDate()).padStart(2, "0");';
+  html += '  return y + "-" + m + "-" + d;';
+  html += '}';
+
   html += 'function isDateAvailable(date) {';
   html += '  var today = new Date(); today.setHours(0, 0, 0, 0);';
   html += '  if (date < today) return false;';
   html += '  if (availableDays.indexOf(date.getDay()) === -1) return false;';
-  html += '  var dateStr = date.toISOString().split("T")[0];';
+  html += '  var dateStr = formatDateStr(date);';
   html += '  if (blockedDates.indexOf(dateStr) !== -1) return false;';
   html += '  return true;';
   html += '}';
@@ -298,7 +307,7 @@ export function generateBookingFormHTML(element: Element): string {
   html += '    var date = new Date(year, month, d);';
   html += '    var available = isDateAvailable(date);';
   html += '    var isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();';
-  html += '    var dateStr = date.toISOString().split("T")[0];';
+  html += '    var dateStr = formatDateStr(date);';
   html += '    var style = "padding: 0.5rem; text-align: center; border-radius: 0.5rem; cursor: " + (available ? "pointer" : "not-allowed") + "; font-size: 0.875rem; border: none; ";';
   html += '    if (isSelected) { style += "background: #3b82f6; color: white; font-weight: 600;"; }';
   html += '    else if (available) { style += "background: none; color: #111827;"; }';
@@ -314,7 +323,8 @@ export function generateBookingFormHTML(element: Element): string {
   html += '}';
 
   html += 'function selectDate(dateStr) {';
-  html += '  selectedDate = new Date(dateStr + "T00:00:00");';
+  html += '  var parts = dateStr.split("-");';
+  html += '  selectedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));';
   html += '  document.getElementById("selected-date-" + sanitizedId).value = dateStr;';
   html += '  renderCalendar();';
   html += '  updateSummary();';
@@ -354,7 +364,7 @@ export function generateBookingFormHTML(element: Element): string {
   html += '    customer_email: formData.get("email") || "",';
   html += '    customer_phone: (formData.get("country_code") || "") + " " + (formData.get("phone") || ""),';
   html += '    customer_remark: formData.get("remark") || "",';
-  html += '    booking_date: selectedDate.toISOString().split("T")[0],';
+  html += '    booking_date: formatDateStr(selectedDate),';
   html += '    time_slot: selectedTime,';
   html += '    service_name: serviceName,';
   html += '    service_price: servicePrice,';

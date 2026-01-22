@@ -52,9 +52,7 @@ INSERT INTO templates (
           'logo', '',
           'logoText', 'AUTO PRO SERVICE',
           'menuItems', jsonb_build_array(
-            jsonb_build_object('label', 'Home', 'url', '#'),
             jsonb_build_object('label', 'Services', 'url', '#services'),
-            jsonb_build_object('label', 'Why Us', 'url', '#why-us'),
             jsonb_build_object('label', 'Testimonials', 'url', '#testimonials'),
             jsonb_build_object('label', 'FAQ', 'url', '#faq')
           ),

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { generateHTML } from '@/lib/publishing/html-generator';
 import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { getSubdomainAlias } from '@/lib/vercel-domains';
 import type { Project, Element } from '@/types';
 
 export async function POST(request: NextRequest) {
@@ -150,14 +151,15 @@ export async function POST(request: NextRequest) {
 
     // Generate published URL based on subdomain availability
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002';
-    const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'localhost:3002';
 
     let publishedUrl: string;
     let urlType: 'path' | 'subdomain' | 'custom';
 
     if (profile.subdomain) {
       // Both Free and Pro users: Use subdomain if available
-      publishedUrl = `https://${profile.subdomain}.${appDomain}`;
+      // New format: subdomain-ide-page-builder.vercel.app
+      const subdomainDomain = getSubdomainAlias(profile.subdomain);
+      publishedUrl = `https://${subdomainDomain}`;
       urlType = 'subdomain';
     } else {
       // Fallback: Use path-based URL if no subdomain

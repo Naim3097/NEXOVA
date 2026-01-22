@@ -12,6 +12,10 @@ const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
 const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID;
 
+// Base domain for single-level subdomain format
+// e.g., subdomain-ide-page-builder.vercel.app
+const VERCEL_APP_SUFFIX = 'ide-page-builder.vercel.app';
+
 export interface VercelDomainVerification {
   type: string;
   domain: string;
@@ -339,4 +343,142 @@ function buildDnsInstructions(
   }
 
   return records;
+}
+
+/**
+ * Convert subdomain to single-level Vercel domain format
+ * e.g., "kurtagorilla" → "kurtagorilla-ide-page-builder.vercel.app"
+ */
+export function getSubdomainAlias(subdomain: string): string {
+  return `${subdomain}-${VERCEL_APP_SUFFIX}`;
+}
+
+/**
+ * Extract subdomain from single-level Vercel domain format
+ * e.g., "kurtagorilla-ide-page-builder.vercel.app" → "kurtagorilla"
+ */
+export function extractSubdomainFromAlias(domain: string): string | null {
+  const suffix = `-${VERCEL_APP_SUFFIX}`;
+  if (domain.endsWith(suffix)) {
+    return domain.slice(0, -suffix.length);
+  }
+  return null;
+}
+
+/**
+ * Add a subdomain alias to the Vercel project
+ * This creates a single-level subdomain like: subdomain-ide-page-builder.vercel.app
+ */
+export async function addSubdomainAlias(subdomain: string): Promise<{
+  success: boolean;
+  domain?: string;
+  error?: string;
+}> {
+  if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+    console.warn('Vercel API credentials not configured. Subdomain alias not created.');
+    // Return success anyway - the subdomain will still work via middleware rewrite
+    // once we have a custom domain or Vercel credentials configured
+    return {
+      success: true,
+      domain: getSubdomainAlias(subdomain),
+    };
+  }
+
+  const domain = getSubdomainAlias(subdomain);
+
+  try {
+    const response = await fetch(
+      `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains${getTeamParam()}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${VERCEL_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: domain }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Domain already exists is okay - might be re-claiming same subdomain
+      if (data.error?.code === 'domain_already_in_use') {
+        // Check if it's our project
+        const status = await getDomainStatus(domain);
+        if (status.exists) {
+          return { success: true, domain };
+        }
+        return {
+          success: false,
+          error: 'This subdomain is already in use.',
+        };
+      }
+      if (data.error?.code === 'invalid_domain') {
+        return {
+          success: false,
+          error: 'Invalid subdomain format.',
+        };
+      }
+      return {
+        success: false,
+        error: data.error?.message || 'Failed to create subdomain alias.',
+      };
+    }
+
+    return { success: true, domain };
+  } catch (error) {
+    console.error('Error adding subdomain alias:', error);
+    return {
+      success: false,
+      error: 'Failed to connect to Vercel API.',
+    };
+  }
+}
+
+/**
+ * Remove a subdomain alias from the Vercel project
+ */
+export async function removeSubdomainAlias(subdomain: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+    // Return success if not configured - nothing to remove
+    return { success: true };
+  }
+
+  const domain = getSubdomainAlias(subdomain);
+
+  try {
+    const response = await fetch(
+      `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains/${encodeURIComponent(domain)}${getTeamParam()}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${VERCEL_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const data = await response.json();
+      // Not found is okay - already removed
+      if (data.error?.code === 'not_found') {
+        return { success: true };
+      }
+      return {
+        success: false,
+        error: data.error?.message || 'Failed to remove subdomain alias.',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error removing subdomain alias:', error);
+    return {
+      success: false,
+      error: 'Failed to connect to Vercel API.',
+    };
+  }
 }

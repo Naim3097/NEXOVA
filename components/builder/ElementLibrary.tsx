@@ -64,8 +64,7 @@ const elementTemplates: ElementTemplate[] = [
       logoText: 'Your Brand',
       menuItems: [
         { label: 'Home', url: '#' },
-        { label: 'Features', url: '#features' },
-        { label: 'Pricing', url: '#pricing' },
+        { label: 'Features', url: '#services' },
         { label: 'Contact', url: '#contact' },
       ],
       ctaButton: {

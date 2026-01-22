@@ -18,7 +18,10 @@ export const CTAElement = React.memo(
       description,
       buttonText,
       buttonUrl,
+      buttonLinkType = 'section',
       bgGradient,
+      bgType = 'gradient',
+      bgColor = '#667eea',
       backgroundImage,
       backgroundOpacity = 70,
       buttonColor = '#ffffff',
@@ -26,6 +29,17 @@ export const CTAElement = React.memo(
       buttonSize = 'lg',
       buttonFontSize = '1.125rem',
     } = props;
+
+    // Determine if link is external
+    const isExternalLink = buttonLinkType === 'external' ||
+      (buttonUrl && (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
+
+    // Get background style based on type
+    const getBackgroundStyle = () => {
+      if (backgroundImage) return 'transparent';
+      if (bgType === 'solid') return bgColor;
+      return bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    };
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -77,7 +91,7 @@ export const CTAElement = React.memo(
       return (
         <section
           className={`${baseClasses} py-20 px-4 cursor-pointer overflow-hidden`}
-          style={{ background: backgroundImage ? 'transparent' : bgGradient }}
+          style={{ background: getBackgroundStyle() }}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -108,6 +122,8 @@ export const CTAElement = React.memo(
               href={buttonUrl || '#'}
               className={getButtonPadding()}
               style={buttonStyles}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
               onMouseEnter={(e) => {
                 Object.assign(e.currentTarget.style, buttonHoverStyles);
               }}
@@ -128,7 +144,7 @@ export const CTAElement = React.memo(
       return (
         <section
           className={`${baseClasses} py-20 px-4 cursor-pointer overflow-hidden`}
-          style={{ background: backgroundImage ? 'transparent' : bgGradient }}
+          style={{ background: getBackgroundStyle() }}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -160,6 +176,8 @@ export const CTAElement = React.memo(
                 href={buttonUrl || '#'}
                 className={getButtonPadding()}
                 style={buttonStyles}
+                target={isExternalLink ? '_blank' : undefined}
+                rel={isExternalLink ? 'noopener noreferrer' : undefined}
                 onMouseEnter={(e) => {
                   Object.assign(e.currentTarget.style, buttonHoverStyles);
                 }}
@@ -181,7 +199,7 @@ export const CTAElement = React.memo(
       return (
         <section
           className={`${baseClasses} py-12 px-4 cursor-pointer overflow-hidden`}
-          style={{ background: backgroundImage ? 'transparent' : bgGradient }}
+          style={{ background: getBackgroundStyle() }}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -212,6 +230,8 @@ export const CTAElement = React.memo(
               href={buttonUrl || '#'}
               className={`flex-shrink-0 whitespace-nowrap ${getButtonPadding()}`}
               style={buttonStyles}
+              target={isExternalLink ? '_blank' : undefined}
+              rel={isExternalLink ? 'noopener noreferrer' : undefined}
               onMouseEnter={(e) => {
                 Object.assign(e.currentTarget.style, buttonHoverStyles);
               }}

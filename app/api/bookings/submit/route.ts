@@ -96,13 +96,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get element configuration to check for Google Sheets
+    // Get element configuration to check for Google Sheets (optional - don't fail if not found)
     // Try to find element by ID first, then by type if ID fails (for template elements)
     let element: any = null;
-    let elementError: any = null;
 
     // First try exact ID match (for UUIDs)
-    const { data: elementById, error: errorById } = await supabase
+    const { data: elementById } = await supabase
       .from('elements')
       .select('id, props')
       .eq('id', element_id)
@@ -113,7 +112,7 @@ export async function POST(request: NextRequest) {
       element = elementById;
     } else {
       // Fallback: find booking_form element by type for this project
-      const { data: elementByType, error: errorByType } = await supabase
+      const { data: elementByType } = await supabase
         .from('elements')
         .select('id, props')
         .eq('type', 'booking_form')
@@ -123,21 +122,12 @@ export async function POST(request: NextRequest) {
 
       if (elementByType) {
         element = elementByType;
-      } else {
-        elementError = errorByType || errorById;
       }
     }
 
-    if (!element) {
-      console.error('Element not found:', elementError);
-      return NextResponse.json(
-        { error: 'Booking form element not found' },
-        { status: 404 }
-      );
-    }
-
-    // Use the actual element ID from database
-    const actualElementId = element.id;
+    // Use element ID from database if found, otherwise use the provided element_id
+    // Both bookings and leads tables use TEXT for element_id, so this is safe
+    const actualElementId = element?.id || element_id;
 
     // Extract metadata - ensure valid IP or null for inet type columns
     const rawIp = request.headers.get('x-forwarded-for') ||
@@ -224,26 +214,28 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Continue with Google Sheets integration using lead data
-        await handleGoogleSheetsIntegration(
-          element.props,
-          project.user_id,
-          {
-            bookingRef,
-            customer_name,
-            customer_email,
-            customer_phone,
-            customer_remark,
-            booking_date,
-            time_slot,
-            service_name,
-            service_price,
-            duration,
-            payment_status,
-            ip_address,
-            referrer,
-          }
-        );
+        // Continue with Google Sheets integration using lead data (if element found)
+        if (element?.props) {
+          await handleGoogleSheetsIntegration(
+            element.props,
+            project.user_id,
+            {
+              bookingRef,
+              customer_name,
+              customer_email,
+              customer_phone,
+              customer_remark,
+              booking_date,
+              time_slot,
+              service_name,
+              service_price,
+              duration,
+              payment_status,
+              ip_address,
+              referrer,
+            }
+          );
+        }
 
         // Track analytics event
         await trackAnalyticsEvent(supabase, project_id, actualElementId, lead?.id || bookingRef);
@@ -263,26 +255,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Google Sheets integration
-    await handleGoogleSheetsIntegration(
-      element.props,
-      project.user_id,
-      {
-        bookingRef,
-        customer_name,
-        customer_email,
-        customer_phone,
-        customer_remark,
-        booking_date,
-        time_slot,
-        service_name,
-        service_price,
-        duration,
-        payment_status,
-        ip_address,
-        referrer,
-      }
-    );
+    // Google Sheets integration (if element found)
+    if (element?.props) {
+      await handleGoogleSheetsIntegration(
+        element.props,
+        project.user_id,
+        {
+          bookingRef,
+          customer_name,
+          customer_email,
+          customer_phone,
+          customer_remark,
+          booking_date,
+          time_slot,
+          service_name,
+          service_price,
+          duration,
+          payment_status,
+          ip_address,
+          referrer,
+        }
+      );
+    }
 
     // Track analytics event
     await trackAnalyticsEvent(supabase, project_id, actualElementId, booking?.id || bookingRef);
@@ -335,7 +329,7 @@ async function handleGoogleSheetsIntegration(
     const result = await appendLeadToSheet(
       props.google_sheets_url,
       {
-        timestamp: new Date().toLocaleString(),
+        timestamp: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
         name: bookingData.customer_name,
         email: bookingData.customer_email,
         phone: bookingData.customer_phone || '',

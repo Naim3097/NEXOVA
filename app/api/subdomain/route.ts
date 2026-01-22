@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { addSubdomainAlias, removeSubdomainAlias, getSubdomainAlias } from '@/lib/vercel-domains';
 
 // GET: Check current subdomain
 export async function GET() {
@@ -106,6 +107,15 @@ export async function PUT(request: NextRequest) {
 
     const { subdomain } = await request.json();
 
+    // Get current subdomain to potentially remove its Vercel alias
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('subdomain')
+      .eq('id', user.id)
+      .single();
+
+    const currentSubdomain = currentProfile?.subdomain;
+
     // Allow null/empty to remove subdomain
     if (subdomain) {
       // Validate subdomain format
@@ -137,9 +147,22 @@ export async function PUT(request: NextRequest) {
           error: 'This subdomain is already taken.',
         }, { status: 400 });
       }
+
+      // Add subdomain alias to Vercel (creates subdomain-ide-page-builder.vercel.app)
+      const aliasResult = await addSubdomainAlias(subdomain);
+      if (!aliasResult.success) {
+        return NextResponse.json({
+          error: aliasResult.error || 'Failed to create subdomain alias.',
+        }, { status: 400 });
+      }
     }
 
-    // Update subdomain
+    // Remove old subdomain alias if changing or removing
+    if (currentSubdomain && currentSubdomain !== subdomain) {
+      await removeSubdomainAlias(currentSubdomain);
+    }
+
+    // Update subdomain in database
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ subdomain: subdomain || null })
@@ -149,9 +172,13 @@ export async function PUT(request: NextRequest) {
       throw updateError;
     }
 
+    // Return the full domain URL for the new format
+    const fullDomain = subdomain ? getSubdomainAlias(subdomain) : null;
+
     return NextResponse.json({
       success: true,
       subdomain: subdomain || null,
+      fullDomain,
     });
   } catch (error) {
     console.error('Error updating subdomain:', error);

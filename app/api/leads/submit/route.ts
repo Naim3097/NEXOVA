@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
         sheetsResult = await appendLeadToSheet(
           props.google_sheets_url,
           {
-            timestamp: new Date().toLocaleString(),
+            timestamp: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
             name: customer_name,
             email: customer_email,
             phone: customer_phone || '',

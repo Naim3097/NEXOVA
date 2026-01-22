@@ -292,45 +292,100 @@ function generateStyles(): string {
 /**
  * Generate body content from elements
  */
+/**
+ * Generate a hidden anchor element for navigation links
+ * The anchor is positioned slightly above the section to account for sticky headers
+ */
+function generateAnchor(anchorId: string): string {
+  return `<a id="${anchorId}" style="display:block;position:relative;top:-80px;visibility:hidden;"></a>`;
+}
+
+/**
+ * Map element types to their common anchor IDs for navigation
+ */
+function getAnchorIds(elementType: string, elementOrder: number): string[] {
+  const anchorMap: Record<string, string[]> = {
+    'features': ['services', 'features', 'why-us'],
+    'testimonials': ['testimonials', 'reviews'],
+    'faq': ['faq'],
+    'pricing': ['pricing'],
+    'cta': ['cta', 'contact'],
+    'lead_form': ['contact', 'form'],
+    'form_with_payment': ['order', 'form'],
+    // booking_form handles its own anchor in booking-form-generator.ts
+  };
+  return anchorMap[elementType] || [];
+}
+
 function generateBodyContent(elements: Element[]): string {
   // Sort elements by order
   const sortedElements = [...elements].sort((a, b) => a.order - b.order);
 
+  // Track which anchors have been used to avoid duplicates
+  const usedAnchors = new Set<string>();
+
   return sortedElements.map(element => {
+    let html = '';
+
+    // Add navigation anchors for this element type (first occurrence only)
+    const anchorIds = getAnchorIds(element.type, element.order);
+    for (const anchorId of anchorIds) {
+      if (!usedAnchors.has(anchorId)) {
+        html += generateAnchor(anchorId);
+        usedAnchors.add(anchorId);
+      }
+    }
+
     switch (element.type) {
       case 'announcement_bar':
-        return generateAnnouncementBarHTML(element);
+        html += generateAnnouncementBarHTML(element);
+        break;
       case 'navigation':
-        return generateNavigationHTML(element);
+        html += generateNavigationHTML(element);
+        break;
       case 'hero':
-        return generateHeroHTML(element);
+        html += generateHeroHTML(element);
+        break;
       case 'features':
-        return generateFeaturesHTML(element);
+        html += generateFeaturesHTML(element);
+        break;
       case 'testimonials':
-        return generateTestimonialsHTML(element);
+        html += generateTestimonialsHTML(element);
+        break;
       case 'pricing':
-        return generatePricingHTML(element);
+        html += generatePricingHTML(element);
+        break;
       case 'faq':
-        return generateFAQHTML(element);
+        html += generateFAQHTML(element);
+        break;
       case 'cta':
-        return generateCTAHTML(element);
+        html += generateCTAHTML(element);
+        break;
       case 'payment_button':
-        return generatePaymentButtonHTML(element);
+        html += generatePaymentButtonHTML(element);
+        break;
       case 'footer':
-        return generateFooterHTML(element);
+        html += generateFooterHTML(element);
+        break;
       case 'lead_form':
-        return generateLeadFormHTML(element);
+        html += generateLeadFormHTML(element);
+        break;
       case 'whatsapp_button':
-        return generateWhatsAppButtonHTML(element);
+        html += generateWhatsAppButtonHTML(element);
+        break;
       case 'form_with_payment':
-        return generateFormWithPaymentHTML(element);
+        html += generateFormWithPaymentHTML(element);
+        break;
       case 'product_carousel':
-        return generateProductCarouselHTML(element);
+        html += generateProductCarouselHTML(element);
+        break;
       case 'booking_form':
-        return generateBookingFormHTML(element);
+        html += generateBookingFormHTML(element);
+        break;
       default:
-        return '';
+        break;
     }
+    return html;
   }).join('\n');
 }
 
@@ -638,7 +693,10 @@ function generateCTAHTML(element: Element): string {
     description,
     buttonText,
     buttonUrl,
+    buttonLinkType = 'section',
     bgGradient,
+    bgType = 'gradient',
+    bgColor = '#667eea',
     backgroundImage,
     backgroundOpacity = 70,
     buttonColor = '#ffffff',
@@ -646,6 +704,20 @@ function generateCTAHTML(element: Element): string {
     buttonSize = 'lg',
     buttonFontSize = '1.125rem',
   } = element.props;
+
+  // Determine if link is external
+  const isExternalLink = buttonLinkType === 'external' ||
+    (buttonUrl && (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
+
+  const linkTarget = isExternalLink ? ' target="_blank" rel="noopener noreferrer"' : '';
+
+  // Get background style based on type
+  const getBackgroundStyle = () => {
+    if (backgroundImage) return 'transparent';
+    if (bgType === 'solid') return bgColor;
+    return bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+  };
+  const backgroundStyle = getBackgroundStyle();
 
   // Button padding based on size
   const getButtonPadding = () => {
@@ -676,17 +748,49 @@ function generateCTAHTML(element: Element): string {
     transition: opacity 0.2s;
   `.trim();
 
-  if (variant === 'centered') {
-    return `
-<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${bgGradient}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  const backgroundHTML = backgroundImage ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: #000000; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  ` : '';
+
+  if (variant === 'centered') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${backgroundStyle}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
   <div class="container-sm text-center" style="position: relative; z-index: 10; color: white;">
     <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;">${headline}</h2>
     <p style="font-size: 1.5rem; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.9);">${description}</p>
-    <a href="${buttonUrl || '#'}" style="${buttonStyles}" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
+    <a href="${buttonUrl || '#'}"${linkTarget} style="${buttonStyles}" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'split') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${backgroundStyle}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="max-width: 72rem; margin: 0 auto; position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+    <div style="color: white;">
+      <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;">${headline}</h2>
+      <p style="font-size: 1.25rem; color: rgba(255, 255, 255, 0.9);">${description}</p>
+    </div>
+    <div style="display: flex; justify-content: flex-end;">
+      <a href="${buttonUrl || '#'}"${linkTarget} style="${buttonStyles}" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'banner') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${backgroundStyle}; padding: 3rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;">
+    <div style="color: white; text-align: left;">
+      <h3 style="color: white; font-size: 1.5rem; margin-bottom: 0.5rem;">${headline}</h3>
+      <p style="font-size: 1.125rem; color: rgba(255, 255, 255, 0.9); margin: 0;">${description}</p>
+    </div>
+    <a href="${buttonUrl || '#'}"${linkTarget} style="${buttonStyles}; flex-shrink: 0; white-space: nowrap;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
   </div>
 </section>`;
   }
@@ -1489,13 +1593,16 @@ function generateNavigationHTML(element: Element): string {
   const {
     logo,
     logoText,
-    menuItems,
+    menuItems: rawMenuItems,
     ctaButton,
     bgColor,
     textColor,
     isSticky,
     layout
   } = element.props;
+
+  // Enforce maximum of 3 menu items
+  const menuItems = (rawMenuItems || []).slice(0, 3);
 
   const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 40;' : '';
   // Always use space-between for proper spacing between logo and nav items

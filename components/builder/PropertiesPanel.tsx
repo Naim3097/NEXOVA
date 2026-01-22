@@ -884,23 +884,65 @@ export const PropertiesPanel = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="buttonUrl">Button Link (Scroll to Section)</Label>
+                    <Label htmlFor="buttonLinkType">Button Link Type</Label>
                     <select
-                      id="buttonUrl"
-                      value={props.buttonUrl || '#'}
-                      onChange={(e) => handlePropChange('buttonUrl', e.target.value)}
+                      id="buttonLinkType"
+                      value={props.buttonLinkType || 'section'}
+                      onChange={(e) => {
+                        handlePropChange('buttonLinkType', e.target.value);
+                        // Reset buttonUrl when switching types
+                        if (e.target.value === 'section') {
+                          handlePropChange('buttonUrl', '#');
+                        } else {
+                          handlePropChange('buttonUrl', 'https://');
+                        }
+                      }}
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                     >
-                      <option value="#">Top of Page</option>
-                      {allElements
-                        .filter((el) => el.type !== 'announcement_bar' && el.type !== 'navigation')
-                        .map((el) => (
-                          <option key={el.id} value={`#${el.type}-${el.order}`}>
-                            {el.type.charAt(0).toUpperCase() + el.type.slice(1).replace('_', ' ')} (Position {el.order + 1})
-                          </option>
-                        ))}
+                      <option value="section">Scroll to Section</option>
+                      <option value="external">External Link</option>
                     </select>
                   </div>
+
+                  {(props.buttonLinkType || 'section') === 'section' ? (
+                    <div>
+                      <Label htmlFor="buttonUrl">Scroll to Section</Label>
+                      <select
+                        id="buttonUrl"
+                        value={props.buttonUrl || '#'}
+                        onChange={(e) => handlePropChange('buttonUrl', e.target.value)}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                      >
+                        <option value="#">Top of Page</option>
+                        <option value="#booking">Booking Form</option>
+                        <option value="#services">Services / Features</option>
+                        <option value="#testimonials">Testimonials</option>
+                        <option value="#faq">FAQ</option>
+                        <option value="#pricing">Pricing</option>
+                        <option value="#contact">Contact / Lead Form</option>
+                        {allElements
+                          .filter((el) => el.type !== 'announcement_bar' && el.type !== 'navigation')
+                          .map((el) => (
+                            <option key={el.id} value={`#${el.type}-${el.order}`}>
+                              {el.type.charAt(0).toUpperCase() + el.type.slice(1).replace('_', ' ')} (Position {el.order + 1})
+                            </option>
+                          ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Select a section to scroll to when clicked</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <Label htmlFor="buttonUrl">External URL</Label>
+                      <Input
+                        id="buttonUrl"
+                        value={props.buttonUrl || 'https://'}
+                        onChange={(e) => handlePropChange('buttonUrl', e.target.value)}
+                        placeholder="https://example.com"
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Enter the full URL including https://</p>
+                    </div>
+                  )}
 
                   <div>
                     <Label htmlFor="buttonColor">Button Background Color</Label>
@@ -972,11 +1014,166 @@ export const PropertiesPanel = () => {
                 </div>
               </div>
 
+              {/* Background Color/Gradient Section */}
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Style</h4>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="bgType">Background Type</Label>
+                    <select
+                      id="bgType"
+                      value={props.bgType || 'gradient'}
+                      onChange={(e) => {
+                        handlePropChange('bgType', e.target.value);
+                        // Set default values based on type
+                        if (e.target.value === 'solid') {
+                          handlePropChange('bgColor', props.bgColor || '#667eea');
+                        } else {
+                          handlePropChange('bgGradient', props.bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                        }
+                      }}
+                      className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                    >
+                      <option value="gradient">Gradient</option>
+                      <option value="solid">Solid Color</option>
+                    </select>
+                  </div>
+
+                  {(props.bgType || 'gradient') === 'solid' ? (
+                    <div>
+                      <Label htmlFor="bgColor">Background Color</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          id="bgColor"
+                          type="color"
+                          value={props.bgColor || '#667eea'}
+                          onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                          className="w-20 h-10 p-1"
+                        />
+                        <Input
+                          value={props.bgColor || '#667eea'}
+                          onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                          placeholder="#667eea"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <Label>Gradient Colors</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">Start Color</p>
+                            <div className="flex gap-1">
+                              <Input
+                                type="color"
+                                value={props.gradientStart || '#667eea'}
+                                onChange={(e) => {
+                                  handlePropChange('gradientStart', e.target.value);
+                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${e.target.value} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                                }}
+                                className="w-10 h-8 p-1"
+                              />
+                              <Input
+                                value={props.gradientStart || '#667eea'}
+                                onChange={(e) => {
+                                  handlePropChange('gradientStart', e.target.value);
+                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${e.target.value} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                                }}
+                                className="flex-1 text-xs"
+                                placeholder="#667eea"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">End Color</p>
+                            <div className="flex gap-1">
+                              <Input
+                                type="color"
+                                value={props.gradientEnd || '#764ba2'}
+                                onChange={(e) => {
+                                  handlePropChange('gradientEnd', e.target.value);
+                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${props.gradientStart || '#667eea'} 0%, ${e.target.value} 100%)`);
+                                }}
+                                className="w-10 h-8 p-1"
+                              />
+                              <Input
+                                value={props.gradientEnd || '#764ba2'}
+                                onChange={(e) => {
+                                  handlePropChange('gradientEnd', e.target.value);
+                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${props.gradientStart || '#667eea'} 0%, ${e.target.value} 100%)`);
+                                }}
+                                className="flex-1 text-xs"
+                                placeholder="#764ba2"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="gradientDirection">Gradient Direction</Label>
+                        <select
+                          id="gradientDirection"
+                          value={props.gradientDirection || '135deg'}
+                          onChange={(e) => {
+                            handlePropChange('gradientDirection', e.target.value);
+                            handlePropChange('bgGradient', `linear-gradient(${e.target.value}, ${props.gradientStart || '#667eea'} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                          }}
+                          className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                        >
+                          <option value="to right">Left to Right</option>
+                          <option value="to left">Right to Left</option>
+                          <option value="to bottom">Top to Bottom</option>
+                          <option value="to top">Bottom to Top</option>
+                          <option value="135deg">Diagonal (Top-Left to Bottom-Right)</option>
+                          <option value="45deg">Diagonal (Bottom-Left to Top-Right)</option>
+                          <option value="225deg">Diagonal (Bottom-Right to Top-Left)</option>
+                          <option value="315deg">Diagonal (Top-Right to Bottom-Left)</option>
+                        </select>
+                      </div>
+
+                      {/* Preset Gradients */}
+                      <div>
+                        <Label>Preset Gradients</Label>
+                        <div className="grid grid-cols-4 gap-2 mt-2">
+                          {[
+                            { start: '#667eea', end: '#764ba2', name: 'Purple' },
+                            { start: '#f093fb', end: '#f5576c', name: 'Pink' },
+                            { start: '#4facfe', end: '#00f2fe', name: 'Blue' },
+                            { start: '#43e97b', end: '#38f9d7', name: 'Green' },
+                            { start: '#fa709a', end: '#fee140', name: 'Sunset' },
+                            { start: '#30cfd0', end: '#330867', name: 'Ocean' },
+                            { start: '#ff9a9e', end: '#fecfef', name: 'Peach' },
+                            { start: '#a8edea', end: '#fed6e3', name: 'Soft' },
+                          ].map((preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              className="h-8 rounded border-2 border-transparent hover:border-gray-400 transition-colors"
+                              style={{ background: `linear-gradient(135deg, ${preset.start} 0%, ${preset.end} 100%)` }}
+                              title={preset.name}
+                              onClick={() => {
+                                handlePropChange('gradientStart', preset.start);
+                                handlePropChange('gradientEnd', preset.end);
+                                handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${preset.start} 0%, ${preset.end} 100%)`);
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
-                  <Label>Background Image (optional)</Label>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image (Optional)</h4>
+                  <p className="text-xs text-gray-500 mb-2">Adding an image will overlay your background color/gradient</p>
                   <ImageUpload
                     value={props.backgroundImage || ''}
                     onChange={(url) => handlePropChange('backgroundImage', url)}

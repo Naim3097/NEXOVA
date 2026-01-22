@@ -655,6 +655,7 @@ export const Toolbar = ({
           currentPublishedUrl={currentProject.published_url}
           subscriptionPlan={profile?.subscription_plan}
           userSubdomain={profile?.subdomain}
+          autoPublish={(projectStatus || currentProject?.status) === 'published'}
         />
       )}
 

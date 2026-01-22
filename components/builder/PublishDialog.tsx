@@ -19,6 +19,7 @@ interface PublishDialogProps {
   currentPublishedUrl?: string | null;
   subscriptionPlan?: 'free' | 'pro';
   userSubdomain?: string | null;
+  autoPublish?: boolean; // If true, automatically publish when dialog opens
 }
 
 export const PublishDialog = ({
@@ -29,6 +30,7 @@ export const PublishDialog = ({
   currentPublishedUrl,
   subscriptionPlan = 'free',
   userSubdomain,
+  autoPublish = false,
 }: PublishDialogProps) => {
   const [publishing, setPublishing] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(
@@ -37,8 +39,21 @@ export const PublishDialog = ({
   const [urlType, setUrlType] = useState<'path' | 'subdomain' | 'custom'>('path');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [hasAutoPublished, setHasAutoPublished] = useState(false);
 
   const isPro = subscriptionPlan === 'pro';
+
+  // Auto-publish when dialog opens if autoPublish is true and page is already published
+  React.useEffect(() => {
+    if (open && autoPublish && currentPublishedUrl && !hasAutoPublished && !publishing) {
+      setHasAutoPublished(true);
+      handlePublish();
+    }
+    // Reset when dialog closes
+    if (!open) {
+      setHasAutoPublished(false);
+    }
+  }, [open, autoPublish, currentPublishedUrl, hasAutoPublished, publishing]);
 
   const handlePublish = async () => {
     try {
@@ -238,17 +253,9 @@ export const PublishDialog = ({
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={handlePublish}
-                  disabled={publishing}
+                  onClick={() => onOpenChange(false)}
                 >
-                  {publishing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
-                    </>
-                  ) : (
-                    'Update'
-                  )}
+                  Close
                 </Button>
               </div>
 

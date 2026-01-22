@@ -17,13 +17,16 @@ export const NavigationElement = React.memo(
     const {
       logo,
       logoText,
-      menuItems,
+      menuItems: rawMenuItems,
       ctaButton,
       bgColor,
       textColor,
       isSticky,
       layout,
     } = props;
+
+    // Enforce maximum of 3 menu items
+    const menuItems = (rawMenuItems || []).slice(0, 3);
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
