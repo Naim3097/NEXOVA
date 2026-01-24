@@ -3,6 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+interface VariationOption {
+  value: string;
+  label: string;
+  priceAdjustment: number;
+  stock: number;
+  colorCode?: string;
+}
+
+interface Variation {
+  id: string;
+  name: string;
+  type: 'size' | 'color' | 'other';
+  options: VariationOption[];
+}
+
 interface BulkProduct {
   code: string;
   name: string;
@@ -12,6 +27,7 @@ interface BulkProduct {
   base_price: number;
   currency?: string;
   quantity_pricing?: Array<{ min_qty: number; price: number }>;
+  variations?: Variation[];
   notes?: string;
   status?: 'active' | 'inactive';
 }
@@ -53,6 +69,7 @@ export async function POST(request: NextRequest) {
       base_price: number;
       currency: string;
       quantity_pricing: Array<{ min_qty: number; price: number }>;
+      variations: Variation[];
       notes: string | null;
       status: 'active' | 'inactive';
     }> = [];
@@ -69,8 +86,15 @@ export async function POST(request: NextRequest) {
         errors.push({ row: rowNum, error: 'Product name is required' });
         return;
       }
-      if (product.base_price === undefined || product.base_price === null || isNaN(Number(product.base_price))) {
-        errors.push({ row: rowNum, error: 'Base price is required and must be a number' });
+      if (
+        product.base_price === undefined ||
+        product.base_price === null ||
+        isNaN(Number(product.base_price))
+      ) {
+        errors.push({
+          row: rowNum,
+          error: 'Base price is required and must be a number',
+        });
         return;
       }
 
@@ -79,12 +103,17 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         code: String(product.code).trim(),
         name: String(product.name).trim(),
-        description: product.description ? String(product.description).trim() : null,
+        description: product.description
+          ? String(product.description).trim()
+          : null,
         image_url: product.image_url ? String(product.image_url).trim() : null,
         stock: Number(product.stock) || 0,
         base_price: Number(product.base_price),
         currency: product.currency ? String(product.currency).trim() : 'RM',
-        quantity_pricing: Array.isArray(product.quantity_pricing) ? product.quantity_pricing : [],
+        quantity_pricing: Array.isArray(product.quantity_pricing)
+          ? product.quantity_pricing
+          : [],
+        variations: Array.isArray(product.variations) ? product.variations : [],
         notes: product.notes ? String(product.notes).trim() : null,
         status: product.status === 'inactive' ? 'inactive' : 'active',
       });
@@ -95,7 +124,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'All products have validation errors',
-          validationErrors: errors
+          validationErrors: errors,
         },
         { status: 400 }
       );
@@ -113,7 +142,9 @@ export async function POST(request: NextRequest) {
       // Check for duplicate code error
       if (insertError.code === '23505') {
         return NextResponse.json(
-          { error: 'Some product codes already exist. Please use unique codes.' },
+          {
+            error: 'Some product codes already exist. Please use unique codes.',
+          },
           { status: 400 }
         );
       }
@@ -124,14 +155,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `Successfully uploaded ${insertedProducts?.length || 0} products`,
-      inserted: insertedProducts?.length || 0,
-      errors: errors.length > 0 ? errors : undefined,
-      skipped: errors.length,
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: `Successfully uploaded ${insertedProducts?.length || 0} products`,
+        inserted: insertedProducts?.length || 0,
+        errors: errors.length > 0 ? errors : undefined,
+        skipped: errors.length,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error in POST /api/products/bulk-upload:', error);
     return NextResponse.json(

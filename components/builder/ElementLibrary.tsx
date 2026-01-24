@@ -26,6 +26,7 @@ import {
   MessageCircle,
   CalendarCheck,
   ShoppingBag,
+  Image,
 } from 'lucide-react';
 import type { ElementType } from '@/types';
 
@@ -49,7 +50,9 @@ const elementTemplates: ElementTemplate[] = [
       textColor: '#ffffff',
       showCountdown: true,
       countdownLabel: 'Ends in:',
-      countdownEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+      countdownEndDate: new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      ).toISOString(), // 7 days from now
       isSticky: true,
       showCloseButton: true,
     },
@@ -131,7 +134,8 @@ const elementTemplates: ElementTemplate[] = [
           name: 'John Doe',
           role: 'CEO, Company Inc',
           avatar: '',
-          quote: 'This product has transformed our business. Highly recommended!',
+          quote:
+            'This product has transformed our business. Highly recommended!',
           rating: 5,
         },
         {
@@ -178,7 +182,7 @@ const elementTemplates: ElementTemplate[] = [
         {
           question: 'Do you offer refunds?',
           answer:
-            'We offer a 30-day money-back guarantee. If you\'re not satisfied, contact us for a full refund.',
+            "We offer a 30-day money-back guarantee. If you're not satisfied, contact us for a full refund.",
         },
       ],
     },
@@ -302,7 +306,7 @@ const elementTemplates: ElementTemplate[] = [
       messageLabel: 'Message (optional)',
       submitButtonText: 'Submit',
       submitButtonColor: '#2563eb',
-      successMessage: 'Thank you! We\'ll be in touch soon.',
+      successMessage: "Thank you! We'll be in touch soon.",
       fields: {
         showPhone: true,
         showMessage: true,
@@ -321,7 +325,7 @@ const elementTemplates: ElementTemplate[] = [
     description: 'Floating or inline WhatsApp click-to-chat button',
     defaultProps: {
       phoneNumber: '60123456789', // Malaysia format example
-      message: 'Hi! I\'m interested in your product.',
+      message: "Hi! I'm interested in your product.",
       buttonText: 'Chat on WhatsApp',
       buttonColor: '#25D366', // WhatsApp green
       buttonSize: 'md',
@@ -469,6 +473,32 @@ const elementTemplates: ElementTemplate[] = [
       ],
     },
   },
+  {
+    type: 'media',
+    label: 'Media',
+    icon: <Image className="w-5 h-5" />,
+    description: 'Add images or videos with upload or URL',
+    defaultProps: {
+      mediaType: 'image',
+      sourceType: 'url',
+      mediaUrl: '',
+      altText: '',
+      autoplay: false,
+      loop: true,
+      muted: true,
+      controls: true,
+      layout: 'contained',
+      maxWidth: '800px',
+      aspectRatio: 'auto',
+      borderRadius: '8px',
+      showCaption: false,
+      caption: '',
+      captionPosition: 'below',
+      bgColor: '#ffffff',
+      paddingY: '2rem',
+      shadow: 'md',
+    },
+  },
 ];
 
 export const ElementLibrary = () => {
@@ -554,7 +584,9 @@ export const ElementLibrary = () => {
                   <h3 className="font-semibold text-gray-900 mb-1">
                     {template.label}
                   </h3>
-                  <p className="text-sm text-gray-600">{template.description}</p>
+                  <p className="text-sm text-gray-600">
+                    {template.description}
+                  </p>
                 </div>
               </div>
             </button>

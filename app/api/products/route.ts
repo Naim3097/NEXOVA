@@ -1,6 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { ProductCreateSchema, safeValidateData, formatValidationErrors } from '@/lib/validation';
+import {
+  ProductCreateSchema,
+  safeValidateData,
+  formatValidationErrors,
+} from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,6 +86,7 @@ export async function POST(request: Request) {
       base_price,
       currency,
       quantity_pricing,
+      variations,
       notes,
       status,
     } = validationResult.data;
@@ -99,6 +104,7 @@ export async function POST(request: Request) {
         base_price,
         currency: currency || 'RM',
         quantity_pricing: quantity_pricing || [],
+        variations: variations || [],
         notes: notes || null,
         status: status || 'active',
       })

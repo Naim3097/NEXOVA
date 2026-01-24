@@ -1,6 +1,9 @@
 import type { Project, Element, SEOSettings } from '@/types';
 import { generateTrackingScript } from '@/lib/analytics/tracking-script';
-import { generateTrackingPixelScripts, type TrackingPixelsConfig } from '@/lib/tracking/pixel-scripts';
+import {
+  generateTrackingPixelScripts,
+  type TrackingPixelsConfig,
+} from '@/lib/tracking/pixel-scripts';
 import { generateBookingFormHTML } from './booking-form-generator';
 
 /**
@@ -16,29 +19,47 @@ function sanitizeId(id: string): string {
  */
 function getIconSVG(iconName: string): string {
   const iconMap: Record<string, string> = {
-    'check-circle': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-    'star': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>',
-    'zap': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
-    'shield': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
-    'heart': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>',
-    'award': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>',
-    'sparkles': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>',
-    'rocket': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>',
-    'target': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>',
-    'trending-up': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>',
-    'clock': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-    'users': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>',
-    'globe': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-    'lock': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>',
-    'settings': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>',
-    'dollar-sign': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-    'gift': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>',
-    'thumbs-up': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>',
-    'lightbulb': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>',
-    'smartphone': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
-    'droplet': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.5c-3.04 0-5.5-2.46-5.5-5.5 0-3.04 5.5-12.5 5.5-12.5s5.5 9.46 5.5 12.5c0 3.04-2.46 5.5-5.5 5.5z"></path>',
-    'wind': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"></path>',
-    'circle': '<circle cx="12" cy="12" r="10" stroke-width="2" fill="none"></circle>',
+    'check-circle':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    star: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>',
+    zap: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
+    shield:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
+    heart:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>',
+    award:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>',
+    sparkles:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>',
+    rocket:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>',
+    target:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>',
+    'trending-up':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>',
+    clock:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    users:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>',
+    globe:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    lock: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>',
+    settings:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>',
+    'dollar-sign':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    gift: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>',
+    'thumbs-up':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>',
+    lightbulb:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>',
+    smartphone:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+    droplet:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.5c-3.04 0-5.5-2.46-5.5-5.5 0-3.04 5.5-12.5 5.5-12.5s5.5 9.46 5.5 12.5c0 3.04-2.46 5.5-5.5 5.5z"></path>',
+    wind: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"></path>',
+    circle:
+      '<circle cx="12" cy="12" r="10" stroke-width="2" fill="none"></circle>',
   };
 
   return iconMap[iconName] || iconMap['check-circle'];
@@ -132,11 +153,15 @@ function generateHeadContent(
   <!-- Styles -->
   ${generateStyles()}
 
-  ${seo.structuredData ? `
+  ${
+    seo.structuredData
+      ? `
   <script type="application/ld+json">
     ${JSON.stringify(seo.structuredData)}
   </script>
-  ` : ''}
+  `
+      : ''
+  }
 `;
 }
 
@@ -305,13 +330,13 @@ function generateAnchor(anchorId: string): string {
  */
 function getAnchorIds(elementType: string, elementOrder: number): string[] {
   const anchorMap: Record<string, string[]> = {
-    'features': ['services', 'features', 'why-us'],
-    'testimonials': ['testimonials', 'reviews'],
-    'faq': ['faq'],
-    'pricing': ['pricing'],
-    'cta': ['cta', 'contact'],
-    'lead_form': ['contact', 'form'],
-    'form_with_payment': ['order', 'form'],
+    features: ['services', 'features', 'why-us'],
+    testimonials: ['testimonials', 'reviews'],
+    faq: ['faq'],
+    pricing: ['pricing'],
+    cta: ['cta', 'contact'],
+    lead_form: ['contact', 'form'],
+    form_with_payment: ['order', 'form'],
     // booking_form handles its own anchor in booking-form-generator.ts
   };
   return anchorMap[elementType] || [];
@@ -324,69 +349,74 @@ function generateBodyContent(elements: Element[]): string {
   // Track which anchors have been used to avoid duplicates
   const usedAnchors = new Set<string>();
 
-  return sortedElements.map(element => {
-    let html = '';
+  return sortedElements
+    .map((element) => {
+      let html = '';
 
-    // Add navigation anchors for this element type (first occurrence only)
-    const anchorIds = getAnchorIds(element.type, element.order);
-    for (const anchorId of anchorIds) {
-      if (!usedAnchors.has(anchorId)) {
-        html += generateAnchor(anchorId);
-        usedAnchors.add(anchorId);
+      // Add navigation anchors for this element type (first occurrence only)
+      const anchorIds = getAnchorIds(element.type, element.order);
+      for (const anchorId of anchorIds) {
+        if (!usedAnchors.has(anchorId)) {
+          html += generateAnchor(anchorId);
+          usedAnchors.add(anchorId);
+        }
       }
-    }
 
-    switch (element.type) {
-      case 'announcement_bar':
-        html += generateAnnouncementBarHTML(element);
-        break;
-      case 'navigation':
-        html += generateNavigationHTML(element);
-        break;
-      case 'hero':
-        html += generateHeroHTML(element);
-        break;
-      case 'features':
-        html += generateFeaturesHTML(element);
-        break;
-      case 'testimonials':
-        html += generateTestimonialsHTML(element);
-        break;
-      case 'pricing':
-        html += generatePricingHTML(element);
-        break;
-      case 'faq':
-        html += generateFAQHTML(element);
-        break;
-      case 'cta':
-        html += generateCTAHTML(element);
-        break;
-      case 'payment_button':
-        html += generatePaymentButtonHTML(element);
-        break;
-      case 'footer':
-        html += generateFooterHTML(element);
-        break;
-      case 'lead_form':
-        html += generateLeadFormHTML(element);
-        break;
-      case 'whatsapp_button':
-        html += generateWhatsAppButtonHTML(element);
-        break;
-      case 'form_with_payment':
-        html += generateFormWithPaymentHTML(element);
-        break;
-      case 'product_carousel':
-        html += generateProductCarouselHTML(element);
-        break;
-      case 'booking_form':
-        html += generateBookingFormHTML(element);
-        break;
-      default:
-        break;
-    }
-    return html;
-  }).join('\n');
+      switch (element.type) {
+        case 'announcement_bar':
+          html += generateAnnouncementBarHTML(element);
+          break;
+        case 'navigation':
+          html += generateNavigationHTML(element);
+          break;
+        case 'hero':
+          html += generateHeroHTML(element);
+          break;
+        case 'features':
+          html += generateFeaturesHTML(element);
+          break;
+        case 'testimonials':
+          html += generateTestimonialsHTML(element);
+          break;
+        case 'pricing':
+          html += generatePricingHTML(element);
+          break;
+        case 'faq':
+          html += generateFAQHTML(element);
+          break;
+        case 'cta':
+          html += generateCTAHTML(element);
+          break;
+        case 'payment_button':
+          html += generatePaymentButtonHTML(element);
+          break;
+        case 'footer':
+          html += generateFooterHTML(element);
+          break;
+        case 'lead_form':
+          html += generateLeadFormHTML(element);
+          break;
+        case 'whatsapp_button':
+          html += generateWhatsAppButtonHTML(element);
+          break;
+        case 'form_with_payment':
+          html += generateFormWithPaymentHTML(element);
+          break;
+        case 'product_carousel':
+          html += generateProductCarouselHTML(element);
+          break;
+        case 'booking_form':
+          html += generateBookingFormHTML(element);
+          break;
+        case 'media':
+          html += generateMediaHTML(element);
+          break;
+        default:
+          break;
+      }
+      return html;
+    })
+    .join('\n');
 }
 
 /**
@@ -407,7 +437,7 @@ function generateHeroHTML(element: Element): string {
     subheadlineSize = 'xl',
     imageOpacity = 70,
     buttonBgColor = '#2563eb',
-    buttonTextColor = '#ffffff'
+    buttonTextColor = '#ffffff',
   } = element.props;
 
   // Convert Tailwind sizes to actual CSS values
@@ -416,15 +446,15 @@ function generateHeroHTML(element: Element): string {
     '4xl': '2.25rem',
     '5xl': '3rem',
     '6xl': '3.75rem',
-    '7xl': '4.5rem'
+    '7xl': '4.5rem',
   };
 
   const subheadlineSizeMap: Record<string, string> = {
-    'base': '1rem',
-    'lg': '1.125rem',
-    'xl': '1.25rem',
+    base: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
     '2xl': '1.5rem',
-    '3xl': '1.875rem'
+    '3xl': '1.875rem',
   };
 
   const headlineFontSize = headlineSizeMap[headlineSize] || '3rem';
@@ -463,14 +493,18 @@ function generateHeroHTML(element: Element): string {
   if (variant === 'image_bg') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; padding: 8rem 1rem; overflow: hidden; scroll-margin-top: 4rem;">
-  ${image ? `
+  ${
+    image
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${image}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${imageOpacity / 100};"></div>
-  ` : `
+  `
+      : `
   <div style="position: absolute; inset: 0; background: #1f2937; display: flex; align-items: center; justify-content: center; color: #6b7280;">
     Background Image
   </div>
-  `}
+  `
+  }
   <div class="container-sm text-center" style="position: relative; z-index: 10;">
     <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;">${headline}</h1>
     <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;">${subheadline}</p>
@@ -493,23 +527,29 @@ function generateFeaturesHTML(element: Element): string {
     features,
     backgroundImage,
     backgroundOpacity = 70,
-    bgColor = '#ffffff'
+    bgColor = '#ffffff',
   } = element.props;
 
   if (variant === 'grid') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div class="container" style="position: relative; z-index: 10;">
     <div style="text-align: center; margin-bottom: 3rem;">
       <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
       ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
     </div>
     <div class="grid grid-cols-3 gap-8">
-      ${features.map((feature: any) => `
+      ${features
+        .map(
+          (feature: any) => `
         <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: white;">
           <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
             <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -519,7 +559,9 @@ function generateFeaturesHTML(element: Element): string {
           <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">${feature.title}</h3>
           <p style="color: #6b7280; margin: 0;">${feature.description}</p>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>`;
@@ -528,17 +570,23 @@ function generateFeaturesHTML(element: Element): string {
   if (variant === 'list') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div style="max-width: 56rem; margin: 0 auto; position: relative; z-index: 10;">
     <div style="text-align: center; margin-bottom: 3rem;">
       <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
       ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
     </div>
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-      ${features.map((feature: any) => `
+      ${features
+        .map(
+          (feature: any) => `
         <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
             <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -550,7 +598,9 @@ function generateFeaturesHTML(element: Element): string {
             <p style="color: #6b7280; margin: 0;">${feature.description}</p>
           </div>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>`;
@@ -559,17 +609,23 @@ function generateFeaturesHTML(element: Element): string {
   if (variant === 'alternating') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div style="max-width: 72rem; margin: 0 auto; position: relative; z-index: 10;">
     <div style="text-align: center; margin-bottom: 4rem;">
       <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 0.5rem 0;">${title}</h2>
       ${subtitle ? `<p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${subtitle}</p>` : ''}
     </div>
     <div style="display: flex; flex-direction: column; gap: 5rem;">
-      ${features.map((feature: any, index: number) => `
+      ${features
+        .map(
+          (feature: any, index: number) => `
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; align-items: center;">
           <div style="${index % 2 === 1 ? 'order: 2;' : ''}">
             <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
@@ -584,7 +640,9 @@ function generateFeaturesHTML(element: Element): string {
             <span style="color: #9ca3af;">Feature illustration</span>
           </div>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>`;
@@ -603,27 +661,36 @@ function generateTestimonialsHTML(element: Element): string {
     testimonials,
     backgroundImage,
     backgroundOpacity = 70,
-    bgColor = '#000000'
+    bgColor = '#000000',
   } = element.props;
 
   const renderStars = (rating: number) => {
-    return Array(5).fill(0).map((_, i) => {
-      const filled = i < rating;
-      return `<svg style="width: 1rem; height: 1rem; display: inline-block; ${filled ? 'color: #fbbf24; fill: #fbbf24;' : 'color: #d1d5db;'}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>`;
-    }).join('');
+    return Array(5)
+      .fill(0)
+      .map((_, i) => {
+        const filled = i < rating;
+        return `<svg style="width: 1rem; height: 1rem; display: inline-block; ${filled ? 'color: #fbbf24; fill: #fbbf24;' : 'color: #d1d5db;'}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>`;
+      })
+      .join('');
   };
 
   if (variant === 'grid') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: #f9fafb; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div class="container" style="position: relative; z-index: 10;">
     <h2 class="text-center mb-12">${title}</h2>
     <div class="grid grid-cols-3 gap-8">
-      ${testimonials.map((testimonial: any) => `
+      ${testimonials
+        .map(
+          (testimonial: any) => `
         <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
           <div style="margin-bottom: 1rem;">${renderStars(testimonial.rating)}</div>
           <p style="color: #374151; margin-bottom: 1rem; font-style: italic;">"${testimonial.quote}"</p>
@@ -632,7 +699,9 @@ function generateTestimonialsHTML(element: Element): string {
             <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">${testimonial.role}</p>
           </div>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>`;
@@ -651,20 +720,26 @@ function generateFAQHTML(element: Element): string {
     questions,
     backgroundImage,
     backgroundOpacity = 70,
-    bgColor = '#000000'
+    bgColor = '#000000',
   } = element.props;
 
   if (variant === 'single_column') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div class="container-sm" style="position: relative; z-index: 10;">
     <h2 class="text-center mb-12">${title}</h2>
     <div style="display: flex; flex-direction: column; gap: 1rem;">
-      ${questions.map((item: any, index: number) => `
+      ${questions
+        .map(
+          (item: any, index: number) => `
         <details style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
           <summary style="padding: 1rem 1.5rem; font-weight: 600; font-size: 1.125rem; cursor: pointer; background: white; list-style: none;">
             ${item.question}
@@ -674,7 +749,9 @@ function generateFAQHTML(element: Element): string {
             <p style="color: #374151; margin: 0;">${item.answer}</p>
           </div>
         </details>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>`;
@@ -706,10 +783,14 @@ function generateCTAHTML(element: Element): string {
   } = element.props;
 
   // Determine if link is external
-  const isExternalLink = buttonLinkType === 'external' ||
-    (buttonUrl && (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
+  const isExternalLink =
+    buttonLinkType === 'external' ||
+    (buttonUrl &&
+      (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
 
-  const linkTarget = isExternalLink ? ' target="_blank" rel="noopener noreferrer"' : '';
+  const linkTarget = isExternalLink
+    ? ' target="_blank" rel="noopener noreferrer"'
+    : '';
 
   // Get background style based on type
   const getBackgroundStyle = () => {
@@ -748,10 +829,12 @@ function generateCTAHTML(element: Element): string {
     transition: opacity 0.2s;
   `.trim();
 
-  const backgroundHTML = backgroundImage ? `
+  const backgroundHTML = backgroundImage
+    ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: #000000; opacity: ${backgroundOpacity / 100};"></div>
-  ` : '';
+  `
+    : '';
 
   if (variant === 'centered') {
     return `
@@ -826,15 +909,18 @@ function generatePaymentButtonHTML(element: Element): string {
   } = element.props;
 
   // Use products array or fall back to legacy single product
-  const displayProducts = products.length > 0
-    ? products
-    : [{
-        id: '1',
-        name: productName || 'Product Name',
-        description: productDescription || '',
-        price: amount || 0,
-        image: productImage,
-      }];
+  const displayProducts =
+    products.length > 0
+      ? products
+      : [
+          {
+            id: '1',
+            name: productName || 'Product Name',
+            description: productDescription || '',
+            price: amount || 0,
+            image: productImage,
+          },
+        ];
 
   const hasMultipleProducts = displayProducts.length > 1;
 
@@ -843,15 +929,18 @@ function generatePaymentButtonHTML(element: Element): string {
   const bumpModalId = `bump-modal-${element.id}`;
 
   // Find bump offer product from products list (new system)
-  const bumpOfferProduct = enableBumpOffer && bumpOfferProductId
-    ? displayProducts.find((p: any) => p.id === bumpOfferProductId)
-    : null;
+  const bumpOfferProduct =
+    enableBumpOffer && bumpOfferProductId
+      ? displayProducts.find((p: any) => p.id === bumpOfferProductId)
+      : null;
 
   // Calculate bump offer discounted price
-  const bumpOriginalPrice = bumpOfferProduct?.price || legacyBumpOfferAmount || 0;
-  const bumpDiscountedPrice = bumpOfferDiscount > 0
-    ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
-    : bumpOriginalPrice;
+  const bumpOriginalPrice =
+    bumpOfferProduct?.price || legacyBumpOfferAmount || 0;
+  const bumpDiscountedPrice =
+    bumpOfferDiscount > 0
+      ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
+      : bumpOriginalPrice;
 
   // Get bump offer name (new system uses product name, legacy uses bumpOfferName)
   const bumpOfferName = bumpOfferProduct?.name || legacyBumpOfferName || '';
@@ -860,7 +949,7 @@ function generatePaymentButtonHTML(element: Element): string {
   const sizeStyles: Record<string, string> = {
     sm: 'padding: 0.5rem 1.5rem; font-size: 0.875rem;',
     md: 'padding: 0.75rem 2rem; font-size: 1rem;',
-    lg: 'padding: 1rem 2.5rem; font-size: 1.125rem;'
+    lg: 'padding: 1rem 2.5rem; font-size: 1.125rem;',
   };
   const buttonSizeStyle = sizeStyles[buttonSize] || sizeStyles['md'];
 
@@ -878,31 +967,43 @@ function generatePaymentButtonHTML(element: Element): string {
   return `
 <section style="background-color: ${bgColor}; padding: 4rem 1rem;" id="${element.type}-${element.order}">
   <div class="container" style="max-width: ${hasMultipleProducts ? '80rem' : '32rem'}; margin: 0 auto;">
-    ${hasMultipleProducts ? `
+    ${
+      hasMultipleProducts
+        ? `
       <!-- Multiple Products Grid -->
       <h2 style="font-size: 2.25rem; font-weight: bold; text-align: center; margin-bottom: 3rem; color: #111827;">Choose Your Product</h2>
       <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 70rem; margin: 0 auto;">
-        ${displayProducts.map((product: any, index: number) => `
+        ${displayProducts
+          .map(
+            (product: any, index: number) => `
           <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; ${product.featured ? 'border: 2px solid #fbbf24; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);' : ''}">
-            ${product.featured ? `
+            ${
+              product.featured
+                ? `
             <div style="background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; text-align: center; padding: 0.5rem; font-weight: 600; font-size: 0.875rem;">
               ⭐ Most Popular
             </div>
-            ` : ''}
+            `
+                : ''
+            }
 
             <!-- Product Image -->
-            ${product.image ? `
+            ${
+              product.image
+                ? `
             <div style="height: 12rem; overflow: hidden;">
               <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
-            ` : `
+            `
+                : `
             <div style="height: 12rem; background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); display: flex; align-items: center; justify-content: center;">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                 <line x1="1" y1="10" x2="23" y2="10"></line>
               </svg>
             </div>
-            `}
+            `
+            }
 
             <div style="padding: 1.5rem; text-align: center;">
               <h3 style="font-size: 1.25rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${product.name}</h3>
@@ -931,17 +1032,23 @@ function generatePaymentButtonHTML(element: Element): string {
               </button>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
-    ` : `
+    `
+        : `
       <!-- Single Product Card -->
       <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden;">
         <!-- Product Image -->
-        ${displayProducts[0].image ? `
+        ${
+          displayProducts[0].image
+            ? `
         <div style="height: 16rem; overflow: hidden;">
           <img src="${displayProducts[0].image}" alt="${displayProducts[0].name}" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
-        ` : `
+        `
+            : `
         <div style="padding: 2rem 2rem 0 2rem; text-align: center;">
           <div style="display: inline-flex; align-items: center; justify-content: center; width: 4rem; height: 4rem; background: #dbeafe; border-radius: 9999px; margin-bottom: 1rem;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
@@ -950,7 +1057,8 @@ function generatePaymentButtonHTML(element: Element): string {
             </svg>
           </div>
         </div>
-        `}
+        `
+        }
 
         <div style="padding: 2rem; text-align: center;">
           <h2 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${displayProducts[0].name}</h2>
@@ -982,7 +1090,8 @@ function generatePaymentButtonHTML(element: Element): string {
           </p>
         </div>
       </div>
-    `}
+    `
+    }
   </div>
 
   <!-- Checkout Modal -->
@@ -1104,7 +1213,9 @@ function generatePaymentButtonHTML(element: Element): string {
     </div>
   </div>
 
-  ${enableBumpOffer && bumpOfferName ? `
+  ${
+    enableBumpOffer && bumpOfferName
+      ? `
   <!-- Bump Offer Modal -->
   <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
     <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -1120,30 +1231,38 @@ function generatePaymentButtonHTML(element: Element): string {
 
           <!-- Product Card -->
           <div style="background: #fefce8; border: 2px solid #fde047; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem;">
-            ${bumpOfferProduct?.image ? `
+            ${
+              bumpOfferProduct?.image
+                ? `
             <div style="margin-bottom: 1rem; text-align: center;">
               <img src="${bumpOfferProduct.image}" alt="${bumpOfferName}" style="max-width: 100%; max-height: 200px; border-radius: 0.375rem; object-fit: cover;">
             </div>
-            ` : `
+            `
+                : `
             <div style="background: #e5e7eb; border-radius: 0.5rem; height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
               <svg style="width: 3rem; height: 3rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
-            `}
+            `
+            }
 
             <h3 style="font-size: 1.125rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">${bumpOfferName}</h3>
 
             <div style="text-align: center; margin-bottom: 1rem;">
-              ${bumpOfferDiscount > 0 ? `
+              ${
+                bumpOfferDiscount > 0
+                  ? `
               <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatCurrency(bumpOriginalPrice)}</p>
               <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                 <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatCurrency(bumpDiscountedPrice)}</p>
                 <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
               </div>
-              ` : `
+              `
+                  : `
               <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatCurrency(bumpOriginalPrice)}</p>
-              `}
+              `
+              }
             </div>
 
             <button
@@ -1173,7 +1292,9 @@ function generatePaymentButtonHTML(element: Element): string {
       </div>
     </div>
   </div>
-  ` : ''}
+  `
+      : ''
+  }
 
   <script>
     (function() {
@@ -1533,7 +1654,7 @@ function generateAnnouncementBarHTML(element: Element): string {
     isSticky,
     showCloseButton,
     link,
-    linkText
+    linkText,
   } = element.props;
 
   const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 50;' : '';
@@ -1547,7 +1668,9 @@ function generateAnnouncementBarHTML(element: Element): string {
     <!-- Main centered content -->
     <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
       <span style="font-weight: 500; text-align: center;">${message}</span>
-      ${showCountdown && countdownEndDate ? `
+      ${
+        showCountdown && countdownEndDate
+          ? `
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           ${countdownLabel ? `<span style="font-size: 0.875rem; opacity: 0.9;">${countdownLabel}</span>` : ''}
           <div id="countdown-${element.id}" style="display: flex; gap: 0.25rem; font-family: monospace;">
@@ -1568,13 +1691,21 @@ function generateAnnouncementBarHTML(element: Element): string {
             </div>
           </div>
         </div>
-      ` : ''}
-      ${link && linkText ? `
+      `
+          : ''
+      }
+      ${
+        link && linkText
+          ? `
         <a href="${link}" style="text-decoration: underline; font-weight: 600; color: inherit;">${linkText}</a>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
     <!-- Close Button - Absolute positioned to the right -->
-    ${showCloseButton ? `
+    ${
+      showCloseButton
+        ? `
       <button
         onclick="document.getElementById('announcement-${element.id}').style.display='none'"
         style="position: absolute; right: 0; padding: 0.25rem; background: transparent; border: none; cursor: pointer; color: inherit; font-size: 1.25rem; transition: opacity 0.2s;"
@@ -1582,10 +1713,14 @@ function generateAnnouncementBarHTML(element: Element): string {
         onmouseout="this.style.opacity='1'"
         aria-label="Close announcement"
       >&times;</button>
-    ` : ''}
+    `
+        : ''
+    }
   </div>
 </div>
-${showCountdown && countdownEndDate ? `
+${
+  showCountdown && countdownEndDate
+    ? `
 <script>
   (function() {
     const countdownEl = document.getElementById('countdown-${element.id}');
@@ -1614,7 +1749,9 @@ ${showCountdown && countdownEndDate ? `
     setInterval(updateCountdown, 1000);
   })();
 </script>
-` : ''}`;
+`
+    : ''
+}`;
 }
 
 /**
@@ -1629,7 +1766,7 @@ function generateNavigationHTML(element: Element): string {
     bgColor,
     textColor,
     isSticky,
-    layout
+    layout,
   } = element.props;
 
   // Enforce maximum of 3 menu items
@@ -1654,12 +1791,20 @@ function generateNavigationHTML(element: Element): string {
 
       <!-- Desktop Menu -->
       <div id="menu-${element.id}" style="display: none; align-items: center; gap: ${menuGap};">
-        ${menuItems.map((item: any) => `
+        ${menuItems
+          .map(
+            (item: any) => `
           <a href="${item.url}" style="color: ${textColor}; text-decoration: none; font-weight: 500; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${item.label}</a>
-        `).join('')}
-        ${ctaButton ? `
+        `
+          )
+          .join('')}
+        ${
+          ctaButton
+            ? `
           <a href="${ctaButton.url}" class="button button-primary" style="padding: 0.5rem 1.5rem; white-space: nowrap;">${ctaButton.text}</a>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <!-- Mobile Menu Button -->
@@ -1676,12 +1821,20 @@ function generateNavigationHTML(element: Element): string {
 
     <!-- Mobile Menu -->
     <div id="mobile-menu-${element.id}" style="display: none; padding-bottom: 1rem;">
-      ${menuItems.map((item: any) => `
+      ${menuItems
+        .map(
+          (item: any) => `
         <a href="${item.url}" style="display: block; padding: 0.75rem 0; color: ${textColor}; text-decoration: none; font-weight: 500;">${item.label}</a>
-      `).join('')}
-      ${ctaButton ? `
+      `
+        )
+        .join('')}
+      ${
+        ctaButton
+          ? `
         <a href="${ctaButton.url}" class="button button-primary" style="display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   </div>
 </nav>
@@ -1728,29 +1881,44 @@ function generatePricingHTML(element: Element): string {
   const bumpModalId = `pricing-bump-modal-${sanitizedId}`;
 
   // Find bump offer plan
-  const bumpOfferPlan = enableBumpOffer && bumpOfferPlanIndex !== null && plans && plans[bumpOfferPlanIndex]
-    ? plans[bumpOfferPlanIndex]
-    : null;
+  const bumpOfferPlan =
+    enableBumpOffer &&
+    bumpOfferPlanIndex !== null &&
+    plans &&
+    plans[bumpOfferPlanIndex]
+      ? plans[bumpOfferPlanIndex]
+      : null;
 
   // Calculate bump offer discounted price
-  const bumpOriginalPrice = bumpOfferPlan ? (parseFloat(bumpOfferPlan.price) || bumpOfferPlan.priceNumeric || 0) : 0;
-  const bumpDiscountedPrice = bumpOfferDiscount > 0
-    ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
-    : bumpOriginalPrice;
+  const bumpOriginalPrice = bumpOfferPlan
+    ? parseFloat(bumpOfferPlan.price) || bumpOfferPlan.priceNumeric || 0
+    : 0;
+  const bumpDiscountedPrice =
+    bumpOfferDiscount > 0
+      ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
+      : bumpOriginalPrice;
 
   // Format currency helper for pricing
-  const formatPricingCurrency = (value: number, currencyCode: string = 'MYR') => {
-    if (currencyCode === 'MYR' || currencyCode === 'RM') return `RM ${value.toFixed(2)}`;
+  const formatPricingCurrency = (
+    value: number,
+    currencyCode: string = 'MYR'
+  ) => {
+    if (currencyCode === 'MYR' || currencyCode === 'RM')
+      return `RM ${value.toFixed(2)}`;
     return `${currencyCode} ${value.toFixed(2)}`;
   };
 
   if (layout === 'cards') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; padding: 5rem 1rem; background: #f9fafb; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 3rem;">
@@ -1760,11 +1928,17 @@ function generatePricingHTML(element: Element): string {
 
     <!-- Pricing Cards -->
     <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto;">
-      ${plans.map((plan: any) => `
+      ${plans
+        .map(
+          (plan: any) => `
         <div style="background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; display: flex; flex-direction: column; ${plan.highlighted ? 'border: 2px solid #3b82f6; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);' : ''}">
-          ${plan.highlighted ? `
+          ${
+            plan.highlighted
+              ? `
             <div style="background: #3b82f6; color: white; font-size: 0.875rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; align-self: flex-start; margin-bottom: 1rem;">Most Popular</div>
-          ` : ''}
+          `
+              : ''
+          }
           <h3 style="font-size: 1.5rem; font-weight: bold; color: #111; margin-bottom: 0.5rem;">${plan.name}</h3>
           <p style="color: #666; margin-bottom: 1.5rem;">${plan.description}</p>
           <div style="margin-bottom: 1.5rem;">
@@ -1772,16 +1946,22 @@ function generatePricingHTML(element: Element): string {
             <span style="color: #666; margin-left: 0.5rem;">/ ${plan.period}</span>
           </div>
           <ul style="list-style: none; margin-bottom: 2rem; flex: 1;">
-            ${plan.features.map((feature: string) => `
+            ${plan.features
+              .map(
+                (feature: string) => `
               <li style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem;">
                 <svg style="width: 1.25rem; height: 1.25rem; color: #10b981; flex-shrink: 0; margin-top: 0.125rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
                 <span style="color: #374151;">${feature}</span>
               </li>
-            `).join('')}
+            `
+              )
+              .join('')}
           </ul>
-          ${enablePaymentIntegration ? `
+          ${
+            enablePaymentIntegration
+              ? `
             <button
               onclick="openPricingCheckout_${sanitizedId}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plans.indexOf(plan)}')"
               style="
@@ -1801,16 +1981,22 @@ function generatePricingHTML(element: Element): string {
             >
               ${plan.buttonText}
             </button>
-          ` : `
+          `
+              : `
             <a href="${plan.buttonUrl}" style="display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.5rem; font-weight: 600; text-align: center; text-decoration: none;">${plan.buttonText}</a>
-          `}
+          `
+          }
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
   </div>
 </section>
 
-${enablePaymentIntegration ? `
+${
+  enablePaymentIntegration
+    ? `
 <!-- Checkout Modal for Pricing -->
 <div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
   <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -1827,7 +2013,9 @@ ${enablePaymentIntegration ? `
   </div>
 </div>
 
-${bumpOfferPlan ? `
+${
+  bumpOfferPlan
+    ? `
 <!-- Bump Offer Modal for Pricing -->
 <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
   <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -1847,15 +2035,19 @@ ${bumpOfferPlan ? `
           ${bumpOfferPlan.description ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin: 0 0 1rem 0;">${bumpOfferPlan.description}</p>` : ''}
 
           <div style="text-align: center; margin-bottom: 1rem;">
-            ${bumpOfferDiscount > 0 ? `
+            ${
+              bumpOfferDiscount > 0
+                ? `
             <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
               <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatPricingCurrency(bumpDiscountedPrice, bumpOfferPlan.currency || 'RM')}</p>
               <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
             </div>
-            ` : `
+            `
+                : `
             <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
-            `}
+            `
+            }
           </div>
 
           <button
@@ -1885,7 +2077,9 @@ ${bumpOfferPlan ? `
     </div>
   </div>
 </div>
-` : ''}
+`
+    : ''
+}
 
 <script>
 (function() {
@@ -1966,15 +2160,21 @@ ${bumpOfferPlan ? `
   };
 })();
 </script>
-` : ''}`;
+`
+    : ''
+}`;
   } else {
     // Table layout
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; padding: 5rem 1rem; background: #f9fafb; scroll-margin-top: 4rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
     <div style="text-align: center; margin-bottom: 3rem;">
       <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;">${title}</h2>
@@ -1991,7 +2191,9 @@ ${bumpOfferPlan ? `
           </tr>
         </thead>
         <tbody>
-          ${plans.map((plan: any, index: number) => `
+          ${plans
+            .map(
+              (plan: any, index: number) => `
             <tr style="${index % 2 === 0 ? 'background: white;' : 'background: #f9fafb;'}">
               <td style="padding: 1rem;">
                 <div style="font-weight: bold; color: #111;">${plan.name}</div>
@@ -2003,14 +2205,21 @@ ${bumpOfferPlan ? `
               </td>
               <td style="padding: 1rem;">
                 <ul style="list-style: none; padding: 0;">
-                  ${plan.features.slice(0, 3).map((feature: string) => `
+                  ${plan.features
+                    .slice(0, 3)
+                    .map(
+                      (feature: string) => `
                     <li style="font-size: 0.875rem; color: #374151; margin-bottom: 0.25rem;">✓ ${feature}</li>
-                  `).join('')}
+                  `
+                    )
+                    .join('')}
                   ${plan.features.length > 3 ? `<li style="font-size: 0.875rem; color: #666;">+${plan.features.length - 3} more</li>` : ''}
                 </ul>
               </td>
               <td style="padding: 1rem;">
-                ${enablePaymentIntegration ? `
+                ${
+                  enablePaymentIntegration
+                    ? `
                   <button
                     onclick="openPricingCheckout_${sanitizedId}('${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${index}')"
                     style="
@@ -2025,19 +2234,25 @@ ${bumpOfferPlan ? `
                   >
                     ${plan.buttonText}
                   </button>
-                ` : `
+                `
+                    : `
                   <a href="${plan.buttonUrl}" style="display: inline-block; padding: 0.5rem 1.25rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.375rem; font-weight: 600; text-decoration: none;">${plan.buttonText}</a>
-                `}
+                `
+                }
               </td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </tbody>
       </table>
     </div>
   </div>
 </section>
 
-${enablePaymentIntegration ? `
+${
+  enablePaymentIntegration
+    ? `
 <!-- Checkout Modal for Pricing Table -->
 <div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
   <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -2054,7 +2269,9 @@ ${enablePaymentIntegration ? `
   </div>
 </div>
 
-${bumpOfferPlan ? `
+${
+  bumpOfferPlan
+    ? `
 <!-- Bump Offer Modal for Pricing Table -->
 <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
   <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -2074,15 +2291,19 @@ ${bumpOfferPlan ? `
           ${bumpOfferPlan.description ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin: 0 0 1rem 0;">${bumpOfferPlan.description}</p>` : ''}
 
           <div style="text-align: center; margin-bottom: 1rem;">
-            ${bumpOfferDiscount > 0 ? `
+            ${
+              bumpOfferDiscount > 0
+                ? `
             <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
               <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatPricingCurrency(bumpDiscountedPrice, bumpOfferPlan.currency || 'RM')}</p>
               <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
             </div>
-            ` : `
+            `
+                : `
             <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatPricingCurrency(bumpOriginalPrice, bumpOfferPlan.currency || 'RM')}</p>
-            `}
+            `
+            }
           </div>
 
           <button
@@ -2112,7 +2333,9 @@ ${bumpOfferPlan ? `
     </div>
   </div>
 </div>
-` : ''}
+`
+    : ''
+}
 
 <script>
 (function() {
@@ -2193,7 +2416,9 @@ ${bumpOfferPlan ? `
   };
 })();
 </script>
-` : ''}`;
+`
+    : ''
+}`;
   }
 }
 
@@ -2211,23 +2436,31 @@ function generateFooterHTML(element: Element): string {
     bgColor,
     textColor,
     backgroundImage,
-    backgroundOpacity = 70
+    backgroundOpacity = 70,
   } = element.props;
 
   const socialIcons: any = {
     facebook: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z',
-    twitter: 'M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z',
-    instagram: 'M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 2h11A4.5 4.5 0 0122 6.5v11a4.5 4.5 0 01-4.5 4.5h-11A4.5 4.5 0 012 17.5v-11A4.5 4.5 0 016.5 2z',
-    linkedin: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z',
-    youtube: 'M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z M9.75 15.02l5.75-3.27-5.75-3.27v6.54z'
+    twitter:
+      'M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z',
+    instagram:
+      'M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 2h11A4.5 4.5 0 0122 6.5v11a4.5 4.5 0 01-4.5 4.5h-11A4.5 4.5 0 012 17.5v-11A4.5 4.5 0 016.5 2z',
+    linkedin:
+      'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z',
+    youtube:
+      'M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z M9.75 15.02l5.75-3.27-5.75-3.27v6.54z',
   };
 
   return `
 <footer style="position: relative; overflow: hidden; background-color: ${bgColor || '#1f2937'}; color: ${textColor || '#f3f4f6'}; padding: 3rem 1rem 1.5rem;">
-  ${backgroundImage ? `
+  ${
+    backgroundImage
+      ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor || '#1f2937'}; opacity: ${backgroundOpacity / 100};"></div>
-  ` : ''}
+  `
+      : ''
+  }
   <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
       <!-- Logo & Description -->
@@ -2238,32 +2471,48 @@ function generateFooterHTML(element: Element): string {
         </div>
         ${description ? `<p style="color: ${textColor || '#d1d5db'}; font-size: 0.875rem; line-height: 1.6;">${description}</p>` : ''}
 
-        ${socialLinks && socialLinks.length > 0 ? `
+        ${
+          socialLinks && socialLinks.length > 0
+            ? `
           <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-            ${socialLinks.map((social: any) => `
+            ${socialLinks
+              .map(
+                (social: any) => `
               <a href="${social.url}" style="color: ${textColor || '#d1d5db'}; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
                 <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="${socialIcons[social.platform] || ''}"></path>
                 </svg>
               </a>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <!-- Link Columns -->
-      ${columns.map((column: any) => `
+      ${columns
+        .map(
+          (column: any) => `
         <div>
           <h4 style="font-weight: 600; margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">${column.title}</h4>
           <ul style="list-style: none; padding: 0;">
-            ${column.links.map((link: any) => `
+            ${column.links
+              .map(
+                (link: any) => `
               <li style="margin-bottom: 0.75rem;">
                 <a href="${link.url}" style="color: ${textColor || '#d1d5db'}; font-size: 0.875rem; text-decoration: none; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">${link.label}</a>
               </li>
-            `).join('')}
+            `
+              )
+              .join('')}
           </ul>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
 
     <!-- Copyright -->
@@ -2280,14 +2529,14 @@ function generateFooterHTML(element: Element): string {
 function generateLeadFormHTML(element: Element): string {
   const {
     title = 'Get In Touch',
-    description = 'Fill out the form below and we\'ll get back to you soon.',
+    description = "Fill out the form below and we'll get back to you soon.",
     nameLabel = 'Your Name',
     emailLabel = 'Email Address',
     phoneLabel = 'Phone Number (optional)',
     messageLabel = 'Message (optional)',
     submitButtonText = 'Submit',
     submitButtonColor = '#2563eb',
-    successMessage = 'Thank you! We\'ll be in touch soon.',
+    successMessage = "Thank you! We'll be in touch soon.",
     fields = {
       showPhone: true,
       showMessage: true,
@@ -2350,7 +2599,9 @@ function generateLeadFormHTML(element: Element): string {
         </div>
 
         <!-- Phone Field (conditional) -->
-        ${fields.showPhone ? `
+        ${
+          fields.showPhone
+            ? `
         <div style="margin-bottom: 1.5rem;">
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
             ${phoneLabel}${fields.phoneRequired ? ' <span style="color: #dc2626;">*</span>' : ''}
@@ -2366,10 +2617,14 @@ function generateLeadFormHTML(element: Element): string {
             onblur="this.style.borderColor='#d1d5db'"
           >
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <!-- Message Field (conditional) -->
-        ${fields.showMessage ? `
+        ${
+          fields.showMessage
+            ? `
         <div style="margin-bottom: 1.5rem;">
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">
             ${messageLabel}${fields.messageRequired ? ' <span style="color: #dc2626;">*</span>' : ''}
@@ -2385,7 +2640,9 @@ function generateLeadFormHTML(element: Element): string {
             onblur="this.style.borderColor='#d1d5db'"
           ></textarea>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <!-- Submit Button -->
         <button
@@ -2528,7 +2785,12 @@ function generateWhatsAppButtonHTML(element: Element): string {
   } = element.props;
 
   // Ensure fixedPosition has a valid value (fallback to bottom-right if undefined/invalid)
-  const validPositions = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
+  const validPositions = [
+    'bottom-right',
+    'bottom-left',
+    'top-right',
+    'top-left',
+  ];
   const fixedPosition = validPositions.includes(element.props.fixedPosition)
     ? element.props.fixedPosition
     : 'bottom-right';
@@ -2583,9 +2845,10 @@ function generateWhatsAppButtonHTML(element: Element): string {
   `;
 
   // Use different container styles - fixed needs position !important to override CSS rules
-  const containerStyle = position === 'fixed'
-    ? `position: fixed !important; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
-    : 'padding: 5rem 1rem; text-align: center;';
+  const containerStyle =
+    position === 'fixed'
+      ? `position: fixed !important; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
+      : 'padding: 5rem 1rem; text-align: center;';
 
   // Use div for fixed position to avoid section CSS rules
   const containerTag = position === 'fixed' ? 'div' : 'section';
@@ -2599,7 +2862,9 @@ function generateWhatsAppButtonHTML(element: Element): string {
 
   return `
 <${containerTag} id="${element.type}-${element.order}" style="${containerStyle}">
-  ${position === 'inline' && showHeadline ? `
+  ${
+    position === 'inline' && showHeadline
+      ? `
   <div style="
     max-width: 42rem;
     margin: 0 auto 2rem auto;
@@ -2613,9 +2878,13 @@ function generateWhatsAppButtonHTML(element: Element): string {
       text-align: center;
     ">${headlineText}</h2>
   </div>
-  ` : ''}
+  `
+      : ''
+  }
 
-  ${position === 'fixed' && tooltipText ? `
+  ${
+    position === 'fixed' && tooltipText
+      ? `
   <div id="wa-tooltip-${sanitizedId}" style="
     position: absolute;
     bottom: 100%;
@@ -2642,7 +2911,9 @@ function generateWhatsAppButtonHTML(element: Element): string {
       background-color: #1f2937;
     "></div>
   </div>
-  ` : ''}
+  `
+      : ''
+  }
 
   <a
     href="${whatsappUrl}"
@@ -2656,7 +2927,9 @@ function generateWhatsAppButtonHTML(element: Element): string {
   >
     ${showIcon ? (customIcon ? `<img src="${customIcon}" alt="WhatsApp" style="width: ${iconSizes[buttonSize as keyof typeof iconSizes]}; height: ${iconSizes[buttonSize as keyof typeof iconSizes]};">` : whatsappIcon) : ''}
     <span>${buttonText}</span>
-    ${position === 'fixed' ? `
+    ${
+      position === 'fixed'
+        ? `
     <span style="
       position: absolute;
       inset: 0;
@@ -2665,11 +2938,15 @@ function generateWhatsAppButtonHTML(element: Element): string {
       opacity: 0.2;
       animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     "></span>
-    ` : ''}
+    `
+        : ''
+    }
   </a>
 </${containerTag}>
 
-${position === 'fixed' ? `
+${
+  position === 'fixed'
+    ? `
 <style>
   @keyframes ping {
     75%, 100% {
@@ -2678,7 +2955,9 @@ ${position === 'fixed' ? `
     }
   }
 </style>
-` : ''}`;
+`
+    : ''
+}`;
 }
 
 /**
@@ -2720,15 +2999,17 @@ function generateFormWithPaymentHTML(element: Element): string {
   const bumpModalId = `bump-modal-${sanitizedId}`;
 
   // Find bump offer product from products list
-  const bumpOfferProduct = enableBumpOffer && bumpOfferProductId
-    ? products.find((p: any) => p.id === bumpOfferProductId)
-    : null;
+  const bumpOfferProduct =
+    enableBumpOffer && bumpOfferProductId
+      ? products.find((p: any) => p.id === bumpOfferProductId)
+      : null;
 
   // Calculate bump offer discounted price
   const bumpOriginalPrice = bumpOfferProduct?.price || 0;
-  const bumpDiscountedPrice = bumpOfferDiscount > 0
-    ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
-    : bumpOriginalPrice;
+  const bumpDiscountedPrice =
+    bumpOfferDiscount > 0
+      ? bumpOriginalPrice * (1 - bumpOfferDiscount / 100)
+      : bumpOriginalPrice;
 
   // Country codes mapping
   const countryCodes: Record<string, { dial: string; flag: string }> = {
@@ -2742,7 +3023,8 @@ function generateFormWithPaymentHTML(element: Element): string {
     GB: { dial: '+44', flag: '🇬🇧' },
   };
 
-  const selectedCountry = countryCodes[defaultCountryCode] || countryCodes['MY'];
+  const selectedCountry =
+    countryCodes[defaultCountryCode] || countryCodes['MY'];
 
   // Format currency helper
   const formatCurrency = (value: number) => {
@@ -2753,12 +3035,13 @@ function generateFormWithPaymentHTML(element: Element): string {
   };
 
   // Generate products HTML
-  const productsHTML = products.map((product: any) => {
-    const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+  const productsHTML = products
+    .map((product: any) => {
+      const isOutOfStock = product.stock !== undefined && product.stock <= 0;
 
-    const stockStatusHTML = isOutOfStock
-      ? '<span style="color: #ef4444; font-weight: 500; font-size: 0.875rem;">Out of Stock</span>'
-      : `
+      const stockStatusHTML = isOutOfStock
+        ? '<span style="color: #ef4444; font-weight: 500; font-size: 0.875rem;">Out of Stock</span>'
+        : `
         <div style="display: flex; align-items: center; gap: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
           <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', -1)" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -2770,11 +3053,11 @@ function generateFormWithPaymentHTML(element: Element): string {
         </div>
       `;
 
-    const amountHTML = isOutOfStock
-      ? '<span style="color: #9ca3af;">-</span>'
-      : `<span id="amount-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>`;
+      const amountHTML = isOutOfStock
+        ? '<span style="color: #9ca3af;">-</span>'
+        : `<span id="amount-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>`;
 
-    return `
+      return `
       <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: center;">
         <div>
           <div style="font-weight: 500; color: #111827;">${product.name}</div>
@@ -2784,31 +3067,40 @@ function generateFormWithPaymentHTML(element: Element): string {
         <div style="text-align: right; color: #111827; font-weight: 500;">${amountHTML}</div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   // Products data for JavaScript
-  const productsDataJS = JSON.stringify(products.map((product: any) => ({
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    stock: product.stock,
-    currency: product.currency || currency,
-  })));
+  const productsDataJS = JSON.stringify(
+    products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      stock: product.stock,
+      currency: product.currency || currency,
+    }))
+  );
 
   return `
 <section style="background-color: ${bgColor}; padding: 2rem 1rem;" id="${element.type}-${element.order}">
   <div class="container" style="max-width: 42rem; margin: 0 auto;">
-    ${title || description ? `
+    ${
+      title || description
+        ? `
     <div style="text-align: center; margin-bottom: 1.5rem;">
       ${title ? `<h2 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${title}</h2>` : ''}
       ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <form id="${formId}" onsubmit="return submitPaymentForm_${sanitizedId}(event)">
       <!-- Customer Fields -->
       <div style="margin-bottom: 1.5rem;">
-        ${showName ? `
+        ${
+          showName
+            ? `
         <div style="margin-bottom: 1rem;">
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
             ${nameLabel}${nameRequired ? '<span style="color: #ef4444;">*</span>' : ''}
@@ -2817,9 +3109,13 @@ function generateFormWithPaymentHTML(element: Element): string {
             style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;"
             placeholder="Enter your name">
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${showMobile ? `
+        ${
+          showMobile
+            ? `
         <div style="margin-bottom: 1rem;">
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
             ${mobileLabel}${mobileRequired ? '<span style="color: #ef4444;">*</span>' : ''}
@@ -2834,9 +3130,13 @@ function generateFormWithPaymentHTML(element: Element): string {
               placeholder="012-345 6789">
           </div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${showEmail ? `
+        ${
+          showEmail
+            ? `
         <div style="margin-bottom: 1rem;">
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
             ${emailLabel}${emailRequired ? '<span style="color: #ef4444;">*</span>' : ''}
@@ -2845,11 +3145,15 @@ function generateFormWithPaymentHTML(element: Element): string {
             style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;"
             placeholder="your@email.com">
         </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <!-- Products Table -->
-      ${products.length > 0 ? `
+      ${
+        products.length > 0
+          ? `
       <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
         <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
           <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
@@ -2858,11 +3162,13 @@ function generateFormWithPaymentHTML(element: Element): string {
         </div>
         ${productsHTML}
       </div>
-      ` : `
+      `
+          : `
       <div style="border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
         <p style="color: #6b7280;">No products configured.</p>
       </div>
-      `}
+      `
+      }
 
       <!-- Total Amount -->
       <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
@@ -2966,7 +3272,9 @@ function generateFormWithPaymentHTML(element: Element): string {
       </div>
     </div>
 
-    ${bumpOfferProduct ? `
+    ${
+      bumpOfferProduct
+        ? `
     <!-- Bump Offer Modal -->
     <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
       <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
@@ -2982,30 +3290,38 @@ function generateFormWithPaymentHTML(element: Element): string {
 
             <!-- Product Card -->
             <div style="background: #fefce8; border: 2px solid #fde047; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem;">
-              ${bumpOfferProduct.image ? `
+              ${
+                bumpOfferProduct.image
+                  ? `
               <div style="margin-bottom: 1rem; text-align: center;">
                 <img src="${bumpOfferProduct.image}" alt="${bumpOfferProduct.name}" style="max-width: 100%; max-height: 200px; border-radius: 0.375rem; object-fit: cover;">
               </div>
-              ` : `
+              `
+                  : `
               <div style="background: #e5e7eb; border-radius: 0.5rem; height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
                 <svg style="width: 3rem; height: 3rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </div>
-              `}
+              `
+              }
 
               <h3 style="font-size: 1.125rem; font-weight: bold; text-align: center; margin: 0 0 0.75rem 0; color: #111827;">${bumpOfferProduct.name}</h3>
 
               <div style="text-align: center; margin-bottom: 1rem;">
-                ${bumpOfferDiscount > 0 ? `
+                ${
+                  bumpOfferDiscount > 0
+                    ? `
                 <p style="color: #6b7280; text-decoration: line-through; font-size: 1rem; margin: 0 0 0.25rem 0;">${formatCurrency(bumpOriginalPrice)}</p>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                   <p style="font-size: 1.75rem; font-weight: bold; color: #dc2626; margin: 0;">${formatCurrency(bumpDiscountedPrice)}</p>
                   <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>
                 </div>
-                ` : `
+                `
+                    : `
                 <p style="font-size: 1.75rem; font-weight: bold; color: #16a34a; margin: 0;">${formatCurrency(bumpOriginalPrice)}</p>
-                `}
+                `
+                }
               </div>
 
               <button
@@ -3035,7 +3351,9 @@ function generateFormWithPaymentHTML(element: Element): string {
         </div>
       </div>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <!-- Footer Links -->
     <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.5rem; font-size: 0.875rem;">
@@ -3609,35 +3927,45 @@ function generateProductCarouselHTML(element: Element): string {
   const sanitizedId = sanitizeId(element.id);
 
   // Card style classes
-  const cardClasses = cardStyle === 'minimal'
-    ? 'background: white;'
-    : cardStyle === 'bordered'
-    ? 'background: white; border: 1px solid #e5e7eb;'
-    : 'background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);';
+  const cardClasses =
+    cardStyle === 'minimal'
+      ? 'background: white;'
+      : cardStyle === 'bordered'
+        ? 'background: white; border: 1px solid #e5e7eb;'
+        : 'background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);';
 
   // Generate product cards HTML
-  const productsHTML = products.map((product: any, index: number) => {
-    const variationsHTML = product.variations && product.variations.length > 0
-      ? `<div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
-          ${product.variations.map((variation: any) =>
-            variation.type === 'color'
-              ? `<div style="display: flex; gap: 4px;">
-                  ${variation.options.slice(0, 4).map((opt: any) =>
-                    `<div style="width: 16px; height: 16px; border-radius: 50%; border: 1px solid #d1d5db; background-color: ${opt.colorCode || '#ccc'};" title="${opt.label}"></div>`
-                  ).join('')}
+  const productsHTML = products
+    .map((product: any, index: number) => {
+      const variationsHTML =
+        product.variations && product.variations.length > 0
+          ? `<div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+          ${product.variations
+            .map((variation: any) =>
+              variation.type === 'color'
+                ? `<div style="display: flex; gap: 4px;">
+                  ${variation.options
+                    .slice(0, 4)
+                    .map(
+                      (opt: any) =>
+                        `<div style="width: 16px; height: 16px; border-radius: 50%; border: 1px solid #d1d5db; background-color: ${opt.colorCode || '#ccc'};" title="${opt.label}"></div>`
+                    )
+                    .join('')}
                   ${variation.options.length > 4 ? `<span style="font-size: 12px; color: #6b7280;">+${variation.options.length - 4}</span>` : ''}
                 </div>`
-              : `<span style="font-size: 12px; color: #6b7280;">${variation.options.length} ${variation.name.toLowerCase()}s</span>`
-          ).join('')}
+                : `<span style="font-size: 12px; color: #6b7280;">${variation.options.length} ${variation.name.toLowerCase()}s</span>`
+            )
+            .join('')}
         </div>`
-      : '';
+          : '';
 
-    return `
+      return `
       <div style="${cardClasses} border-radius: 12px; overflow: hidden; transition: transform 0.2s;" class="product-card-${sanitizedId}">
         <div style="aspect-ratio: 1; background: #f3f4f6; position: relative; overflow: hidden;">
-          ${product.image_url
-            ? `<img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />`
-            : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+          ${
+            product.image_url
+              ? `<img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />`
+              : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
                 <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -3646,19 +3974,22 @@ function generateProductCarouselHTML(element: Element): string {
         </div>
         <div style="padding: 16px;">
           <h3 style="font-weight: 600; font-size: 18px; margin-bottom: 4px; color: ${textColor};">${product.name}</h3>
-          ${showDescription && product.description
-            ? `<p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px; color: ${textColor}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.description}</p>`
-            : ''
+          ${
+            showDescription && product.description
+              ? `<p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px; color: ${textColor}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.description}</p>`
+              : ''
           }
           ${variationsHTML}
-          ${showPrice
-            ? `<p style="font-weight: 700; font-size: 18px; color: ${priceColor};">${product.currency} ${typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}</p>`
-            : ''
+          ${
+            showPrice
+              ? `<p style="font-weight: 700; font-size: 18px; color: ${priceColor};">${product.currency} ${typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}</p>`
+              : ''
           }
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   // Determine grid columns CSS
   const gridCSS = `
@@ -3683,11 +4014,12 @@ function generateProductCarouselHTML(element: Element): string {
           ${subtitle ? `<p style="font-size: 18px; opacity: 0.8; max-width: 672px; margin: 0 auto; color: ${textColor};">${subtitle}</p>` : ''}
         </div>
 
-        ${products.length === 0
-          ? `<div style="text-align: center; padding: 48px; border: 2px dashed #d1d5db; border-radius: 8px;">
+        ${
+          products.length === 0
+            ? `<div style="text-align: center; padding: 48px; border: 2px dashed #d1d5db; border-radius: 8px;">
               <p style="color: #6b7280; font-size: 18px;">No products to display</p>
             </div>`
-          : `<div style="${gridCSS}">${productsHTML}</div>`
+            : `<div style="${gridCSS}">${productsHTML}</div>`
         }
       </div>
       <style>
@@ -3705,6 +4037,182 @@ function generateProductCarouselHTML(element: Element): string {
           }
         }
       </style>
+    </section>
+  `;
+}
+
+/**
+ * Generate Media section HTML
+ */
+function generateMediaHTML(element: Element): string {
+  const {
+    mediaType = 'image',
+    mediaUrl,
+    altText = 'Media content',
+    autoplay = false,
+    loop = true,
+    muted = true,
+    controls = true,
+    layout = 'contained',
+    maxWidth = '800px',
+    aspectRatio = 'auto',
+    borderRadius = '8px',
+    showCaption = false,
+    caption = '',
+    captionPosition = 'below',
+    bgColor = '#ffffff',
+    paddingY = '2rem',
+    shadow = 'none',
+  } = element.props;
+
+  const sanitizedId = element.id.replace(/[^a-zA-Z0-9]/g, '_');
+
+  // Get alignment style
+  const getAlignmentStyle = () => {
+    switch (layout) {
+      case 'left':
+        return 'display: flex; justify-content: flex-start;';
+      case 'right':
+        return 'display: flex; justify-content: flex-end;';
+      case 'center':
+      case 'contained':
+        return 'display: flex; justify-content: center;';
+      default:
+        return '';
+    }
+  };
+
+  // Get aspect ratio style
+  const getAspectRatioStyle = () => {
+    switch (aspectRatio) {
+      case '16:9':
+        return 'aspect-ratio: 16/9;';
+      case '4:3':
+        return 'aspect-ratio: 4/3;';
+      case '1:1':
+        return 'aspect-ratio: 1/1;';
+      case '9:16':
+        return 'aspect-ratio: 9/16;';
+      default:
+        return '';
+    }
+  };
+
+  // Get shadow style
+  const getShadowStyle = () => {
+    switch (shadow) {
+      case 'sm':
+        return 'box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);';
+      case 'md':
+        return 'box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);';
+      case 'lg':
+        return 'box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);';
+      case 'xl':
+        return 'box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);';
+      default:
+        return '';
+    }
+  };
+
+  // Get border radius style
+  const getBorderRadiusStyle = () => {
+    if (borderRadius === 'full') {
+      return 'border-radius: 9999px;';
+    }
+    return `border-radius: ${borderRadius};`;
+  };
+
+  // Media element styles
+  const mediaStyles = `
+    width: ${layout === 'full_width' ? '100%' : maxWidth};
+    max-width: ${layout === 'full_width' ? '100%' : maxWidth};
+    ${getAspectRatioStyle()}
+    ${getBorderRadiusStyle()}
+    ${getShadowStyle()}
+    object-fit: cover;
+  `;
+
+  // Render caption
+  const captionHTML =
+    showCaption && caption
+      ? `
+    <p style="color: #4b5563; font-size: 0.875rem; text-align: center; margin-top: 0.75rem; max-width: ${layout === 'full_width' ? '100%' : maxWidth};">
+      ${escapeHTML(caption)}
+    </p>
+  `
+      : '';
+
+  // Render media content
+  let mediaContent = '';
+
+  if (!mediaUrl) {
+    // Empty placeholder
+    mediaContent = `
+      <div style="${mediaStyles} min-height: 200px; background-color: #f3f4f6; border: 2px dashed #d1d5db; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <p style="color: #9ca3af;">No media uploaded</p>
+      </div>
+    `;
+  } else if (mediaType === 'image') {
+    mediaContent = `<img src="${escapeHTML(mediaUrl)}" alt="${escapeHTML(altText)}" style="${mediaStyles}" loading="lazy" />`;
+  } else {
+    // Check for YouTube
+    const isYouTube =
+      mediaUrl.includes('youtube.com') || mediaUrl.includes('youtu.be');
+    const isVimeo = mediaUrl.includes('vimeo.com');
+
+    if (isYouTube) {
+      let videoId = '';
+      if (mediaUrl.includes('youtu.be/')) {
+        videoId = mediaUrl.split('youtu.be/')[1]?.split('?')[0] || '';
+      } else if (mediaUrl.includes('youtube.com/watch')) {
+        const urlParams = new URLSearchParams(mediaUrl.split('?')[1]);
+        videoId = urlParams.get('v') || '';
+      } else if (mediaUrl.includes('youtube.com/embed/')) {
+        videoId = mediaUrl.split('embed/')[1]?.split('?')[0] || '';
+      }
+
+      mediaContent = `
+        <iframe
+          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&loop=${loop ? 1 : 0}&mute=${muted ? 1 : 0}&controls=${controls ? 1 : 0}"
+          style="${mediaStyles} ${aspectRatio === 'auto' ? 'aspect-ratio: 16/9;' : ''}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      `;
+    } else if (isVimeo) {
+      const videoId = mediaUrl.split('vimeo.com/')[1]?.split('?')[0] || '';
+      mediaContent = `
+        <iframe
+          src="https://player.vimeo.com/video/${videoId}?autoplay=${autoplay ? 1 : 0}&loop=${loop ? 1 : 0}&muted=${muted ? 1 : 0}"
+          style="${mediaStyles} ${aspectRatio === 'auto' ? 'aspect-ratio: 16/9;' : ''}"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      `;
+    } else {
+      mediaContent = `
+        <video
+          src="${escapeHTML(mediaUrl)}"
+          style="${mediaStyles}"
+          ${autoplay ? 'autoplay' : ''}
+          ${loop ? 'loop' : ''}
+          ${muted ? 'muted' : ''}
+          ${controls ? 'controls' : ''}
+          playsinline
+        ></video>
+      `;
+    }
+  }
+
+  return `
+    <section id="media-${sanitizedId}" style="background-color: ${bgColor}; padding: ${paddingY} 1rem;">
+      <div style="max-width: 80rem; margin: 0 auto; ${getAlignmentStyle()}">
+        <div style="${layout !== 'full_width' ? 'display: inline-block;' : 'width: 100%;'}">
+          ${captionPosition === 'above' ? captionHTML : ''}
+          ${mediaContent}
+          ${captionPosition === 'below' ? captionHTML : ''}
+        </div>
+      </div>
     </section>
   `;
 }

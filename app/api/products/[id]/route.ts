@@ -78,6 +78,7 @@ export async function PATCH(
       base_price,
       currency,
       quantity_pricing,
+      variations,
       notes,
       status,
     } = body;
@@ -91,7 +92,9 @@ export async function PATCH(
     if (stock !== undefined) updateData.stock = stock;
     if (base_price !== undefined) updateData.base_price = base_price;
     if (currency !== undefined) updateData.currency = currency;
-    if (quantity_pricing !== undefined) updateData.quantity_pricing = quantity_pricing;
+    if (quantity_pricing !== undefined)
+      updateData.quantity_pricing = quantity_pricing;
+    if (variations !== undefined) updateData.variations = variations;
     if (notes !== undefined) updateData.notes = notes;
     if (status !== undefined) updateData.status = status;
 

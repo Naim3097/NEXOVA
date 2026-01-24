@@ -60,7 +60,8 @@ export type ElementType =
   | 'whatsapp_button'
   | 'form_with_payment'
   | 'booking_form'
-  | 'product_carousel';
+  | 'product_carousel'
+  | 'media';
 
 export interface Template {
   id: string;
@@ -331,7 +332,13 @@ export interface Transaction {
   customer_phone: string | null;
 
   // Payment status
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'refunded';
+  status:
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'failed'
+    | 'cancelled'
+    | 'refunded';
   payment_method: string | null;
 
   // LeanX specific
@@ -365,6 +372,8 @@ export interface Product {
   price: number;
   image?: string; // Product image URL
   featured?: boolean; // Highlight as featured/popular
+  stock?: number; // Product stock
+  variations?: ProductVariation[]; // Product variations (size, color, etc.)
 }
 
 export interface PaymentButtonProps {
@@ -460,4 +469,31 @@ export interface ProductCarouselProps {
   priceColor: string;
   backgroundImage?: string;
   backgroundOpacity?: number;
+}
+
+// Media Element Props
+export interface MediaProps {
+  mediaType: 'image' | 'video';
+  sourceType: 'upload' | 'url';
+  mediaUrl?: string;
+  // Image specific
+  altText?: string;
+  // Video specific
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  controls?: boolean;
+  // Layout options
+  layout: 'full_width' | 'contained' | 'left' | 'center' | 'right';
+  maxWidth?: string; // e.g., '100%', '800px', '50%'
+  aspectRatio?: '16:9' | '4:3' | '1:1' | '9:16' | 'auto';
+  borderRadius?: string; // e.g., '0', '8px', '16px', 'full'
+  // Caption
+  showCaption?: boolean;
+  caption?: string;
+  captionPosition?: 'above' | 'below';
+  // Styling
+  bgColor?: string;
+  paddingY?: string; // Vertical padding
+  shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
 }

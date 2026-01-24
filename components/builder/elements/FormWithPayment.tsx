@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Shield, Minus, Plus, CreditCard } from 'lucide-react';
-import { Product } from '@/types';
+import { Shield, Minus, Plus, CreditCard, ChevronDown } from 'lucide-react';
+import { Product, ProductVariation } from '@/types';
 
 interface FormWithPaymentElementProps {
   props: {
@@ -46,7 +46,13 @@ const countryCodes = [
 ];
 
 export const FormWithPaymentElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover }: FormWithPaymentElementProps) => {
+  ({
+    props,
+    isSelected,
+    isHovered,
+    onSelect,
+    onHover,
+  }: FormWithPaymentElementProps) => {
     const {
       title = 'Order Form',
       description,
@@ -74,8 +80,46 @@ export const FormWithPaymentElement = React.memo(
 
     // Preview state for quantities (builder preview only)
     const [quantities, setQuantities] = useState<Record<string, number>>({});
+    // Track selected variation for each product
+    const [selectedVariations, setSelectedVariations] = useState<
+      Record<string, string>
+    >({});
 
-    const selectedCountry = countryCodes.find(c => c.code === defaultCountryCode) || countryCodes[0];
+    const selectedCountry =
+      countryCodes.find((c) => c.code === defaultCountryCode) ||
+      countryCodes[0];
+
+    // Get price adjustment for selected variation
+    const getVariationPriceAdjustment = (product: Product): number => {
+      if (!product.variations || product.variations.length === 0) return 0;
+
+      const variationKey = `${product.id}`;
+      const selectedValue = selectedVariations[variationKey];
+      if (!selectedValue) return 0;
+
+      for (const variation of product.variations) {
+        const option = variation.options.find(
+          (opt) => opt.value === selectedValue
+        );
+        if (option && option.priceAdjustment) {
+          return option.priceAdjustment;
+        }
+      }
+      return 0;
+    };
+
+    // Get effective price for product (base + variation adjustment)
+    const getEffectivePrice = (product: Product): number => {
+      return product.price + getVariationPriceAdjustment(product);
+    };
+
+    // Handle variation selection
+    const handleVariationChange = (productId: string, value: string) => {
+      setSelectedVariations((prev) => ({
+        ...prev,
+        [productId]: value,
+      }));
+    };
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -97,14 +141,19 @@ export const FormWithPaymentElement = React.memo(
       return `${currency} ${value.toFixed(2)}`;
     };
 
-    // Calculate total from quantities
+    // Calculate total from quantities (including variation price adjustments)
     const total = products.reduce((sum, product) => {
-      const qty = quantities[product.id] || 0;
-      return sum + (product.price * qty);
+      const qty = quantities[product.id || ''] || 0;
+      const effectivePrice = getEffectivePrice(product);
+      return sum + effectivePrice * qty;
     }, 0);
 
-    const handleQuantityChange = (productId: string, delta: number, stock?: number) => {
-      setQuantities(prev => {
+    const handleQuantityChange = (
+      productId: string,
+      delta: number,
+      stock?: number
+    ) => {
+      setQuantities((prev) => {
         const current = prev[productId] || 0;
         let newQty = Math.max(0, current + delta);
         // Respect stock limit if defined
@@ -131,20 +180,20 @@ export const FormWithPaymentElement = React.memo(
             className="px-3 py-2 text-gray-500 hover:bg-gray-100 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
-              handleQuantityChange(product.id, -1);
+              handleQuantityChange(product.id || '', -1);
             }}
           >
             <Minus className="w-4 h-4" />
           </button>
           <span className="w-8 text-center font-medium">
-            {quantities[product.id] || 0}
+            {quantities[product.id || ''] || 0}
           </span>
           <button
             type="button"
             className="px-3 py-2 text-gray-500 hover:bg-gray-100 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
-              handleQuantityChange(product.id, 1, product.stock);
+              handleQuantityChange(product.id || '', 1, product.stock);
             }}
           >
             <Plus className="w-4 h-4" />
@@ -158,8 +207,48 @@ export const FormWithPaymentElement = React.memo(
       if (product.stock !== undefined && product.stock <= 0) {
         return <span className="text-gray-400">-</span>;
       }
-      const qty = quantities[product.id] || 0;
-      return formatCurrency(product.price * qty);
+      const qty = quantities[product.id || ''] || 0;
+      const effectivePrice = getEffectivePrice(product);
+      return formatCurrency(effectivePrice * qty);
+    };
+
+    // Render variation selector dropdown
+    const renderVariationSelector = (product: Product) => {
+      if (!product.variations || product.variations.length === 0) return null;
+
+      return (
+        <div className="mt-2 space-y-2">
+          {product.variations.map((variation) => (
+            <div key={variation.id} className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 w-12">
+                {variation.name}:
+              </span>
+              <div className="relative flex-1">
+                <select
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={selectedVariations[product.id || ''] || ''}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    handleVariationChange(product.id || '', e.target.value);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="">Select {variation.name}</option>
+                  {variation.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                      {option.priceAdjustment &&
+                        option.priceAdjustment > 0 &&
+                        ` (+${formatCurrency(option.priceAdjustment)})`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
     };
 
     const hasNoProducts = products.length === 0;
@@ -176,7 +265,11 @@ export const FormWithPaymentElement = React.memo(
           {/* Header */}
           {(title || description) && (
             <div className="text-center mb-6">
-              {title && <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>}
+              {title && (
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {title}
+                </h2>
+              )}
               {description && <p className="text-gray-600">{description}</p>}
             </div>
           )}
@@ -255,25 +348,41 @@ export const FormWithPaymentElement = React.memo(
               </div>
 
               {/* Table Body */}
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="grid grid-cols-12 gap-4 px-4 py-4 border-b border-gray-100 last:border-b-0 items-center"
-                >
-                  <div className="col-span-5">
-                    <div className="font-medium text-gray-900">{product.name}</div>
-                    <div className="text-blue-600 text-sm font-medium">
-                      {formatCurrency(product.price)}
+              {products.map((product) => {
+                const hasVariations =
+                  product.variations && product.variations.length > 0;
+                const effectivePrice = getEffectivePrice(product);
+                const priceAdjustment = getVariationPriceAdjustment(product);
+
+                return (
+                  <div
+                    key={product.id}
+                    className="grid grid-cols-12 gap-4 px-4 py-4 border-b border-gray-100 last:border-b-0 items-start"
+                  >
+                    <div className="col-span-5">
+                      <div className="font-medium text-gray-900">
+                        {product.name}
+                      </div>
+                      <div className="text-blue-600 text-sm font-medium">
+                        {formatCurrency(effectivePrice)}
+                        {priceAdjustment > 0 && (
+                          <span className="text-gray-400 text-xs ml-1 line-through">
+                            {formatCurrency(product.price)}
+                          </span>
+                        )}
+                      </div>
+                      {/* Variation Selector */}
+                      {hasVariations && renderVariationSelector(product)}
+                    </div>
+                    <div className="col-span-4 flex justify-center pt-1">
+                      {renderStockStatus(product)}
+                    </div>
+                    <div className="col-span-3 text-right text-gray-900 font-medium pt-1">
+                      {renderProductAmount(product)}
                     </div>
                   </div>
-                  <div className="col-span-4 flex justify-center">
-                    {renderStockStatus(product)}
-                  </div>
-                  <div className="col-span-3 text-right text-gray-900 font-medium">
-                    {renderProductAmount(product)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -283,8 +392,13 @@ export const FormWithPaymentElement = React.memo(
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                 <CreditCard className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Products Added</h3>
-              <p className="text-gray-500">Add products from your inventory using the properties panel on the right</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                No Products Added
+              </h3>
+              <p className="text-gray-500">
+                Add products from your inventory using the properties panel on
+                the right
+              </p>
             </div>
           )}
 
@@ -320,22 +434,36 @@ export const FormWithPaymentElement = React.memo(
 
           {/* Footer Links */}
           <div className="flex items-center justify-center gap-4 mt-6 text-sm">
-            <a href={termsUrl} className="text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+            <a
+              href={termsUrl}
+              className="text-blue-600 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
               Terms & Conditions
             </a>
             <span className="text-gray-300">|</span>
-            <a href={policyUrl} className="text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+            <a
+              href={policyUrl}
+              className="text-blue-600 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
               Policy
             </a>
             <span className="text-gray-300">|</span>
-            <a href={contactUrl} className="text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+            <a
+              href={contactUrl}
+              className="text-blue-600 hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
               Contact Us
             </a>
           </div>
 
           {/* Company Info */}
           <div className="text-center text-gray-500 text-sm mt-4">
-            <p>&copy; {new Date().getFullYear()} {companyName}.</p>
+            <p>
+              &copy; {new Date().getFullYear()} {companyName}.
+            </p>
             <p>{companyRegistration}</p>
           </div>
         </div>

@@ -344,20 +344,31 @@ export const PropertiesPanel = () => {
 
               {/* CTA Button Toggle */}
               <div className="flex items-center justify-between py-2">
-                <Label htmlFor="showCtaButton" className="cursor-pointer">Show CTA Button</Label>
+                <Label htmlFor="showCtaButton" className="cursor-pointer">
+                  Show CTA Button
+                </Label>
                 <button
                   id="showCtaButton"
                   type="button"
                   role="switch"
                   aria-checked={props.showCtaButton !== false}
-                  onClick={() => handlePropChange('showCtaButton', props.showCtaButton === false ? true : false)}
+                  onClick={() =>
+                    handlePropChange(
+                      'showCtaButton',
+                      props.showCtaButton === false ? true : false
+                    )
+                  }
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    props.showCtaButton !== false ? 'bg-blue-600' : 'bg-gray-300'
+                    props.showCtaButton !== false
+                      ? 'bg-blue-600'
+                      : 'bg-gray-300'
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      props.showCtaButton !== false ? 'translate-x-6' : 'translate-x-1'
+                      props.showCtaButton !== false
+                        ? 'translate-x-6'
+                        : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -369,7 +380,9 @@ export const PropertiesPanel = () => {
                   <Input
                     id="ctaText"
                     value={props.ctaText || ''}
-                    onChange={(e) => handlePropChange('ctaText', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('ctaText', e.target.value)
+                    }
                     placeholder="Enter button text"
                   />
                 </div>
@@ -382,12 +395,16 @@ export const PropertiesPanel = () => {
                     id="bgColor"
                     type="color"
                     value={props.bgColor || '#f9fafb'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.bgColor || '#f9fafb'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#f9fafb"
                     className="flex-1"
                   />
@@ -397,9 +414,11 @@ export const PropertiesPanel = () => {
               {currentProject && (
                 <div>
                   <Label>
-                    {props.variant === 'centered' ? 'Hero Icon/Image (optional)' :
-                     props.variant === 'image_bg' ? 'Background Image' :
-                     'Hero Image'}
+                    {props.variant === 'centered'
+                      ? 'Hero Icon/Image (optional)'
+                      : props.variant === 'image_bg'
+                        ? 'Background Image'
+                        : 'Hero Image'}
                   </Label>
                   <ImageUpload
                     value={props.image || ''}
@@ -423,14 +442,18 @@ export const PropertiesPanel = () => {
               {/* Image Opacity Control - Only for image_bg variant */}
               {props.variant === 'image_bg' && (
                 <div>
-                  <Label htmlFor="imageOpacity">Overlay Opacity ({props.imageOpacity || 70}%)</Label>
+                  <Label htmlFor="imageOpacity">
+                    Overlay Opacity ({props.imageOpacity || 70}%)
+                  </Label>
                   <input
                     id="imageOpacity"
                     type="range"
                     min="0"
                     max="100"
                     value={props.imageOpacity || 70}
-                    onChange={(e) => handlePropChange('imageOpacity', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handlePropChange('imageOpacity', parseInt(e.target.value))
+                    }
                     className="w-full mt-2"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -441,7 +464,9 @@ export const PropertiesPanel = () => {
 
               {/* Text Styling Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Text Styling</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Text Styling
+                </h4>
 
                 {/* Headline Color */}
                 <div className="mb-4">
@@ -451,12 +476,16 @@ export const PropertiesPanel = () => {
                       id="headlineColor"
                       type="color"
                       value={props.headlineColor || '#111827'}
-                      onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('headlineColor', e.target.value)
+                      }
                       className="w-20 h-10 p-1"
                     />
                     <Input
                       value={props.headlineColor || '#111827'}
-                      onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('headlineColor', e.target.value)
+                      }
                       placeholder="#111827"
                       className="flex-1"
                     />
@@ -469,7 +498,9 @@ export const PropertiesPanel = () => {
                   <select
                     id="headlineSize"
                     value={props.headlineSize || '5xl'}
-                    onChange={(e) => handlePropChange('headlineSize', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('headlineSize', e.target.value)
+                    }
                     className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                   >
                     <option value="3xl">Small (3xl)</option>
@@ -488,12 +519,16 @@ export const PropertiesPanel = () => {
                       id="subheadlineColor"
                       type="color"
                       value={props.subheadlineColor || '#4b5563'}
-                      onChange={(e) => handlePropChange('subheadlineColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('subheadlineColor', e.target.value)
+                      }
                       className="w-20 h-10 p-1"
                     />
                     <Input
                       value={props.subheadlineColor || '#4b5563'}
-                      onChange={(e) => handlePropChange('subheadlineColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('subheadlineColor', e.target.value)
+                      }
                       placeholder="#4b5563"
                       className="flex-1"
                     />
@@ -506,7 +541,9 @@ export const PropertiesPanel = () => {
                   <select
                     id="subheadlineSize"
                     value={props.subheadlineSize || 'xl'}
-                    onChange={(e) => handlePropChange('subheadlineSize', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('subheadlineSize', e.target.value)
+                    }
                     className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                   >
                     <option value="base">Small (base)</option>
@@ -520,7 +557,9 @@ export const PropertiesPanel = () => {
 
               {/* Button Styling Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Button Styling</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Button Styling
+                </h4>
 
                 {/* Button Background Color */}
                 <div className="mb-4">
@@ -530,12 +569,16 @@ export const PropertiesPanel = () => {
                       id="buttonBgColor"
                       type="color"
                       value={props.buttonBgColor || '#2563eb'}
-                      onChange={(e) => handlePropChange('buttonBgColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonBgColor', e.target.value)
+                      }
                       className="w-20 h-10 p-1"
                     />
                     <Input
                       value={props.buttonBgColor || '#2563eb'}
-                      onChange={(e) => handlePropChange('buttonBgColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonBgColor', e.target.value)
+                      }
                       placeholder="#2563eb"
                       className="flex-1"
                     />
@@ -550,12 +593,16 @@ export const PropertiesPanel = () => {
                       id="buttonTextColor"
                       type="color"
                       value={props.buttonTextColor || '#ffffff'}
-                      onChange={(e) => handlePropChange('buttonTextColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonTextColor', e.target.value)
+                      }
                       className="w-20 h-10 p-1"
                     />
                     <Input
                       value={props.buttonTextColor || '#ffffff'}
-                      onChange={(e) => handlePropChange('buttonTextColor', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonTextColor', e.target.value)
+                      }
                       placeholder="#ffffff"
                       className="flex-1"
                     />
@@ -606,7 +653,11 @@ export const PropertiesPanel = () => {
                     options: iconOptions,
                   },
                   { key: 'title', label: 'Feature Title', type: 'text' },
-                  { key: 'description', label: 'Description', type: 'textarea' },
+                  {
+                    key: 'description',
+                    label: 'Description',
+                    type: 'textarea',
+                  },
                 ]}
                 defaultItem={{
                   icon: 'check-circle',
@@ -619,7 +670,9 @@ export const PropertiesPanel = () => {
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image
+                  </h4>
                   <Label>Background Image (optional)</Label>
                   <ImageUpload
                     value={props.backgroundImage || ''}
@@ -630,14 +683,21 @@ export const PropertiesPanel = () => {
                   {props.backgroundImage && (
                     <>
                       <div className="mt-4">
-                        <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                        <Label htmlFor="backgroundOpacity">
+                          Overlay Opacity ({props.backgroundOpacity || 70}%)
+                        </Label>
                         <input
                           id="backgroundOpacity"
                           type="range"
                           min="0"
                           max="100"
                           value={props.backgroundOpacity || 70}
-                          onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'backgroundOpacity',
+                              parseInt(e.target.value)
+                            )
+                          }
                           className="w-full mt-2"
                         />
                       </div>
@@ -648,12 +708,16 @@ export const PropertiesPanel = () => {
                             id="bgColor"
                             type="color"
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             placeholder="#000000"
                             className="flex-1"
                           />
@@ -712,13 +776,17 @@ export const PropertiesPanel = () => {
                   rating: 5,
                   avatar: '',
                 }}
-                onChange={(testimonials) => handlePropChange('testimonials', testimonials)}
+                onChange={(testimonials) =>
+                  handlePropChange('testimonials', testimonials)
+                }
               />
 
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image
+                  </h4>
                   <Label>Background Image (optional)</Label>
                   <ImageUpload
                     value={props.backgroundImage || ''}
@@ -729,14 +797,21 @@ export const PropertiesPanel = () => {
                   {props.backgroundImage && (
                     <>
                       <div className="mt-4">
-                        <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                        <Label htmlFor="backgroundOpacity">
+                          Overlay Opacity ({props.backgroundOpacity || 70}%)
+                        </Label>
                         <input
                           id="backgroundOpacity"
                           type="range"
                           min="0"
                           max="100"
                           value={props.backgroundOpacity || 70}
-                          onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'backgroundOpacity',
+                              parseInt(e.target.value)
+                            )
+                          }
                           className="w-full mt-2"
                         />
                       </div>
@@ -747,12 +822,16 @@ export const PropertiesPanel = () => {
                             id="bgColor"
                             type="color"
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             placeholder="#000000"
                             className="flex-1"
                           />
@@ -805,13 +884,17 @@ export const PropertiesPanel = () => {
                   question: 'Your question here?',
                   answer: 'The answer to your question.',
                 }}
-                onChange={(questions) => handlePropChange('questions', questions)}
+                onChange={(questions) =>
+                  handlePropChange('questions', questions)
+                }
               />
 
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image
+                  </h4>
                   <Label>Background Image (optional)</Label>
                   <ImageUpload
                     value={props.backgroundImage || ''}
@@ -822,14 +905,21 @@ export const PropertiesPanel = () => {
                   {props.backgroundImage && (
                     <>
                       <div className="mt-4">
-                        <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                        <Label htmlFor="backgroundOpacity">
+                          Overlay Opacity ({props.backgroundOpacity || 70}%)
+                        </Label>
                         <input
                           id="backgroundOpacity"
                           type="range"
                           min="0"
                           max="100"
                           value={props.backgroundOpacity || 70}
-                          onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'backgroundOpacity',
+                              parseInt(e.target.value)
+                            )
+                          }
                           className="w-full mt-2"
                         />
                       </div>
@@ -840,12 +930,16 @@ export const PropertiesPanel = () => {
                             id="bgColor"
                             type="color"
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             placeholder="#000000"
                             className="flex-1"
                           />
@@ -914,7 +1008,9 @@ export const PropertiesPanel = () => {
 
               {/* Button Customization Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Button Customization</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Button Customization
+                </h4>
 
                 <div className="space-y-4">
                   <div>
@@ -944,7 +1040,9 @@ export const PropertiesPanel = () => {
                       <select
                         id="buttonUrl"
                         value={props.buttonUrl || '#'}
-                        onChange={(e) => handlePropChange('buttonUrl', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonUrl', e.target.value)
+                        }
                         className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                       >
                         <option value="#">Top of Page</option>
@@ -955,14 +1053,25 @@ export const PropertiesPanel = () => {
                         <option value="#pricing">Pricing</option>
                         <option value="#contact">Contact / Lead Form</option>
                         {allElements
-                          .filter((el) => el.type !== 'announcement_bar' && el.type !== 'navigation')
+                          .filter(
+                            (el) =>
+                              el.type !== 'announcement_bar' &&
+                              el.type !== 'navigation'
+                          )
                           .map((el) => (
-                            <option key={el.id} value={`#${el.type}-${el.order}`}>
-                              {el.type.charAt(0).toUpperCase() + el.type.slice(1).replace('_', ' ')} (Position {el.order + 1})
+                            <option
+                              key={el.id}
+                              value={`#${el.type}-${el.order}`}
+                            >
+                              {el.type.charAt(0).toUpperCase() +
+                                el.type.slice(1).replace('_', ' ')}{' '}
+                              (Position {el.order + 1})
                             </option>
                           ))}
                       </select>
-                      <p className="text-xs text-gray-500 mt-1">Select a section to scroll to when clicked</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Select a section to scroll to when clicked
+                      </p>
                     </div>
                   ) : (
                     <div>
@@ -970,11 +1079,15 @@ export const PropertiesPanel = () => {
                       <Input
                         id="buttonUrl"
                         value={props.buttonUrl || 'https://'}
-                        onChange={(e) => handlePropChange('buttonUrl', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonUrl', e.target.value)
+                        }
                         placeholder="https://example.com"
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Enter the full URL including https://</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Enter the full URL including https://
+                      </p>
                     </div>
                   )}
 
@@ -985,12 +1098,16 @@ export const PropertiesPanel = () => {
                         id="buttonColor"
                         type="color"
                         value={props.buttonColor || '#ffffff'}
-                        onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonColor', e.target.value)
+                        }
                         className="w-20 h-10 p-1"
                       />
                       <Input
                         value={props.buttonColor || '#ffffff'}
-                        onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonColor', e.target.value)
+                        }
                         placeholder="#ffffff"
                         className="flex-1"
                       />
@@ -1004,12 +1121,16 @@ export const PropertiesPanel = () => {
                         id="buttonTextColor"
                         type="color"
                         value={props.buttonTextColor || '#111827'}
-                        onChange={(e) => handlePropChange('buttonTextColor', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonTextColor', e.target.value)
+                        }
                         className="w-20 h-10 p-1"
                       />
                       <Input
                         value={props.buttonTextColor || '#111827'}
-                        onChange={(e) => handlePropChange('buttonTextColor', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('buttonTextColor', e.target.value)
+                        }
                         placeholder="#111827"
                         className="flex-1"
                       />
@@ -1021,7 +1142,9 @@ export const PropertiesPanel = () => {
                     <select
                       id="buttonSize"
                       value={props.buttonSize || 'lg'}
-                      onChange={(e) => handlePropChange('buttonSize', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonSize', e.target.value)
+                      }
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                     >
                       <option value="sm">Small</option>
@@ -1035,7 +1158,9 @@ export const PropertiesPanel = () => {
                     <select
                       id="buttonFontSize"
                       value={props.buttonFontSize || '1.125rem'}
-                      onChange={(e) => handlePropChange('buttonFontSize', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('buttonFontSize', e.target.value)
+                      }
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                     >
                       <option value="0.875rem">Small (14px)</option>
@@ -1050,7 +1175,9 @@ export const PropertiesPanel = () => {
 
               {/* Background Color/Gradient Section */}
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Style</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Background Style
+                </h4>
 
                 <div className="space-y-4">
                   <div>
@@ -1062,9 +1189,16 @@ export const PropertiesPanel = () => {
                         handlePropChange('bgType', e.target.value);
                         // Set default values based on type
                         if (e.target.value === 'solid') {
-                          handlePropChange('bgColor', props.bgColor || '#667eea');
+                          handlePropChange(
+                            'bgColor',
+                            props.bgColor || '#667eea'
+                          );
                         } else {
-                          handlePropChange('bgGradient', props.bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                          handlePropChange(
+                            'bgGradient',
+                            props.bgGradient ||
+                              'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          );
                         }
                       }}
                       className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
@@ -1082,12 +1216,16 @@ export const PropertiesPanel = () => {
                           id="bgColor"
                           type="color"
                           value={props.bgColor || '#667eea'}
-                          onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange('bgColor', e.target.value)
+                          }
                           className="w-20 h-10 p-1"
                         />
                         <Input
                           value={props.bgColor || '#667eea'}
-                          onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange('bgColor', e.target.value)
+                          }
                           placeholder="#667eea"
                           className="flex-1"
                         />
@@ -1099,18 +1237,22 @@ export const PropertiesPanel = () => {
                         <Label>Gradient Colors</Label>
                         <div className="grid grid-cols-2 gap-2 mt-1">
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">Start Color</p>
+                            <p className="text-xs text-gray-500 mb-1">
+                              Start Color
+                            </p>
                             <div className="flex gap-1">
                               <Input
                                 type="color"
                                 value={props.gradientStart || '#667eea'}
                                 onChange={(e) => {
                                   const newStart = e.target.value;
-                                  const endColor = props.gradientEnd || '#764ba2';
-                                  const direction = props.gradientDirection || '135deg';
+                                  const endColor =
+                                    props.gradientEnd || '#764ba2';
+                                  const direction =
+                                    props.gradientDirection || '135deg';
                                   handleMultiPropChange({
                                     gradientStart: newStart,
-                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`
+                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`,
                                   });
                                 }}
                                 className="w-10 h-8 p-1"
@@ -1119,11 +1261,13 @@ export const PropertiesPanel = () => {
                                 value={props.gradientStart || '#667eea'}
                                 onChange={(e) => {
                                   const newStart = e.target.value;
-                                  const endColor = props.gradientEnd || '#764ba2';
-                                  const direction = props.gradientDirection || '135deg';
+                                  const endColor =
+                                    props.gradientEnd || '#764ba2';
+                                  const direction =
+                                    props.gradientDirection || '135deg';
                                   handleMultiPropChange({
                                     gradientStart: newStart,
-                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`
+                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`,
                                   });
                                 }}
                                 className="flex-1 text-xs"
@@ -1132,18 +1276,22 @@ export const PropertiesPanel = () => {
                             </div>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">End Color</p>
+                            <p className="text-xs text-gray-500 mb-1">
+                              End Color
+                            </p>
                             <div className="flex gap-1">
                               <Input
                                 type="color"
                                 value={props.gradientEnd || '#764ba2'}
                                 onChange={(e) => {
-                                  const startColor = props.gradientStart || '#667eea';
+                                  const startColor =
+                                    props.gradientStart || '#667eea';
                                   const newEnd = e.target.value;
-                                  const direction = props.gradientDirection || '135deg';
+                                  const direction =
+                                    props.gradientDirection || '135deg';
                                   handleMultiPropChange({
                                     gradientEnd: newEnd,
-                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`
+                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`,
                                   });
                                 }}
                                 className="w-10 h-8 p-1"
@@ -1151,12 +1299,14 @@ export const PropertiesPanel = () => {
                               <Input
                                 value={props.gradientEnd || '#764ba2'}
                                 onChange={(e) => {
-                                  const startColor = props.gradientStart || '#667eea';
+                                  const startColor =
+                                    props.gradientStart || '#667eea';
                                   const newEnd = e.target.value;
-                                  const direction = props.gradientDirection || '135deg';
+                                  const direction =
+                                    props.gradientDirection || '135deg';
                                   handleMultiPropChange({
                                     gradientEnd: newEnd,
-                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`
+                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`,
                                   });
                                 }}
                                 className="flex-1 text-xs"
@@ -1168,7 +1318,9 @@ export const PropertiesPanel = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="gradientDirection">Gradient Direction</Label>
+                        <Label htmlFor="gradientDirection">
+                          Gradient Direction
+                        </Label>
                         <select
                           id="gradientDirection"
                           value={props.gradientDirection || '135deg'}
@@ -1178,7 +1330,7 @@ export const PropertiesPanel = () => {
                             const endColor = props.gradientEnd || '#764ba2';
                             handleMultiPropChange({
                               gradientDirection: newDirection,
-                              bgGradient: `linear-gradient(${newDirection}, ${startColor} 0%, ${endColor} 100%)`
+                              bgGradient: `linear-gradient(${newDirection}, ${startColor} 0%, ${endColor} 100%)`,
                             });
                           }}
                           className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
@@ -1187,10 +1339,18 @@ export const PropertiesPanel = () => {
                           <option value="to left">Right to Left</option>
                           <option value="to bottom">Top to Bottom</option>
                           <option value="to top">Bottom to Top</option>
-                          <option value="135deg">Diagonal (Top-Left to Bottom-Right)</option>
-                          <option value="45deg">Diagonal (Bottom-Left to Top-Right)</option>
-                          <option value="225deg">Diagonal (Bottom-Right to Top-Left)</option>
-                          <option value="315deg">Diagonal (Top-Right to Bottom-Left)</option>
+                          <option value="135deg">
+                            Diagonal (Top-Left to Bottom-Right)
+                          </option>
+                          <option value="45deg">
+                            Diagonal (Bottom-Left to Top-Right)
+                          </option>
+                          <option value="225deg">
+                            Diagonal (Bottom-Right to Top-Left)
+                          </option>
+                          <option value="315deg">
+                            Diagonal (Top-Right to Bottom-Left)
+                          </option>
                         </select>
                       </div>
 
@@ -1199,11 +1359,19 @@ export const PropertiesPanel = () => {
                         <Label>Preset Gradients</Label>
                         <div className="grid grid-cols-4 gap-2 mt-2">
                           {[
-                            { start: '#667eea', end: '#764ba2', name: 'Purple' },
+                            {
+                              start: '#667eea',
+                              end: '#764ba2',
+                              name: 'Purple',
+                            },
                             { start: '#f093fb', end: '#f5576c', name: 'Pink' },
                             { start: '#4facfe', end: '#00f2fe', name: 'Blue' },
                             { start: '#43e97b', end: '#38f9d7', name: 'Green' },
-                            { start: '#fa709a', end: '#fee140', name: 'Sunset' },
+                            {
+                              start: '#fa709a',
+                              end: '#fee140',
+                              name: 'Sunset',
+                            },
                             { start: '#30cfd0', end: '#330867', name: 'Ocean' },
                             { start: '#ff9a9e', end: '#fecfef', name: 'Peach' },
                             { start: '#a8edea', end: '#fed6e3', name: 'Soft' },
@@ -1212,14 +1380,17 @@ export const PropertiesPanel = () => {
                               key={idx}
                               type="button"
                               className="h-8 rounded border-2 border-transparent hover:border-gray-400 transition-colors"
-                              style={{ background: `linear-gradient(135deg, ${preset.start} 0%, ${preset.end} 100%)` }}
+                              style={{
+                                background: `linear-gradient(135deg, ${preset.start} 0%, ${preset.end} 100%)`,
+                              }}
                               title={preset.name}
                               onClick={() => {
-                                const direction = props.gradientDirection || '135deg';
+                                const direction =
+                                  props.gradientDirection || '135deg';
                                 handleMultiPropChange({
                                   gradientStart: preset.start,
                                   gradientEnd: preset.end,
-                                  bgGradient: `linear-gradient(${direction}, ${preset.start} 0%, ${preset.end} 100%)`
+                                  bgGradient: `linear-gradient(${direction}, ${preset.start} 0%, ${preset.end} 100%)`,
                                 });
                               }}
                             />
@@ -1234,8 +1405,12 @@ export const PropertiesPanel = () => {
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image (Optional)</h4>
-                  <p className="text-xs text-gray-500 mb-2">Adding an image will overlay your background color/gradient</p>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image (Optional)
+                  </h4>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Adding an image will overlay your background color/gradient
+                  </p>
                   <ImageUpload
                     value={props.backgroundImage || ''}
                     onChange={(url) => handlePropChange('backgroundImage', url)}
@@ -1244,14 +1419,21 @@ export const PropertiesPanel = () => {
                   />
                   {props.backgroundImage && (
                     <div className="mt-4">
-                      <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                      <Label htmlFor="backgroundOpacity">
+                        Overlay Opacity ({props.backgroundOpacity || 70}%)
+                      </Label>
                       <input
                         id="backgroundOpacity"
                         type="range"
                         min="0"
                         max="100"
                         value={props.backgroundOpacity || 70}
-                        onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                        onChange={(e) =>
+                          handlePropChange(
+                            'backgroundOpacity',
+                            parseInt(e.target.value)
+                          )
+                        }
                         className="w-full mt-2"
                       />
                       <p className="text-xs text-gray-500 mt-1">
@@ -1287,7 +1469,9 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="showCountdown"
                   checked={props.showCountdown || false}
-                  onChange={(e) => handlePropChange('showCountdown', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('showCountdown', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
                 <Label htmlFor="showCountdown" className="cursor-pointer">
@@ -1302,7 +1486,9 @@ export const PropertiesPanel = () => {
                     <Input
                       id="countdownLabel"
                       value={props.countdownLabel || ''}
-                      onChange={(e) => handlePropChange('countdownLabel', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('countdownLabel', e.target.value)
+                      }
                       placeholder="Ends in:"
                     />
                   </div>
@@ -1311,12 +1497,25 @@ export const PropertiesPanel = () => {
                     <Input
                       id="countdownEndDate"
                       type="date"
-                      value={props.countdownEndDate ? new Date(props.countdownEndDate).toISOString().slice(0, 10) : ''}
+                      value={
+                        props.countdownEndDate
+                          ? new Date(props.countdownEndDate)
+                              .toISOString()
+                              .slice(0, 10)
+                          : ''
+                      }
                       onChange={(e) => {
-                        const currentDate = props.countdownEndDate ? new Date(props.countdownEndDate) : new Date();
-                        const [year, month, day] = e.target.value.split('-').map(Number);
+                        const currentDate = props.countdownEndDate
+                          ? new Date(props.countdownEndDate)
+                          : new Date();
+                        const [year, month, day] = e.target.value
+                          .split('-')
+                          .map(Number);
                         currentDate.setFullYear(year, month - 1, day);
-                        handlePropChange('countdownEndDate', currentDate.toISOString());
+                        handlePropChange(
+                          'countdownEndDate',
+                          currentDate.toISOString()
+                        );
                       }}
                     />
                   </div>
@@ -1325,12 +1524,25 @@ export const PropertiesPanel = () => {
                     <Input
                       id="countdownEndTime"
                       type="time"
-                      value={props.countdownEndDate ? new Date(props.countdownEndDate).toTimeString().slice(0, 5) : ''}
+                      value={
+                        props.countdownEndDate
+                          ? new Date(props.countdownEndDate)
+                              .toTimeString()
+                              .slice(0, 5)
+                          : ''
+                      }
                       onChange={(e) => {
-                        const currentDate = props.countdownEndDate ? new Date(props.countdownEndDate) : new Date();
-                        const [hours, minutes] = e.target.value.split(':').map(Number);
+                        const currentDate = props.countdownEndDate
+                          ? new Date(props.countdownEndDate)
+                          : new Date();
+                        const [hours, minutes] = e.target.value
+                          .split(':')
+                          .map(Number);
                         currentDate.setHours(hours, minutes, 0, 0);
-                        handlePropChange('countdownEndDate', currentDate.toISOString());
+                        handlePropChange(
+                          'countdownEndDate',
+                          currentDate.toISOString()
+                        );
                       }}
                     />
                   </div>
@@ -1344,12 +1556,16 @@ export const PropertiesPanel = () => {
                     id="bgColor"
                     type="color"
                     value={props.bgColor || '#ef4444'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.bgColor || '#ef4444'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ef4444"
                     className="flex-1"
                   />
@@ -1363,12 +1579,16 @@ export const PropertiesPanel = () => {
                     id="textColor"
                     type="color"
                     value={props.textColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.textColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -1380,7 +1600,9 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="isSticky"
                   checked={props.isSticky || false}
-                  onChange={(e) => handlePropChange('isSticky', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('isSticky', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
                 <Label htmlFor="isSticky" className="cursor-pointer">
@@ -1393,7 +1615,9 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="showCloseButton"
                   checked={props.showCloseButton || false}
-                  onChange={(e) => handlePropChange('showCloseButton', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('showCloseButton', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
                 <Label htmlFor="showCloseButton" className="cursor-pointer">
@@ -1407,10 +1631,12 @@ export const PropertiesPanel = () => {
       case 'navigation':
         // Generate section options from all elements
         const sectionOptions = allElements
-          .filter(el => el.type !== 'navigation' && el.type !== 'announcement_bar')
+          .filter(
+            (el) => el.type !== 'navigation' && el.type !== 'announcement_bar'
+          )
           .map((el, index) => ({
             value: `#${el.type}-${el.order}`,
-            label: `${el.type.charAt(0).toUpperCase() + el.type.slice(1).replace('_', ' ')} (Position ${el.order + 1})`
+            label: `${el.type.charAt(0).toUpperCase() + el.type.slice(1).replace('_', ' ')} (Position ${el.order + 1})`,
           }));
 
         return (
@@ -1449,8 +1675,14 @@ export const PropertiesPanel = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      const newMenuItem = { label: 'New Item', url: sectionOptions[0]?.value || '#' };
-                      handlePropChange('menuItems', [...(props.menuItems || []), newMenuItem]);
+                      const newMenuItem = {
+                        label: 'New Item',
+                        url: sectionOptions[0]?.value || '#',
+                      };
+                      handlePropChange('menuItems', [
+                        ...(props.menuItems || []),
+                        newMenuItem,
+                      ]);
                     }}
                     className="h-7 text-xs"
                     disabled={(props.menuItems?.length || 0) >= 3}
@@ -1460,22 +1692,31 @@ export const PropertiesPanel = () => {
                   </Button>
                 </div>
                 {(props.menuItems?.length || 0) >= 3 && (
-                  <p className="text-xs text-amber-600 mb-2">Maximum 3 menu items allowed</p>
+                  <p className="text-xs text-amber-600 mb-2">
+                    Maximum 3 menu items allowed
+                  </p>
                 )}
 
                 <div className="space-y-2">
-                  {(!props.menuItems || props.menuItems.length === 0) ? (
+                  {!props.menuItems || props.menuItems.length === 0 ? (
                     <p className="text-xs text-gray-500 text-center py-4">
                       No menu items. Click "Add" to create one.
                     </p>
                   ) : (
                     props.menuItems.map((item: any, index: number) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-3">
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-3"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">Item {index + 1}</span>
+                          <span className="text-sm font-medium text-gray-700">
+                            Item {index + 1}
+                          </span>
                           <button
                             onClick={() => {
-                              const newMenuItems = props.menuItems.filter((_: any, i: number) => i !== index);
+                              const newMenuItems = props.menuItems.filter(
+                                (_: any, i: number) => i !== index
+                              );
                               handlePropChange('menuItems', newMenuItems);
                             }}
                             className="text-red-500 hover:text-red-700 p-1"
@@ -1491,7 +1732,10 @@ export const PropertiesPanel = () => {
                               value={item.label || ''}
                               onChange={(e) => {
                                 const newMenuItems = [...props.menuItems];
-                                newMenuItems[index] = { ...item, label: e.target.value };
+                                newMenuItems[index] = {
+                                  ...item,
+                                  label: e.target.value,
+                                };
                                 handlePropChange('menuItems', newMenuItems);
                               }}
                               placeholder="Menu Label"
@@ -1505,7 +1749,10 @@ export const PropertiesPanel = () => {
                               value={item.url || '#'}
                               onChange={(e) => {
                                 const newMenuItems = [...props.menuItems];
-                                newMenuItems[index] = { ...item, url: e.target.value };
+                                newMenuItems[index] = {
+                                  ...item,
+                                  url: e.target.value,
+                                };
                                 handlePropChange('menuItems', newMenuItems);
                               }}
                               className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
@@ -1533,14 +1780,20 @@ export const PropertiesPanel = () => {
                     checked={props.ctaButton?.text ? true : false}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        handlePropChange('ctaButton', { text: 'Get Started', url: '#' });
+                        handlePropChange('ctaButton', {
+                          text: 'Get Started',
+                          url: '#',
+                        });
                       } else {
                         handlePropChange('ctaButton', null);
                       }
                     }}
                     className="w-4 h-4"
                   />
-                  <Label htmlFor="showCTA" className="cursor-pointer font-semibold">
+                  <Label
+                    htmlFor="showCTA"
+                    className="cursor-pointer font-semibold"
+                  >
                     Show CTA Button
                   </Label>
                 </div>
@@ -1552,7 +1805,12 @@ export const PropertiesPanel = () => {
                       <Input
                         id="ctaText"
                         value={props.ctaButton.text || ''}
-                        onChange={(e) => handlePropChange('ctaButton', { ...props.ctaButton, text: e.target.value })}
+                        onChange={(e) =>
+                          handlePropChange('ctaButton', {
+                            ...props.ctaButton,
+                            text: e.target.value,
+                          })
+                        }
                         placeholder="Get Started"
                       />
                     </div>
@@ -1561,7 +1819,12 @@ export const PropertiesPanel = () => {
                       <select
                         id="ctaUrl"
                         value={props.ctaButton.url || '#'}
-                        onChange={(e) => handlePropChange('ctaButton', { ...props.ctaButton, url: e.target.value })}
+                        onChange={(e) =>
+                          handlePropChange('ctaButton', {
+                            ...props.ctaButton,
+                            url: e.target.value,
+                          })
+                        }
                         className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                       >
                         <option value="#">Top of Page</option>
@@ -1583,12 +1846,16 @@ export const PropertiesPanel = () => {
                     id="bgColor"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -1602,12 +1869,16 @@ export const PropertiesPanel = () => {
                     id="textColor"
                     type="color"
                     value={props.textColor || '#111827'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.textColor || '#111827'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     placeholder="#111827"
                     className="flex-1"
                   />
@@ -1619,7 +1890,9 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="isSticky"
                   checked={props.isSticky || false}
-                  onChange={(e) => handlePropChange('isSticky', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('isSticky', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
                 <Label htmlFor="isSticky" className="cursor-pointer">
@@ -1675,24 +1948,36 @@ export const PropertiesPanel = () => {
                     type="checkbox"
                     id="enablePaymentIntegration"
                     checked={props.enablePaymentIntegration || false}
-                    onChange={(e) => handlePropChange('enablePaymentIntegration', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange(
+                        'enablePaymentIntegration',
+                        e.target.checked
+                      )
+                    }
                     className="w-4 h-4"
                   />
-                  <Label htmlFor="enablePaymentIntegration" className="cursor-pointer font-semibold">
+                  <Label
+                    htmlFor="enablePaymentIntegration"
+                    className="cursor-pointer font-semibold"
+                  >
                     Enable LeanX Payment Gateway
                   </Label>
                 </div>
                 <p className="text-xs text-gray-600 mt-2">
-                  When enabled, plan buttons will process payments via LeanX instead of redirecting to URLs
+                  When enabled, plan buttons will process payments via LeanX
+                  instead of redirecting to URLs
                 </p>
               </div>
 
               {/* Product Selector for Pricing Plans */}
               {currentProject && (
                 <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Add from Inventory
+                  </h4>
                   <p className="text-xs text-gray-600 mb-3">
-                    Select products from your inventory to create pricing plans or{' '}
+                    Select products from your inventory to create pricing plans
+                    or{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
@@ -1703,20 +1988,28 @@ export const PropertiesPanel = () => {
                   </p>
                   <ProductSelector
                     onSelect={(product) => {
-                      const newPlans = [...(props.plans || []), {
-                        name: product.name,
-                        price: product.base_price.toString(),
-                        currency: product.currency,
-                        description: product.description || '',
-                        features: product.description ? product.description.split('\n').filter((f: string) => f.trim()) : [],
-                        buttonText: 'Buy Now',
-                        buttonUrl: '#',
-                        highlighted: false,
-                        enablePayment: props.enablePaymentIntegration || false,
-                        productId: product.id,
-                        priceNumeric: product.base_price,
-                        stock: product.stock,
-                      }];
+                      const newPlans = [
+                        ...(props.plans || []),
+                        {
+                          name: product.name,
+                          price: product.base_price.toString(),
+                          currency: product.currency,
+                          description: product.description || '',
+                          features: product.description
+                            ? product.description
+                                .split('\n')
+                                .filter((f: string) => f.trim())
+                            : [],
+                          buttonText: 'Buy Now',
+                          buttonUrl: '#',
+                          highlighted: false,
+                          enablePayment:
+                            props.enablePaymentIntegration || false,
+                          productId: product.id,
+                          priceNumeric: product.base_price,
+                          stock: product.stock,
+                        },
+                      ];
                       handlePropChange('plans', newPlans);
                     }}
                   />
@@ -1726,16 +2019,25 @@ export const PropertiesPanel = () => {
               {/* Plans List (Read-only with remove option) */}
               {(props.plans || []).length > 0 && (
                 <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products/Plans</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Added Products/Plans
+                  </h4>
                   <div className="space-y-3">
                     {(props.plans || []).map((plan: any, planIndex: number) => (
-                      <div key={planIndex} className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                      <div
+                        key={planIndex}
+                        className="border border-gray-200 rounded-md p-3 bg-gray-50"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="text-sm font-semibold text-gray-900">{plan.name}</h5>
+                          <h5 className="text-sm font-semibold text-gray-900">
+                            {plan.name}
+                          </h5>
                           <button
                             type="button"
                             onClick={() => {
-                              const newPlans = (props.plans || []).filter((_: any, i: number) => i !== planIndex);
+                              const newPlans = (props.plans || []).filter(
+                                (_: any, i: number) => i !== planIndex
+                              );
                               handlePropChange('plans', newPlans);
                             }}
                             className="text-xs text-red-600 hover:text-red-800"
@@ -1744,15 +2046,24 @@ export const PropertiesPanel = () => {
                           </button>
                         </div>
                         <div className="space-y-1 text-xs text-gray-600">
-                          <p><strong>Price:</strong> {plan.currency || 'RM'} {plan.price || plan.priceNumeric}</p>
-                          {plan.description && <p><strong>Description:</strong> {plan.description}</p>}
+                          <p>
+                            <strong>Price:</strong> {plan.currency || 'RM'}{' '}
+                            {plan.price || plan.priceNumeric}
+                          </p>
+                          {plan.description && (
+                            <p>
+                              <strong>Description:</strong> {plan.description}
+                            </p>
+                          )}
                           {plan.features && plan.features.length > 0 && (
                             <div>
                               <strong>Features:</strong>
                               <ul className="list-disc list-inside ml-2 mt-1">
-                                {plan.features.map((feature: string, idx: number) => (
-                                  <li key={idx}>{feature}</li>
-                                ))}
+                                {plan.features.map(
+                                  (feature: string, idx: number) => (
+                                    <li key={idx}>{feature}</li>
+                                  )
+                                )}
                               </ul>
                             </div>
                           )}
@@ -1762,7 +2073,11 @@ export const PropertiesPanel = () => {
                   </div>
                   <p className="text-xs text-gray-500 mt-3">
                     To edit product details, go to the{' '}
-                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
                       Products page
                     </a>
                   </p>
@@ -1772,7 +2087,9 @@ export const PropertiesPanel = () => {
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image
+                  </h4>
                   <Label>Background Image (optional)</Label>
                   <ImageUpload
                     value={props.backgroundImage || ''}
@@ -1783,14 +2100,21 @@ export const PropertiesPanel = () => {
                   {props.backgroundImage && (
                     <>
                       <div className="mt-4">
-                        <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                        <Label htmlFor="backgroundOpacity">
+                          Overlay Opacity ({props.backgroundOpacity || 70}%)
+                        </Label>
                         <input
                           id="backgroundOpacity"
                           type="range"
                           min="0"
                           max="100"
                           value={props.backgroundOpacity || 70}
-                          onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'backgroundOpacity',
+                              parseInt(e.target.value)
+                            )
+                          }
                           className="w-full mt-2"
                         />
                       </div>
@@ -1801,12 +2125,16 @@ export const PropertiesPanel = () => {
                             id="bgColor"
                             type="color"
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             placeholder="#000000"
                             className="flex-1"
                           />
@@ -1820,7 +2148,9 @@ export const PropertiesPanel = () => {
               {/* Bump Offer Section - Only available with payment integration and 2+ plans */}
               {props.enablePaymentIntegration && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="font-semibold text-sm text-gray-700 mb-2">Bump Offer (Upsell)</div>
+                  <div className="font-semibold text-sm text-gray-700 mb-2">
+                    Bump Offer (Upsell)
+                  </div>
 
                   {(props.plans || []).length < 2 ? (
                     <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
@@ -1839,7 +2169,10 @@ export const PropertiesPanel = () => {
                           id="enableBumpOffer-pricing"
                           checked={props.enableBumpOffer || false}
                           onChange={(e) => {
-                            handlePropChange('enableBumpOffer', e.target.checked);
+                            handlePropChange(
+                              'enableBumpOffer',
+                              e.target.checked
+                            );
                             if (!e.target.checked) {
                               handlePropChange('bumpOfferPlanIndex', null);
                               handlePropChange('bumpOfferDiscount', 0);
@@ -1848,7 +2181,10 @@ export const PropertiesPanel = () => {
                           }}
                           className="w-4 h-4"
                         />
-                        <Label htmlFor="enableBumpOffer-pricing" className="cursor-pointer">
+                        <Label
+                          htmlFor="enableBumpOffer-pricing"
+                          className="cursor-pointer"
+                        >
                           Enable Bump Offer
                         </Label>
                       </div>
@@ -1856,52 +2192,92 @@ export const PropertiesPanel = () => {
                       {props.enableBumpOffer && (
                         <div className="space-y-3 border border-yellow-200 rounded-md p-3 bg-yellow-50 mt-3">
                           <div>
-                            <Label htmlFor="bumpOfferPlanIndex">Select Bump Offer Plan</Label>
+                            <Label htmlFor="bumpOfferPlanIndex">
+                              Select Bump Offer Plan
+                            </Label>
                             <select
                               id="bumpOfferPlanIndex"
                               value={props.bumpOfferPlanIndex ?? ''}
-                              onChange={(e) => handlePropChange('bumpOfferPlanIndex', e.target.value === '' ? null : parseInt(e.target.value))}
+                              onChange={(e) =>
+                                handlePropChange(
+                                  'bumpOfferPlanIndex',
+                                  e.target.value === ''
+                                    ? null
+                                    : parseInt(e.target.value)
+                                )
+                              }
                               className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                             >
                               <option value="">-- Select a plan --</option>
-                              {(props.plans || []).map((plan: any, idx: number) => (
-                                <option key={idx} value={idx}>
-                                  {plan.name} - {plan.currency || 'RM'} {plan.price || plan.priceNumeric}
-                                </option>
-                              ))}
+                              {(props.plans || []).map(
+                                (plan: any, idx: number) => (
+                                  <option key={idx} value={idx}>
+                                    {plan.name} - {plan.currency || 'RM'}{' '}
+                                    {plan.price || plan.priceNumeric}
+                                  </option>
+                                )
+                              )}
                             </select>
                             <p className="text-xs text-gray-500 mt-1">
-                              This plan will be offered as an upsell before checkout
+                              This plan will be offered as an upsell before
+                              checkout
                             </p>
                           </div>
 
                           <div>
-                            <Label htmlFor="bumpOfferDiscount-pricing">Discount % (optional)</Label>
+                            <Label htmlFor="bumpOfferDiscount-pricing">
+                              Discount % (optional)
+                            </Label>
                             <Input
                               id="bumpOfferDiscount-pricing"
                               type="number"
                               min="0"
                               max="100"
                               value={props.bumpOfferDiscount || 0}
-                              onChange={(e) => handlePropChange('bumpOfferDiscount', parseInt(e.target.value) || 0)}
+                              onChange={(e) =>
+                                handlePropChange(
+                                  'bumpOfferDiscount',
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
                               placeholder="0"
                             />
-                            {props.bumpOfferPlanIndex !== null && props.bumpOfferPlanIndex !== undefined && props.bumpOfferDiscount > 0 && (
-                              <p className="text-xs text-green-600 mt-1">
-                                Discounted price: {(props.plans || [])[props.bumpOfferPlanIndex]?.currency || 'RM'} {(
-                                  (parseFloat((props.plans || [])[props.bumpOfferPlanIndex]?.price) || (props.plans || [])[props.bumpOfferPlanIndex]?.priceNumeric || 0) *
-                                  (1 - (props.bumpOfferDiscount || 0) / 100)
-                                ).toFixed(2)}
-                              </p>
-                            )}
+                            {props.bumpOfferPlanIndex !== null &&
+                              props.bumpOfferPlanIndex !== undefined &&
+                              props.bumpOfferDiscount > 0 && (
+                                <p className="text-xs text-green-600 mt-1">
+                                  Discounted price:{' '}
+                                  {(props.plans || [])[props.bumpOfferPlanIndex]
+                                    ?.currency || 'RM'}{' '}
+                                  {(
+                                    (parseFloat(
+                                      (props.plans || [])[
+                                        props.bumpOfferPlanIndex
+                                      ]?.price
+                                    ) ||
+                                      (props.plans || [])[
+                                        props.bumpOfferPlanIndex
+                                      ]?.priceNumeric ||
+                                      0) *
+                                    (1 - (props.bumpOfferDiscount || 0) / 100)
+                                  ).toFixed(2)}
+                                </p>
+                              )}
                           </div>
 
                           <div>
-                            <Label htmlFor="bumpOfferDescription-pricing">Offer Description</Label>
+                            <Label htmlFor="bumpOfferDescription-pricing">
+                              Offer Description
+                            </Label>
                             <textarea
                               id="bumpOfferDescription-pricing"
                               value={props.bumpOfferDescription || ''}
-                              onChange={(e) => handlePropChange('bumpOfferDescription', e.target.value)}
+                              onChange={(e) =>
+                                handlePropChange(
+                                  'bumpOfferDescription',
+                                  e.target.value
+                                )
+                              }
                               placeholder="Get this exclusive offer at a special price!"
                               className="w-full p-2 border border-gray-300 rounded-md text-sm"
                               rows={2}
@@ -1909,8 +2285,11 @@ export const PropertiesPanel = () => {
                           </div>
 
                           <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
-                            <strong>How it works:</strong> When customer clicks a plan button, the bump offer modal appears.
-                            If accepted, the bump offer plan is added to their order. If skipped, they proceed to checkout normally.
+                            <strong>How it works:</strong> When customer clicks
+                            a plan button, the bump offer modal appears. If
+                            accepted, the bump offer plan is added to their
+                            order. If skipped, they proceed to checkout
+                            normally.
                           </div>
                         </div>
                       )}
@@ -1942,7 +2321,9 @@ export const PropertiesPanel = () => {
                 <textarea
                   id="description"
                   value={props.description || ''}
-                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('description', e.target.value)
+                  }
                   placeholder="Building amazing products that make a difference."
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                   rows={2}
@@ -1954,7 +2335,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="copyright"
                   value={props.copyright || ''}
-                  onChange={(e) => handlePropChange('copyright', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('copyright', e.target.value)
+                  }
                   placeholder="© 2024 Your Company. All rights reserved."
                 />
               </div>
@@ -1962,9 +2345,7 @@ export const PropertiesPanel = () => {
               <ArrayEditor
                 title="Link Columns"
                 items={props.columns || []}
-                schema={[
-                  { key: 'title', label: 'Column Title', type: 'text' },
-                ]}
+                schema={[{ key: 'title', label: 'Column Title', type: 'text' }]}
                 defaultItem={{
                   title: 'New Column',
                   links: [
@@ -1986,7 +2367,9 @@ export const PropertiesPanel = () => {
                   platform: 'facebook',
                   url: '#',
                 }}
-                onChange={(socialLinks) => handlePropChange('socialLinks', socialLinks)}
+                onChange={(socialLinks) =>
+                  handlePropChange('socialLinks', socialLinks)
+                }
               />
 
               <div>
@@ -1996,12 +2379,16 @@ export const PropertiesPanel = () => {
                     id="bgColor"
                     type="color"
                     value={props.bgColor || '#1f2937'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.bgColor || '#1f2937'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#1f2937"
                     className="flex-1"
                   />
@@ -2015,12 +2402,16 @@ export const PropertiesPanel = () => {
                     id="textColor"
                     type="color"
                     value={props.textColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.textColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -2030,7 +2421,9 @@ export const PropertiesPanel = () => {
               {/* Background Image Section */}
               {currentProject && (
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Background Image</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Background Image
+                  </h4>
                   <Label>Background Image (optional)</Label>
                   <ImageUpload
                     value={props.backgroundImage || ''}
@@ -2041,14 +2434,21 @@ export const PropertiesPanel = () => {
                   {props.backgroundImage && (
                     <>
                       <div className="mt-4">
-                        <Label htmlFor="backgroundOpacity">Overlay Opacity ({props.backgroundOpacity || 70}%)</Label>
+                        <Label htmlFor="backgroundOpacity">
+                          Overlay Opacity ({props.backgroundOpacity || 70}%)
+                        </Label>
                         <input
                           id="backgroundOpacity"
                           type="range"
                           min="0"
                           max="100"
                           value={props.backgroundOpacity || 70}
-                          onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'backgroundOpacity',
+                              parseInt(e.target.value)
+                            )
+                          }
                           className="w-full mt-2"
                         />
                       </div>
@@ -2059,12 +2459,16 @@ export const PropertiesPanel = () => {
                             id="bgColor"
                             type="color"
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             value={props.bgColor || '#000000'}
-                            onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('bgColor', e.target.value)
+                            }
                             placeholder="#000000"
                             className="flex-1"
                           />
@@ -2083,12 +2487,16 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">Products</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Products
+              </div>
 
               {/* Product Selector from Database */}
               {currentProject && (
                 <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Add from Inventory
+                  </h4>
                   <p className="text-xs text-gray-600 mb-3">
                     Select products from your inventory or{' '}
                     <a
@@ -2101,16 +2509,19 @@ export const PropertiesPanel = () => {
                   </p>
                   <ProductSelector
                     onSelect={(product) => {
-                      const newProducts = [...(props.products || []), {
-                        id: product.id,
-                        name: product.name,
-                        description: product.description || '',
-                        price: product.base_price,
-                        currency: product.currency,
-                        image: product.image_url || '',
-                        stock: product.stock,
-                        featured: false,
-                      }];
+                      const newProducts = [
+                        ...(props.products || []),
+                        {
+                          id: product.id,
+                          name: product.name,
+                          description: product.description || '',
+                          price: product.base_price,
+                          currency: product.currency,
+                          image: product.image_url || '',
+                          stock: product.stock,
+                          featured: false,
+                        },
+                      ];
                       handlePropChange('products', newProducts);
                     }}
                   />
@@ -2120,52 +2531,79 @@ export const PropertiesPanel = () => {
               {/* Products List (Read-only with remove option) */}
               {currentProject && (props.products || []).length > 0 && (
                 <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Added Products
+                  </h4>
                   <div className="space-y-2">
-                    {(props.products || []).map((product: any, index: number) => (
-                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
-                        <div className="flex items-center gap-2 flex-1">
-                          {product.image && (
-                            <img src={product.image} alt={product.name} className="w-8 h-8 object-cover rounded" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {product.currency || 'RM'} {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
-                              {product.stock !== undefined && ` • Stock: ${product.stock}`}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
-                            handlePropChange('products', newProducts);
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800 ml-2"
+                    {(props.products || []).map(
+                      (product: any, index: number) => (
+                        <div
+                          key={product.id || index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
                         >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-center gap-2 flex-1">
+                            {product.image && (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-8 h-8 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {product.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {product.currency || 'RM'}{' '}
+                                {typeof product.price === 'number'
+                                  ? product.price.toFixed(2)
+                                  : product.price}
+                                {product.stock !== undefined &&
+                                  ` • Stock: ${product.stock}`}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newProducts = (props.products || []).filter(
+                                (_: any, i: number) => i !== index
+                              );
+                              handlePropChange('products', newProducts);
+                            }}
+                            className="text-xs text-red-600 hover:text-red-800 ml-2"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )
+                    )}
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
                     To edit product details, go to the{' '}
-                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
                       Products page
                     </a>
                   </p>
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Button Styling</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Button Styling
+              </div>
 
               <div>
                 <Label htmlFor="buttonText">Button Text</Label>
                 <Input
                   id="buttonText"
                   value={props.buttonText || ''}
-                  onChange={(e) => handlePropChange('buttonText', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('buttonText', e.target.value)
+                  }
                   placeholder="Pay Now"
                 />
               </div>
@@ -2177,12 +2615,16 @@ export const PropertiesPanel = () => {
                     id="buttonColor"
                     type="color"
                     value={props.buttonColor || '#3b82f6'}
-                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('buttonColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.buttonColor || '#3b82f6'}
-                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('buttonColor', e.target.value)
+                    }
                     placeholder="#3b82f6"
                     className="flex-1"
                   />
@@ -2194,7 +2636,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="buttonSize"
                   value={props.buttonSize || 'md'}
-                  onChange={(e) => handlePropChange('buttonSize', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('buttonSize', e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 >
                   <option value="sm">Small</option>
@@ -2210,19 +2654,25 @@ export const PropertiesPanel = () => {
                     id="bgColor"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
                 </div>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Bump Offer (Upsell)</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Bump Offer (Upsell)
+              </div>
 
               {(props.products || []).length < 2 ? (
                 <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
@@ -2258,11 +2708,18 @@ export const PropertiesPanel = () => {
                   {props.enableBumpOffer && (
                     <div className="space-y-3 border border-yellow-200 rounded-md p-3 bg-yellow-50 mt-3">
                       <div>
-                        <Label htmlFor="bumpOfferProductId">Select Bump Offer Product</Label>
+                        <Label htmlFor="bumpOfferProductId">
+                          Select Bump Offer Product
+                        </Label>
                         <select
                           id="bumpOfferProductId"
                           value={props.bumpOfferProductId || ''}
-                          onChange={(e) => handlePropChange('bumpOfferProductId', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferProductId',
+                              e.target.value
+                            )
+                          }
                           className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                         >
                           <option value="">-- Select a product --</option>
@@ -2273,37 +2730,56 @@ export const PropertiesPanel = () => {
                           ))}
                         </select>
                         <p className="text-xs text-gray-500 mt-1">
-                          This product will be offered as an upsell before checkout
+                          This product will be offered as an upsell before
+                          checkout
                         </p>
                       </div>
 
                       <div>
-                        <Label htmlFor="bumpOfferDiscount">Discount % (optional)</Label>
+                        <Label htmlFor="bumpOfferDiscount">
+                          Discount % (optional)
+                        </Label>
                         <Input
                           id="bumpOfferDiscount"
                           type="number"
                           min="0"
                           max="100"
                           value={props.bumpOfferDiscount || 0}
-                          onChange={(e) => handlePropChange('bumpOfferDiscount', parseInt(e.target.value) || 0)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferDiscount',
+                              parseInt(e.target.value) || 0
+                            )
+                          }
                           placeholder="0"
                         />
-                        {props.bumpOfferProductId && props.bumpOfferDiscount > 0 && (
-                          <p className="text-xs text-green-600 mt-1">
-                            Discounted price: RM {(
-                              ((props.products || []).find((p: any) => p.id === props.bumpOfferProductId)?.price || 0) *
-                              (1 - (props.bumpOfferDiscount || 0) / 100)
-                            ).toFixed(2)}
-                          </p>
-                        )}
+                        {props.bumpOfferProductId &&
+                          props.bumpOfferDiscount > 0 && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Discounted price: RM{' '}
+                              {(
+                                ((props.products || []).find(
+                                  (p: any) => p.id === props.bumpOfferProductId
+                                )?.price || 0) *
+                                (1 - (props.bumpOfferDiscount || 0) / 100)
+                              ).toFixed(2)}
+                            </p>
+                          )}
                       </div>
 
                       <div>
-                        <Label htmlFor="bumpOfferDescription">Offer Description</Label>
+                        <Label htmlFor="bumpOfferDescription">
+                          Offer Description
+                        </Label>
                         <textarea
                           id="bumpOfferDescription"
                           value={props.bumpOfferDescription || ''}
-                          onChange={(e) => handlePropChange('bumpOfferDescription', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferDescription',
+                              e.target.value
+                            )
+                          }
                           placeholder="Get this exclusive offer at a special price!"
                           className="w-full p-2 border border-gray-300 rounded-md text-sm"
                           rows={2}
@@ -2311,22 +2787,28 @@ export const PropertiesPanel = () => {
                       </div>
 
                       <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
-                        <strong>How it works:</strong> When customer clicks Pay, the bump offer modal appears.
-                        If accepted, the product is added to their order. If skipped, they proceed to checkout normally.
+                        <strong>How it works:</strong> When customer clicks Pay,
+                        the bump offer modal appears. If accepted, the product
+                        is added to their order. If skipped, they proceed to
+                        checkout normally.
                       </div>
                     </div>
                   )}
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Messages</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Messages
+              </div>
 
               <div>
                 <Label htmlFor="successMessage">Success Message</Label>
                 <Input
                   id="successMessage"
                   value={props.successMessage || ''}
-                  onChange={(e) => handlePropChange('successMessage', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('successMessage', e.target.value)
+                  }
                   placeholder="Payment successful!"
                 />
               </div>
@@ -2336,7 +2818,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="failureMessage"
                   value={props.failureMessage || ''}
-                  onChange={(e) => handlePropChange('failureMessage', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('failureMessage', e.target.value)
+                  }
                   placeholder="Payment failed. Please try again."
                 />
               </div>
@@ -2349,7 +2833,9 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">Form Content</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Form Content
+              </div>
 
               <div>
                 <Label htmlFor="title">Form Title</Label>
@@ -2366,21 +2852,27 @@ export const PropertiesPanel = () => {
                 <textarea
                   id="description"
                   value={props.description || ''}
-                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('description', e.target.value)
+                  }
                   placeholder="Fill out the form below and we'll get back to you soon."
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Field Labels</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Field Labels
+              </div>
 
               <div>
                 <Label htmlFor="nameLabel">Name Field Label</Label>
                 <Input
                   id="nameLabel"
                   value={props.nameLabel || ''}
-                  onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('nameLabel', e.target.value)
+                  }
                   placeholder="Your Name"
                 />
               </div>
@@ -2390,7 +2882,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="emailLabel"
                   value={props.emailLabel || ''}
-                  onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('emailLabel', e.target.value)
+                  }
                   placeholder="Email Address"
                 />
               </div>
@@ -2400,7 +2894,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="phoneLabel"
                   value={props.phoneLabel || ''}
-                  onChange={(e) => handlePropChange('phoneLabel', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('phoneLabel', e.target.value)
+                  }
                   placeholder="Phone Number (optional)"
                 />
               </div>
@@ -2410,71 +2906,113 @@ export const PropertiesPanel = () => {
                 <Input
                   id="messageLabel"
                   value={props.messageLabel || ''}
-                  onChange={(e) => handlePropChange('messageLabel', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('messageLabel', e.target.value)
+                  }
                   placeholder="Message (optional)"
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Field Configuration</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Field Configuration
+              </div>
 
               <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showPhone" className="cursor-pointer">Show Phone Field</Label>
+                  <Label htmlFor="showPhone" className="cursor-pointer">
+                    Show Phone Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showPhone"
                     checked={props.fields?.showPhone ?? true}
-                    onChange={(e) => handlePropChange('fields', { ...props.fields, showPhone: e.target.checked })}
+                    onChange={(e) =>
+                      handlePropChange('fields', {
+                        ...props.fields,
+                        showPhone: e.target.checked,
+                      })
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.fields?.showPhone && (
                   <div className="flex items-center justify-between pl-4">
-                    <Label htmlFor="phoneRequired" className="cursor-pointer text-sm">Phone Required</Label>
+                    <Label
+                      htmlFor="phoneRequired"
+                      className="cursor-pointer text-sm"
+                    >
+                      Phone Required
+                    </Label>
                     <input
                       type="checkbox"
                       id="phoneRequired"
                       checked={props.fields?.phoneRequired ?? false}
-                      onChange={(e) => handlePropChange('fields', { ...props.fields, phoneRequired: e.target.checked })}
+                      onChange={(e) =>
+                        handlePropChange('fields', {
+                          ...props.fields,
+                          phoneRequired: e.target.checked,
+                        })
+                      }
                       className="w-4 h-4"
                     />
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showMessage" className="cursor-pointer">Show Message Field</Label>
+                  <Label htmlFor="showMessage" className="cursor-pointer">
+                    Show Message Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showMessage"
                     checked={props.fields?.showMessage ?? true}
-                    onChange={(e) => handlePropChange('fields', { ...props.fields, showMessage: e.target.checked })}
+                    onChange={(e) =>
+                      handlePropChange('fields', {
+                        ...props.fields,
+                        showMessage: e.target.checked,
+                      })
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.fields?.showMessage && (
                   <div className="flex items-center justify-between pl-4">
-                    <Label htmlFor="messageRequired" className="cursor-pointer text-sm">Message Required</Label>
+                    <Label
+                      htmlFor="messageRequired"
+                      className="cursor-pointer text-sm"
+                    >
+                      Message Required
+                    </Label>
                     <input
                       type="checkbox"
                       id="messageRequired"
                       checked={props.fields?.messageRequired ?? false}
-                      onChange={(e) => handlePropChange('fields', { ...props.fields, messageRequired: e.target.checked })}
+                      onChange={(e) =>
+                        handlePropChange('fields', {
+                          ...props.fields,
+                          messageRequired: e.target.checked,
+                        })
+                      }
                       className="w-4 h-4"
                     />
                   </div>
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Submit Button
+              </div>
 
               <div>
                 <Label htmlFor="submitButtonText">Button Text</Label>
                 <Input
                   id="submitButtonText"
                   value={props.submitButtonText || ''}
-                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('submitButtonText', e.target.value)
+                  }
                   placeholder="Submit"
                 />
               </div>
@@ -2486,13 +3024,17 @@ export const PropertiesPanel = () => {
                     id="submitButtonColor"
                     type="color"
                     value={props.submitButtonColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.submitButtonColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     placeholder="#2563eb"
                     className="flex-1"
                   />
@@ -2504,36 +3046,56 @@ export const PropertiesPanel = () => {
                 <Input
                   id="successMessage"
                   value={props.successMessage || ''}
-                  onChange={(e) => handlePropChange('successMessage', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('successMessage', e.target.value)
+                  }
                   placeholder="Thank you! We'll be in touch soon."
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Google Sheets Integration</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Google Sheets Integration
+              </div>
 
               <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="google_sheets_enabled" className="cursor-pointer">Enable Google Sheets</Label>
+                  <Label
+                    htmlFor="google_sheets_enabled"
+                    className="cursor-pointer"
+                  >
+                    Enable Google Sheets
+                  </Label>
                   <input
                     type="checkbox"
                     id="google_sheets_enabled"
                     checked={props.google_sheets_enabled ?? false}
-                    onChange={(e) => handlePropChange('google_sheets_enabled', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange(
+                        'google_sheets_enabled',
+                        e.target.checked
+                      )
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.google_sheets_enabled && (
                   <div>
-                    <Label htmlFor="google_sheets_url">Google Sheets URL or ID</Label>
+                    <Label htmlFor="google_sheets_url">
+                      Google Sheets URL or ID
+                    </Label>
                     <Input
                       id="google_sheets_url"
                       value={props.google_sheets_url || ''}
-                      onChange={(e) => handlePropChange('google_sheets_url', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('google_sheets_url', e.target.value)
+                      }
                       placeholder="https://docs.google.com/spreadsheets/d/..."
                     />
                     <p className="text-xs text-gray-600 mt-1">
-                      Share your Google Sheet with: {process.env.NEXT_PUBLIC_GOOGLE_SERVICE_ACCOUNT_EMAIL || 'service account email not configured'}
+                      Share your Google Sheet with:{' '}
+                      {process.env.NEXT_PUBLIC_GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+                        'service account email not configured'}
                     </p>
                   </div>
                 )}
@@ -2546,13 +3108,17 @@ export const PropertiesPanel = () => {
                     id="bgColor-leadform"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -2567,14 +3133,18 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">WhatsApp Configuration</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                WhatsApp Configuration
+              </div>
 
               <div>
                 <Label htmlFor="phoneNumber">Phone Number</Label>
                 <Input
                   id="phoneNumber"
                   value={props.phoneNumber || ''}
-                  onChange={(e) => handlePropChange('phoneNumber', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('phoneNumber', e.target.value)
+                  }
                   placeholder="60123456789"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -2597,14 +3167,18 @@ export const PropertiesPanel = () => {
                 </p>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Button Style</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Button Style
+              </div>
 
               <div>
                 <Label htmlFor="buttonText">Button Text</Label>
                 <Input
                   id="buttonText"
                   value={props.buttonText || ''}
-                  onChange={(e) => handlePropChange('buttonText', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('buttonText', e.target.value)
+                  }
                   placeholder="Chat on WhatsApp"
                 />
               </div>
@@ -2616,13 +3190,17 @@ export const PropertiesPanel = () => {
                     id="buttonColor"
                     type="color"
                     value={props.buttonColor || '#25D366'}
-                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('buttonColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.buttonColor || '#25D366'}
-                    onChange={(e) => handlePropChange('buttonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('buttonColor', e.target.value)
+                    }
                     placeholder="#25D366"
                     className="flex-1"
                   />
@@ -2634,7 +3212,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="buttonSize"
                   value={props.buttonSize || 'md'}
-                  onChange={(e) => handlePropChange('buttonSize', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('buttonSize', e.target.value)
+                  }
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                 >
                   <option value="sm">Small</option>
@@ -2643,7 +3223,9 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Button Position</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Button Position
+              </div>
 
               <div>
                 <Label htmlFor="position">Position Type</Label>
@@ -2657,7 +3239,8 @@ export const PropertiesPanel = () => {
                   <option value="inline">Inline</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Fixed: Button floats on the page. Inline: Button appears in the content flow.
+                  Fixed: Button floats on the page. Inline: Button appears in
+                  the content flow.
                 </p>
               </div>
 
@@ -2667,7 +3250,9 @@ export const PropertiesPanel = () => {
                   <select
                     id="fixedPosition"
                     value={props.fixedPosition || 'bottom-right'}
-                    onChange={(e) => handlePropChange('fixedPosition', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('fixedPosition', e.target.value)
+                    }
                     className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   >
                     <option value="bottom-right">Bottom Right</option>
@@ -2678,15 +3263,21 @@ export const PropertiesPanel = () => {
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Icon & Tooltip</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Icon & Tooltip
+              </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="showIcon" className="cursor-pointer">Show Icon</Label>
+                <Label htmlFor="showIcon" className="cursor-pointer">
+                  Show Icon
+                </Label>
                 <input
                   type="checkbox"
                   id="showIcon"
                   checked={props.showIcon ?? true}
-                  onChange={(e) => handlePropChange('showIcon', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('showIcon', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
               </div>
@@ -2697,7 +3288,9 @@ export const PropertiesPanel = () => {
                   <Input
                     id="customIcon"
                     value={props.customIcon || ''}
-                    onChange={(e) => handlePropChange('customIcon', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('customIcon', e.target.value)
+                    }
                     placeholder="https://example.com/icon.png"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -2712,7 +3305,9 @@ export const PropertiesPanel = () => {
                   <Input
                     id="tooltipText"
                     value={props.tooltipText || ''}
-                    onChange={(e) => handlePropChange('tooltipText', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('tooltipText', e.target.value)
+                    }
                     placeholder="Need help? Chat with us!"
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -2723,15 +3318,21 @@ export const PropertiesPanel = () => {
 
               {props.position === 'inline' && (
                 <>
-                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Headline</div>
+                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                    Headline
+                  </div>
 
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="showHeadline" className="cursor-pointer">Show Headline</Label>
+                    <Label htmlFor="showHeadline" className="cursor-pointer">
+                      Show Headline
+                    </Label>
                     <input
                       type="checkbox"
                       id="showHeadline"
                       checked={props.showHeadline ?? true}
-                      onChange={(e) => handlePropChange('showHeadline', e.target.checked)}
+                      onChange={(e) =>
+                        handlePropChange('showHeadline', e.target.checked)
+                      }
                       className="w-4 h-4"
                     />
                   </div>
@@ -2743,7 +3344,9 @@ export const PropertiesPanel = () => {
                         <Input
                           id="headlineText"
                           value={props.headlineText || ''}
-                          onChange={(e) => handlePropChange('headlineText', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange('headlineText', e.target.value)
+                          }
                           placeholder="Want to know more about this product?"
                         />
                         <p className="text-xs text-gray-500 mt-1">
@@ -2758,13 +3361,17 @@ export const PropertiesPanel = () => {
                             id="headlineColor"
                             type="color"
                             value={props.headlineColor || '#1f2937'}
-                            onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('headlineColor', e.target.value)
+                            }
                             className="w-20 h-10 p-1"
                           />
                           <Input
                             type="text"
                             value={props.headlineColor || '#1f2937'}
-                            onChange={(e) => handlePropChange('headlineColor', e.target.value)}
+                            onChange={(e) =>
+                              handlePropChange('headlineColor', e.target.value)
+                            }
                             placeholder="#1f2937"
                             className="flex-1"
                           />
@@ -2783,7 +3390,9 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">Booking Form Header</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Booking Form Header
+              </div>
 
               <div>
                 <Label htmlFor="title">Form Title</Label>
@@ -2800,21 +3409,27 @@ export const PropertiesPanel = () => {
                 <textarea
                   id="description"
                   value={props.description || ''}
-                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('description', e.target.value)
+                  }
                   placeholder="Select your preferred date and time slot"
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Service Details</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Service Details
+              </div>
 
               <div>
                 <Label htmlFor="serviceName">Service Name</Label>
                 <Input
                   id="serviceName"
                   value={props.serviceName || ''}
-                  onChange={(e) => handlePropChange('serviceName', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('serviceName', e.target.value)
+                  }
                   placeholder="Consultation"
                 />
               </div>
@@ -2825,10 +3440,17 @@ export const PropertiesPanel = () => {
                   id="servicePrice"
                   type="number"
                   value={props.servicePrice || 0}
-                  onChange={(e) => handlePropChange('servicePrice', parseFloat(e.target.value) || 0)}
+                  onChange={(e) =>
+                    handlePropChange(
+                      'servicePrice',
+                      parseFloat(e.target.value) || 0
+                    )
+                  }
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-500 mt-1">Set to 0 for free services</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Set to 0 for free services
+                </p>
               </div>
 
               <div>
@@ -2837,7 +3459,9 @@ export const PropertiesPanel = () => {
                   id="duration"
                   type="number"
                   value={props.duration || 60}
-                  onChange={(e) => handlePropChange('duration', parseInt(e.target.value) || 60)}
+                  onChange={(e) =>
+                    handlePropChange('duration', parseInt(e.target.value) || 60)
+                  }
                   placeholder="60"
                 />
               </div>
@@ -2857,7 +3481,9 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Time Slots Configuration</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Time Slots Configuration
+              </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
@@ -2866,7 +3492,9 @@ export const PropertiesPanel = () => {
                     id="startTime"
                     type="time"
                     value={props.startTime || '09:00'}
-                    onChange={(e) => handlePropChange('startTime', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('startTime', e.target.value)
+                    }
                   />
                 </div>
                 <div>
@@ -2875,7 +3503,9 @@ export const PropertiesPanel = () => {
                     id="endTime"
                     type="time"
                     value={props.endTime || '18:00'}
-                    onChange={(e) => handlePropChange('endTime', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('endTime', e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -2885,7 +3515,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="slotDuration"
                   value={props.slotDuration || 60}
-                  onChange={(e) => handlePropChange('slotDuration', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handlePropChange('slotDuration', parseInt(e.target.value))
+                  }
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                 >
                   <option value={15}>15 minutes</option>
@@ -2897,21 +3529,43 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Available Days</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Available Days
+              </div>
               <div className="space-y-2 border border-gray-200 rounded-md p-3 bg-gray-50">
-                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
+                {[
+                  'Sunday',
+                  'Monday',
+                  'Tuesday',
+                  'Wednesday',
+                  'Thursday',
+                  'Friday',
+                  'Saturday',
+                ].map((day, index) => (
                   <div key={day} className="flex items-center justify-between">
-                    <Label htmlFor={`day-${index}`} className="cursor-pointer">{day}</Label>
+                    <Label htmlFor={`day-${index}`} className="cursor-pointer">
+                      {day}
+                    </Label>
                     <input
                       type="checkbox"
                       id={`day-${index}`}
-                      checked={(props.availableDays || [1, 2, 3, 4, 5]).includes(index)}
+                      checked={(
+                        props.availableDays || [1, 2, 3, 4, 5]
+                      ).includes(index)}
                       onChange={(e) => {
-                        const currentDays = props.availableDays || [1, 2, 3, 4, 5];
+                        const currentDays = props.availableDays || [
+                          1, 2, 3, 4, 5,
+                        ];
                         if (e.target.checked) {
-                          handlePropChange('availableDays', [...currentDays, index].sort());
+                          handlePropChange(
+                            'availableDays',
+                            [...currentDays, index].sort()
+                          );
                         } else {
-                          handlePropChange('availableDays', currentDays.filter((d: number) => d !== index));
+                          handlePropChange(
+                            'availableDays',
+                            currentDays.filter((d: number) => d !== index)
+                          );
                         }
                       }}
                       className="w-4 h-4"
@@ -2920,85 +3574,115 @@ export const PropertiesPanel = () => {
                 ))}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Customer Fields</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Customer Fields
+              </div>
 
               <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showName" className="cursor-pointer">Show Name Field</Label>
+                  <Label htmlFor="showName" className="cursor-pointer">
+                    Show Name Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showName"
                     checked={props.showName ?? true}
-                    onChange={(e) => handlePropChange('showName', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showName', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.showName && (
                   <div className="pl-4">
-                    <Label htmlFor="nameLabel" className="text-xs">Name Label</Label>
+                    <Label htmlFor="nameLabel" className="text-xs">
+                      Name Label
+                    </Label>
                     <Input
                       id="nameLabel"
                       value={props.nameLabel || ''}
-                      onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('nameLabel', e.target.value)
+                      }
                       placeholder="Full Name"
                     />
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showPhone" className="cursor-pointer">Show Phone Field</Label>
+                  <Label htmlFor="showPhone" className="cursor-pointer">
+                    Show Phone Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showPhone"
                     checked={props.showPhone ?? true}
-                    onChange={(e) => handlePropChange('showPhone', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showPhone', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.showPhone && (
                   <div className="pl-4">
-                    <Label htmlFor="phoneLabel" className="text-xs">Phone Label</Label>
+                    <Label htmlFor="phoneLabel" className="text-xs">
+                      Phone Label
+                    </Label>
                     <Input
                       id="phoneLabel"
                       value={props.phoneLabel || ''}
-                      onChange={(e) => handlePropChange('phoneLabel', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('phoneLabel', e.target.value)
+                      }
                       placeholder="Phone Number"
                     />
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showEmail" className="cursor-pointer">Show Email Field</Label>
+                  <Label htmlFor="showEmail" className="cursor-pointer">
+                    Show Email Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showEmail"
                     checked={props.showEmail ?? true}
-                    onChange={(e) => handlePropChange('showEmail', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showEmail', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.showEmail && (
                   <div className="pl-4">
-                    <Label htmlFor="emailLabel" className="text-xs">Email Label</Label>
+                    <Label htmlFor="emailLabel" className="text-xs">
+                      Email Label
+                    </Label>
                     <Input
                       id="emailLabel"
                       value={props.emailLabel || ''}
-                      onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('emailLabel', e.target.value)
+                      }
                       placeholder="Email"
                     />
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showRemark" className="cursor-pointer">Show Remarks/Notes Field</Label>
+                  <Label htmlFor="showRemark" className="cursor-pointer">
+                    Show Remarks/Notes Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showRemark"
                     checked={props.showRemark ?? true}
-                    onChange={(e) => handlePropChange('showRemark', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showRemark', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
@@ -3006,21 +3690,32 @@ export const PropertiesPanel = () => {
                 {props.showRemark && (
                   <div className="pl-4 space-y-2">
                     <div>
-                      <Label htmlFor="remarkLabel" className="text-xs">Remark Label</Label>
+                      <Label htmlFor="remarkLabel" className="text-xs">
+                        Remark Label
+                      </Label>
                       <Input
                         id="remarkLabel"
                         value={props.remarkLabel || ''}
-                        onChange={(e) => handlePropChange('remarkLabel', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('remarkLabel', e.target.value)
+                        }
                         placeholder="Notes / Remarks"
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="remarkRequired" className="text-xs cursor-pointer">Required</Label>
+                      <Label
+                        htmlFor="remarkRequired"
+                        className="text-xs cursor-pointer"
+                      >
+                        Required
+                      </Label>
                       <input
                         type="checkbox"
                         id="remarkRequired"
                         checked={props.remarkRequired ?? false}
-                        onChange={(e) => handlePropChange('remarkRequired', e.target.checked)}
+                        onChange={(e) =>
+                          handlePropChange('remarkRequired', e.target.checked)
+                        }
                         className="w-4 h-4"
                       />
                     </div>
@@ -3033,7 +3728,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="defaultCountryCode"
                   value={props.defaultCountryCode || 'MY'}
-                  onChange={(e) => handlePropChange('defaultCountryCode', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('defaultCountryCode', e.target.value)
+                  }
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                 >
                   <option value="MY">🇲🇾 Malaysia (+60)</option>
@@ -3047,14 +3744,18 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Submit Button
+              </div>
 
               <div>
                 <Label htmlFor="submitButtonText">Button Text</Label>
                 <Input
                   id="submitButtonText"
                   value={props.submitButtonText || ''}
-                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('submitButtonText', e.target.value)
+                  }
                   placeholder="Confirm Booking"
                 />
               </div>
@@ -3066,13 +3767,17 @@ export const PropertiesPanel = () => {
                     id="submitButtonColor"
                     type="color"
                     value={props.submitButtonColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.submitButtonColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     placeholder="#2563eb"
                     className="flex-1"
                   />
@@ -3080,47 +3785,70 @@ export const PropertiesPanel = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="requirePayment" className="cursor-pointer">Require Payment</Label>
+                <Label htmlFor="requirePayment" className="cursor-pointer">
+                  Require Payment
+                </Label>
                 <input
                   type="checkbox"
                   id="requirePayment"
                   checked={props.requirePayment ?? false}
-                  onChange={(e) => handlePropChange('requirePayment', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('requirePayment', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Google Sheets Integration</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Google Sheets Integration
+              </div>
 
               <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="google_sheets_enabled" className="cursor-pointer">Enable Google Sheets</Label>
+                  <Label
+                    htmlFor="google_sheets_enabled"
+                    className="cursor-pointer"
+                  >
+                    Enable Google Sheets
+                  </Label>
                   <input
                     type="checkbox"
                     id="google_sheets_enabled"
                     checked={props.google_sheets_enabled ?? false}
-                    onChange={(e) => handlePropChange('google_sheets_enabled', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange(
+                        'google_sheets_enabled',
+                        e.target.checked
+                      )
+                    }
                     className="w-4 h-4"
                   />
                 </div>
 
                 {props.google_sheets_enabled && (
                   <div>
-                    <Label htmlFor="google_sheets_url">Google Sheets URL or ID</Label>
+                    <Label htmlFor="google_sheets_url">
+                      Google Sheets URL or ID
+                    </Label>
                     <Input
                       id="google_sheets_url"
                       value={props.google_sheets_url || ''}
-                      onChange={(e) => handlePropChange('google_sheets_url', e.target.value)}
+                      onChange={(e) =>
+                        handlePropChange('google_sheets_url', e.target.value)
+                      }
                       placeholder="https://docs.google.com/spreadsheets/d/..."
                     />
                     <p className="text-xs text-gray-600 mt-1">
-                      Connect your Google account in Integrations to enable this feature.
+                      Connect your Google account in Integrations to enable this
+                      feature.
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Footer Links</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Footer Links
+              </div>
 
               <div>
                 <Label htmlFor="termsUrl">Terms & Conditions URL</Label>
@@ -3137,7 +3865,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="policyUrl"
                   value={props.policyUrl || ''}
-                  onChange={(e) => handlePropChange('policyUrl', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('policyUrl', e.target.value)
+                  }
                   placeholder="#"
                 />
               </div>
@@ -3149,13 +3879,17 @@ export const PropertiesPanel = () => {
                     id="bgColor-booking"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -3170,7 +3904,9 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">Form Header</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Form Header
+              </div>
 
               <div>
                 <Label htmlFor="title">Form Title</Label>
@@ -3187,23 +3923,31 @@ export const PropertiesPanel = () => {
                 <textarea
                   id="description"
                   value={props.description || ''}
-                  onChange={(e) => handlePropChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('description', e.target.value)
+                  }
                   placeholder="Fill in the form to complete your order"
                   className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Customer Fields</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Customer Fields
+              </div>
 
               <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="showName" className="cursor-pointer">Show Name Field</Label>
+                  <Label htmlFor="showName" className="cursor-pointer">
+                    Show Name Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showName"
                     checked={props.showName ?? true}
-                    onChange={(e) => handlePropChange('showName', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showName', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
@@ -3211,22 +3955,33 @@ export const PropertiesPanel = () => {
                 {props.showName && (
                   <>
                     <div className="pl-4">
-                      <Label htmlFor="nameLabel" className="text-xs">Name Label</Label>
+                      <Label htmlFor="nameLabel" className="text-xs">
+                        Name Label
+                      </Label>
                       <Input
                         id="nameLabel"
                         value={props.nameLabel || ''}
-                        onChange={(e) => handlePropChange('nameLabel', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('nameLabel', e.target.value)
+                        }
                         placeholder="Name"
                         className="mt-1"
                       />
                     </div>
                     <div className="flex items-center justify-between pl-4">
-                      <Label htmlFor="nameRequired" className="cursor-pointer text-sm">Name Required</Label>
+                      <Label
+                        htmlFor="nameRequired"
+                        className="cursor-pointer text-sm"
+                      >
+                        Name Required
+                      </Label>
                       <input
                         type="checkbox"
                         id="nameRequired"
                         checked={props.nameRequired ?? true}
-                        onChange={(e) => handlePropChange('nameRequired', e.target.checked)}
+                        onChange={(e) =>
+                          handlePropChange('nameRequired', e.target.checked)
+                        }
                         className="w-4 h-4"
                       />
                     </div>
@@ -3234,12 +3989,16 @@ export const PropertiesPanel = () => {
                 )}
 
                 <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-                  <Label htmlFor="showMobile" className="cursor-pointer">Show Mobile Field</Label>
+                  <Label htmlFor="showMobile" className="cursor-pointer">
+                    Show Mobile Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showMobile"
                     checked={props.showMobile ?? true}
-                    onChange={(e) => handlePropChange('showMobile', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showMobile', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
@@ -3247,31 +4006,46 @@ export const PropertiesPanel = () => {
                 {props.showMobile && (
                   <>
                     <div className="pl-4">
-                      <Label htmlFor="mobileLabel" className="text-xs">Mobile Label</Label>
+                      <Label htmlFor="mobileLabel" className="text-xs">
+                        Mobile Label
+                      </Label>
                       <Input
                         id="mobileLabel"
                         value={props.mobileLabel || ''}
-                        onChange={(e) => handlePropChange('mobileLabel', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('mobileLabel', e.target.value)
+                        }
                         placeholder="Mobile Number"
                         className="mt-1"
                       />
                     </div>
                     <div className="flex items-center justify-between pl-4">
-                      <Label htmlFor="mobileRequired" className="cursor-pointer text-sm">Mobile Required</Label>
+                      <Label
+                        htmlFor="mobileRequired"
+                        className="cursor-pointer text-sm"
+                      >
+                        Mobile Required
+                      </Label>
                       <input
                         type="checkbox"
                         id="mobileRequired"
                         checked={props.mobileRequired ?? true}
-                        onChange={(e) => handlePropChange('mobileRequired', e.target.checked)}
+                        onChange={(e) =>
+                          handlePropChange('mobileRequired', e.target.checked)
+                        }
                         className="w-4 h-4"
                       />
                     </div>
                     <div className="pl-4">
-                      <Label htmlFor="defaultCountryCode" className="text-xs">Default Country</Label>
+                      <Label htmlFor="defaultCountryCode" className="text-xs">
+                        Default Country
+                      </Label>
                       <select
                         id="defaultCountryCode"
                         value={props.defaultCountryCode || 'MY'}
-                        onChange={(e) => handlePropChange('defaultCountryCode', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('defaultCountryCode', e.target.value)
+                        }
                         className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                       >
                         <option value="MY">Malaysia (+60)</option>
@@ -3288,12 +4062,16 @@ export const PropertiesPanel = () => {
                 )}
 
                 <div className="flex items-center justify-between border-t border-gray-200 pt-3">
-                  <Label htmlFor="showEmail" className="cursor-pointer">Show Email Field</Label>
+                  <Label htmlFor="showEmail" className="cursor-pointer">
+                    Show Email Field
+                  </Label>
                   <input
                     type="checkbox"
                     id="showEmail"
                     checked={props.showEmail ?? true}
-                    onChange={(e) => handlePropChange('showEmail', e.target.checked)}
+                    onChange={(e) =>
+                      handlePropChange('showEmail', e.target.checked)
+                    }
                     className="w-4 h-4"
                   />
                 </div>
@@ -3301,22 +4079,33 @@ export const PropertiesPanel = () => {
                 {props.showEmail && (
                   <>
                     <div className="pl-4">
-                      <Label htmlFor="emailLabel" className="text-xs">Email Label</Label>
+                      <Label htmlFor="emailLabel" className="text-xs">
+                        Email Label
+                      </Label>
                       <Input
                         id="emailLabel"
                         value={props.emailLabel || ''}
-                        onChange={(e) => handlePropChange('emailLabel', e.target.value)}
+                        onChange={(e) =>
+                          handlePropChange('emailLabel', e.target.value)
+                        }
                         placeholder="Email"
                         className="mt-1"
                       />
                     </div>
                     <div className="flex items-center justify-between pl-4">
-                      <Label htmlFor="emailRequired" className="cursor-pointer text-sm">Email Required</Label>
+                      <Label
+                        htmlFor="emailRequired"
+                        className="cursor-pointer text-sm"
+                      >
+                        Email Required
+                      </Label>
                       <input
                         type="checkbox"
                         id="emailRequired"
                         checked={props.emailRequired ?? true}
-                        onChange={(e) => handlePropChange('emailRequired', e.target.checked)}
+                        onChange={(e) =>
+                          handlePropChange('emailRequired', e.target.checked)
+                        }
                         className="w-4 h-4"
                       />
                     </div>
@@ -3324,12 +4113,16 @@ export const PropertiesPanel = () => {
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Products</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Products
+              </div>
 
               {/* Product Selector from Database (same as Payment Button) */}
               {currentProject && (
                 <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Add from Inventory
+                  </h4>
                   <p className="text-xs text-gray-600 mb-3">
                     Select products from your inventory or{' '}
                     <a
@@ -3341,17 +4134,39 @@ export const PropertiesPanel = () => {
                     </a>
                   </p>
                   <ProductSelector
+                    enableBulkSelect={true}
                     onSelect={(product) => {
-                      const newProducts = [...(props.products || []), {
-                        id: product.id,
-                        name: product.name,
-                        description: product.description || '',
-                        price: product.base_price,
-                        currency: product.currency,
-                        image: product.image_url || '',
-                        stock: product.stock,
-                        featured: false,
-                      }];
+                      const newProducts = [
+                        ...(props.products || []),
+                        {
+                          id: product.id,
+                          name: product.name,
+                          description: product.description || '',
+                          price: product.base_price,
+                          currency: product.currency,
+                          image: product.image_url || '',
+                          stock: product.stock,
+                          featured: false,
+                          variations: product.variations || [],
+                        },
+                      ];
+                      handlePropChange('products', newProducts);
+                    }}
+                    onBulkSelect={(products) => {
+                      const newProducts = [
+                        ...(props.products || []),
+                        ...products.map((product) => ({
+                          id: product.id,
+                          name: product.name,
+                          description: product.description || '',
+                          price: product.base_price,
+                          currency: product.currency,
+                          image: product.image_url || '',
+                          stock: product.stock,
+                          featured: false,
+                          variations: product.variations || [],
+                        })),
+                      ];
                       handlePropChange('products', newProducts);
                     }}
                   />
@@ -3361,52 +4176,104 @@ export const PropertiesPanel = () => {
               {/* Products List (Read-only with remove option) */}
               {currentProject && (props.products || []).length > 0 && (
                 <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products</h4>
-                  <div className="space-y-2">
-                    {(props.products || []).map((product: any, index: number) => (
-                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
-                        <div className="flex items-center gap-2 flex-1">
-                          {product.image && (
-                            <img src={product.image} alt={product.name} className="w-8 h-8 object-cover rounded" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {product.currency || 'RM'} {typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
-                              {product.stock !== undefined && ` • Stock: ${product.stock}`}
-                            </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      Added Products ({(props.products || []).length})
+                    </h4>
+                    {(props.products || []).length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handlePropChange('products', [])}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {(props.products || []).map(
+                      (product: any, index: number) => {
+                        const hasVariations =
+                          product.variations && product.variations.length > 0;
+                        return (
+                          <div
+                            key={product.id || index}
+                            className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
+                          >
+                            <div className="flex items-center gap-2 flex-1">
+                              {product.image && (
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="w-8 h-8 object-cover rounded"
+                                />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {product.name}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {product.currency || 'RM'}{' '}
+                                  {typeof product.price === 'number'
+                                    ? product.price.toFixed(2)
+                                    : product.price}
+                                  {product.stock !== undefined &&
+                                    ` • Stock: ${product.stock}`}
+                                </p>
+                                {hasVariations && (
+                                  <p className="text-xs text-blue-600">
+                                    {product.variations[0].options.length}{' '}
+                                    {product.variations[0].name.toLowerCase()}{' '}
+                                    variants
+                                    {product.variations[0].options.some(
+                                      (o: any) => o.priceAdjustment > 0
+                                    ) && ' (with price tiers)'}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newProducts = (
+                                  props.products || []
+                                ).filter((_: any, i: number) => i !== index);
+                                handlePropChange('products', newProducts);
+                              }}
+                              className="text-xs text-red-600 hover:text-red-800 ml-2"
+                            >
+                              Remove
+                            </button>
                           </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
-                            handlePropChange('products', newProducts);
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800 ml-2"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
+                        );
+                      }
+                    )}
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
                     To edit product details, go to the{' '}
-                    <a href="/dashboard/products" target="_blank" className="text-blue-600 hover:underline">
+                    <a
+                      href="/dashboard/products"
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
                       Products page
                     </a>
                   </p>
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Submit Button</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Submit Button
+              </div>
 
               <div>
                 <Label htmlFor="submitButtonText">Button Text</Label>
                 <Input
                   id="submitButtonText"
                   value={props.submitButtonText || ''}
-                  onChange={(e) => handlePropChange('submitButtonText', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('submitButtonText', e.target.value)
+                  }
                   placeholder="Complete Payment"
                 />
               </div>
@@ -3418,13 +4285,17 @@ export const PropertiesPanel = () => {
                     id="submitButtonColor"
                     type="color"
                     value={props.submitButtonColor || '#ef4444'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.submitButtonColor || '#ef4444'}
-                    onChange={(e) => handlePropChange('submitButtonColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('submitButtonColor', e.target.value)
+                    }
                     placeholder="#ef4444"
                     className="flex-1"
                   />
@@ -3432,7 +4303,9 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Bump Offer Section - Only available with 2+ products */}
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Bump Offer (Upsell)</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Bump Offer (Upsell)
+              </div>
 
               {(props.products || []).length < 2 ? (
                 <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
@@ -3460,7 +4333,10 @@ export const PropertiesPanel = () => {
                       }}
                       className="w-4 h-4"
                     />
-                    <Label htmlFor="enableBumpOffer-form" className="cursor-pointer">
+                    <Label
+                      htmlFor="enableBumpOffer-form"
+                      className="cursor-pointer"
+                    >
                       Enable Bump Offer
                     </Label>
                   </div>
@@ -3468,11 +4344,18 @@ export const PropertiesPanel = () => {
                   {props.enableBumpOffer && (
                     <div className="space-y-3 border border-yellow-200 rounded-md p-3 bg-yellow-50 mt-3">
                       <div>
-                        <Label htmlFor="bumpOfferProductId">Select Bump Offer Product</Label>
+                        <Label htmlFor="bumpOfferProductId">
+                          Select Bump Offer Product
+                        </Label>
                         <select
                           id="bumpOfferProductId"
                           value={props.bumpOfferProductId || ''}
-                          onChange={(e) => handlePropChange('bumpOfferProductId', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferProductId',
+                              e.target.value
+                            )
+                          }
                           className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                         >
                           <option value="">-- Select a product --</option>
@@ -3483,37 +4366,56 @@ export const PropertiesPanel = () => {
                           ))}
                         </select>
                         <p className="text-xs text-gray-500 mt-1">
-                          This product will be offered as an upsell before checkout
+                          This product will be offered as an upsell before
+                          checkout
                         </p>
                       </div>
 
                       <div>
-                        <Label htmlFor="bumpOfferDiscount-form">Discount % (optional)</Label>
+                        <Label htmlFor="bumpOfferDiscount-form">
+                          Discount % (optional)
+                        </Label>
                         <Input
                           id="bumpOfferDiscount-form"
                           type="number"
                           min="0"
                           max="100"
                           value={props.bumpOfferDiscount || 0}
-                          onChange={(e) => handlePropChange('bumpOfferDiscount', parseInt(e.target.value) || 0)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferDiscount',
+                              parseInt(e.target.value) || 0
+                            )
+                          }
                           placeholder="0"
                         />
-                        {props.bumpOfferProductId && props.bumpOfferDiscount > 0 && (
-                          <p className="text-xs text-green-600 mt-1">
-                            Discounted price: RM {(
-                              ((props.products || []).find((p: any) => p.id === props.bumpOfferProductId)?.price || 0) *
-                              (1 - (props.bumpOfferDiscount || 0) / 100)
-                            ).toFixed(2)}
-                          </p>
-                        )}
+                        {props.bumpOfferProductId &&
+                          props.bumpOfferDiscount > 0 && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Discounted price: RM{' '}
+                              {(
+                                ((props.products || []).find(
+                                  (p: any) => p.id === props.bumpOfferProductId
+                                )?.price || 0) *
+                                (1 - (props.bumpOfferDiscount || 0) / 100)
+                              ).toFixed(2)}
+                            </p>
+                          )}
                       </div>
 
                       <div>
-                        <Label htmlFor="bumpOfferDescription-form">Offer Description</Label>
+                        <Label htmlFor="bumpOfferDescription-form">
+                          Offer Description
+                        </Label>
                         <textarea
                           id="bumpOfferDescription-form"
                           value={props.bumpOfferDescription || ''}
-                          onChange={(e) => handlePropChange('bumpOfferDescription', e.target.value)}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bumpOfferDescription',
+                              e.target.value
+                            )
+                          }
                           placeholder="Get this exclusive offer at a special price!"
                           className="w-full p-2 border border-gray-300 rounded-md text-sm"
                           rows={2}
@@ -3521,15 +4423,19 @@ export const PropertiesPanel = () => {
                       </div>
 
                       <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
-                        <strong>How it works:</strong> When customer clicks Pay, the bump offer modal appears.
-                        If accepted, the product is added to their order. If skipped, they proceed to checkout normally.
+                        <strong>How it works:</strong> When customer clicks Pay,
+                        the bump offer modal appears. If accepted, the product
+                        is added to their order. If skipped, they proceed to
+                        checkout normally.
                       </div>
                     </div>
                   )}
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Footer Links</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Footer Links
+              </div>
 
               <div>
                 <Label htmlFor="termsUrl">Terms & Conditions URL</Label>
@@ -3546,7 +4452,9 @@ export const PropertiesPanel = () => {
                 <Input
                   id="policyUrl"
                   value={props.policyUrl || ''}
-                  onChange={(e) => handlePropChange('policyUrl', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('policyUrl', e.target.value)
+                  }
                   placeholder="#policy"
                 />
               </div>
@@ -3556,34 +4464,46 @@ export const PropertiesPanel = () => {
                 <Input
                   id="contactUrl"
                   value={props.contactUrl || ''}
-                  onChange={(e) => handlePropChange('contactUrl', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('contactUrl', e.target.value)
+                  }
                   placeholder="#contact"
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Company Info</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Company Info
+              </div>
 
               <div>
                 <Label htmlFor="companyName">Company Name</Label>
                 <Input
                   id="companyName"
                   value={props.companyName || ''}
-                  onChange={(e) => handlePropChange('companyName', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('companyName', e.target.value)
+                  }
                   placeholder="Your Company Name"
                 />
               </div>
 
               <div>
-                <Label htmlFor="companyRegistration">Company Registration</Label>
+                <Label htmlFor="companyRegistration">
+                  Company Registration
+                </Label>
                 <Input
                   id="companyRegistration"
                   value={props.companyRegistration || ''}
-                  onChange={(e) => handlePropChange('companyRegistration', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('companyRegistration', e.target.value)
+                  }
                   placeholder="Company Registration Number"
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Styling</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Styling
+              </div>
 
               <div>
                 <Label htmlFor="bgColor-form-payment">Background Color</Label>
@@ -3592,13 +4512,17 @@ export const PropertiesPanel = () => {
                     id="bgColor-form-payment"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -3613,7 +4537,9 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">Header</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Header
+              </div>
 
               <div>
                 <Label htmlFor="title-carousel">Title</Label>
@@ -3635,7 +4561,9 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Layout</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Layout
+              </div>
 
               <div>
                 <Label htmlFor="layout-carousel">Layout Style</Label>
@@ -3655,7 +4583,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="columns-carousel"
                   value={props.columns || 3}
-                  onChange={(e) => handlePropChange('columns', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handlePropChange('columns', parseInt(e.target.value))
+                  }
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                 >
                   <option value={2}>2 Columns</option>
@@ -3669,7 +4599,9 @@ export const PropertiesPanel = () => {
                 <select
                   id="cardStyle-carousel"
                   value={props.cardStyle || 'shadow'}
-                  onChange={(e) => handlePropChange('cardStyle', e.target.value)}
+                  onChange={(e) =>
+                    handlePropChange('cardStyle', e.target.value)
+                  }
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                 >
                   <option value="minimal">Minimal</option>
@@ -3683,10 +4615,14 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="showPrice-carousel"
                   checked={props.showPrice ?? true}
-                  onChange={(e) => handlePropChange('showPrice', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('showPrice', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
-                <Label htmlFor="showPrice-carousel" className="cursor-pointer">Show Price</Label>
+                <Label htmlFor="showPrice-carousel" className="cursor-pointer">
+                  Show Price
+                </Label>
               </div>
 
               <div className="flex items-center gap-3">
@@ -3694,18 +4630,29 @@ export const PropertiesPanel = () => {
                   type="checkbox"
                   id="showDescription-carousel"
                   checked={props.showDescription ?? true}
-                  onChange={(e) => handlePropChange('showDescription', e.target.checked)}
+                  onChange={(e) =>
+                    handlePropChange('showDescription', e.target.checked)
+                  }
                   className="w-4 h-4"
                 />
-                <Label htmlFor="showDescription-carousel" className="cursor-pointer">Show Description</Label>
+                <Label
+                  htmlFor="showDescription-carousel"
+                  className="cursor-pointer"
+                >
+                  Show Description
+                </Label>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Products</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Products
+              </div>
 
               {/* Product Selector from Database */}
               {currentProject && (
                 <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Add from Inventory</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Add from Inventory
+                  </h4>
                   <p className="text-xs text-gray-600 mb-3">
                     Select products from your inventory or{' '}
                     <a
@@ -3718,17 +4665,20 @@ export const PropertiesPanel = () => {
                   </p>
                   <ProductSelector
                     onSelect={(product) => {
-                      const newProducts = [...(props.products || []), {
-                        id: product.id,
-                        code: product.code,
-                        name: product.name,
-                        description: product.description || '',
-                        base_price: product.base_price,
-                        currency: product.currency,
-                        image_url: product.image_url || '',
-                        status: product.status,
-                        variations: product.variations || [],
-                      }];
+                      const newProducts = [
+                        ...(props.products || []),
+                        {
+                          id: product.id,
+                          code: product.code,
+                          name: product.name,
+                          description: product.description || '',
+                          base_price: product.base_price,
+                          currency: product.currency,
+                          image_url: product.image_url || '',
+                          status: product.status,
+                          variations: product.variations || [],
+                        },
+                      ];
                       handlePropChange('products', newProducts);
                     }}
                   />
@@ -3738,38 +4688,58 @@ export const PropertiesPanel = () => {
               {/* Products List */}
               {currentProject && (props.products || []).length > 0 && (
                 <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Added Products ({(props.products || []).length})</h4>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Added Products ({(props.products || []).length})
+                  </h4>
                   <div className="space-y-2">
-                    {(props.products || []).map((product: any, index: number) => (
-                      <div key={product.id || index} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
-                        <div className="flex items-center gap-2 flex-1">
-                          {product.image_url && (
-                            <img src={product.image_url} alt={product.name} className="w-8 h-8 object-cover rounded" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {product.currency || 'RM'} {typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newProducts = (props.products || []).filter((_: any, i: number) => i !== index);
-                            handlePropChange('products', newProducts);
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800 ml-2"
+                    {(props.products || []).map(
+                      (product: any, index: number) => (
+                        <div
+                          key={product.id || index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
                         >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-center gap-2 flex-1">
+                            {product.image_url && (
+                              <img
+                                src={product.image_url}
+                                alt={product.name}
+                                className="w-8 h-8 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {product.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {product.currency || 'RM'}{' '}
+                                {typeof product.base_price === 'number'
+                                  ? product.base_price.toFixed(2)
+                                  : product.base_price}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newProducts = (props.products || []).filter(
+                                (_: any, i: number) => i !== index
+                              );
+                              handlePropChange('products', newProducts);
+                            }}
+                            className="text-xs text-red-600 hover:text-red-800 ml-2"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">Colors</div>
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Colors
+              </div>
 
               <div>
                 <Label htmlFor="bgColor-carousel">Background Color</Label>
@@ -3778,13 +4748,17 @@ export const PropertiesPanel = () => {
                     id="bgColor-carousel"
                     type="color"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.bgColor || '#ffffff'}
-                    onChange={(e) => handlePropChange('bgColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
                     placeholder="#ffffff"
                     className="flex-1"
                   />
@@ -3798,13 +4772,17 @@ export const PropertiesPanel = () => {
                     id="textColor-carousel"
                     type="color"
                     value={props.textColor || '#1f2937'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.textColor || '#1f2937'}
-                    onChange={(e) => handlePropChange('textColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('textColor', e.target.value)
+                    }
                     placeholder="#1f2937"
                     className="flex-1"
                   />
@@ -3818,13 +4796,17 @@ export const PropertiesPanel = () => {
                     id="priceColor-carousel"
                     type="color"
                     value={props.priceColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('priceColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('priceColor', e.target.value)
+                    }
                     className="w-20 h-10 p-1"
                   />
                   <Input
                     type="text"
                     value={props.priceColor || '#2563eb'}
-                    onChange={(e) => handlePropChange('priceColor', e.target.value)}
+                    onChange={(e) =>
+                      handlePropChange('priceColor', e.target.value)
+                    }
                     placeholder="#2563eb"
                     className="flex-1"
                   />
@@ -3846,18 +4828,524 @@ export const PropertiesPanel = () => {
 
               {props.backgroundImage && (
                 <div>
-                  <Label htmlFor="backgroundOpacity-carousel">Background Overlay ({props.backgroundOpacity || 70}%)</Label>
+                  <Label htmlFor="backgroundOpacity-carousel">
+                    Background Overlay ({props.backgroundOpacity || 70}%)
+                  </Label>
                   <input
                     id="backgroundOpacity-carousel"
                     type="range"
                     min="0"
                     max="100"
                     value={props.backgroundOpacity || 70}
-                    onChange={(e) => handlePropChange('backgroundOpacity', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handlePropChange(
+                        'backgroundOpacity',
+                        parseInt(e.target.value)
+                      )
+                    }
                     className="w-full"
                   />
                 </div>
               )}
+            </div>
+          </>
+        );
+
+      case 'media':
+        return (
+          <>
+            {commonSection}
+            <div className="space-y-4 pt-6">
+              <div className="font-semibold text-sm text-gray-700 mb-2">
+                Media Type
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePropChange('mediaType', 'image')}
+                  className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
+                    props.mediaType === 'image'
+                      ? 'bg-blue-50 border-blue-500 text-blue-700'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePropChange('mediaType', 'video')}
+                  className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
+                    props.mediaType === 'video'
+                      ? 'bg-blue-50 border-blue-500 text-blue-700'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Video
+                </button>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-4">
+                Media Source
+              </div>
+
+              {/* URL Input */}
+              <div>
+                <Label htmlFor="mediaUrl">
+                  {props.mediaType === 'image' ? 'Image URL' : 'Video URL'}
+                </Label>
+                <Input
+                  id="mediaUrl"
+                  value={props.mediaUrl || ''}
+                  onChange={(e) => handlePropChange('mediaUrl', e.target.value)}
+                  placeholder={
+                    props.mediaType === 'image'
+                      ? 'https://example.com/image.jpg'
+                      : 'https://youtube.com/watch?v=... or video URL'
+                  }
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {props.mediaType === 'video'
+                    ? 'Supports YouTube, Vimeo, or direct video file URLs'
+                    : 'Paste image URL or upload below'}
+                </p>
+              </div>
+
+              {/* Upload Button for Images */}
+              {props.mediaType === 'image' && currentProject && (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="media-upload"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      // Validate file type
+                      if (!file.type.startsWith('image/')) {
+                        alert('Please select an image file');
+                        return;
+                      }
+
+                      // Validate file size (max 5MB)
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert('Image must be less than 5MB');
+                        return;
+                      }
+
+                      // Show uploading state
+                      const uploadLabel =
+                        document.getElementById('media-upload-label');
+                      if (uploadLabel) {
+                        uploadLabel.innerHTML =
+                          '<p class="text-sm font-medium text-blue-600">Uploading...</p>';
+                      }
+
+                      try {
+                        // Create file name
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `media/${currentProject.user_id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                        console.log('[Media Upload] Uploading to:', fileName);
+
+                        // Upload to Supabase storage
+                        const { supabase } =
+                          await import('@/lib/supabase/auth-client');
+                        const { data, error } = await supabase.storage
+                          .from('project-images')
+                          .upload(fileName, file, {
+                            cacheControl: '3600',
+                            upsert: false,
+                          });
+
+                        if (error) {
+                          console.error('[Media Upload] Upload error:', error);
+                          throw error;
+                        }
+
+                        console.log('[Media Upload] Upload success:', data);
+
+                        // Get public URL
+                        const {
+                          data: { publicUrl },
+                        } = supabase.storage
+                          .from('project-images')
+                          .getPublicUrl(data.path);
+
+                        console.log('[Media Upload] Public URL:', publicUrl);
+
+                        handlePropChange('mediaUrl', publicUrl);
+
+                        // Reset upload label
+                        if (uploadLabel) {
+                          uploadLabel.innerHTML =
+                            '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                        }
+                      } catch (err) {
+                        console.error('[Media Upload] Error:', err);
+                        alert(
+                          'Failed to upload image: ' +
+                            (err instanceof Error
+                              ? err.message
+                              : 'Unknown error')
+                        );
+                        // Reset upload label
+                        const uploadLabel =
+                          document.getElementById('media-upload-label');
+                        if (uploadLabel) {
+                          uploadLabel.innerHTML =
+                            '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                        }
+                      }
+
+                      // Reset file input
+                      e.target.value = '';
+                    }}
+                  />
+                  <label htmlFor="media-upload" className="cursor-pointer">
+                    <div
+                      id="media-upload-label"
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <p className="text-sm font-medium">
+                        Click to upload image
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">Max 5MB</p>
+                    </div>
+                  </label>
+                </div>
+              )}
+
+              {/* Preview */}
+              {props.mediaUrl && props.mediaType === 'image' && (
+                <div className="relative">
+                  <img
+                    src={props.mediaUrl}
+                    alt="Preview"
+                    className="w-full h-32 object-cover rounded-md border border-gray-200"
+                    onError={(e) => {
+                      // Show placeholder on error
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const placeholder = document.getElementById(
+                        'media-preview-error'
+                      );
+                      if (placeholder) placeholder.style.display = 'flex';
+                    }}
+                    onLoad={(e) => {
+                      // Hide error placeholder on successful load
+                      (e.target as HTMLImageElement).style.display = 'block';
+                      const placeholder = document.getElementById(
+                        'media-preview-error'
+                      );
+                      if (placeholder) placeholder.style.display = 'none';
+                    }}
+                  />
+                  <div
+                    id="media-preview-error"
+                    className="w-full h-32 bg-gray-100 rounded-md border border-gray-200 items-center justify-center text-gray-500 text-xs text-center p-2"
+                    style={{ display: 'none' }}
+                  >
+                    <div>
+                      <p>Preview unavailable</p>
+                      <p className="mt-1 text-blue-600 break-all">
+                        {props.mediaUrl.substring(0, 50)}...
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handlePropChange('mediaUrl', '')}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  <p className="text-xs text-green-600 mt-1">
+                    Image uploaded successfully
+                  </p>
+                </div>
+              )}
+
+              {/* Alt Text for Images */}
+              {props.mediaType === 'image' && (
+                <div>
+                  <Label htmlFor="altText">Alt Text (for accessibility)</Label>
+                  <Input
+                    id="altText"
+                    value={props.altText || ''}
+                    onChange={(e) =>
+                      handlePropChange('altText', e.target.value)
+                    }
+                    placeholder="Describe the image"
+                  />
+                </div>
+              )}
+
+              {/* Video Options */}
+              {props.mediaType === 'video' && (
+                <>
+                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-4">
+                    Video Options
+                  </div>
+                  <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="autoplay" className="cursor-pointer">
+                        Autoplay
+                      </Label>
+                      <input
+                        type="checkbox"
+                        id="autoplay"
+                        checked={props.autoplay ?? false}
+                        onChange={(e) =>
+                          handlePropChange('autoplay', e.target.checked)
+                        }
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="loop" className="cursor-pointer">
+                        Loop
+                      </Label>
+                      <input
+                        type="checkbox"
+                        id="loop"
+                        checked={props.loop ?? true}
+                        onChange={(e) =>
+                          handlePropChange('loop', e.target.checked)
+                        }
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="muted" className="cursor-pointer">
+                        Muted
+                      </Label>
+                      <input
+                        type="checkbox"
+                        id="muted"
+                        checked={props.muted ?? true}
+                        onChange={(e) =>
+                          handlePropChange('muted', e.target.checked)
+                        }
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="controls" className="cursor-pointer">
+                        Show Controls
+                      </Label>
+                      <input
+                        type="checkbox"
+                        id="controls"
+                        checked={props.controls ?? true}
+                        onChange={(e) =>
+                          handlePropChange('controls', e.target.checked)
+                        }
+                        className="w-4 h-4"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Layout
+              </div>
+
+              <div>
+                <Label htmlFor="layout">Alignment</Label>
+                <select
+                  id="layout"
+                  value={props.layout || 'contained'}
+                  onChange={(e) => handlePropChange('layout', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="full_width">Full Width</option>
+                  <option value="contained">Contained (Centered)</option>
+                  <option value="left">Left Aligned</option>
+                  <option value="center">Center Aligned</option>
+                  <option value="right">Right Aligned</option>
+                </select>
+              </div>
+
+              {props.layout !== 'full_width' && (
+                <div>
+                  <Label htmlFor="maxWidth">Max Width</Label>
+                  <select
+                    id="maxWidth"
+                    value={props.maxWidth || '800px'}
+                    onChange={(e) =>
+                      handlePropChange('maxWidth', e.target.value)
+                    }
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="400px">Small (400px)</option>
+                    <option value="600px">Medium (600px)</option>
+                    <option value="800px">Large (800px)</option>
+                    <option value="1000px">Extra Large (1000px)</option>
+                    <option value="100%">Full Container Width</option>
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="aspectRatio">Aspect Ratio</Label>
+                <select
+                  id="aspectRatio"
+                  value={props.aspectRatio || 'auto'}
+                  onChange={(e) =>
+                    handlePropChange('aspectRatio', e.target.value)
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="auto">Auto (Original)</option>
+                  <option value="16:9">16:9 (Widescreen)</option>
+                  <option value="4:3">4:3 (Standard)</option>
+                  <option value="1:1">1:1 (Square)</option>
+                  <option value="9:16">9:16 (Portrait)</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="borderRadius">Border Radius</Label>
+                <select
+                  id="borderRadius"
+                  value={props.borderRadius || '8px'}
+                  onChange={(e) =>
+                    handlePropChange('borderRadius', e.target.value)
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="0">None</option>
+                  <option value="4px">Small</option>
+                  <option value="8px">Medium</option>
+                  <option value="16px">Large</option>
+                  <option value="24px">Extra Large</option>
+                  <option value="full">Full (Circular)</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="shadow">Shadow</Label>
+                <select
+                  id="shadow"
+                  value={props.shadow || 'none'}
+                  onChange={(e) => handlePropChange('shadow', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="none">None</option>
+                  <option value="sm">Small</option>
+                  <option value="md">Medium</option>
+                  <option value="lg">Large</option>
+                  <option value="xl">Extra Large</option>
+                </select>
+              </div>
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Caption
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="showCaption" className="cursor-pointer">
+                  Show Caption
+                </Label>
+                <input
+                  type="checkbox"
+                  id="showCaption"
+                  checked={props.showCaption ?? false}
+                  onChange={(e) =>
+                    handlePropChange('showCaption', e.target.checked)
+                  }
+                  className="w-4 h-4"
+                />
+              </div>
+
+              {props.showCaption && (
+                <>
+                  <div>
+                    <Label htmlFor="caption">Caption Text</Label>
+                    <Input
+                      id="caption"
+                      value={props.caption || ''}
+                      onChange={(e) =>
+                        handlePropChange('caption', e.target.value)
+                      }
+                      placeholder="Add a caption..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="captionPosition">Caption Position</Label>
+                    <select
+                      id="captionPosition"
+                      value={props.captionPosition || 'below'}
+                      onChange={(e) =>
+                        handlePropChange('captionPosition', e.target.value)
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    >
+                      <option value="above">Above Media</option>
+                      <option value="below">Below Media</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                Styling
+              </div>
+
+              <div>
+                <Label htmlFor="bgColor">Background Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bgColor"
+                    type="color"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    type="text"
+                    value={props.bgColor || '#ffffff'}
+                    onChange={(e) =>
+                      handlePropChange('bgColor', e.target.value)
+                    }
+                    placeholder="#ffffff"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="paddingY">Vertical Padding</Label>
+                <select
+                  id="paddingY"
+                  value={props.paddingY || '2rem'}
+                  onChange={(e) => handlePropChange('paddingY', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="0">None</option>
+                  <option value="1rem">Small</option>
+                  <option value="2rem">Medium</option>
+                  <option value="3rem">Large</option>
+                  <option value="4rem">Extra Large</option>
+                </select>
+              </div>
             </div>
           </>
         );
@@ -3897,11 +5385,7 @@ export const PropertiesPanel = () => {
 
       {/* Actions */}
       <div className="p-4 border-t border-gray-200 space-y-2">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleDuplicate}
-        >
+        <Button variant="outline" className="w-full" onClick={handleDuplicate}>
           <Copy className="w-4 h-4 mr-2" />
           Duplicate Element
         </Button>

@@ -25,6 +25,7 @@ import {
   FormWithPaymentElement,
   BookingFormElement,
   ProductCarouselElement,
+  MediaElement,
 } from './elements';
 import {
   DndContext,
@@ -109,8 +110,8 @@ const SortableElement = ({
           isSelected
             ? 'ring-2 ring-blue-500 ring-offset-2'
             : isHovered
-            ? 'ring-2 ring-gray-300 ring-offset-2'
-            : ''
+              ? 'ring-2 ring-gray-300 ring-offset-2'
+              : ''
         }`}
       >
         {children}
@@ -179,49 +180,96 @@ export const Canvas = () => {
 
     switch (element.type as ElementType) {
       case 'announcement_bar':
-        elementContent = <AnnouncementBarElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <AnnouncementBarElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
         break;
       case 'navigation':
-        elementContent = <NavigationElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <NavigationElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'hero':
-        elementContent = <HeroElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <HeroElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'features':
-        elementContent = <FeaturesElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <FeaturesElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'testimonials':
-        elementContent = <TestimonialsElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <TestimonialsElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'faq':
-        elementContent = <FAQElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <FAQElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'cta':
-        elementContent = <CTAElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <CTAElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'pricing':
-        elementContent = <PricingElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <PricingElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'payment_button':
-        elementContent = <PaymentButtonElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <PaymentButtonElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'lead_form':
-        elementContent = <LeadFormElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <LeadFormElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'whatsapp_button':
-        elementContent = <WhatsAppButtonElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <WhatsAppButtonElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
         break;
       case 'form_with_payment':
-        elementContent = <FormWithPaymentElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <FormWithPaymentElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
         break;
       case 'booking_form':
-        elementContent = <BookingFormElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <BookingFormElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'product_carousel':
-        elementContent = <ProductCarouselElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <ProductCarouselElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
+        break;
+      case 'media':
+        elementContent = (
+          <MediaElement props={element.props as any} {...commonProps} />
+        );
         break;
       case 'footer':
-        elementContent = <FooterElement props={element.props as any} {...commonProps} />;
+        elementContent = (
+          <FooterElement props={element.props as any} {...commonProps} />
+        );
         break;
       default:
         elementContent = (

@@ -14,3 +14,4 @@ export { WhatsAppButtonElement } from './WhatsAppButton';
 export { FormWithPaymentElement } from './FormWithPayment';
 export { BookingFormElement } from './BookingForm';
 export { ProductCarouselElement } from './ProductCarousel';
+export { MediaElement } from './Media';

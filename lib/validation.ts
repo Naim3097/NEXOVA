@@ -5,6 +5,23 @@ import { z } from 'zod';
  * These schemas ensure type safety and data validation
  */
 
+// Variation option schema
+export const VariationOptionSchema = z.object({
+  value: z.string().min(1).max(50),
+  label: z.string().min(1).max(100),
+  priceAdjustment: z.number().default(0),
+  stock: z.number().int().min(0).default(0),
+  colorCode: z.string().optional(),
+});
+
+// Variation schema
+export const VariationSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1).max(100),
+  type: z.enum(['size', 'color', 'other']),
+  options: z.array(VariationOptionSchema).default([]),
+});
+
 // Product validation schemas
 export const ProductCreateSchema = z.object({
   code: z.string().min(1).max(50),
@@ -14,10 +31,15 @@ export const ProductCreateSchema = z.object({
   stock: z.number().int().min(0).default(0),
   base_price: z.number().positive(),
   currency: z.enum(['MYR', 'USD', 'SGD', 'EUR', 'GBP']).default('MYR'),
-  quantity_pricing: z.array(z.object({
-    min_quantity: z.number().int().positive(),
-    price: z.number().positive(),
-  })).default([]),
+  quantity_pricing: z
+    .array(
+      z.object({
+        min_quantity: z.number().int().positive(),
+        price: z.number().positive(),
+      })
+    )
+    .default([]),
+  variations: z.array(VariationSchema).default([]),
   notes: z.string().max(1000).optional().nullable(),
   status: z.enum(['active', 'inactive', 'archived']).default('active'),
 });
@@ -46,16 +68,24 @@ export const FormSubmissionSchema = z.object({
   project_id: z.string().uuid(),
   form_id: z.string().optional(),
   data: z.record(z.any()),
-  metadata: z.object({
-    user_agent: z.string().optional(),
-    referrer: z.string().optional(),
-  }).optional(),
+  metadata: z
+    .object({
+      user_agent: z.string().optional(),
+      referrer: z.string().optional(),
+    })
+    .optional(),
 });
 
 // Analytics event validation
 export const AnalyticsEventSchema = z.object({
   project_id: z.string().uuid(),
-  event_type: z.enum(['page_view', 'button_click', 'form_view', 'form_submit', 'page_exit']),
+  event_type: z.enum([
+    'page_view',
+    'button_click',
+    'form_view',
+    'form_submit',
+    'page_exit',
+  ]),
   session_id: z.string().min(1),
   device_type: z.string().optional(),
   metadata: z.record(z.any()).optional(),
@@ -110,7 +140,9 @@ export function safeValidateData<T>(
 /**
  * Format Zod errors for API responses
  */
-export function formatValidationErrors(error: z.ZodError): Record<string, string[]> {
+export function formatValidationErrors(
+  error: z.ZodError
+): Record<string, string[]> {
   const formatted: Record<string, string[]> = {};
 
   for (const issue of error.issues) {
