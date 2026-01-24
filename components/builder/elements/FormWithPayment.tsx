@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Shield,
   Minus,
@@ -8,6 +8,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { Product, ProductVariation, BundlePricingTier } from '@/types';
+import { useCart } from '@/lib/cart-context';
 
 interface FormWithPaymentElementProps {
   props: {
@@ -85,6 +86,9 @@ export const FormWithPaymentElement = React.memo(
       companyRegistration = 'Company Registration Number',
     } = props;
 
+    // Get cart context for syncing with Product Carousel
+    const cart = useCart();
+
     // Preview state for quantities (builder preview only)
     // For products with variations: key is "productId-variationValue"
     // For products without variations: key is just "productId"
@@ -93,6 +97,34 @@ export const FormWithPaymentElement = React.memo(
     const [expandedProducts, setExpandedProducts] = useState<
       Record<string, boolean>
     >({});
+
+    // Sync quantities from cart items when cart changes
+    useEffect(() => {
+      if (cart.items.length > 0) {
+        const cartQuantities: Record<string, number> = {};
+        const expandedFromCart: Record<string, boolean> = {};
+
+        cart.items.forEach((item) => {
+          // Find matching product in our products list
+          const matchingProduct = products.find((p) => p.id === item.productId);
+          if (matchingProduct) {
+            // Use variantKey if it has one, otherwise use productId
+            const key = item.variantKey || item.productId;
+            cartQuantities[key] = item.quantity;
+
+            // Auto-expand products that have items in cart
+            if (item.variantKey && item.variantKey !== item.productId) {
+              expandedFromCart[item.productId] = true;
+            }
+          }
+        });
+
+        // Merge with existing quantities (cart quantities take priority)
+        setQuantities((prev) => ({ ...prev, ...cartQuantities }));
+        // Auto-expand products with cart items
+        setExpandedProducts((prev) => ({ ...prev, ...expandedFromCart }));
+      }
+    }, [cart.items, products]);
 
     const selectedCountry =
       countryCodes.find((c) => c.code === defaultCountryCode) ||
@@ -316,10 +348,14 @@ export const FormWithPaymentElement = React.memo(
     }, [products, quantities]);
 
     // Handle quantity change - key can be "productId" or "productId-variationValue"
+    // Handle quantity change - key can be "productId" or "productId-variationValue"
+    // Also syncs back to cart for cross-element communication
     const handleQuantityChange = (
       key: string,
       delta: number,
-      stock?: number
+      stock?: number,
+      productName?: string,
+      price?: number
     ) => {
       setQuantities((prev) => {
         const current = prev[key] || 0;
@@ -328,6 +364,22 @@ export const FormWithPaymentElement = React.memo(
         if (stock !== undefined && newQty > stock) {
           newQty = stock;
         }
+
+        // Sync to cart if available
+        if (cart && productName && price !== undefined) {
+          const isVariant = key.includes('-');
+          const productId = isVariant ? key.split('-')[0] : key;
+          const variantLabel = isVariant
+            ? key.split('-').slice(1).join('-')
+            : undefined;
+
+          if (newQty > 0) {
+            cart.updateQuantity(productId, newQty, isVariant ? key : undefined);
+          } else {
+            cart.removeFromCart(productId, isVariant ? key : undefined);
+          }
+        }
+
         return { ...prev, [key]: newQty };
       });
     };

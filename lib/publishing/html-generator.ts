@@ -116,6 +116,77 @@ export function generateHTML(
         document.body.style.overflow = 'auto';
       }
     };
+
+    // Global cart for syncing between Product Carousel and Form with Payment
+    window.__GLOBAL_CART__ = {
+      items: [],
+      listeners: [],
+
+      addItem: function(item) {
+        var key = item.variantKey || item.productId;
+        var existingIndex = this.items.findIndex(function(i) {
+          return (i.variantKey || i.productId) === key;
+        });
+
+        if (existingIndex >= 0) {
+          this.items[existingIndex].quantity += (item.quantity || 1);
+        } else {
+          this.items.push({
+            productId: item.productId,
+            productName: item.productName,
+            variantKey: item.variantKey,
+            variantLabel: item.variantLabel,
+            price: item.price,
+            quantity: item.quantity || 1
+          });
+        }
+        this.notifyListeners();
+      },
+
+      updateQuantity: function(key, quantity) {
+        var index = this.items.findIndex(function(i) {
+          return (i.variantKey || i.productId) === key;
+        });
+
+        if (index >= 0) {
+          if (quantity <= 0) {
+            this.items.splice(index, 1);
+          } else {
+            this.items[index].quantity = quantity;
+          }
+          this.notifyListeners();
+        }
+      },
+
+      removeItem: function(key) {
+        this.items = this.items.filter(function(i) {
+          return (i.variantKey || i.productId) !== key;
+        });
+        this.notifyListeners();
+      },
+
+      getQuantity: function(key) {
+        var item = this.items.find(function(i) {
+          return (i.variantKey || i.productId) === key;
+        });
+        return item ? item.quantity : 0;
+      },
+
+      subscribe: function(listener) {
+        this.listeners.push(listener);
+        return function() {
+          var idx = this.listeners.indexOf(listener);
+          if (idx > -1) this.listeners.splice(idx, 1);
+        }.bind(this);
+      },
+
+      notifyListeners: function() {
+        var self = this;
+        this.listeners.forEach(function(listener) {
+          listener(self.items);
+        });
+      }
+    };
   </script>
 
   ${generateBodyContent(elements)}
@@ -3518,6 +3589,45 @@ function generateFormWithPaymentHTML(element: Element): string {
       // Track expanded state for products with variants
       const expandedProducts_${sanitizedId} = {};
 
+      // Subscribe to global cart changes (sync from Product Carousel)
+      if (window.__GLOBAL_CART__) {
+        window.__GLOBAL_CART__.subscribe(function(cartItems) {
+          cartItems.forEach(function(item) {
+            // Find matching product in our products list
+            const matchingProduct = products_${sanitizedId}.find(function(p) {
+              return p.id === item.productId;
+            });
+
+            if (matchingProduct) {
+              const key = item.variantKey || item.productId;
+              const currentQty = quantities_${sanitizedId}[key] || 0;
+
+              // Only update if different (to avoid infinite loops)
+              if (currentQty !== item.quantity) {
+                quantities_${sanitizedId}[key] = item.quantity;
+
+                // Update UI
+                const qtyEl = document.getElementById('qty-${sanitizedId}-' + key);
+                if (qtyEl) qtyEl.textContent = item.quantity;
+
+                // If it's a variant, update the product summary and expand the product
+                if (item.variantKey && item.variantKey !== item.productId) {
+                  expandedProducts_${sanitizedId}[item.productId] = true;
+                  const grid = document.getElementById('variant-grid-${sanitizedId}-' + item.productId);
+                  const icon = document.getElementById('expand-icon-${sanitizedId}-' + item.productId);
+                  if (grid) grid.style.display = 'block';
+                  if (icon) icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+                  updateProductVariantSummary_${sanitizedId}(item.productId);
+                }
+              }
+            }
+          });
+
+          // Update total after syncing all items
+          updateTotal_${sanitizedId}();
+        });
+      }
+
       // Toggle product expand/collapse
       window.toggleProductExpand_${sanitizedId} = function(productId) {
         expandedProducts_${sanitizedId}[productId] = !expandedProducts_${sanitizedId}[productId];
@@ -4307,7 +4417,7 @@ function generateAnalyticsScripts(project: Project): string {
 }
 
 /**
- * Generate Product Carousel HTML
+ * Generate Product Carousel HTML with Add to Cart functionality
  */
 function generateProductCarouselHTML(element: Element): string {
   const {
@@ -4324,6 +4434,9 @@ function generateProductCarouselHTML(element: Element): string {
     priceColor = '#2563eb',
     backgroundImage,
     backgroundOpacity = 70,
+    showAddToCart = true,
+    addToCartButtonColor = '#111827',
+    addToCartButtonText = 'Add to Cart',
   } = element.props;
 
   const sanitizedId = sanitizeId(element.id);
@@ -4336,33 +4449,126 @@ function generateProductCarouselHTML(element: Element): string {
         ? 'background: white; border: 1px solid #e5e7eb;'
         : 'background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);';
 
+  // Format currency helper
+  const formatCurrency = (value: number, currency: string) => {
+    if (currency === 'RM' || currency === 'MYR') {
+      return `RM${value.toFixed(2)}`;
+    }
+    return `${currency} ${value.toFixed(2)}`;
+  };
+
   // Generate product cards HTML
   const productsHTML = products
     .map((product: any, index: number) => {
-      const variationsHTML =
-        product.variations && product.variations.length > 0
-          ? `<div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
-          ${product.variations
-            .map((variation: any) =>
-              variation.type === 'color'
-                ? `<div style="display: flex; gap: 4px;">
-                  ${variation.options
-                    .slice(0, 4)
-                    .map(
-                      (opt: any) =>
-                        `<div style="width: 16px; height: 16px; border-radius: 50%; border: 1px solid #d1d5db; background-color: ${opt.colorCode || '#ccc'};" title="${opt.label}"></div>`
-                    )
-                    .join('')}
-                  ${variation.options.length > 4 ? `<span style="font-size: 12px; color: #6b7280;">+${variation.options.length - 4}</span>` : ''}
-                </div>`
-                : `<span style="font-size: 12px; color: #6b7280;">${variation.options.length} ${variation.name.toLowerCase()}s</span>`
-            )
-            .join('')}
-        </div>`
+      const hasVariations = product.variations && product.variations.length > 0;
+      const variantOptions =
+        hasVariations && product.variations[0]
+          ? product.variations[0].options
+          : [];
+
+      // Generate variant dropdown if product has variations
+      const variantDropdownHTML =
+        hasVariations && showAddToCart
+          ? `
+          <div style="position: relative; margin-bottom: 12px;">
+            <button
+              type="button"
+              onclick="toggleDropdown_${sanitizedId}('${product.id}')"
+              id="dropdown-btn-${sanitizedId}-${product.id}"
+              style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; background: white; cursor: pointer; text-align: left;"
+            >
+              <span id="dropdown-label-${sanitizedId}-${product.id}" style="color: #6b7280;">Choose an option</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="transition: transform 0.2s;" id="dropdown-icon-${sanitizedId}-${product.id}">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div
+              id="dropdown-options-${sanitizedId}-${product.id}"
+              style="display: none; position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 20; max-height: 192px; overflow-y: auto;"
+            >
+              ${variantOptions
+                .map(
+                  (option: any) => `
+                <button
+                  type="button"
+                  onclick="selectVariant_${sanitizedId}('${product.id}', '${option.value}', '${option.label}', ${option.priceAdjustment || 0})"
+                  style="width: 100%; padding: 8px 16px; text-align: left; background: none; border: none; cursor: pointer; display: flex; justify-content: space-between;"
+                  onmouseover="this.style.background='#f3f4f6'"
+                  onmouseout="this.style.background='none'"
+                >
+                  <span>${option.label}</span>
+                  ${
+                    option.priceAdjustment && option.priceAdjustment !== 0
+                      ? `<span style="color: #6b7280; font-size: 14px;">${option.priceAdjustment > 0 ? '+' : ''}${formatCurrency(option.priceAdjustment, product.currency)}</span>`
+                      : ''
+                  }
+                </button>
+              `
+                )
+                .join('')}
+            </div>
+            <button
+              type="button"
+              id="clear-btn-${sanitizedId}-${product.id}"
+              onclick="clearVariant_${sanitizedId}('${product.id}')"
+              style="display: none; margin-top: 8px; font-size: 14px; color: #6b7280; background: none; border: none; cursor: pointer;"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        `
           : '';
 
+      // Price display
+      const priceHTML = showPrice
+        ? hasVariations
+          ? `
+            <div style="margin-bottom: 12px;">
+              <p id="price-display-${sanitizedId}-${product.id}" style="font-weight: 700; font-size: 18px; color: ${priceColor};">
+                ${formatCurrency(product.base_price, product.currency)}${
+                  variantOptions.some(
+                    (opt: any) => opt.priceAdjustment && opt.priceAdjustment > 0
+                  )
+                    ? ` - ${formatCurrency(
+                        product.base_price +
+                          Math.max(
+                            ...variantOptions.map(
+                              (opt: any) => opt.priceAdjustment || 0
+                            )
+                          ),
+                        product.currency
+                      )}`
+                    : ''
+                }
+              </p>
+            </div>
+          `
+          : `<p style="font-weight: 700; font-size: 18px; color: ${priceColor}; margin-bottom: 12px;">${formatCurrency(product.base_price, product.currency)}</p>`
+        : '';
+
+      // Add to Cart button
+      const addToCartHTML = showAddToCart
+        ? `
+          <button
+            type="button"
+            id="add-to-cart-btn-${sanitizedId}-${product.id}"
+            onclick="addToCart_${sanitizedId}('${product.id}')"
+            style="width: 100%; padding: 12px; border-radius: 9999px; border: none; background: ${addToCartButtonColor}; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;"
+            onmouseover="this.style.opacity='0.9'"
+            onmouseout="this.style.opacity='1'"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span id="add-to-cart-text-${sanitizedId}-${product.id}">${hasVariations ? 'Select Options' : addToCartButtonText}</span>
+          </button>
+        `
+        : '';
+
       return `
-      <div style="${cardClasses} border-radius: 12px; overflow: hidden; transition: transform 0.2s;" class="product-card-${sanitizedId}">
+      <div style="${cardClasses} border-radius: 12px; overflow: hidden; transition: transform 0.2s;" class="product-card-${sanitizedId}" data-product-id="${product.id}">
         <div style="aspect-ratio: 1; background: #f3f4f6; position: relative; overflow: hidden;">
           ${
             product.image_url
@@ -4375,18 +4581,15 @@ function generateProductCarouselHTML(element: Element): string {
           }
         </div>
         <div style="padding: 16px;">
+          ${variantDropdownHTML}
           <h3 style="font-weight: 600; font-size: 18px; margin-bottom: 4px; color: ${textColor};">${product.name}</h3>
           ${
             showDescription && product.description
               ? `<p style="font-size: 14px; opacity: 0.7; margin-bottom: 12px; color: ${textColor}; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.description}</p>`
               : ''
           }
-          ${variationsHTML}
-          ${
-            showPrice
-              ? `<p style="font-weight: 700; font-size: 18px; color: ${priceColor};">${product.currency} ${typeof product.base_price === 'number' ? product.base_price.toFixed(2) : product.base_price}</p>`
-              : ''
-          }
+          ${priceHTML}
+          ${addToCartHTML}
         </div>
       </div>
     `;
@@ -4406,6 +4609,17 @@ function generateProductCarouselHTML(element: Element): string {
       <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
     `
     : '';
+
+  // Products data for JavaScript
+  const productsDataJS = JSON.stringify(
+    products.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      base_price: product.base_price,
+      currency: product.currency,
+      variations: product.variations || [],
+    }))
+  );
 
   return `
     <section id="product-carousel-${sanitizedId}" style="position: relative; padding: 64px 16px; background-color: ${bgColor}; overflow: hidden;">
@@ -4439,6 +4653,182 @@ function generateProductCarouselHTML(element: Element): string {
           }
         }
       </style>
+
+      <!-- Product Carousel JavaScript -->
+      <script>
+        (function() {
+          var products_${sanitizedId} = ${productsDataJS};
+          var selectedVariants_${sanitizedId} = {};
+
+          // Format currency
+          function formatCurrency_${sanitizedId}(value, currency) {
+            if (currency === 'RM' || currency === 'MYR') {
+              return 'RM' + value.toFixed(2);
+            }
+            return currency + ' ' + value.toFixed(2);
+          }
+
+          // Toggle dropdown
+          window.toggleDropdown_${sanitizedId} = function(productId) {
+            var dropdown = document.getElementById('dropdown-options-${sanitizedId}-' + productId);
+            var icon = document.getElementById('dropdown-icon-${sanitizedId}-' + productId);
+            var isOpen = dropdown.style.display === 'block';
+
+            // Close all other dropdowns first
+            products_${sanitizedId}.forEach(function(p) {
+              var d = document.getElementById('dropdown-options-${sanitizedId}-' + p.id);
+              var i = document.getElementById('dropdown-icon-${sanitizedId}-' + p.id);
+              if (d && d !== dropdown) {
+                d.style.display = 'none';
+                if (i) i.style.transform = 'rotate(0deg)';
+              }
+            });
+
+            dropdown.style.display = isOpen ? 'none' : 'block';
+            icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+          };
+
+          // Select variant
+          window.selectVariant_${sanitizedId} = function(productId, variantValue, variantLabel, priceAdjustment) {
+            selectedVariants_${sanitizedId}[productId] = {
+              value: variantValue,
+              label: variantLabel,
+              priceAdjustment: priceAdjustment || 0
+            };
+
+            // Update dropdown label
+            var label = document.getElementById('dropdown-label-${sanitizedId}-' + productId);
+            if (label) {
+              label.textContent = variantLabel;
+              label.style.color = '#111827';
+            }
+
+            // Close dropdown
+            var dropdown = document.getElementById('dropdown-options-${sanitizedId}-' + productId);
+            var icon = document.getElementById('dropdown-icon-${sanitizedId}-' + productId);
+            if (dropdown) dropdown.style.display = 'none';
+            if (icon) icon.style.transform = 'rotate(0deg)';
+
+            // Show clear button
+            var clearBtn = document.getElementById('clear-btn-${sanitizedId}-' + productId);
+            if (clearBtn) clearBtn.style.display = 'block';
+
+            // Update price display
+            var product = products_${sanitizedId}.find(function(p) { return p.id === productId; });
+            if (product) {
+              var priceEl = document.getElementById('price-display-${sanitizedId}-' + productId);
+              if (priceEl) {
+                priceEl.textContent = formatCurrency_${sanitizedId}(product.base_price + priceAdjustment, product.currency);
+              }
+            }
+
+            // Update button text
+            var btnText = document.getElementById('add-to-cart-text-${sanitizedId}-' + productId);
+            if (btnText) btnText.textContent = '${addToCartButtonText}';
+          };
+
+          // Clear variant
+          window.clearVariant_${sanitizedId} = function(productId) {
+            delete selectedVariants_${sanitizedId}[productId];
+
+            // Reset dropdown label
+            var label = document.getElementById('dropdown-label-${sanitizedId}-' + productId);
+            if (label) {
+              label.textContent = 'Choose an option';
+              label.style.color = '#6b7280';
+            }
+
+            // Hide clear button
+            var clearBtn = document.getElementById('clear-btn-${sanitizedId}-' + productId);
+            if (clearBtn) clearBtn.style.display = 'none';
+
+            // Reset price display
+            var product = products_${sanitizedId}.find(function(p) { return p.id === productId; });
+            if (product && product.variations && product.variations.length > 0) {
+              var priceEl = document.getElementById('price-display-${sanitizedId}-' + productId);
+              if (priceEl) {
+                var options = product.variations[0].options;
+                var maxAdj = Math.max.apply(null, options.map(function(o) { return o.priceAdjustment || 0; }));
+                if (maxAdj > 0) {
+                  priceEl.textContent = formatCurrency_${sanitizedId}(product.base_price, product.currency) + ' - ' + formatCurrency_${sanitizedId}(product.base_price + maxAdj, product.currency);
+                } else {
+                  priceEl.textContent = formatCurrency_${sanitizedId}(product.base_price, product.currency);
+                }
+              }
+            }
+
+            // Reset button text
+            var btnText = document.getElementById('add-to-cart-text-${sanitizedId}-' + productId);
+            if (btnText) btnText.textContent = 'Select Options';
+          };
+
+          // Add to cart
+          window.addToCart_${sanitizedId} = function(productId) {
+            var product = products_${sanitizedId}.find(function(p) { return p.id === productId; });
+            if (!product) return;
+
+            var hasVariations = product.variations && product.variations.length > 0;
+            var selectedVariant = selectedVariants_${sanitizedId}[productId];
+
+            // If has variations but none selected, open dropdown
+            if (hasVariations && !selectedVariant) {
+              toggleDropdown_${sanitizedId}(productId);
+              return;
+            }
+
+            var price = product.base_price + (selectedVariant ? selectedVariant.priceAdjustment : 0);
+            var variantKey = selectedVariant ? (productId + '-' + selectedVariant.value) : productId;
+            var variantLabel = selectedVariant ? selectedVariant.label : null;
+
+            // Add to global cart
+            if (window.__GLOBAL_CART__) {
+              window.__GLOBAL_CART__.addItem({
+                productId: productId,
+                productName: product.name,
+                variantKey: variantKey,
+                variantLabel: variantLabel,
+                price: price
+              });
+            }
+
+            // Show added feedback
+            var btn = document.getElementById('add-to-cart-btn-${sanitizedId}-' + productId);
+            var btnText = document.getElementById('add-to-cart-text-${sanitizedId}-' + productId);
+            if (btn && btnText) {
+              btn.style.background = '#22c55e';
+              btnText.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Added!';
+
+              setTimeout(function() {
+                btn.style.background = '${addToCartButtonColor}';
+                btnText.textContent = hasVariations && !selectedVariant ? 'Select Options' : '${addToCartButtonText}';
+              }, 1500);
+            }
+          };
+
+          // Close dropdowns when clicking outside
+          document.addEventListener('click', function(e) {
+            var target = e.target;
+            var isDropdownClick = false;
+
+            products_${sanitizedId}.forEach(function(p) {
+              var btn = document.getElementById('dropdown-btn-${sanitizedId}-' + p.id);
+              var dropdown = document.getElementById('dropdown-options-${sanitizedId}-' + p.id);
+              if (btn && (btn.contains(target) || (dropdown && dropdown.contains(target)))) {
+                isDropdownClick = true;
+              }
+            });
+
+            if (!isDropdownClick) {
+              products_${sanitizedId}.forEach(function(p) {
+                var dropdown = document.getElementById('dropdown-options-${sanitizedId}-' + p.id);
+                var icon = document.getElementById('dropdown-icon-${sanitizedId}-' + p.id);
+                if (dropdown) dropdown.style.display = 'none';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+              });
+            }
+          });
+        })();
+      </script>
     </section>
   `;
 }
