@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id, versionId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();
@@ -81,7 +81,7 @@ export async function PATCH(
     const body = await request.json();
     const { label } = body;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();
@@ -151,7 +151,7 @@ export async function DELETE(
 ) {
   try {
     const { id, versionId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();

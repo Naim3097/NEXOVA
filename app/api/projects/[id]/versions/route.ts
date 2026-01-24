@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();
@@ -81,7 +81,7 @@ export async function POST(
     const body = await request.json();
     const { label, is_auto_save } = body;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();

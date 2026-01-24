@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+
+// Create a Supabase client for edge runtime (no auth needed for public tracking)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export const runtime = 'edge';
 
@@ -40,8 +46,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const supabase = createClient();
 
     // Verify project exists
     const { data: project, error: projectError } = await supabase

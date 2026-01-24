@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 // POST bulk delete products
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const {

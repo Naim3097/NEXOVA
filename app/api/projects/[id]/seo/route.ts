@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();
@@ -76,7 +76,7 @@ export async function PUT(
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();

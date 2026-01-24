@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 
 // Helper to get valid OAuth client with token refresh
 async function getValidOAuth2Client(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -49,7 +49,7 @@ async function getValidOAuth2Client(userId: string) {
 // GET: List all GA4 properties for the connected account
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -132,7 +132,7 @@ export async function GET() {
 // POST: Update the selected GA4 property
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {

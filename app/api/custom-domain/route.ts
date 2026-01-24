@@ -10,7 +10,7 @@ import {
 // GET: Get current custom domain settings
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -104,7 +104,7 @@ export async function GET() {
 // POST: Check if custom domain is available and add to Vercel
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 // PUT: Save custom domain (add to Vercel and save to database)
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -296,7 +296,7 @@ export async function PUT(request: NextRequest) {
 // DELETE: Remove custom domain
 export async function DELETE() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {

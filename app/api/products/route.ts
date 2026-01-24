@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // GET all products for current user
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const {
@@ -47,7 +47,7 @@ export async function GET() {
 // POST create new product
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get current user
     const {

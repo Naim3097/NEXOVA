@@ -5,7 +5,7 @@ import { addSubdomainAlias, removeSubdomainAlias, getSubdomainAlias } from '@/li
 // GET: Check current subdomain
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -38,7 +38,7 @@ export async function GET() {
 // POST: Check if subdomain is available
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 // PUT: Update subdomain
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {

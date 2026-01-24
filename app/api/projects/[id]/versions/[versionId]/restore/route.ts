@@ -11,7 +11,7 @@ export async function POST(
 ) {
   try {
     const { id, versionId } = params;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verify user owns the project
     const { data: { user } } = await supabase.auth.getUser();

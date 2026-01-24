@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Save tokens to database
-    const supabase = createClient();
+    const supabase = await createClient();
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
