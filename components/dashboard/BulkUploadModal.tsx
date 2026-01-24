@@ -299,9 +299,10 @@ export default function BulkUploadModal({
       } else {
         setUploadResult({
           success: false,
-          error: result.error,
+          error: result.error || 'Unknown error occurred',
           errors: result.validationErrors,
         });
+        console.error('Upload failed:', result);
       }
     } catch (error) {
       console.error('Error uploading:', error);

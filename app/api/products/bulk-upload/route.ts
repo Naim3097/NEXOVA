@@ -138,6 +138,10 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error inserting products:', insertError);
+      console.error(
+        'Insert error details:',
+        JSON.stringify(insertError, null, 2)
+      );
 
       // Check for duplicate code error
       if (insertError.code === '23505') {
@@ -149,8 +153,25 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Check for column doesn't exist error
+      if (
+        insertError.code === '42703' ||
+        insertError.message?.includes('column')
+      ) {
+        return NextResponse.json(
+          {
+            error: `Database schema error: ${insertError.message}. Please ensure the 'variations' column exists in the products table.`,
+            details: insertError.message,
+          },
+          { status: 500 }
+        );
+      }
+
       return NextResponse.json(
-        { error: 'Failed to insert products' },
+        {
+          error: `Failed to insert products: ${insertError.message || 'Unknown error'}`,
+          code: insertError.code,
+        },
         { status: 500 }
       );
     }
@@ -168,7 +189,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error in POST /api/products/bulk-upload:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: `Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      },
       { status: 500 }
     );
   }
