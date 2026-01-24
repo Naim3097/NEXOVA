@@ -1,5 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { Shield, Minus, Plus, CreditCard, ChevronDown } from 'lucide-react';
+import {
+  Shield,
+  Minus,
+  Plus,
+  CreditCard,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { Product, ProductVariation, BundlePricingTier } from '@/types';
 
 interface FormWithPaymentElementProps {
@@ -79,27 +86,33 @@ export const FormWithPaymentElement = React.memo(
     } = props;
 
     // Preview state for quantities (builder preview only)
+    // For products with variations: key is "productId-variationValue"
+    // For products without variations: key is just "productId"
     const [quantities, setQuantities] = useState<Record<string, number>>({});
-    // Track selected variation for each product
-    const [selectedVariations, setSelectedVariations] = useState<
-      Record<string, string>
+    // Track expanded products (to show variant grid)
+    const [expandedProducts, setExpandedProducts] = useState<
+      Record<string, boolean>
     >({});
 
     const selectedCountry =
       countryCodes.find((c) => c.code === defaultCountryCode) ||
       countryCodes[0];
 
-    // Get price adjustment for selected variation
-    const getVariationPriceAdjustment = (product: Product): number => {
-      if (!product.variations || product.variations.length === 0) return 0;
-
-      const variationKey = `${product.id}`;
-      const selectedValue = selectedVariations[variationKey];
-      if (!selectedValue) return 0;
+    // Get price adjustment for a specific variation option
+    const getVariationPriceAdjustment = (
+      product: Product,
+      variationValue?: string
+    ): number => {
+      if (
+        !product.variations ||
+        product.variations.length === 0 ||
+        !variationValue
+      )
+        return 0;
 
       for (const variation of product.variations) {
         const option = variation.options.find(
-          (opt) => opt.value === selectedValue
+          (opt) => opt.value === variationValue
         );
         if (option && option.priceAdjustment) {
           return option.priceAdjustment;
@@ -108,17 +121,38 @@ export const FormWithPaymentElement = React.memo(
       return 0;
     };
 
-    // Get effective price for product (base + variation adjustment)
-    const getEffectivePrice = (product: Product): number => {
-      return product.price + getVariationPriceAdjustment(product);
+    // Get effective price for product with optional variation
+    const getEffectivePrice = (
+      product: Product,
+      variationValue?: string
+    ): number => {
+      return (
+        product.price + getVariationPriceAdjustment(product, variationValue)
+      );
     };
 
-    // Handle variation selection
-    const handleVariationChange = (productId: string, value: string) => {
-      setSelectedVariations((prev) => ({
+    // Toggle product expansion
+    const toggleProductExpand = (productId: string) => {
+      setExpandedProducts((prev) => ({
         ...prev,
-        [productId]: value,
+        [productId]: !prev[productId],
       }));
+    };
+
+    // Get total quantity for a product (sum of all variants)
+    const getProductTotalQty = (product: Product): number => {
+      if (!product.variations || product.variations.length === 0) {
+        return quantities[product.id || ''] || 0;
+      }
+      // Sum all variant quantities
+      let total = 0;
+      for (const variation of product.variations) {
+        for (const option of variation.options) {
+          const key = `${product.id}-${option.value}`;
+          total += quantities[key] || 0;
+        }
+      }
+      return total;
     };
 
     const baseClasses = `relative transition-all ${
@@ -141,13 +175,14 @@ export const FormWithPaymentElement = React.memo(
       return `${currency} ${value.toFixed(2)}`;
     };
 
-    // Get bundle price for a product and quantity
+    // Get bundle price for a product and quantity (uses base price for bundle calculation)
     const getBundlePrice = (
       product: Product,
-      qty: number
+      qty: number,
+      basePrice?: number
     ): { bundlePrice: number | null; originalPrice: number } => {
-      const effectivePrice = getEffectivePrice(product);
-      const originalPrice = effectivePrice * qty;
+      const price = basePrice ?? product.price;
+      const originalPrice = price * qty;
 
       if (
         !product.bundlePricing ||
@@ -183,7 +218,7 @@ export const FormWithPaymentElement = React.memo(
 
       // Add remaining items at regular price
       if (remaining > 0) {
-        bundleTotal += effectivePrice * remaining;
+        bundleTotal += price * remaining;
       }
 
       return {
@@ -199,15 +234,60 @@ export const FormWithPaymentElement = React.memo(
       let hasDiscount = false;
 
       products.forEach((product) => {
-        const qty = quantities[product.id || ''] || 0;
-        const { bundlePrice, originalPrice } = getBundlePrice(product, qty);
+        if (!product.variations || product.variations.length === 0) {
+          // No variations - simple calculation
+          const qty = quantities[product.id || ''] || 0;
+          const { bundlePrice, originalPrice } = getBundlePrice(
+            product,
+            qty,
+            product.price
+          );
 
-        calculatedOriginal += originalPrice;
-        if (bundlePrice !== null && bundlePrice < originalPrice) {
-          calculatedTotal += bundlePrice;
-          hasDiscount = true;
+          calculatedOriginal += originalPrice;
+          if (bundlePrice !== null && bundlePrice < originalPrice) {
+            calculatedTotal += bundlePrice;
+            hasDiscount = true;
+          } else {
+            calculatedTotal += originalPrice;
+          }
         } else {
-          calculatedTotal += originalPrice;
+          // Has variations - calculate each variant separately
+          // Sum up total quantity across all variants for bundle pricing
+          let totalProductQty = 0;
+          let totalVariantPrice = 0;
+
+          for (const variation of product.variations) {
+            for (const option of variation.options) {
+              const key = `${product.id}-${option.value}`;
+              const qty = quantities[key] || 0;
+              totalProductQty += qty;
+              const variantPrice =
+                product.price + (option.priceAdjustment || 0);
+              totalVariantPrice += variantPrice * qty;
+            }
+          }
+
+          calculatedOriginal += totalVariantPrice;
+
+          // Apply bundle pricing based on total quantity
+          const { bundlePrice, originalPrice } = getBundlePrice(
+            product,
+            totalProductQty,
+            product.price
+          );
+
+          if (
+            bundlePrice !== null &&
+            bundlePrice < originalPrice &&
+            totalProductQty > 0
+          ) {
+            // Calculate the discount ratio and apply it
+            const discountRatio = bundlePrice / originalPrice;
+            calculatedTotal += totalVariantPrice * discountRatio;
+            hasDiscount = true;
+          } else {
+            calculatedTotal += totalVariantPrice;
+          }
         }
       });
 
@@ -216,21 +296,22 @@ export const FormWithPaymentElement = React.memo(
         originalTotal: calculatedOriginal,
         hasBundleDiscount: hasDiscount,
       };
-    }, [products, quantities, selectedVariations]);
+    }, [products, quantities]);
 
+    // Handle quantity change - key can be "productId" or "productId-variationValue"
     const handleQuantityChange = (
-      productId: string,
+      key: string,
       delta: number,
       stock?: number
     ) => {
       setQuantities((prev) => {
-        const current = prev[productId] || 0;
+        const current = prev[key] || 0;
         let newQty = Math.max(0, current + delta);
         // Respect stock limit if defined
         if (stock !== undefined && newQty > stock) {
           newQty = stock;
         }
-        return { ...prev, [productId]: newQty };
+        return { ...prev, [key]: newQty };
       });
     };
 
@@ -301,38 +382,68 @@ export const FormWithPaymentElement = React.memo(
       return formatCurrency(originalPrice);
     };
 
-    // Render variation selector dropdown
-    const renderVariationSelector = (product: Product) => {
+    // Render variant grid for a product
+    const renderVariantGrid = (product: Product) => {
       if (!product.variations || product.variations.length === 0) return null;
 
+      const isExpanded = expandedProducts[product.id || ''];
+      if (!isExpanded) return null;
+
       return (
-        <div className="mt-2 space-y-2">
+        <div className="mt-3 pt-3 border-t border-gray-200">
           {product.variations.map((variation) => (
-            <div key={variation.id} className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-12">
-                {variation.name}:
-              </span>
-              <div className="relative flex-1">
-                <select
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={selectedVariations[product.id || ''] || ''}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    handleVariationChange(product.id || '', e.target.value);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <option value="">Select {variation.name}</option>
-                  {variation.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                      {option.priceAdjustment &&
-                        option.priceAdjustment > 0 &&
-                        ` (+${formatCurrency(option.priceAdjustment)})`}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <div key={variation.id} className="mb-3 last:mb-0">
+              <div className="text-xs font-medium text-gray-500 mb-2">
+                {variation.name}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {variation.options.map((option) => {
+                  const key = `${product.id}-${option.value}`;
+                  const qty = quantities[key] || 0;
+                  const variantPrice =
+                    product.price + (option.priceAdjustment || 0);
+
+                  return (
+                    <div
+                      key={option.value}
+                      className="flex items-center justify-between bg-gray-50 rounded-md px-2 py-1.5"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {option.label}
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          {formatCurrency(variantPrice)}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 border border-gray-300 rounded bg-white ml-2">
+                        <button
+                          type="button"
+                          className="px-2 py-1 text-gray-500 hover:bg-gray-100 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuantityChange(key, -1, option.stock);
+                          }}
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-6 text-center text-sm font-medium">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          className="px-2 py-1 text-gray-500 hover:bg-gray-100 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuantityChange(key, 1, option.stock);
+                          }}
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -440,52 +551,115 @@ export const FormWithPaymentElement = React.memo(
               {products.map((product) => {
                 const hasVariations =
                   product.variations && product.variations.length > 0;
-                const effectivePrice = getEffectivePrice(product);
-                const priceAdjustment = getVariationPriceAdjustment(product);
+                const isExpanded = expandedProducts[product.id || ''];
+                const totalQty = getProductTotalQty(product);
 
                 return (
                   <div
                     key={product.id}
-                    className="grid grid-cols-12 gap-4 px-4 py-4 border-b border-gray-100 last:border-b-0 items-start"
+                    className="border-b border-gray-100 last:border-b-0"
                   >
-                    <div className="col-span-5">
-                      <div className="font-medium text-gray-900">
-                        {product.name}
-                      </div>
-                      <div className="text-blue-600 text-sm font-medium">
-                        {formatCurrency(effectivePrice)}
-                        {priceAdjustment > 0 && (
-                          <span className="text-gray-400 text-xs ml-1 line-through">
-                            {formatCurrency(product.price)}
-                          </span>
-                        )}
-                      </div>
-                      {/* Bundle Pricing Info */}
-                      {product.bundlePricing &&
-                        product.bundlePricing.length > 0 && (
-                          <div className="mt-1 text-xs text-green-600">
-                            {product.bundlePricing
-                              .slice(0, 3)
-                              .map((bundle, i) => (
-                                <span key={i}>
-                                  Buy {bundle.quantity} ={' '}
-                                  {formatCurrency(bundle.totalPrice)}
-                                  {i <
-                                    Math.min(product.bundlePricing!.length, 3) -
-                                      1 && ' | '}
+                    {/* Product Header Row */}
+                    <div
+                      className={`grid grid-cols-12 gap-4 px-4 py-4 items-start ${hasVariations ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                      onClick={(e) => {
+                        if (hasVariations) {
+                          e.stopPropagation();
+                          toggleProductExpand(product.id || '');
+                        }
+                      }}
+                    >
+                      <div className="col-span-5">
+                        <div className="flex items-center gap-2">
+                          {hasVariations && (
+                            <span className="text-gray-400">
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                            </span>
+                          )}
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {product.name}
+                            </div>
+                            <div className="text-blue-600 text-sm font-medium">
+                              {formatCurrency(product.price)}
+                              {hasVariations && (
+                                <span className="text-gray-400 text-xs ml-1">
+                                  (tap to select size)
                                 </span>
-                              ))}
+                              )}
+                            </div>
+                            {/* Bundle Pricing Info */}
+                            {product.bundlePricing &&
+                              product.bundlePricing.length > 0 && (
+                                <div className="mt-1 text-xs text-green-600">
+                                  {product.bundlePricing
+                                    .slice(0, 3)
+                                    .map((bundle, i) => (
+                                      <span key={i}>
+                                        Buy {bundle.quantity} ={' '}
+                                        {formatCurrency(bundle.totalPrice)}
+                                        {i <
+                                          Math.min(
+                                            product.bundlePricing!.length,
+                                            3
+                                          ) -
+                                            1 && ' | '}
+                                      </span>
+                                    ))}
+                                </div>
+                              )}
                           </div>
+                        </div>
+                      </div>
+                      <div className="col-span-4 flex justify-center pt-1">
+                        {hasVariations ? (
+                          // Show total qty summary for products with variants
+                          <div className="text-center">
+                            {totalQty > 0 ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                {totalQty} selected
+                              </span>
+                            ) : (
+                              <span className="text-sm text-gray-400">
+                                Select sizes below
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          // Regular quantity selector for products without variants
+                          renderStockStatus(product)
                         )}
-                      {/* Variation Selector */}
-                      {hasVariations && renderVariationSelector(product)}
+                      </div>
+                      <div className="col-span-3 text-right text-gray-900 font-medium pt-1">
+                        {hasVariations
+                          ? // Calculate total for all variants
+                            (() => {
+                              let variantTotal = 0;
+                              for (const variation of product.variations!) {
+                                for (const option of variation.options) {
+                                  const key = `${product.id}-${option.value}`;
+                                  const qty = quantities[key] || 0;
+                                  const variantPrice =
+                                    product.price +
+                                    (option.priceAdjustment || 0);
+                                  variantTotal += variantPrice * qty;
+                                }
+                              }
+                              return formatCurrency(variantTotal);
+                            })()
+                          : renderProductAmount(product)}
+                      </div>
                     </div>
-                    <div className="col-span-4 flex justify-center pt-1">
-                      {renderStockStatus(product)}
-                    </div>
-                    <div className="col-span-3 text-right text-gray-900 font-medium pt-1">
-                      {renderProductAmount(product)}
-                    </div>
+                    {/* Variant Grid (expandable) */}
+                    {hasVariations && (
+                      <div className="px-4 pb-4">
+                        {renderVariantGrid(product)}
+                      </div>
+                    )}
                   </div>
                 );
               })}

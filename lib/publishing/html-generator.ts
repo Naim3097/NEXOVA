@@ -3047,46 +3047,137 @@ function generateFormWithPaymentHTML(element: Element): string {
     return `${currency} ${value.toFixed(2)}`;
   };
 
-  // Generate products HTML
+  // Generate products HTML with variant grid support
   const productsHTML = products
     .map((product: any) => {
+      const hasVariations = product.variations && product.variations.length > 0;
       const isOutOfStock = product.stock !== undefined && product.stock <= 0;
 
-      const stockStatusHTML = isOutOfStock
-        ? '<span style="color: #ef4444; font-weight: 500; font-size: 0.875rem;">Out of Stock</span>'
-        : `
-        <div style="display: flex; align-items: center; gap: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-          <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', -1)" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          </button>
-          <span id="qty-${sanitizedId}-${product.id}" style="width: 2rem; text-align: center; font-weight: 500;">0</span>
-          <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', 1, ${product.stock || 999})" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          </button>
+      // Bundle pricing info HTML
+      const bundlePricingHTML =
+        product.bundlePricing && product.bundlePricing.length > 0
+          ? `<div style="margin-top: 0.25rem; font-size: 0.75rem; color: #16a34a;">
+          ${product.bundlePricing
+            .slice(0, 3)
+            .map(
+              (b: any, i: number) =>
+                `Buy ${b.quantity} = ${formatCurrency(b.totalPrice)}${i < Math.min(product.bundlePricing.length, 3) - 1 ? ' | ' : ''}`
+            )
+            .join('')}
+        </div>`
+          : '';
+
+      if (hasVariations) {
+        // Product with variations - expandable variant grid
+        const variationGridHTML = product.variations
+          .map((variation: any) => {
+            const optionsHTML = variation.options
+              .map((option: any) => {
+                const variantKey = `${product.id}-${option.value}`;
+                const variantPrice =
+                  product.price + (option.priceAdjustment || 0);
+                return `
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border-radius: 0.375rem; padding: 0.5rem 0.75rem;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 0.875rem; font-weight: 500; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${option.label}</div>
+                  <div style="font-size: 0.75rem; color: #3b82f6;">${formatCurrency(variantPrice)}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.25rem; border: 1px solid #d1d5db; border-radius: 0.25rem; background: white; margin-left: 0.5rem;">
+                  <button type="button" onclick="updateVariantQty_${sanitizedId}('${variantKey}', -1)" style="padding: 0.25rem 0.5rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <span id="qty-${sanitizedId}-${variantKey}" style="width: 1.5rem; text-align: center; font-size: 0.875rem; font-weight: 500;">0</span>
+                  <button type="button" onclick="updateVariantQty_${sanitizedId}('${variantKey}', 1, ${option.stock || 999})" style="padding: 0.25rem 0.5rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                </div>
+              </div>
+            `;
+              })
+              .join('');
+
+            return `
+            <div style="margin-bottom: 0.75rem;">
+              <div style="font-size: 0.75rem; font-weight: 500; color: #6b7280; margin-bottom: 0.5rem;">${variation.name}</div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                ${optionsHTML}
+              </div>
+            </div>
+          `;
+          })
+          .join('');
+
+        return `
+        <div style="border-bottom: 1px solid #f3f4f6;">
+          <!-- Product Header (clickable to expand) -->
+          <div id="product-header-${sanitizedId}-${product.id}" onclick="toggleProductExpand_${sanitizedId}('${product.id}')" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: flex-start; cursor: pointer;">
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+              <span id="expand-icon-${sanitizedId}-${product.id}" style="color: #9ca3af; margin-top: 0.125rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+              <div>
+                <div style="font-weight: 500; color: #111827;">${product.name}</div>
+                <div style="color: #3b82f6; font-size: 0.875rem; font-weight: 500;">
+                  ${formatCurrency(product.price)}
+                  <span style="color: #9ca3af; font-size: 0.75rem; margin-left: 0.25rem;">(tap to select size)</span>
+                </div>
+                ${bundlePricingHTML}
+              </div>
+            </div>
+            <div style="display: flex; justify-content: center;">
+              <span id="variant-summary-${sanitizedId}-${product.id}" style="display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: #f3f4f6; color: #6b7280;">Select sizes below</span>
+            </div>
+            <div style="text-align: right; color: #111827; font-weight: 500;">
+              <span id="amount-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>
+            </div>
+          </div>
+          <!-- Variant Grid (expandable) -->
+          <div id="variant-grid-${sanitizedId}-${product.id}" style="display: none; padding: 0 1rem 1rem 2.5rem; border-top: 1px solid #e5e7eb; margin-top: 0;">
+            <div style="padding-top: 0.75rem;">
+              ${variationGridHTML}
+            </div>
+          </div>
         </div>
       `;
+      } else {
+        // Product without variations - simple quantity selector
+        const stockStatusHTML = isOutOfStock
+          ? '<span style="color: #ef4444; font-weight: 500; font-size: 0.875rem;">Out of Stock</span>'
+          : `
+          <div style="display: flex; align-items: center; gap: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+            <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', -1)" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <span id="qty-${sanitizedId}-${product.id}" style="width: 2rem; text-align: center; font-weight: 500;">0</span>
+            <button type="button" onclick="updateQty_${sanitizedId}('${product.id}', 1, ${product.stock || 999})" style="padding: 0.5rem 0.75rem; background: none; border: none; cursor: pointer; color: #6b7280;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+        `;
 
-      const amountHTML = isOutOfStock
-        ? '<span style="color: #9ca3af;">-</span>'
-        : `<span id="amount-${sanitizedId}-${product.id}">
-            <span id="amount-original-${sanitizedId}-${product.id}" style="display: none; text-decoration: line-through; color: #9ca3af; font-size: 0.75rem; margin-right: 0.25rem;"></span>
-            <span id="amount-final-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>
-          </span>`;
+        const amountHTML = isOutOfStock
+          ? '<span style="color: #9ca3af;">-</span>'
+          : `<span id="amount-${sanitizedId}-${product.id}">
+              <span id="amount-original-${sanitizedId}-${product.id}" style="display: none; text-decoration: line-through; color: #9ca3af; font-size: 0.75rem; margin-right: 0.25rem;"></span>
+              <span id="amount-final-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>
+            </span>`;
 
-      return `
-      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: center;">
-        <div>
-          <div style="font-weight: 500; color: #111827;">${product.name}</div>
-          <div style="color: #3b82f6; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+        return `
+        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: flex-start;">
+          <div>
+            <div style="font-weight: 500; color: #111827;">${product.name}</div>
+            <div style="color: #3b82f6; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+            ${bundlePricingHTML}
+          </div>
+          <div style="display: flex; justify-content: center;">${stockStatusHTML}</div>
+          <div style="text-align: right; color: #111827; font-weight: 500;">${amountHTML}</div>
         </div>
-        <div style="display: flex; justify-content: center;">${stockStatusHTML}</div>
-        <div style="text-align: right; color: #111827; font-weight: 500;">${amountHTML}</div>
-      </div>
-    `;
+      `;
+      }
     })
     .join('');
 
-  // Products data for JavaScript
+  // Products data for JavaScript (including variations)
   const productsDataJS = JSON.stringify(
     products.map((product: any) => ({
       id: product.id,
@@ -3095,6 +3186,7 @@ function generateFormWithPaymentHTML(element: Element): string {
       stock: product.stock,
       currency: product.currency || currency,
       bundlePricing: product.bundlePricing || [],
+      variations: product.variations || [],
     }))
   );
 
@@ -3407,10 +3499,101 @@ function generateFormWithPaymentHTML(element: Element): string {
       const bumpOfferOriginalPrice_${sanitizedId} = ${bumpOriginalPrice};
       const bumpOfferName_${sanitizedId} = ${bumpOfferProduct ? `'${bumpOfferProduct.name}'` : 'null'};
 
-      // Initialize quantities
+      // Initialize quantities (for products without variations)
+      // For products with variations, we track variant quantities separately
       products_${sanitizedId}.forEach(product => {
-        quantities_${sanitizedId}[product.id] = 0;
+        if (!product.variations || product.variations.length === 0) {
+          quantities_${sanitizedId}[product.id] = 0;
+        } else {
+          // Initialize variant quantities
+          product.variations.forEach(function(variation) {
+            variation.options.forEach(function(option) {
+              const key = product.id + '-' + option.value;
+              quantities_${sanitizedId}[key] = 0;
+            });
+          });
+        }
       });
+
+      // Track expanded state for products with variants
+      const expandedProducts_${sanitizedId} = {};
+
+      // Toggle product expand/collapse
+      window.toggleProductExpand_${sanitizedId} = function(productId) {
+        expandedProducts_${sanitizedId}[productId] = !expandedProducts_${sanitizedId}[productId];
+        const grid = document.getElementById('variant-grid-${sanitizedId}-' + productId);
+        const icon = document.getElementById('expand-icon-${sanitizedId}-' + productId);
+
+        if (grid) {
+          grid.style.display = expandedProducts_${sanitizedId}[productId] ? 'block' : 'none';
+        }
+        if (icon) {
+          icon.innerHTML = expandedProducts_${sanitizedId}[productId]
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+        }
+      };
+
+      // Update variant quantity
+      window.updateVariantQty_${sanitizedId} = function(variantKey, delta, maxStock) {
+        const current = quantities_${sanitizedId}[variantKey] || 0;
+        let newQty = Math.max(0, current + delta);
+
+        // Respect stock limit
+        if (maxStock !== undefined && newQty > maxStock) {
+          newQty = maxStock;
+        }
+
+        quantities_${sanitizedId}[variantKey] = newQty;
+
+        // Update quantity display
+        const qtyEl = document.getElementById('qty-${sanitizedId}-' + variantKey);
+        if (qtyEl) qtyEl.textContent = newQty;
+
+        // Extract productId from variantKey (format: productId-variantValue)
+        const productId = variantKey.substring(0, variantKey.lastIndexOf('-'));
+        updateProductVariantSummary_${sanitizedId}(productId);
+        updateTotal_${sanitizedId}();
+      };
+
+      // Update product variant summary (total qty and amount)
+      function updateProductVariantSummary_${sanitizedId}(productId) {
+        const product = products_${sanitizedId}.find(p => p.id === productId);
+        if (!product || !product.variations) return;
+
+        let totalQty = 0;
+        let totalAmount = 0;
+
+        product.variations.forEach(function(variation) {
+          variation.options.forEach(function(option) {
+            const key = productId + '-' + option.value;
+            const qty = quantities_${sanitizedId}[key] || 0;
+            const variantPrice = product.price + (option.priceAdjustment || 0);
+            totalQty += qty;
+            totalAmount += variantPrice * qty;
+          });
+        });
+
+        // Update summary display
+        const summaryEl = document.getElementById('variant-summary-${sanitizedId}-' + productId);
+        if (summaryEl) {
+          if (totalQty > 0) {
+            summaryEl.textContent = totalQty + ' selected';
+            summaryEl.style.background = '#dbeafe';
+            summaryEl.style.color = '#1e40af';
+          } else {
+            summaryEl.textContent = 'Select sizes below';
+            summaryEl.style.background = '#f3f4f6';
+            summaryEl.style.color = '#6b7280';
+          }
+        }
+
+        // Update amount display
+        const amountEl = document.getElementById('amount-${sanitizedId}-' + productId);
+        if (amountEl) {
+          amountEl.textContent = formatCurrency_${sanitizedId}(totalAmount);
+        }
+      }
 
       function formatCurrency_${sanitizedId}(value) {
         if (currencyCode_${sanitizedId} === 'MYR') {
@@ -3514,16 +3697,47 @@ function generateFormWithPaymentHTML(element: Element): string {
         let hasBundleDiscount = false;
 
         products_${sanitizedId}.forEach(product => {
-          if (product.stock === undefined || product.stock > 0) {
-            const qty = quantities_${sanitizedId}[product.id] || 0;
-            const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
+          if (!product.variations || product.variations.length === 0) {
+            // Product without variations
+            if (product.stock === undefined || product.stock > 0) {
+              const qty = quantities_${sanitizedId}[product.id] || 0;
+              const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
 
-            originalTotal += originalPrice;
-            if (bundlePrice !== null && bundlePrice < originalPrice) {
-              total += bundlePrice;
+              originalTotal += originalPrice;
+              if (bundlePrice !== null && bundlePrice < originalPrice) {
+                total += bundlePrice;
+                hasBundleDiscount = true;
+              } else {
+                total += originalPrice;
+              }
+            }
+          } else {
+            // Product with variations - calculate total across all variants
+            let productTotalQty = 0;
+            let productVariantTotal = 0;
+
+            product.variations.forEach(function(variation) {
+              variation.options.forEach(function(option) {
+                const key = product.id + '-' + option.value;
+                const qty = quantities_${sanitizedId}[key] || 0;
+                const variantPrice = product.price + (option.priceAdjustment || 0);
+                productTotalQty += qty;
+                productVariantTotal += variantPrice * qty;
+              });
+            });
+
+            originalTotal += productVariantTotal;
+
+            // Apply bundle pricing based on total quantity
+            const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, productTotalQty);
+
+            if (bundlePrice !== null && bundlePrice < originalPrice && productTotalQty > 0) {
+              // Calculate the discount ratio and apply it
+              const discountRatio = bundlePrice / originalPrice;
+              total += productVariantTotal * discountRatio;
               hasBundleDiscount = true;
             } else {
-              total += originalPrice;
+              total += productVariantTotal;
             }
           }
         });
@@ -3813,22 +4027,73 @@ function generateFormWithPaymentHTML(element: Element): string {
         let total = 0;
         let originalTotal = 0;
         const orderItems = [];
+
         products_${sanitizedId}.forEach(product => {
-          const qty = quantities_${sanitizedId}[product.id] || 0;
-          if (qty > 0 && (product.stock === undefined || product.stock > 0)) {
-            const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
-            const finalAmount = (bundlePrice !== null && bundlePrice < originalPrice) ? bundlePrice : originalPrice;
-            originalTotal += originalPrice;
-            total += finalAmount;
-            orderItems.push({
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              quantity: qty,
-              amount: finalAmount,
-              originalAmount: originalPrice,
-              hasBundleDiscount: bundlePrice !== null && bundlePrice < originalPrice
+          if (!product.variations || product.variations.length === 0) {
+            // Product without variations
+            const qty = quantities_${sanitizedId}[product.id] || 0;
+            if (qty > 0 && (product.stock === undefined || product.stock > 0)) {
+              const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
+              const finalAmount = (bundlePrice !== null && bundlePrice < originalPrice) ? bundlePrice : originalPrice;
+              originalTotal += originalPrice;
+              total += finalAmount;
+              orderItems.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: qty,
+                amount: finalAmount,
+                originalAmount: originalPrice,
+                hasBundleDiscount: bundlePrice !== null && bundlePrice < originalPrice
+              });
+            }
+          } else {
+            // Product with variations - collect each variant separately
+            let productTotalQty = 0;
+            let productVariantTotal = 0;
+            const variantItems = [];
+
+            product.variations.forEach(function(variation) {
+              variation.options.forEach(function(option) {
+                const key = product.id + '-' + option.value;
+                const qty = quantities_${sanitizedId}[key] || 0;
+                if (qty > 0) {
+                  const variantPrice = product.price + (option.priceAdjustment || 0);
+                  productTotalQty += qty;
+                  productVariantTotal += variantPrice * qty;
+                  variantItems.push({
+                    id: key,
+                    name: product.name + ' (' + option.label + ')',
+                    price: variantPrice,
+                    quantity: qty,
+                    amount: variantPrice * qty
+                  });
+                }
+              });
             });
+
+            if (variantItems.length > 0) {
+              // Apply bundle pricing based on total quantity
+              const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, productTotalQty);
+              const hasBundleDiscount = bundlePrice !== null && bundlePrice < originalPrice;
+              const discountRatio = hasBundleDiscount ? (bundlePrice / originalPrice) : 1;
+
+              originalTotal += productVariantTotal;
+              total += productVariantTotal * discountRatio;
+
+              // Add each variant as a separate order item
+              variantItems.forEach(function(item) {
+                orderItems.push({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity,
+                  amount: item.amount * discountRatio,
+                  originalAmount: item.amount,
+                  hasBundleDiscount: hasBundleDiscount
+                });
+              });
+            }
           }
         });
 
