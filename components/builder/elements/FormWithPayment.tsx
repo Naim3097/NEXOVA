@@ -155,6 +155,23 @@ export const FormWithPaymentElement = React.memo(
       return total;
     };
 
+    // Get total amount for a product with variants
+    const getProductVariantTotal = (product: Product): number => {
+      if (!product.variations || product.variations.length === 0) {
+        return 0;
+      }
+      let variantTotal = 0;
+      for (const variation of product.variations) {
+        for (const option of variation.options) {
+          const key = `${product.id}-${option.value}`;
+          const qty = quantities[key] || 0;
+          const variantPrice = product.price + (option.priceAdjustment || 0);
+          variantTotal += variantPrice * qty;
+        }
+      }
+      return variantTotal;
+    };
+
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
     } ${isHovered ? 'ring-2 ring-blue-300' : ''}`;
@@ -636,21 +653,7 @@ export const FormWithPaymentElement = React.memo(
                       </div>
                       <div className="col-span-3 text-right text-gray-900 font-medium pt-1">
                         {hasVariations
-                          ? // Calculate total for all variants
-                            (() => {
-                              let variantTotal = 0;
-                              for (const variation of product.variations!) {
-                                for (const option of variation.options) {
-                                  const key = `${product.id}-${option.value}`;
-                                  const qty = quantities[key] || 0;
-                                  const variantPrice =
-                                    product.price +
-                                    (option.priceAdjustment || 0);
-                                  variantTotal += variantPrice * qty;
-                                }
-                              }
-                              return formatCurrency(variantTotal);
-                            })()
+                          ? formatCurrency(getProductVariantTotal(product))
                           : renderProductAmount(product)}
                       </div>
                     </div>
