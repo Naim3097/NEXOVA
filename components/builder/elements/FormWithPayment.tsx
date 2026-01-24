@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Shield, Minus, Plus, CreditCard, ChevronDown } from 'lucide-react';
-import { Product, ProductVariation } from '@/types';
+import { Product, ProductVariation, BundlePricingTier } from '@/types';
 
 interface FormWithPaymentElementProps {
   props: {
@@ -141,12 +141,82 @@ export const FormWithPaymentElement = React.memo(
       return `${currency} ${value.toFixed(2)}`;
     };
 
-    // Calculate total from quantities (including variation price adjustments)
-    const total = products.reduce((sum, product) => {
-      const qty = quantities[product.id || ''] || 0;
+    // Get bundle price for a product and quantity
+    const getBundlePrice = (
+      product: Product,
+      qty: number
+    ): { bundlePrice: number | null; originalPrice: number } => {
       const effectivePrice = getEffectivePrice(product);
-      return sum + effectivePrice * qty;
-    }, 0);
+      const originalPrice = effectivePrice * qty;
+
+      if (
+        !product.bundlePricing ||
+        product.bundlePricing.length === 0 ||
+        qty === 0
+      ) {
+        return { bundlePrice: null, originalPrice };
+      }
+
+      // Find exact bundle match
+      const exactBundle = product.bundlePricing.find((b) => b.quantity === qty);
+      if (exactBundle) {
+        return { bundlePrice: exactBundle.totalPrice, originalPrice };
+      }
+
+      // Find the best bundle combination
+      // Sort bundles by quantity descending for greedy algorithm
+      const sortedBundles = [...product.bundlePricing].sort(
+        (a, b) => b.quantity - a.quantity
+      );
+
+      let remaining = qty;
+      let bundleTotal = 0;
+      let usedBundles = false;
+
+      for (const bundle of sortedBundles) {
+        while (remaining >= bundle.quantity) {
+          bundleTotal += bundle.totalPrice;
+          remaining -= bundle.quantity;
+          usedBundles = true;
+        }
+      }
+
+      // Add remaining items at regular price
+      if (remaining > 0) {
+        bundleTotal += effectivePrice * remaining;
+      }
+
+      return {
+        bundlePrice: usedBundles ? bundleTotal : null,
+        originalPrice,
+      };
+    };
+
+    // Calculate total from quantities (including variation price adjustments and bundle pricing)
+    const { total, originalTotal, hasBundleDiscount } = useMemo(() => {
+      let calculatedTotal = 0;
+      let calculatedOriginal = 0;
+      let hasDiscount = false;
+
+      products.forEach((product) => {
+        const qty = quantities[product.id || ''] || 0;
+        const { bundlePrice, originalPrice } = getBundlePrice(product, qty);
+
+        calculatedOriginal += originalPrice;
+        if (bundlePrice !== null && bundlePrice < originalPrice) {
+          calculatedTotal += bundlePrice;
+          hasDiscount = true;
+        } else {
+          calculatedTotal += originalPrice;
+        }
+      });
+
+      return {
+        total: calculatedTotal,
+        originalTotal: calculatedOriginal,
+        hasBundleDiscount: hasDiscount,
+      };
+    }, [products, quantities, selectedVariations]);
 
     const handleQuantityChange = (
       productId: string,
@@ -208,8 +278,27 @@ export const FormWithPaymentElement = React.memo(
         return <span className="text-gray-400">-</span>;
       }
       const qty = quantities[product.id || ''] || 0;
-      const effectivePrice = getEffectivePrice(product);
-      return formatCurrency(effectivePrice * qty);
+      if (qty === 0) {
+        return formatCurrency(0);
+      }
+
+      const { bundlePrice, originalPrice } = getBundlePrice(product, qty);
+
+      // If bundle price is cheaper, show strikethrough
+      if (bundlePrice !== null && bundlePrice < originalPrice) {
+        return (
+          <div className="text-right">
+            <span className="text-gray-400 line-through text-sm block">
+              {formatCurrency(originalPrice)}
+            </span>
+            <span className="text-green-600 font-semibold">
+              {formatCurrency(bundlePrice)}
+            </span>
+          </div>
+        );
+      }
+
+      return formatCurrency(originalPrice);
     };
 
     // Render variation selector dropdown
@@ -371,6 +460,23 @@ export const FormWithPaymentElement = React.memo(
                           </span>
                         )}
                       </div>
+                      {/* Bundle Pricing Info */}
+                      {product.bundlePricing &&
+                        product.bundlePricing.length > 0 && (
+                          <div className="mt-1 text-xs text-green-600">
+                            {product.bundlePricing
+                              .slice(0, 3)
+                              .map((bundle, i) => (
+                                <span key={i}>
+                                  Buy {bundle.quantity} ={' '}
+                                  {formatCurrency(bundle.totalPrice)}
+                                  {i <
+                                    Math.min(product.bundlePricing!.length, 3) -
+                                      1 && ' | '}
+                                </span>
+                              ))}
+                          </div>
+                        )}
                       {/* Variation Selector */}
                       {hasVariations && renderVariationSelector(product)}
                     </div>
@@ -403,11 +509,35 @@ export const FormWithPaymentElement = React.memo(
           )}
 
           {/* Total Amount */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="flex justify-between text-lg font-bold text-gray-900">
-              <span>Total Amount:</span>
-              <span>{formatCurrency(total)}</span>
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 border-l-4 border-blue-500">
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-bold text-gray-900">
+                Total Amount:
+              </span>
+              <div className="text-right">
+                {hasBundleDiscount && originalTotal > total ? (
+                  <>
+                    <span className="text-gray-400 line-through text-base block">
+                      {formatCurrency(originalTotal)}
+                    </span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {formatCurrency(total)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-bold text-gray-900">
+                    {formatCurrency(total)}
+                  </span>
+                )}
+              </div>
             </div>
+            {hasBundleDiscount && originalTotal > total && (
+              <div className="mt-2 flex items-center justify-end gap-2">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  You save {formatCurrency(originalTotal - total)}!
+                </span>
+              </div>
+            )}
             {total === 0 && (
               <p className="text-gray-500 text-sm mt-2">
                 Please select your items above.

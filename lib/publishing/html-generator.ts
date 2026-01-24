@@ -15,6 +15,19 @@ function sanitizeId(id: string): string {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHTML(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Map icon names to SVG paths
  */
 function getIconSVG(iconName: string): string {
@@ -3055,7 +3068,10 @@ function generateFormWithPaymentHTML(element: Element): string {
 
       const amountHTML = isOutOfStock
         ? '<span style="color: #9ca3af;">-</span>'
-        : `<span id="amount-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>`;
+        : `<span id="amount-${sanitizedId}-${product.id}">
+            <span id="amount-original-${sanitizedId}-${product.id}" style="display: none; text-decoration: line-through; color: #9ca3af; font-size: 0.75rem; margin-right: 0.25rem;"></span>
+            <span id="amount-final-${sanitizedId}-${product.id}">${formatCurrency(0)}</span>
+          </span>`;
 
       return `
       <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: center;">
@@ -3078,6 +3094,7 @@ function generateFormWithPaymentHTML(element: Element): string {
       price: product.price,
       stock: product.stock,
       currency: product.currency || currency,
+      bundlePricing: product.bundlePricing || [],
     }))
   );
 
@@ -3174,7 +3191,11 @@ function generateFormWithPaymentHTML(element: Element): string {
       <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
         <div style="display: flex; justify-content: space-between; font-size: 1.125rem; font-weight: bold; color: #111827;">
           <span>Total Amount:</span>
-          <span id="total-${sanitizedId}">${formatCurrency(0)}</span>
+          <span id="total-${sanitizedId}">
+            <span id="total-original-${sanitizedId}" style="display: none; text-decoration: line-through; color: #9ca3af; font-weight: normal; font-size: 1rem; margin-right: 0.5rem;"></span>
+            <span id="total-final-${sanitizedId}">${formatCurrency(0)}</span>
+            <span id="total-savings-${sanitizedId}" style="display: none; background: #dcfce7; color: #16a34a; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; margin-left: 0.5rem;"></span>
+          </span>
         </div>
         <p id="empty-msg-${sanitizedId}" style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
       </div>
@@ -3398,6 +3419,44 @@ function generateFormWithPaymentHTML(element: Element): string {
         return currencyCode_${sanitizedId} + ' ' + value.toFixed(2);
       }
 
+      // Get bundle price for a product
+      function getBundlePrice_${sanitizedId}(product, qty) {
+        const originalPrice = product.price * qty;
+        if (!product.bundlePricing || product.bundlePricing.length === 0 || qty === 0) {
+          return { bundlePrice: null, originalPrice: originalPrice };
+        }
+
+        // Sort bundle pricing by quantity descending for optimal match
+        const sortedTiers = [...product.bundlePricing].sort((a, b) => b.quantity - a.quantity);
+
+        // Find exact match first
+        const exactMatch = sortedTiers.find(tier => tier.quantity === qty);
+        if (exactMatch) {
+          return { bundlePrice: exactMatch.totalPrice, originalPrice: originalPrice };
+        }
+
+        // Greedy algorithm: find best combination
+        let remainingQty = qty;
+        let bundleTotal = 0;
+        let usedBundle = false;
+
+        for (const tier of sortedTiers) {
+          if (tier.quantity <= remainingQty) {
+            const count = Math.floor(remainingQty / tier.quantity);
+            bundleTotal += tier.totalPrice * count;
+            remainingQty -= tier.quantity * count;
+            usedBundle = true;
+          }
+        }
+
+        // Add remaining items at regular price
+        if (remainingQty > 0) {
+          bundleTotal += product.price * remainingQty;
+        }
+
+        return { bundlePrice: usedBundle ? bundleTotal : null, originalPrice: originalPrice };
+      }
+
       window.updateQty_${sanitizedId} = function(productId, delta, maxStock) {
         const product = products_${sanitizedId}.find(p => p.id === productId);
         if (!product) return;
@@ -3419,22 +3478,83 @@ function generateFormWithPaymentHTML(element: Element): string {
         const qtyEl = document.getElementById('qty-${sanitizedId}-' + productId);
         if (qtyEl) qtyEl.textContent = newQty;
 
-        // Update amount display
-        const amountEl = document.getElementById('amount-${sanitizedId}-' + productId);
-        if (amountEl) amountEl.textContent = formatCurrency_${sanitizedId}(product.price * newQty);
+        // Update amount display with bundle pricing
+        const originalEl = document.getElementById('amount-original-${sanitizedId}-' + productId);
+        const finalEl = document.getElementById('amount-final-${sanitizedId}-' + productId);
+
+        const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, newQty);
+
+        if (bundlePrice !== null && bundlePrice < originalPrice) {
+          // Show strikethrough original and discounted bundle price
+          if (originalEl) {
+            originalEl.textContent = formatCurrency_${sanitizedId}(originalPrice);
+            originalEl.style.display = 'inline';
+          }
+          if (finalEl) {
+            finalEl.textContent = formatCurrency_${sanitizedId}(bundlePrice);
+            finalEl.style.color = '#16a34a';
+            finalEl.style.fontWeight = '600';
+          }
+        } else {
+          // Show regular price
+          if (originalEl) originalEl.style.display = 'none';
+          if (finalEl) {
+            finalEl.textContent = formatCurrency_${sanitizedId}(originalPrice);
+            finalEl.style.color = '#111827';
+            finalEl.style.fontWeight = '500';
+          }
+        }
 
         updateTotal_${sanitizedId}();
       };
 
       function updateTotal_${sanitizedId}() {
         let total = 0;
+        let originalTotal = 0;
+        let hasBundleDiscount = false;
+
         products_${sanitizedId}.forEach(product => {
           if (product.stock === undefined || product.stock > 0) {
-            total += product.price * (quantities_${sanitizedId}[product.id] || 0);
+            const qty = quantities_${sanitizedId}[product.id] || 0;
+            const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
+
+            originalTotal += originalPrice;
+            if (bundlePrice !== null && bundlePrice < originalPrice) {
+              total += bundlePrice;
+              hasBundleDiscount = true;
+            } else {
+              total += originalPrice;
+            }
           }
         });
 
-        document.getElementById('total-${sanitizedId}').textContent = formatCurrency_${sanitizedId}(total);
+        // Update total display with strikethrough if bundle discount applies
+        const originalTotalEl = document.getElementById('total-original-${sanitizedId}');
+        const finalTotalEl = document.getElementById('total-final-${sanitizedId}');
+        const savingsEl = document.getElementById('total-savings-${sanitizedId}');
+
+        if (hasBundleDiscount && total < originalTotal) {
+          const savings = originalTotal - total;
+          if (originalTotalEl) {
+            originalTotalEl.textContent = formatCurrency_${sanitizedId}(originalTotal);
+            originalTotalEl.style.display = 'inline';
+          }
+          if (finalTotalEl) {
+            finalTotalEl.textContent = formatCurrency_${sanitizedId}(total);
+            finalTotalEl.style.color = '#16a34a';
+          }
+          if (savingsEl) {
+            savingsEl.textContent = 'Save ' + formatCurrency_${sanitizedId}(savings);
+            savingsEl.style.display = 'inline';
+          }
+        } else {
+          if (originalTotalEl) originalTotalEl.style.display = 'none';
+          if (finalTotalEl) {
+            finalTotalEl.textContent = formatCurrency_${sanitizedId}(total);
+            finalTotalEl.style.color = '#111827';
+          }
+          if (savingsEl) savingsEl.style.display = 'none';
+        }
 
         const emptyMsg = document.getElementById('empty-msg-${sanitizedId}');
         if (emptyMsg) {
@@ -3598,6 +3718,18 @@ function generateFormWithPaymentHTML(element: Element): string {
                 '<span style="font-weight: 600; color: #b45309;">' + formatCurrency_${sanitizedId}(item.amount) + '</span>' +
               '</div>' +
             '</div>';
+          } else if (item.hasBundleDiscount) {
+            // Bundle discount styling
+            summaryHTML += '<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: #dcfce7; border-radius: 0.25rem;">' +
+              '<div>' +
+                '<span style="color: #166534; font-weight: 500;">' + item.name + ' x' + item.quantity + '</span>' +
+                '<span style="display: block; font-size: 0.75rem; color: #16a34a;">Bundle Discount Applied</span>' +
+              '</div>' +
+              '<div style="text-align: right;">' +
+                '<span style="text-decoration: line-through; color: #9ca3af; font-size: 0.75rem; margin-right: 0.25rem;">' + formatCurrency_${sanitizedId}(item.originalAmount) + '</span>' +
+                '<span style="font-weight: 600; color: #16a34a;">' + formatCurrency_${sanitizedId}(item.amount) + '</span>' +
+              '</div>' +
+            '</div>';
           } else {
             summaryHTML += '<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">' +
               '<span>' + item.name + ' x' + item.quantity + '</span>' +
@@ -3677,20 +3809,25 @@ function generateFormWithPaymentHTML(element: Element): string {
 
         const statusDiv = document.getElementById('status-${sanitizedId}');
 
-        // Calculate total and collect order items
+        // Calculate total and collect order items with bundle pricing
         let total = 0;
+        let originalTotal = 0;
         const orderItems = [];
         products_${sanitizedId}.forEach(product => {
           const qty = quantities_${sanitizedId}[product.id] || 0;
           if (qty > 0 && (product.stock === undefined || product.stock > 0)) {
-            const amount = product.price * qty;
-            total += amount;
+            const { bundlePrice, originalPrice } = getBundlePrice_${sanitizedId}(product, qty);
+            const finalAmount = (bundlePrice !== null && bundlePrice < originalPrice) ? bundlePrice : originalPrice;
+            originalTotal += originalPrice;
+            total += finalAmount;
             orderItems.push({
               id: product.id,
               name: product.name,
               price: product.price,
               quantity: qty,
-              amount: amount
+              amount: finalAmount,
+              originalAmount: originalPrice,
+              hasBundleDiscount: bundlePrice !== null && bundlePrice < originalPrice
             });
           }
         });

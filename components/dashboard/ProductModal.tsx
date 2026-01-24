@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Plus, Trash2, Upload, Loader2, Image as ImageIcon } from 'lucide-react';
+import {
+  X,
+  Plus,
+  Trash2,
+  Upload,
+  Loader2,
+  Image as ImageIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase/auth-client';
@@ -21,6 +28,11 @@ interface Variation {
   options: VariationOption[];
 }
 
+interface BundlePricingTier {
+  quantity: number;
+  totalPrice: number;
+}
+
 interface Product {
   id: string;
   code: string;
@@ -31,6 +43,7 @@ interface Product {
   base_price: number;
   currency: string;
   quantity_pricing: Array<{ min_qty: number; price: number }>;
+  bundle_pricing: BundlePricingTier[];
   notes: string | null;
   status: 'active' | 'inactive';
   variations?: Variation[];
@@ -58,6 +71,7 @@ export default function ProductModal({
     base_price: 0,
     currency: 'RM',
     quantity_pricing: [] as Array<{ min_qty: number; price: number }>,
+    bundle_pricing: [] as BundlePricingTier[],
     notes: '',
     status: 'active' as 'active' | 'inactive',
     variations: [] as Variation[],
@@ -71,7 +85,9 @@ export default function ProductModal({
   // Get user ID on mount
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
       }
@@ -90,6 +106,7 @@ export default function ProductModal({
         base_price: product.base_price,
         currency: product.currency,
         quantity_pricing: product.quantity_pricing || [],
+        bundle_pricing: product.bundle_pricing || [],
         notes: product.notes || '',
         status: product.status,
         variations: product.variations || [],
@@ -105,6 +122,7 @@ export default function ProductModal({
         base_price: 0,
         currency: 'RM',
         quantity_pricing: [],
+        bundle_pricing: [],
         notes: '',
         status: 'active',
         variations: [],
@@ -151,9 +169,9 @@ export default function ProductModal({
       }
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('project-images')
-        .getPublicUrl(data.path);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('project-images').getPublicUrl(data.path);
 
       setFormData({ ...formData, image_url: publicUrl });
     } catch (err) {
@@ -233,6 +251,43 @@ export default function ProductModal({
     });
   };
 
+  // Bundle Pricing handlers
+  const addBundlePricing = () => {
+    const nextQty =
+      formData.bundle_pricing.length > 0
+        ? Math.max(...formData.bundle_pricing.map((t) => t.quantity)) + 1
+        : 1;
+    setFormData({
+      ...formData,
+      bundle_pricing: [
+        ...formData.bundle_pricing,
+        { quantity: nextQty, totalPrice: formData.base_price * nextQty },
+      ],
+    });
+  };
+
+  const removeBundlePricing = (index: number) => {
+    setFormData({
+      ...formData,
+      bundle_pricing: formData.bundle_pricing.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateBundlePricing = (
+    index: number,
+    field: 'quantity' | 'totalPrice',
+    value: number
+  ) => {
+    const updated = [...formData.bundle_pricing];
+    updated[index][field] = value;
+    // Sort by quantity
+    updated.sort((a, b) => a.quantity - b.quantity);
+    setFormData({
+      ...formData,
+      bundle_pricing: updated,
+    });
+  };
+
   // Variation handlers
   const addVariation = () => {
     const newVariation: Variation = {
@@ -254,7 +309,11 @@ export default function ProductModal({
     });
   };
 
-  const updateVariation = (index: number, field: keyof Variation, value: any) => {
+  const updateVariation = (
+    index: number,
+    field: keyof Variation,
+    value: any
+  ) => {
     const updated = [...formData.variations];
     updated[index] = { ...updated[index], [field]: value };
     setFormData({
@@ -270,18 +329,29 @@ export default function ProductModal({
       label: '',
       priceAdjustment: 0,
       stock: 0,
-      colorCode: formData.variations[variationIndex].type === 'color' ? '#000000' : undefined,
+      colorCode:
+        formData.variations[variationIndex].type === 'color'
+          ? '#000000'
+          : undefined,
     };
-    updated[variationIndex].options = [...updated[variationIndex].options, newOption];
+    updated[variationIndex].options = [
+      ...updated[variationIndex].options,
+      newOption,
+    ];
     setFormData({
       ...formData,
       variations: updated,
     });
   };
 
-  const removeVariationOption = (variationIndex: number, optionIndex: number) => {
+  const removeVariationOption = (
+    variationIndex: number,
+    optionIndex: number
+  ) => {
     const updated = [...formData.variations];
-    updated[variationIndex].options = updated[variationIndex].options.filter((_, i) => i !== optionIndex);
+    updated[variationIndex].options = updated[variationIndex].options.filter(
+      (_, i) => i !== optionIndex
+    );
     setFormData({
       ...formData,
       variations: updated,
@@ -404,7 +474,9 @@ export default function ProductModal({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                        onClick={() =>
+                          setFormData({ ...formData, image_url: '' })
+                        }
                         className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600"
                         title="Remove image"
                       >
@@ -425,7 +497,9 @@ export default function ProductModal({
                     ) : (
                       <>
                         <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600">Click to upload image</p>
+                        <p className="text-sm text-gray-600">
+                          Click to upload image
+                        </p>
                         <p className="text-xs text-gray-500 mt-1">Max 5MB</p>
                       </>
                     )}
@@ -441,7 +515,9 @@ export default function ProductModal({
                 />
                 {/* URL Input as Alternative */}
                 <div className="mt-2">
-                  <p className="text-xs text-gray-500 mb-1">Or enter image URL:</p>
+                  <p className="text-xs text-gray-500 mb-1">
+                    Or enter image URL:
+                  </p>
                   <Input
                     type="url"
                     value={formData.image_url}
@@ -515,9 +591,7 @@ export default function ProductModal({
             {/* Product Variations */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold">
-                  Variations (Optional)
-                </h3>
+                <h3 className="text-lg font-semibold">Variations (Optional)</h3>
                 <Button
                   type="button"
                   onClick={addVariation}
@@ -534,7 +608,10 @@ export default function ProductModal({
               {formData.variations.length > 0 && (
                 <div className="space-y-4">
                   {formData.variations.map((variation, vIndex) => (
-                    <div key={variation.id} className="border border-gray-200 rounded-lg p-4">
+                    <div
+                      key={variation.id}
+                      className="border border-gray-200 rounded-lg p-4"
+                    >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex gap-3 flex-1">
                           <div className="flex-1">
@@ -545,7 +622,9 @@ export default function ProductModal({
                               type="text"
                               placeholder="e.g., Size, Color"
                               value={variation.name}
-                              onChange={(e) => updateVariation(vIndex, 'name', e.target.value)}
+                              onChange={(e) =>
+                                updateVariation(vIndex, 'name', e.target.value)
+                              }
                             />
                           </div>
                           <div className="w-32">
@@ -554,7 +633,9 @@ export default function ProductModal({
                             </label>
                             <select
                               value={variation.type}
-                              onChange={(e) => updateVariation(vIndex, 'type', e.target.value)}
+                              onChange={(e) =>
+                                updateVariation(vIndex, 'type', e.target.value)
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                             >
                               <option value="size">Size</option>
@@ -575,7 +656,9 @@ export default function ProductModal({
                       {/* Options */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">Options</span>
+                          <span className="text-sm font-medium text-gray-700">
+                            Options
+                          </span>
                           <button
                             type="button"
                             onClick={() => addVariationOption(vIndex)}
@@ -587,12 +670,22 @@ export default function ProductModal({
                         {variation.options.length > 0 ? (
                           <div className="space-y-2">
                             {variation.options.map((option, oIndex) => (
-                              <div key={oIndex} className="flex gap-2 items-center bg-gray-50 p-2 rounded">
+                              <div
+                                key={oIndex}
+                                className="flex gap-2 items-center bg-gray-50 p-2 rounded"
+                              >
                                 {variation.type === 'color' && (
                                   <input
                                     type="color"
                                     value={option.colorCode || '#000000'}
-                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'colorCode', e.target.value)}
+                                    onChange={(e) =>
+                                      updateVariationOption(
+                                        vIndex,
+                                        oIndex,
+                                        'colorCode',
+                                        e.target.value
+                                      )
+                                    }
                                     className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
                                   />
                                 )}
@@ -600,41 +693,75 @@ export default function ProductModal({
                                   type="text"
                                   placeholder="Label (e.g., Small)"
                                   value={option.label}
-                                  onChange={(e) => updateVariationOption(vIndex, oIndex, 'label', e.target.value)}
+                                  onChange={(e) =>
+                                    updateVariationOption(
+                                      vIndex,
+                                      oIndex,
+                                      'label',
+                                      e.target.value
+                                    )
+                                  }
                                   className="flex-1"
                                 />
                                 <Input
                                   type="text"
                                   placeholder="Value (e.g., S)"
                                   value={option.value}
-                                  onChange={(e) => updateVariationOption(vIndex, oIndex, 'value', e.target.value)}
+                                  onChange={(e) =>
+                                    updateVariationOption(
+                                      vIndex,
+                                      oIndex,
+                                      'value',
+                                      e.target.value
+                                    )
+                                  }
                                   className="w-24"
                                 />
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs text-gray-500">+/-</span>
+                                  <span className="text-xs text-gray-500">
+                                    +/-
+                                  </span>
                                   <Input
                                     type="number"
                                     step="0.01"
                                     placeholder="0"
                                     value={option.priceAdjustment}
-                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'priceAdjustment', parseFloat(e.target.value) || 0)}
+                                    onChange={(e) =>
+                                      updateVariationOption(
+                                        vIndex,
+                                        oIndex,
+                                        'priceAdjustment',
+                                        parseFloat(e.target.value) || 0
+                                      )
+                                    }
                                     className="w-20"
                                   />
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs text-gray-500">Stock:</span>
+                                  <span className="text-xs text-gray-500">
+                                    Stock:
+                                  </span>
                                   <Input
                                     type="number"
                                     min="0"
                                     placeholder="0"
                                     value={option.stock}
-                                    onChange={(e) => updateVariationOption(vIndex, oIndex, 'stock', parseInt(e.target.value) || 0)}
+                                    onChange={(e) =>
+                                      updateVariationOption(
+                                        vIndex,
+                                        oIndex,
+                                        'stock',
+                                        parseInt(e.target.value) || 0
+                                      )
+                                    }
                                     className="w-20"
                                   />
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => removeVariationOption(vIndex, oIndex)}
+                                  onClick={() =>
+                                    removeVariationOption(vIndex, oIndex)
+                                  }
                                   className="text-red-500 hover:text-red-700"
                                 >
                                   <X size={16} />
@@ -643,7 +770,9 @@ export default function ProductModal({
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-500 py-2">No options added yet</p>
+                          <p className="text-xs text-gray-500 py-2">
+                            No options added yet
+                          </p>
                         )}
                       </div>
                     </div>
@@ -721,6 +850,108 @@ export default function ProductModal({
               )}
             </div>
 
+            {/* Bundle Pricing */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">
+                  Bundle Pricing (Optional)
+                </h3>
+                <Button
+                  type="button"
+                  onClick={addBundlePricing}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Plus size={16} className="mr-1" />
+                  Add Bundle
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Set fixed total prices for quantity bundles (e.g., Buy 1 = RM39,
+                Buy 2 = RM75, Buy 3 = RM100)
+              </p>
+              {formData.bundle_pricing.length > 0 && (
+                <div className="space-y-2">
+                  {formData.bundle_pricing.map((tier, index) => {
+                    const originalPrice = formData.base_price * tier.quantity;
+                    const savings = originalPrice - tier.totalPrice;
+                    const savingsPercent =
+                      originalPrice > 0
+                        ? Math.round((savings / originalPrice) * 100)
+                        : 0;
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex gap-2 items-center bg-gray-50 p-2 rounded-md"
+                      >
+                        <span className="text-sm text-gray-600">Buy</span>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="Qty"
+                          value={tier.quantity}
+                          onChange={(e) =>
+                            updateBundlePricing(
+                              index,
+                              'quantity',
+                              parseInt(e.target.value) || 1
+                            )
+                          }
+                          className="w-20"
+                        />
+                        <span className="text-gray-500">=</span>
+                        <span className="text-sm text-gray-600">
+                          {formData.currency}
+                        </span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="Total Price"
+                          value={tier.totalPrice}
+                          onChange={(e) =>
+                            updateBundlePricing(
+                              index,
+                              'totalPrice',
+                              parseFloat(e.target.value) || 0
+                            )
+                          }
+                          className="w-28"
+                        />
+                        {savings > 0 && (
+                          <span className="text-xs text-green-600 font-medium">
+                            Save {savingsPercent}%
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeBundlePricing(index)}
+                          className="text-red-600 hover:text-red-800 ml-auto"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {formData.bundle_pricing.length > 0 && (
+                <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                  <p className="text-xs text-blue-700">
+                    <strong>Preview:</strong>{' '}
+                    {formData.bundle_pricing.map((tier, i) => (
+                      <span key={i}>
+                        Buy {tier.quantity} = {formData.currency}{' '}
+                        {tier.totalPrice.toFixed(2)}
+                        {i < formData.bundle_pricing.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Internal Notes & Status */}
             <div>
               <h3 className="text-lg font-semibold mb-3">Additional Info</h3>
@@ -770,7 +1001,11 @@ export default function ProductModal({
               Cancel
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving ? 'Saving...' : product ? 'Update Product' : 'Add Product'}
+              {saving
+                ? 'Saving...'
+                : product
+                  ? 'Update Product'
+                  : 'Add Product'}
             </Button>
           </div>
         </form>

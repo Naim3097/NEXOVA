@@ -365,6 +365,11 @@ export interface TransactionStats {
   today_transactions: number;
 }
 
+export interface BundlePricingTier {
+  quantity: number; // Buy X items
+  totalPrice: number; // Pay this total price
+}
+
 export interface Product {
   id?: string;
   name: string;
@@ -374,6 +379,7 @@ export interface Product {
   featured?: boolean; // Highlight as featured/popular
   stock?: number; // Product stock
   variations?: ProductVariation[]; // Product variations (size, color, etc.)
+  bundlePricing?: BundlePricingTier[]; // Bundle pricing: Buy 1 = RM39, Buy 2 = RM75, etc.
 }
 
 export interface PaymentButtonProps {
