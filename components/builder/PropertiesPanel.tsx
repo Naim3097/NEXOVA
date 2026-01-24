@@ -4259,6 +4259,64 @@ export const PropertiesPanel = () => {
                       Products page
                     </a>
                   </p>
+                  {/* Sync Products Button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/products');
+                        const data = await response.json();
+                        if (response.ok && data.products) {
+                          const currentProducts = props.products || [];
+                          const updatedProducts = currentProducts.map(
+                            (p: any) => {
+                              const freshProduct = data.products.find(
+                                (fp: any) => fp.id === p.id
+                              );
+                              if (freshProduct) {
+                                return {
+                                  id: freshProduct.id,
+                                  name: freshProduct.name,
+                                  description: freshProduct.description || '',
+                                  price: freshProduct.base_price,
+                                  currency: freshProduct.currency,
+                                  image: freshProduct.image_url || '',
+                                  stock: freshProduct.stock,
+                                  featured: p.featured || false,
+                                  variations: freshProduct.variations || [],
+                                };
+                              }
+                              return p;
+                            }
+                          );
+                          handlePropChange('products', updatedProducts);
+                          alert('Products synced successfully!');
+                        }
+                      } catch (error) {
+                        console.error('Error syncing products:', error);
+                        alert('Failed to sync products');
+                      }
+                    }}
+                    className="w-full mt-3 px-3 py-2 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Sync from Inventory
+                  </button>
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Update products with latest data from inventory
+                  </p>
                 </div>
               )}
 
@@ -4734,6 +4792,64 @@ export const PropertiesPanel = () => {
                       )
                     )}
                   </div>
+                  {/* Sync Products Button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/products');
+                        const data = await response.json();
+                        if (response.ok && data.products) {
+                          const currentProducts = props.products || [];
+                          const updatedProducts = currentProducts.map(
+                            (p: any) => {
+                              const freshProduct = data.products.find(
+                                (fp: any) => fp.id === p.id
+                              );
+                              if (freshProduct) {
+                                return {
+                                  id: freshProduct.id,
+                                  code: freshProduct.code,
+                                  name: freshProduct.name,
+                                  description: freshProduct.description || '',
+                                  base_price: freshProduct.base_price,
+                                  currency: freshProduct.currency,
+                                  image_url: freshProduct.image_url || '',
+                                  status: freshProduct.status,
+                                  variations: freshProduct.variations || [],
+                                };
+                              }
+                              return p;
+                            }
+                          );
+                          handlePropChange('products', updatedProducts);
+                          alert('Products synced successfully!');
+                        }
+                      } catch (error) {
+                        console.error('Error syncing products:', error);
+                        alert('Failed to sync products');
+                      }
+                    }}
+                    className="w-full mt-3 px-3 py-2 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    Sync from Inventory
+                  </button>
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Update products with latest data from inventory
+                  </p>
                 </div>
               )}
 
