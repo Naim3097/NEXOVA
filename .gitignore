@@ -42,3 +42,5 @@ vercel-env-setup.sh
 *.tsbuildinfo
 next-env.d.ts
 .env.vercel.check
+*.csv
+*.xlsx
