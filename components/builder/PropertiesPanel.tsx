@@ -4268,12 +4268,16 @@ export const PropertiesPanel = () => {
                         const data = await response.json();
                         if (response.ok && data.products) {
                           const currentProducts = props.products || [];
+                          let syncedCount = 0;
                           const updatedProducts = currentProducts.map(
                             (p: any) => {
+                              // Try to match by ID first, then by name
                               const freshProduct = data.products.find(
-                                (fp: any) => fp.id === p.id
+                                (fp: any) =>
+                                  fp.id === p.id || fp.name === p.name
                               );
                               if (freshProduct) {
+                                syncedCount++;
                                 return {
                                   id: freshProduct.id,
                                   name: freshProduct.name,
@@ -4290,7 +4294,9 @@ export const PropertiesPanel = () => {
                             }
                           );
                           handlePropChange('products', updatedProducts);
-                          alert('Products synced successfully!');
+                          alert(
+                            `Synced ${syncedCount} of ${currentProducts.length} products!`
+                          );
                         }
                       } catch (error) {
                         console.error('Error syncing products:', error);
@@ -4801,12 +4807,18 @@ export const PropertiesPanel = () => {
                         const data = await response.json();
                         if (response.ok && data.products) {
                           const currentProducts = props.products || [];
+                          let syncedCount = 0;
                           const updatedProducts = currentProducts.map(
                             (p: any) => {
+                              // Try to match by ID first, then by code, then by name
                               const freshProduct = data.products.find(
-                                (fp: any) => fp.id === p.id
+                                (fp: any) =>
+                                  fp.id === p.id ||
+                                  fp.code === p.code ||
+                                  fp.name === p.name
                               );
                               if (freshProduct) {
+                                syncedCount++;
                                 return {
                                   id: freshProduct.id,
                                   code: freshProduct.code,
@@ -4823,7 +4835,9 @@ export const PropertiesPanel = () => {
                             }
                           );
                           handlePropChange('products', updatedProducts);
-                          alert('Products synced successfully!');
+                          alert(
+                            `Synced ${syncedCount} of ${currentProducts.length} products!`
+                          );
                         }
                       } catch (error) {
                         console.error('Error syncing products:', error);
