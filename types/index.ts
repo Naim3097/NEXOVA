@@ -157,6 +157,8 @@ export interface HeroProps {
   // Button styling options
   buttonBgColor?: string;
   buttonTextColor?: string;
+  // CTA button visibility
+  showCtaButton?: boolean;
 }
 
 export interface FeaturesProps {

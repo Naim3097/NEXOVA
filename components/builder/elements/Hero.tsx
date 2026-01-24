@@ -26,6 +26,7 @@ export const HeroElement = ({ props, isSelected, isHovered, onSelect, onHover }:
     imageOpacity = 70,
     buttonBgColor = '#2563eb',
     buttonTextColor = '#ffffff',
+    showCtaButton = true,
   } = props;
 
   // Debug: Log when image prop changes
@@ -84,17 +85,19 @@ export const HeroElement = ({ props, isSelected, isHovered, onSelect, onHover }:
             >
               {subheadline}
             </p>
-            <Button
-              size="lg"
-              className="text-lg px-8"
-              style={{
-                backgroundColor: buttonBgColor,
-                color: buttonTextColor,
-                border: 'none'
-              }}
-            >
-              {ctaText}
-            </Button>
+            {showCtaButton && (
+              <Button
+                size="lg"
+                className="text-lg px-8"
+                style={{
+                  backgroundColor: buttonBgColor,
+                  color: buttonTextColor,
+                  border: 'none'
+                }}
+              >
+                {ctaText}
+              </Button>
+            )}
           </div>
         </section>
       );
@@ -124,17 +127,19 @@ export const HeroElement = ({ props, isSelected, isHovered, onSelect, onHover }:
               >
                 {subheadline}
               </p>
-              <Button
-                size="lg"
-                className="text-lg px-8"
-                style={{
-                  backgroundColor: buttonBgColor,
-                  color: buttonTextColor,
-                  border: 'none'
-                }}
-              >
-                {ctaText}
-              </Button>
+              {showCtaButton && (
+                <Button
+                  size="lg"
+                  className="text-lg px-8"
+                  style={{
+                    backgroundColor: buttonBgColor,
+                    color: buttonTextColor,
+                    border: 'none'
+                  }}
+                >
+                  {ctaText}
+                </Button>
+              )}
             </div>
             <div className="order-1 md:order-2">
               {image ? (
@@ -204,17 +209,19 @@ export const HeroElement = ({ props, isSelected, isHovered, onSelect, onHover }:
             >
               {subheadline}
             </p>
-            <Button
-              size="lg"
-              className="text-lg px-8"
-              style={{
-                backgroundColor: buttonBgColor,
-                color: buttonTextColor,
-                border: `2px solid ${buttonTextColor}`
-              }}
-            >
-              {ctaText}
-            </Button>
+            {showCtaButton && (
+              <Button
+                size="lg"
+                className="text-lg px-8"
+                style={{
+                  backgroundColor: buttonBgColor,
+                  color: buttonTextColor,
+                  border: `2px solid ${buttonTextColor}`
+                }}
+              >
+                {ctaText}
+              </Button>
+            )}
           </div>
         </section>
       );

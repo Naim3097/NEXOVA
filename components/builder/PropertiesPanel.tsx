@@ -262,6 +262,17 @@ export const PropertiesPanel = () => {
     });
   };
 
+  // Handle multiple prop changes at once to avoid stale state issues
+  const handleMultiPropChange = (changes: Record<string, any>) => {
+    updateElement({
+      id: selectedElement.id,
+      props: {
+        ...selectedElement.props,
+        ...changes,
+      },
+    });
+  };
+
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this element?')) {
       deleteElement(selectedElement.id);
@@ -331,15 +342,38 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="ctaText">Button Text</Label>
-                <Input
-                  id="ctaText"
-                  value={props.ctaText || ''}
-                  onChange={(e) => handlePropChange('ctaText', e.target.value)}
-                  placeholder="Enter button text"
-                />
+              {/* CTA Button Toggle */}
+              <div className="flex items-center justify-between py-2">
+                <Label htmlFor="showCtaButton" className="cursor-pointer">Show CTA Button</Label>
+                <button
+                  id="showCtaButton"
+                  type="button"
+                  role="switch"
+                  aria-checked={props.showCtaButton !== false}
+                  onClick={() => handlePropChange('showCtaButton', props.showCtaButton === false ? true : false)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    props.showCtaButton !== false ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      props.showCtaButton !== false ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
+
+              {props.showCtaButton !== false && (
+                <div>
+                  <Label htmlFor="ctaText">Button Text</Label>
+                  <Input
+                    id="ctaText"
+                    value={props.ctaText || ''}
+                    onChange={(e) => handlePropChange('ctaText', e.target.value)}
+                    placeholder="Enter button text"
+                  />
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="bgColor">Background Color</Label>
@@ -1071,16 +1105,26 @@ export const PropertiesPanel = () => {
                                 type="color"
                                 value={props.gradientStart || '#667eea'}
                                 onChange={(e) => {
-                                  handlePropChange('gradientStart', e.target.value);
-                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${e.target.value} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                                  const newStart = e.target.value;
+                                  const endColor = props.gradientEnd || '#764ba2';
+                                  const direction = props.gradientDirection || '135deg';
+                                  handleMultiPropChange({
+                                    gradientStart: newStart,
+                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`
+                                  });
                                 }}
                                 className="w-10 h-8 p-1"
                               />
                               <Input
                                 value={props.gradientStart || '#667eea'}
                                 onChange={(e) => {
-                                  handlePropChange('gradientStart', e.target.value);
-                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${e.target.value} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                                  const newStart = e.target.value;
+                                  const endColor = props.gradientEnd || '#764ba2';
+                                  const direction = props.gradientDirection || '135deg';
+                                  handleMultiPropChange({
+                                    gradientStart: newStart,
+                                    bgGradient: `linear-gradient(${direction}, ${newStart} 0%, ${endColor} 100%)`
+                                  });
                                 }}
                                 className="flex-1 text-xs"
                                 placeholder="#667eea"
@@ -1094,16 +1138,26 @@ export const PropertiesPanel = () => {
                                 type="color"
                                 value={props.gradientEnd || '#764ba2'}
                                 onChange={(e) => {
-                                  handlePropChange('gradientEnd', e.target.value);
-                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${props.gradientStart || '#667eea'} 0%, ${e.target.value} 100%)`);
+                                  const startColor = props.gradientStart || '#667eea';
+                                  const newEnd = e.target.value;
+                                  const direction = props.gradientDirection || '135deg';
+                                  handleMultiPropChange({
+                                    gradientEnd: newEnd,
+                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`
+                                  });
                                 }}
                                 className="w-10 h-8 p-1"
                               />
                               <Input
                                 value={props.gradientEnd || '#764ba2'}
                                 onChange={(e) => {
-                                  handlePropChange('gradientEnd', e.target.value);
-                                  handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${props.gradientStart || '#667eea'} 0%, ${e.target.value} 100%)`);
+                                  const startColor = props.gradientStart || '#667eea';
+                                  const newEnd = e.target.value;
+                                  const direction = props.gradientDirection || '135deg';
+                                  handleMultiPropChange({
+                                    gradientEnd: newEnd,
+                                    bgGradient: `linear-gradient(${direction}, ${startColor} 0%, ${newEnd} 100%)`
+                                  });
                                 }}
                                 className="flex-1 text-xs"
                                 placeholder="#764ba2"
@@ -1119,8 +1173,13 @@ export const PropertiesPanel = () => {
                           id="gradientDirection"
                           value={props.gradientDirection || '135deg'}
                           onChange={(e) => {
-                            handlePropChange('gradientDirection', e.target.value);
-                            handlePropChange('bgGradient', `linear-gradient(${e.target.value}, ${props.gradientStart || '#667eea'} 0%, ${props.gradientEnd || '#764ba2'} 100%)`);
+                            const newDirection = e.target.value;
+                            const startColor = props.gradientStart || '#667eea';
+                            const endColor = props.gradientEnd || '#764ba2';
+                            handleMultiPropChange({
+                              gradientDirection: newDirection,
+                              bgGradient: `linear-gradient(${newDirection}, ${startColor} 0%, ${endColor} 100%)`
+                            });
                           }}
                           className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
                         >
@@ -1156,9 +1215,12 @@ export const PropertiesPanel = () => {
                               style={{ background: `linear-gradient(135deg, ${preset.start} 0%, ${preset.end} 100%)` }}
                               title={preset.name}
                               onClick={() => {
-                                handlePropChange('gradientStart', preset.start);
-                                handlePropChange('gradientEnd', preset.end);
-                                handlePropChange('bgGradient', `linear-gradient(${props.gradientDirection || '135deg'}, ${preset.start} 0%, ${preset.end} 100%)`);
+                                const direction = props.gradientDirection || '135deg';
+                                handleMultiPropChange({
+                                  gradientStart: preset.start,
+                                  gradientEnd: preset.end,
+                                  bgGradient: `linear-gradient(${direction}, ${preset.start} 0%, ${preset.end} 100%)`
+                                });
                               }}
                             />
                           ))}
@@ -1245,12 +1307,31 @@ export const PropertiesPanel = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="countdownEndDate">End Date & Time</Label>
+                    <Label htmlFor="countdownEndDate">End Date</Label>
                     <Input
                       id="countdownEndDate"
-                      type="datetime-local"
-                      value={props.countdownEndDate ? new Date(props.countdownEndDate).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => handlePropChange('countdownEndDate', new Date(e.target.value).toISOString())}
+                      type="date"
+                      value={props.countdownEndDate ? new Date(props.countdownEndDate).toISOString().slice(0, 10) : ''}
+                      onChange={(e) => {
+                        const currentDate = props.countdownEndDate ? new Date(props.countdownEndDate) : new Date();
+                        const [year, month, day] = e.target.value.split('-').map(Number);
+                        currentDate.setFullYear(year, month - 1, day);
+                        handlePropChange('countdownEndDate', currentDate.toISOString());
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="countdownEndTime">End Time</Label>
+                    <Input
+                      id="countdownEndTime"
+                      type="time"
+                      value={props.countdownEndDate ? new Date(props.countdownEndDate).toTimeString().slice(0, 5) : ''}
+                      onChange={(e) => {
+                        const currentDate = props.countdownEndDate ? new Date(props.countdownEndDate) : new Date();
+                        const [hours, minutes] = e.target.value.split(':').map(Number);
+                        currentDate.setHours(hours, minutes, 0, 0);
+                        handlePropChange('countdownEndDate', currentDate.toISOString());
+                      }}
                     />
                   </div>
                 </>

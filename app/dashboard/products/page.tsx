@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Package, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import ProductModal from '@/components/dashboard/ProductModal';
+import BulkUploadModal from '@/components/dashboard/BulkUploadModal';
 
 interface Product {
   id: string;
@@ -34,6 +35,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -147,16 +149,26 @@ export default function ProductsPage() {
                   Manage your product inventory
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  setEditingProduct(null);
-                  setShowModal(true);
-                }}
-                className="flex items-center gap-2"
-              >
-                <Plus size={20} />
-                Add Product
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowBulkUploadModal(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Upload size={20} />
+                  Bulk Upload
+                </Button>
+                <Button
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setShowModal(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Plus size={20} />
+                  Add Product
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -376,6 +388,12 @@ export default function ProductsPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={fetchProducts}
+      />
+
+      <BulkUploadModal
+        isOpen={showBulkUploadModal}
+        onClose={() => setShowBulkUploadModal(false)}
+        onSuccess={fetchProducts}
       />
     </div>
   );

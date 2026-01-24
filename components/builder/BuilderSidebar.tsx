@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAtomValue } from 'jotai';
 import {
   LayoutTemplate,
   Settings,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { currentProjectAtom } from '@/store/builder';
 
 const navigation = [
   {
@@ -28,9 +30,10 @@ const navigation = [
   },
   {
     name: 'Builder',
-    href: '/builder',
+    href: '/builder', // This will be dynamically replaced
     icon: Layers,
     description: 'Visual page builder',
+    isDynamic: true, // Flag to indicate dynamic href
   },
   {
     name: 'Templates',
@@ -77,6 +80,34 @@ interface BuilderSidebarProps {
 
 export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebarProps) {
   const pathname = usePathname();
+  const currentProject = useAtomValue(currentProjectAtom);
+
+  // Function to get the correct href for navigation items
+  const getHref = (item: typeof navigation[0]) => {
+    // For Builder link, if we're editing a real project (not temp/guest), stay on that project
+    if (item.isDynamic && currentProject) {
+      const projectId = currentProject.id;
+      // Check if it's a real project (not a temp or guest project)
+      const isRealProject = projectId &&
+        !projectId.startsWith('temp-project-') &&
+        !projectId.startsWith('guest-project');
+
+      if (isRealProject) {
+        return `/projects/${projectId}/edit`;
+      }
+    }
+    return item.href;
+  };
+
+  // Function to check if a navigation item is active
+  const isActive = (item: typeof navigation[0]) => {
+    const href = getHref(item);
+    // For builder, also consider project edit pages as active
+    if (item.name === 'Builder') {
+      return pathname === '/builder' || pathname?.startsWith('/projects/') && pathname?.endsWith('/edit');
+    }
+    return pathname === href || pathname?.startsWith(href + '/');
+  };
 
   return (
     <aside className={cn(
@@ -112,16 +143,17 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
       <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+          const itemIsActive = isActive(item);
+          const href = getHref(item);
 
           return (
             <Link
               key={item.name}
-              href={item.href}
+              href={href}
               className={cn(
                 'flex items-center rounded-lg transition-colors group relative',
                 isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5',
-                isActive
+                itemIsActive
                   ? 'bg-gray-100 text-gray-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               )}
@@ -131,7 +163,7 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{item.name}</div>
-                  {!isActive && (
+                  {!itemIsActive && (
                     <div className="text-xs text-gray-500 truncate">{item.description}</div>
                   )}
                 </div>
