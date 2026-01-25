@@ -4842,6 +4842,17 @@ function generateProductCarouselHTML(element: Element): string {
               });
             }
 
+            // Track AddToCart event for Meta Pixel
+            if (typeof window.trackAddToCart === 'function') {
+              window.trackAddToCart({
+                productName: product.name + (variantLabel ? ' (' + variantLabel + ')' : ''),
+                productId: productId,
+                value: price,
+                currency: product.currency || 'MYR',
+                quantity: 1
+              });
+            }
+
             // Show added feedback
             var btn = document.getElementById('add-to-cart-btn-${sanitizedId}-' + productId);
             var btnText = document.getElementById('add-to-cart-text-${sanitizedId}-' + productId);
