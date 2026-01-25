@@ -44,13 +44,17 @@ import {
   ChevronDown,
   Search,
   Clock,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { PublishDialog } from './PublishDialog';
 import { SEOSettingsDialog } from '@/components/seo/SEOSettingsDialog';
 import { VersionHistorySidebar } from '@/components/versions/VersionHistorySidebar';
 import { ProjectTrackingPixelsDialog } from './ProjectTrackingPixelsDialog';
-import { ProjectSettingsDialog, ImportedProjectData } from './ProjectSettingsDialog';
+import {
+  ProjectSettingsDialog,
+  ImportedProjectData,
+} from './ProjectSettingsDialog';
 
 interface ToolbarProps {
   projectId?: string;
@@ -63,7 +67,7 @@ export const Toolbar = ({
   projectId,
   projectName,
   projectStatus,
-  isGuestMode = false
+  isGuestMode = false,
 }: ToolbarProps = {}) => {
   const currentProject = useAtomValue(currentProjectAtom);
   const profile = useAtomValue(profileAtom);
@@ -79,16 +83,21 @@ export const Toolbar = ({
   const [saveState, setSaveState] = useAtom(saveStateAtom);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [seoDialogOpen, setSeoDialogOpen] = useState(false);
-  const [trackingPixelsDialogOpen, setTrackingPixelsDialogOpen] = useState(false);
+  const [trackingPixelsDialogOpen, setTrackingPixelsDialogOpen] =
+    useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [projectSettingsOpen, setProjectSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRepublishing, setIsRepublishing] = useState(false);
   const [nameDialogOpen, setNameDialogOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectDescription, setNewProjectDescription] = useState('');
 
-  const handleSave = async (customName?: string, customDescription?: string) => {
+  const handleSave = async (
+    customName?: string,
+    customDescription?: string
+  ) => {
     if (isGuestMode) {
       alert('Sign up to save your work!');
       return;
@@ -120,7 +129,10 @@ export const Toolbar = ({
       setSaveState({ status: 'saving', lastSaved: null, error: null });
 
       // Check authentication
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
       if (authError || !user) {
         throw new Error('Not authenticated. Please log in again.');
@@ -132,7 +144,9 @@ export const Toolbar = ({
       let projectId = currentProject.id;
 
       if (isTempProject) {
-        console.log('Temporary project detected, creating new project in database...');
+        console.log(
+          'Temporary project detected, creating new project in database...'
+        );
 
         // Check project limit before creating
         const { data: limitCheck, error: limitError } = await supabase
@@ -153,7 +167,8 @@ export const Toolbar = ({
 
         // Use custom name and description if provided, otherwise use current project values
         const finalName = customName || currentProject.name;
-        const finalDescription = customDescription || currentProject.description;
+        const finalDescription =
+          customDescription || currentProject.description;
 
         // Create a new project in the database
         const { data: newProject, error: createError } = await supabase
@@ -162,10 +177,11 @@ export const Toolbar = ({
             user_id: user.id,
             name: finalName,
             description: finalDescription,
-            slug: finalName
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-|-$/g, '') + `-${Date.now()}`,
+            slug:
+              finalName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '') + `-${Date.now()}`,
             status: 'draft',
             element_count: elements.length,
             seo_settings: currentProject.seo_settings || {},
@@ -181,7 +197,7 @@ export const Toolbar = ({
         console.log('New project created:', projectId);
 
         // Update elements to reference the new project ID
-        elements.forEach(el => {
+        elements.forEach((el) => {
           el.project_id = projectId;
         });
       }
@@ -190,8 +206,8 @@ export const Toolbar = ({
         projectId: projectId,
         userId: user.id,
         elements: elements.length,
-        elementTypes: elements.map(el => el.type),
-        isNewProject: isTempProject
+        elementTypes: elements.map((el) => el.type),
+        isNewProject: isTempProject,
       });
 
       // Validate elements before saving
@@ -200,24 +216,31 @@ export const Toolbar = ({
       }
 
       // Deduplicate elements by ID
-      const uniqueElements = elements.reduce((acc, el) => {
-        if (!el || !el.id) {
-          console.error('Invalid element found:', el);
+      const uniqueElements = elements.reduce(
+        (acc, el) => {
+          if (!el || !el.id) {
+            console.error('Invalid element found:', el);
+            return acc;
+          }
+          const exists = acc.find((item) => item.id === el.id);
+          if (!exists) {
+            acc.push(el);
+          } else {
+            console.warn(
+              'Duplicate element prevented during save:',
+              el.id,
+              el.type
+            );
+          }
           return acc;
-        }
-        const exists = acc.find((item) => item.id === el.id);
-        if (!exists) {
-          acc.push(el);
-        } else {
-          console.warn('Duplicate element prevented during save:', el.id, el.type);
-        }
-        return acc;
-      }, [] as typeof elements);
+        },
+        [] as typeof elements
+      );
 
       console.log('After deduplication:', {
         unique: uniqueElements.length,
         original: elements.length,
-        uniqueTypes: uniqueElements.map(el => el.type)
+        uniqueTypes: uniqueElements.map((el) => el.type),
       });
 
       // Verify user owns the project (skip for new temp projects)
@@ -235,7 +258,9 @@ export const Toolbar = ({
 
       if (deleteError) {
         console.error('Delete error:', deleteError);
-        throw new Error(`Failed to delete elements: ${deleteError.message || JSON.stringify(deleteError)}`);
+        throw new Error(
+          `Failed to delete elements: ${deleteError.message || JSON.stringify(deleteError)}`
+        );
       }
 
       console.log('Deleted elements:', count);
@@ -253,7 +278,11 @@ export const Toolbar = ({
           updated_at: new Date().toISOString(),
         }));
 
-        console.log('Inserting elements:', elementsToInsert.length, elementsToInsert);
+        console.log(
+          'Inserting elements:',
+          elementsToInsert.length,
+          elementsToInsert
+        );
 
         const { error: insertError, data: insertedData } = await supabase
           .from('elements')
@@ -262,10 +291,16 @@ export const Toolbar = ({
 
         if (insertError) {
           console.error('Insert error:', insertError);
-          throw new Error(`Failed to insert elements: ${insertError.message || JSON.stringify(insertError)}`);
+          throw new Error(
+            `Failed to insert elements: ${insertError.message || JSON.stringify(insertError)}`
+          );
         }
 
-        console.log('Successfully inserted:', insertedData?.length || 0, 'elements');
+        console.log(
+          'Successfully inserted:',
+          insertedData?.length || 0,
+          'elements'
+        );
       } else {
         console.log('No elements to insert');
       }
@@ -283,7 +318,9 @@ export const Toolbar = ({
 
       if (projectError) {
         console.error('Project update error:', projectError);
-        throw new Error(`Failed to update project: ${projectError.message || JSON.stringify(projectError)}`);
+        throw new Error(
+          `Failed to update project: ${projectError.message || JSON.stringify(projectError)}`
+        );
       }
 
       console.log('Project updated:', updatedProject);
@@ -291,17 +328,23 @@ export const Toolbar = ({
       // Create version snapshot
       console.log('Creating version snapshot...');
       try {
-        const versionResponse = await fetch(`/api/projects/${projectId}/versions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            label: null, // Auto-generated label
-            is_auto_save: false, // Manual save
-          }),
-        });
+        const versionResponse = await fetch(
+          `/api/projects/${projectId}/versions`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              label: null, // Auto-generated label
+              is_auto_save: false, // Manual save
+            }),
+          }
+        );
 
         if (!versionResponse.ok) {
-          console.warn('Failed to create version snapshot:', await versionResponse.text());
+          console.warn(
+            'Failed to create version snapshot:',
+            await versionResponse.text()
+          );
         } else {
           const versionData = await versionResponse.json();
           console.log('Version snapshot created:', versionData);
@@ -328,10 +371,11 @@ export const Toolbar = ({
       console.error('Error details:', {
         message: error instanceof Error ? error.message : 'Unknown',
         stack: error instanceof Error ? error.stack : undefined,
-        error: error
+        error: error,
       });
 
-      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      const errorMessage =
+        error instanceof Error ? error.message : JSON.stringify(error);
 
       setSaveState({
         status: 'error',
@@ -359,6 +403,45 @@ export const Toolbar = ({
       return;
     }
     setPublishDialogOpen(true);
+  };
+
+  const handleRepublish = async () => {
+    if (isGuestMode || !currentProject) return;
+
+    // First save the current changes
+    await handleSave();
+
+    setIsRepublishing(true);
+    try {
+      // Get CSRF token
+      const csrfResponse = await fetch('/api/csrf');
+      const csrfData = await csrfResponse.json();
+
+      const response = await fetch('/api/publish', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfData.token,
+        },
+        body: JSON.stringify({ projectId: currentProject.id }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert('Page republished successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to republish');
+      }
+    } catch (error) {
+      console.error('Republish error:', error);
+      alert(
+        'Failed to republish: ' +
+          (error instanceof Error ? error.message : 'Unknown error')
+      );
+    } finally {
+      setIsRepublishing(false);
+    }
   };
 
   const handleSaveSEO = async (settings: any) => {
@@ -562,6 +645,25 @@ export const Toolbar = ({
           <span className="hidden md:inline">Preview</span>
         </Button>
 
+        {/* Republish button - only shown for published projects */}
+        {!isGuestMode &&
+          (projectStatus || currentProject?.status) === 'published' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRepublish}
+              disabled={isRepublishing}
+              title="Republish page with latest changes"
+            >
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${isRepublishing ? 'animate-spin' : ''}`}
+              />
+              <span className="hidden md:inline">
+                {isRepublishing ? 'Republishing...' : 'Republish'}
+              </span>
+            </Button>
+          )}
+
         {/* More menu - Analytics, Forms, Settings */}
         <div className="relative">
           <Button
@@ -640,8 +742,8 @@ export const Toolbar = ({
           {isGuestMode
             ? 'Sign Up to Publish'
             : (projectStatus || currentProject?.status) === 'published'
-            ? 'Update'
-            : 'Publish'}
+              ? 'Update'
+              : 'Publish'}
         </Button>
       </div>
 
@@ -655,7 +757,9 @@ export const Toolbar = ({
           currentPublishedUrl={currentProject.published_url}
           subscriptionPlan={profile?.subscription_plan}
           userSubdomain={profile?.subdomain}
-          autoPublish={(projectStatus || currentProject?.status) === 'published'}
+          autoPublish={
+            (projectStatus || currentProject?.status) === 'published'
+          }
         />
       )}
 
@@ -718,7 +822,9 @@ export const Toolbar = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="project-description">Description (Optional)</Label>
+              <Label htmlFor="project-description">
+                Description (Optional)
+              </Label>
               <Input
                 id="project-description"
                 value={newProjectDescription}
