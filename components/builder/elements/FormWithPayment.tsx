@@ -105,16 +105,30 @@ export const FormWithPaymentElement = React.memo(
         const expandedFromCart: Record<string, boolean> = {};
 
         cart.items.forEach((item) => {
-          // Find matching product in our products list
-          const matchingProduct = products.find((p) => p.id === item.productId);
+          // Find matching product by ID first, then by name (for cross-element sync)
+          const matchingProduct = products.find(
+            (p) => p.id === item.productId || p.name === item.productName
+          );
           if (matchingProduct) {
-            // Use variantKey if it has one, otherwise use productId
-            const key = item.variantKey || item.productId;
+            // Build variant key using the matching product's ID
+            let key: string;
+            if (item.variantKey && item.variantLabel) {
+              // Extract variant value from the original key and rebuild with matching product's ID
+              const variantValue = item.variantKey
+                .split('-')
+                .slice(1)
+                .join('-');
+              key = variantValue
+                ? `${matchingProduct.id}-${variantValue}`
+                : (matchingProduct.id as string);
+            } else {
+              key = matchingProduct.id as string;
+            }
             cartQuantities[key] = item.quantity;
 
-            // Auto-expand products that have items in cart
+            // Auto-expand products that have variant items in cart
             if (item.variantKey && item.variantKey !== item.productId) {
-              expandedFromCart[item.productId] = true;
+              expandedFromCart[matchingProduct.id as string] = true;
             }
           }
         });
