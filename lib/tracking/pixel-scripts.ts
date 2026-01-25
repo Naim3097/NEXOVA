@@ -7,6 +7,9 @@ interface TrackingPixelsConfig {
     enabled: boolean;
     pixelId: string | null;
     enableConversionsAPI?: boolean;
+    conversionsAPIToken?: string | null;
+    enableAdvancedMatching?: boolean;
+    testEventCode?: string | null;
   };
   tiktok?: {
     enabled: boolean;
@@ -84,7 +87,10 @@ function generateGoogleAnalyticsScript(measurementId: string): string {
 /**
  * Generate Google Ads Conversion Tracking script
  */
-function generateGoogleAdsScript(tagId: string, conversionLabel?: string | null): string {
+function generateGoogleAdsScript(
+  tagId: string,
+  conversionLabel?: string | null
+): string {
   const baseScript = `
 <!-- Google Ads -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=${tagId}"></script>
@@ -97,7 +103,9 @@ function generateGoogleAdsScript(tagId: string, conversionLabel?: string | null)
 
   // If conversion label is provided, add conversion tracking setup
   if (conversionLabel) {
-    return baseScript + `
+    return (
+      baseScript +
+      `
 <script>
   // Google Ads Conversion Tracking
   window.gtag_report_conversion = function(url) {
@@ -112,7 +120,8 @@ function generateGoogleAdsScript(tagId: string, conversionLabel?: string | null)
     return false;
   }
 </script>
-<!-- End Google Ads -->`;
+<!-- End Google Ads -->`
+    );
   }
 
   return baseScript + '\n<!-- End Google Ads -->';
@@ -122,11 +131,67 @@ function generateGoogleAdsScript(tagId: string, conversionLabel?: string | null)
  * Generate conversion event tracking helper functions
  */
 function generateConversionHelpers(config: TrackingPixelsConfig): string {
+  const enableCAPI =
+    config.facebook?.enableConversionsAPI &&
+    config.facebook?.conversionsAPIToken;
+  const enableAdvancedMatching = config.facebook?.enableAdvancedMatching;
+
   let helpers = `
 <script>
+  // Meta Pixel Configuration
+  window.__META_PIXEL_CONFIG__ = {
+    pixelId: '${config.facebook?.pixelId || ''}',
+    enableCAPI: ${enableCAPI ? 'true' : 'false'},
+    enableAdvancedMatching: ${enableAdvancedMatching ? 'true' : 'false'},
+    testEventCode: ${config.facebook?.testEventCode ? `'${config.facebook.testEventCode}'` : 'null'}
+  };
+
+  // Generate unique event ID for deduplication
+  function generateEventId() {
+    return 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Hash function for Advanced Matching (SHA-256)
+  async function hashValue(value) {
+    if (!value) return null;
+    const normalized = value.toLowerCase().trim();
+    const encoder = new TextEncoder();
+    const data = encoder.encode(normalized);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Send event to Conversion API (server-side)
+  async function sendToCAPI(eventName, eventData, userData) {
+    if (!window.__META_PIXEL_CONFIG__.enableCAPI) return;
+
+    try {
+      const response = await fetch('/api/tracking/meta-capi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName,
+          eventData,
+          userData,
+          eventSourceUrl: window.location.href,
+          userAgent: navigator.userAgent,
+          eventId: eventData.event_id
+        })
+      });
+
+      if (response.ok) {
+        console.log('[CAPI] Event sent:', eventName);
+      }
+    } catch (error) {
+      console.error('[CAPI] Error sending event:', error);
+    }
+  }
+
   // Conversion tracking helper functions
-  window.trackPurchase = function(transactionData) {
-    const { orderId, value, currency, productName } = transactionData;
+  window.trackPurchase = async function(transactionData) {
+    const { orderId, value, currency, productName, customerEmail, customerPhone, customerName } = transactionData;
+    const eventId = generateEventId();
 
     try {`;
 
@@ -135,13 +200,29 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
     helpers += `
       // Facebook Pixel Purchase Event
       if (typeof fbq !== 'undefined') {
-        fbq('track', 'Purchase', {
+        const purchaseData = {
           value: value,
           currency: currency || 'MYR',
           content_name: productName,
-          content_type: 'product'
-        });
+          content_type: 'product',
+          content_ids: [orderId]
+        };
+
+        fbq('track', 'Purchase', purchaseData, { eventID: eventId });
         console.log('[Tracking] Facebook Pixel: Purchase tracked');
+
+        // Send to Conversion API for better attribution
+        const userData = {};
+        if (customerEmail) userData.em = await hashValue(customerEmail);
+        if (customerPhone) userData.ph = await hashValue(customerPhone);
+        if (customerName) {
+          const names = customerName.split(' ');
+          if (names[0]) userData.fn = await hashValue(names[0]);
+          if (names[1]) userData.ln = await hashValue(names[names.length - 1]);
+        }
+        userData.client_user_agent = navigator.userAgent;
+
+        sendToCAPI('Purchase', { ...purchaseData, event_id: eventId }, userData);
       }`;
   }
 
@@ -161,7 +242,10 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
   }
 
   // Google Analytics 4 purchase event
-  if (config.google_analytics?.enabled && config.google_analytics.measurementId) {
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
     helpers += `
       // Google Analytics 4 Purchase Event
       if (typeof gtag !== 'undefined') {
@@ -194,15 +278,105 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
     }
   };
 
+  // Initiate Checkout tracking
+  window.trackInitiateCheckout = async function(checkoutData) {
+    const { value, currency, productName, numItems, customerEmail, customerPhone, customerName } = checkoutData;
+    const eventId = generateEventId();
+
+    try {`;
+
+  if (config.facebook?.enabled && config.facebook.pixelId) {
+    helpers += `
+      // Facebook Pixel InitiateCheckout Event
+      if (typeof fbq !== 'undefined') {
+        const checkoutEventData = {
+          value: value,
+          currency: currency || 'MYR',
+          content_name: productName,
+          num_items: numItems || 1
+        };
+
+        fbq('track', 'InitiateCheckout', checkoutEventData, { eventID: eventId });
+        console.log('[Tracking] Facebook Pixel: InitiateCheckout tracked');
+
+        // Send to Conversion API
+        const userData = {};
+        if (customerEmail) userData.em = await hashValue(customerEmail);
+        if (customerPhone) userData.ph = await hashValue(customerPhone);
+        if (customerName) {
+          const names = customerName.split(' ');
+          if (names[0]) userData.fn = await hashValue(names[0]);
+          if (names[1]) userData.ln = await hashValue(names[names.length - 1]);
+        }
+        userData.client_user_agent = navigator.userAgent;
+
+        sendToCAPI('InitiateCheckout', { ...checkoutEventData, event_id: eventId }, userData);
+      }`;
+  }
+
+  if (config.tiktok?.enabled && config.tiktok.pixelId) {
+    helpers += `
+      // TikTok Pixel InitiateCheckout Event
+      if (typeof ttq !== 'undefined') {
+        ttq.track('InitiateCheckout', {
+          value: value,
+          currency: currency || 'MYR',
+          content_name: productName
+        });
+        console.log('[Tracking] TikTok Pixel: InitiateCheckout tracked');
+      }`;
+  }
+
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
+    helpers += `
+      // Google Analytics 4 Begin Checkout Event
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'begin_checkout', {
+          value: value,
+          currency: currency || 'MYR',
+          items: [{
+            item_name: productName,
+            price: value
+          }]
+        });
+        console.log('[Tracking] Google Analytics: Begin Checkout tracked');
+      }`;
+  }
+
+  helpers += `
+    } catch (error) {
+      console.error('[Tracking] Error tracking initiate checkout:', error);
+    }
+  };
+
   // Lead form submission tracking
-  window.trackLead = function(formData) {
+  window.trackLead = async function(formData) {
+    const { customerEmail, customerPhone, customerName } = formData || {};
+    const eventId = generateEventId();
+
     try {`;
 
   if (config.facebook?.enabled && config.facebook.pixelId) {
     helpers += `
       if (typeof fbq !== 'undefined') {
-        fbq('track', 'Lead');
+        fbq('track', 'Lead', {}, { eventID: eventId });
         console.log('[Tracking] Facebook Pixel: Lead tracked');
+
+        // Send to Conversion API
+        const userData = {};
+        if (customerEmail) userData.em = await hashValue(customerEmail);
+        if (customerPhone) userData.ph = await hashValue(customerPhone);
+        if (customerName) {
+          const names = customerName.split(' ');
+          if (names[0]) userData.fn = await hashValue(names[0]);
+          if (names[1]) userData.ln = await hashValue(names[names.length - 1]);
+        }
+        userData.client_user_agent = navigator.userAgent;
+
+        sendToCAPI('Lead', { event_id: eventId }, userData);
       }`;
   }
 
@@ -214,7 +388,10 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
       }`;
   }
 
-  if (config.google_analytics?.enabled && config.google_analytics.measurementId) {
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
     helpers += `
       if (typeof gtag !== 'undefined') {
         gtag('event', 'generate_lead');
@@ -229,17 +406,29 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
   };
 
   // Add to cart tracking
-  window.trackAddToCart = function(productData) {
-    const { productName, value, currency } = productData;
+  window.trackAddToCart = async function(productData) {
+    const { productName, productId, value, currency, quantity } = productData;
+    const eventId = generateEventId();
+
     try {`;
 
   if (config.facebook?.enabled && config.facebook.pixelId) {
     helpers += `
       if (typeof fbq !== 'undefined') {
-        fbq('track', 'AddToCart', {
+        const addToCartData = {
           content_name: productName,
+          content_ids: [productId],
+          content_type: 'product',
           value: value,
           currency: currency || 'MYR'
+        };
+
+        fbq('track', 'AddToCart', addToCartData, { eventID: eventId });
+        console.log('[Tracking] Facebook Pixel: AddToCart tracked');
+
+        // Send to Conversion API
+        sendToCAPI('AddToCart', { ...addToCartData, event_id: eventId }, {
+          client_user_agent: navigator.userAgent
         });
       }`;
   }
@@ -252,15 +441,82 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
           value: value,
           currency: currency || 'MYR'
         });
+        console.log('[Tracking] TikTok Pixel: AddToCart tracked');
       }`;
   }
 
-  if (config.google_analytics?.enabled && config.google_analytics.measurementId) {
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
     helpers += `
       if (typeof gtag !== 'undefined') {
         gtag('event', 'add_to_cart', {
           items: [{
+            item_id: productId,
             item_name: productName,
+            price: value,
+            quantity: quantity || 1
+          }]
+        });
+        console.log('[Tracking] Google Analytics: AddToCart tracked');
+      }`;
+  }
+
+  helpers += `
+    } catch (error) {
+      console.error('[Tracking] Error tracking add to cart:', error);
+    }
+  };
+
+  // View Content tracking
+  window.trackViewContent = async function(contentData) {
+    const { contentName, contentId, value, currency } = contentData;
+    const eventId = generateEventId();
+
+    try {`;
+
+  if (config.facebook?.enabled && config.facebook.pixelId) {
+    helpers += `
+      if (typeof fbq !== 'undefined') {
+        const viewContentData = {
+          content_name: contentName,
+          content_ids: contentId ? [contentId] : [],
+          content_type: 'product',
+          value: value,
+          currency: currency || 'MYR'
+        };
+
+        fbq('track', 'ViewContent', viewContentData, { eventID: eventId });
+        console.log('[Tracking] Facebook Pixel: ViewContent tracked');
+
+        sendToCAPI('ViewContent', { ...viewContentData, event_id: eventId }, {
+          client_user_agent: navigator.userAgent
+        });
+      }`;
+  }
+
+  if (config.tiktok?.enabled && config.tiktok.pixelId) {
+    helpers += `
+      if (typeof ttq !== 'undefined') {
+        ttq.track('ViewContent', {
+          content_name: contentName,
+          value: value,
+          currency: currency || 'MYR'
+        });
+      }`;
+  }
+
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
+    helpers += `
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'view_item', {
+          items: [{
+            item_id: contentId,
+            item_name: contentName,
             price: value
           }]
         });
@@ -269,7 +525,7 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
 
   helpers += `
     } catch (error) {
-      console.error('[Tracking] Error tracking add to cart:', error);
+      console.error('[Tracking] Error tracking view content:', error);
     }
   };
 
@@ -282,7 +538,9 @@ function generateConversionHelpers(config: TrackingPixelsConfig): string {
 /**
  * Main function to generate all tracking pixel scripts
  */
-export function generateTrackingPixelScripts(config: TrackingPixelsConfig | null): string {
+export function generateTrackingPixelScripts(
+  config: TrackingPixelsConfig | null
+): string {
   if (!config) return '';
 
   let scripts = '';
@@ -298,8 +556,13 @@ export function generateTrackingPixelScripts(config: TrackingPixelsConfig | null
   }
 
   // Google Analytics 4
-  if (config.google_analytics?.enabled && config.google_analytics.measurementId) {
-    scripts += generateGoogleAnalyticsScript(config.google_analytics.measurementId);
+  if (
+    config.google_analytics?.enabled &&
+    config.google_analytics.measurementId
+  ) {
+    scripts += generateGoogleAnalyticsScript(
+      config.google_analytics.measurementId
+    );
   }
 
   // Google Ads
@@ -314,7 +577,8 @@ export function generateTrackingPixelScripts(config: TrackingPixelsConfig | null
   const hasAnyPixel =
     (config.facebook?.enabled && config.facebook.pixelId) ||
     (config.tiktok?.enabled && config.tiktok.pixelId) ||
-    (config.google_analytics?.enabled && config.google_analytics.measurementId) ||
+    (config.google_analytics?.enabled &&
+      config.google_analytics.measurementId) ||
     (config.google_ads?.enabled && config.google_ads.tagId);
 
   if (hasAnyPixel) {

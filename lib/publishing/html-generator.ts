@@ -4115,6 +4115,20 @@ function generateFormWithPaymentHTML(element: Element): string {
           const data = await response.json();
 
           if (response.ok && data.redirect_url) {
+            // Store order data in localStorage for tracking after payment redirect
+            try {
+              const trackingData = {
+                total: pendingOrderData_${sanitizedId}.total,
+                currency: currencyCode_${sanitizedId},
+                productName: pendingOrderData_${sanitizedId}.productName,
+                name: pendingOrderData_${sanitizedId}.name,
+                email: pendingOrderData_${sanitizedId}.email,
+                mobile: pendingOrderData_${sanitizedId}.mobile
+              };
+              localStorage.setItem('pendingOrderData_' + data.invoice_ref, JSON.stringify(trackingData));
+            } catch (e) {
+              console.error('[Tracking] Error storing order data:', e);
+            }
             window.location.href = data.redirect_url;
           } else {
             throw new Error(data.error || 'Failed to create payment');
@@ -4247,6 +4261,19 @@ function generateFormWithPaymentHTML(element: Element): string {
           }
         }
 
+        // Track InitiateCheckout event
+        if (typeof window.trackInitiateCheckout === 'function') {
+          window.trackInitiateCheckout({
+            value: total,
+            currency: currencyCode_${sanitizedId},
+            productName: productName,
+            numItems: orderItems.reduce(function(sum, item) { return sum + item.quantity; }, 0),
+            customerEmail: email,
+            customerPhone: mobile,
+            customerName: name
+          });
+        }
+
         // Open checkout modal with bank selection
         openCheckoutModal_${sanitizedId}(orderItems, total);
 
@@ -4328,6 +4355,30 @@ function generateFormWithPaymentHTML(element: Element): string {
           title = 'Payment Successful!';
           message = 'Thank you for your purchase. Your order has been confirmed.';
           bgColor = '#dcfce7';
+
+          // Track Purchase event
+          if (typeof window.trackPurchase === 'function') {
+            // Get stored order data from localStorage
+            try {
+              const storedOrderData = localStorage.getItem('pendingOrderData_' + orderRef);
+              if (storedOrderData) {
+                const orderData = JSON.parse(storedOrderData);
+                window.trackPurchase({
+                  orderId: orderRef,
+                  value: orderData.total || 0,
+                  currency: orderData.currency || currencyCode_${sanitizedId},
+                  productName: orderData.productName || 'Purchase',
+                  customerEmail: orderData.email || '',
+                  customerPhone: orderData.mobile || '',
+                  customerName: orderData.name || ''
+                });
+                // Clean up stored data after tracking
+                localStorage.removeItem('pendingOrderData_' + orderRef);
+              }
+            } catch (e) {
+              console.error('[Tracking] Error tracking purchase:', e);
+            }
+          }
         } else if (status === 'failed') {
           icon = '<svg style="width: 4rem; height: 4rem; color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
           title = 'Payment Cancelled';
