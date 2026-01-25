@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Shield,
   Minus,
@@ -89,6 +89,18 @@ export const FormWithPaymentElement = React.memo(
     // Get cart context for syncing with Product Carousel
     const cart = useCart();
 
+    // Refs for auto-scroll functionality
+    const formRef = useRef<HTMLElement>(null);
+    const productRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+    // Track previous cart items count to detect new additions
+    const prevCartLengthRef = useRef(cart.items.length);
+
+    // Track highlighted product for visual feedback
+    const [highlightedProductId, setHighlightedProductId] = useState<
+      string | null
+    >(null);
+
     // Preview state for quantities (builder preview only)
     // For products with variations: key is "productId-variationValue"
     // For products without variations: key is just "productId"
@@ -103,6 +115,7 @@ export const FormWithPaymentElement = React.memo(
       if (cart.items.length > 0) {
         const cartQuantities: Record<string, number> = {};
         const expandedFromCart: Record<string, boolean> = {};
+        let newlyAddedProductId: string | null = null;
 
         cart.items.forEach((item) => {
           // Find matching product by ID first, then by name (for cross-element sync)
@@ -130,6 +143,11 @@ export const FormWithPaymentElement = React.memo(
             if (item.variantKey && item.variantKey !== item.productId) {
               expandedFromCart[matchingProduct.id as string] = true;
             }
+
+            // Track the most recently added product for scrolling
+            if (cart.items.length > prevCartLengthRef.current) {
+              newlyAddedProductId = matchingProduct.id as string;
+            }
           }
         });
 
@@ -137,6 +155,32 @@ export const FormWithPaymentElement = React.memo(
         setQuantities((prev) => ({ ...prev, ...cartQuantities }));
         // Auto-expand products with cart items
         setExpandedProducts((prev) => ({ ...prev, ...expandedFromCart }));
+
+        // Auto-scroll and highlight if a new item was added
+        if (
+          newlyAddedProductId &&
+          cart.items.length > prevCartLengthRef.current
+        ) {
+          // Scroll to form first
+          formRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+
+          // Then scroll to specific product after a short delay
+          setTimeout(() => {
+            const productEl = productRefs.current[newlyAddedProductId!];
+            if (productEl) {
+              productEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+
+          // Highlight the product
+          setHighlightedProductId(newlyAddedProductId);
+          setTimeout(() => setHighlightedProductId(null), 2000);
+        }
+
+        prevCartLengthRef.current = cart.items.length;
       }
     }, [cart.items, products]);
 
@@ -538,6 +582,8 @@ export const FormWithPaymentElement = React.memo(
 
     return (
       <section
+        ref={formRef}
+        id="form-with-payment"
         className={`${baseClasses} py-8 px-4 cursor-pointer`}
         style={{ backgroundColor: bgColor }}
         onClick={handleClick}
@@ -636,11 +682,19 @@ export const FormWithPaymentElement = React.memo(
                   product.variations && product.variations.length > 0;
                 const isExpanded = expandedProducts[product.id || ''];
                 const totalQty = getProductTotalQty(product);
+                const isHighlighted = highlightedProductId === product.id;
 
                 return (
                   <div
                     key={product.id}
-                    className="border-b border-gray-100 last:border-b-0"
+                    ref={(el) => {
+                      if (product.id) productRefs.current[product.id] = el;
+                    }}
+                    className={`border-b border-gray-100 last:border-b-0 transition-all duration-500 ${
+                      isHighlighted
+                        ? 'bg-green-50 ring-2 ring-green-400 ring-inset'
+                        : ''
+                    }`}
                   >
                     {/* Product Header Row */}
                     <div
