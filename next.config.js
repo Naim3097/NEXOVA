@@ -41,7 +41,8 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+            value:
+              'camera=(), microphone=(), geolocation=(), interest-cohort=()',
           },
         ],
       },
@@ -67,17 +68,20 @@ const nextConfig = {
       },
       {
         // More permissive CSP for published pages (user-generated content)
+        // Includes tracking pixels: Meta/Facebook, TikTok, Google Analytics/Ads
         source: '/(p|s)/:path*',
         headers: [
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              // Scripts: Meta Pixel, TikTok Pixel, Google Analytics/Ads
+              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://connect.facebook.net https://analytics.tiktok.com https://www.googletagmanager.com https://www.google-analytics.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://api.leanx.com",
+              // Connect: API calls for tracking, payments, CAPI
+              "connect-src 'self' https://api.leanx.com https://www.facebook.com https://analytics.tiktok.com https://www.google-analytics.com https://region1.google-analytics.com",
               "frame-src 'self' https://www.youtube.com https://player.vimeo.com",
               "media-src 'self' https:",
             ].join('; '),
