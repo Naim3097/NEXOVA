@@ -4,9 +4,11 @@ export interface Profile {
   display_name: string | null;
   avatar_url: string | null;
   email: string | null;
+  phone: string | null;
   subdomain: string | null; // User's subdomain (e.g., "johndoe" for johndoe.xide.app)
-  subscription_plan: 'free' | 'pro'; // Simplified 2-tier model
+  subscription_plan: 'free' | 'pro' | 'premium' | 'enterprise';
   subscription_status: 'active' | 'cancelled' | 'expired';
+  role: 'user' | 'admin' | null;
   settings: Record<string, any>;
   // LeanX Payment Integration
   leanx_api_key: string | null;

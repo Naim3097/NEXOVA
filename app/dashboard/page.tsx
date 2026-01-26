@@ -8,8 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/auth-client';
-import { ExternalLink, Edit, Trash2, Crown, Sparkles } from 'lucide-react';
+import {
+  ExternalLink,
+  Edit,
+  Trash2,
+  Crown,
+  Sparkles,
+  Shield,
+} from 'lucide-react';
 import { UpgradePlanModal } from '@/components/dashboard/UpgradePlanModal';
+import { HelpButton } from '@/components/dashboard/HelpButton';
+import { isAdminEmail } from '@/lib/admin';
 import type { Project } from '@/types';
 
 function DashboardContent() {
@@ -22,6 +31,7 @@ function DashboardContent() {
   const currentPlan = profile?.subscription_plan || 'free';
   const isPremiumOrHigher =
     currentPlan === 'premium' || currentPlan === 'enterprise';
+  const isAdmin = user?.email ? isAdminEmail(user.email) : false;
 
   useEffect(() => {
     if (user) {
@@ -88,9 +98,20 @@ function DashboardContent() {
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button variant="outline" onClick={signOut}>
-            Sign out
-          </Button>
+          <div className="flex items-center gap-2">
+            <HelpButton pageSource="dashboard" />
+            {isAdmin && (
+              <Link href="/dashboard/admin">
+                <Button variant="outline" size="sm">
+                  <Shield className="h-4 w-4 mr-1" />
+                  Admin
+                </Button>
+              </Link>
+            )}
+            <Button variant="outline" onClick={signOut}>
+              Sign out
+            </Button>
+          </div>
         </div>
       </header>
 
