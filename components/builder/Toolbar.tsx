@@ -408,9 +408,6 @@ export const Toolbar = ({
   const handleRepublish = async () => {
     if (isGuestMode || !currentProject) return;
 
-    // First save the current changes
-    await handleSave();
-
     setIsRepublishing(true);
     try {
       // Get CSRF token
