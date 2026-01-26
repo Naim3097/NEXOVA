@@ -389,12 +389,6 @@ export const ProductCarouselElement = React.memo(
                             </svg>
                           </div>
                         )}
-                        {/* Discount Badge (if base_price differs from sale price) */}
-                        {product.base_price < 69 && (
-                          <div className="absolute top-3 left-3 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded">
-                            -43%
-                          </div>
-                        )}
                       </div>
 
                       {/* Product Info */}
