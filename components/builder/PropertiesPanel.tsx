@@ -25,11 +25,12 @@ interface ArrayItemEditorProps {
   schema: {
     key: string;
     label: string;
-    type: 'text' | 'textarea' | 'number' | 'select';
+    type: 'text' | 'textarea' | 'number' | 'select' | 'image';
     options?: { value: string; label: string }[];
   }[];
   onUpdate: (index: number, updatedItem: any) => void;
   onRemove: (index: number) => void;
+  userId?: string;
 }
 
 const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
@@ -38,6 +39,7 @@ const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
   schema,
   onUpdate,
   onRemove,
+  userId,
 }) => {
   const [isExpanded, setIsExpanded] = useState(index === 0);
 
@@ -96,6 +98,15 @@ const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
                     </option>
                   ))}
                 </select>
+              ) : field.type === 'image' && userId ? (
+                <div className="mt-1">
+                  <ImageUpload
+                    value={item[field.key] || ''}
+                    onChange={(url) => handleFieldChange(field.key, url)}
+                    userId={userId}
+                    maxSizeMB={5}
+                  />
+                </div>
               ) : (
                 <Input
                   type={field.type}
@@ -119,11 +130,12 @@ interface ArrayEditorProps {
   schema: {
     key: string;
     label: string;
-    type: 'text' | 'textarea' | 'number' | 'select';
+    type: 'text' | 'textarea' | 'number' | 'select' | 'image';
     options?: { value: string; label: string }[];
   }[];
   defaultItem: any;
   onChange: (items: any[]) => void;
+  userId?: string;
 }
 
 const ArrayEditor: React.FC<ArrayEditorProps> = ({
@@ -132,6 +144,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
   schema,
   defaultItem,
   onChange,
+  userId,
 }) => {
   const handleAddItem = () => {
     onChange([...items, { ...defaultItem }]);
@@ -177,6 +190,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
               schema={schema}
               onUpdate={handleUpdateItem}
               onRemove={handleRemoveItem}
+              userId={userId}
             />
           ))
         )}
@@ -647,6 +661,11 @@ export const PropertiesPanel = () => {
                 items={props.features || []}
                 schema={[
                   {
+                    key: 'image',
+                    label: 'Feature Image (optional)',
+                    type: 'image',
+                  },
+                  {
                     key: 'icon',
                     label: 'Icon',
                     type: 'select',
@@ -663,8 +682,10 @@ export const PropertiesPanel = () => {
                   icon: 'check-circle',
                   title: 'New Feature',
                   description: 'Describe this feature',
+                  image: '',
                 }}
                 onChange={(features) => handlePropChange('features', features)}
+                userId={currentProject?.user_id}
               />
 
               {/* Background Image Section */}

@@ -632,8 +632,22 @@ function generateFeaturesHTML(element: Element): string {
     </div>
     <div class="grid grid-cols-3 gap-8">
       ${features
-        .map(
-          (feature: any) => `
+        .map((feature: any) => {
+          const hasImage = feature.image && feature.image.trim() !== '';
+          if (hasImage) {
+            return `
+        <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; background: white; overflow: hidden;">
+          <div style="aspect-ratio: 4/3; overflow: hidden;">
+            <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827; text-align: center;">${feature.title}</h3>
+            <p style="color: #6b7280; margin: 0; text-align: center;">${feature.description}</p>
+          </div>
+        </div>
+      `;
+          }
+          return `
         <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: white;">
           <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
             <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -643,8 +657,8 @@ function generateFeaturesHTML(element: Element): string {
           <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">${feature.title}</h3>
           <p style="color: #6b7280; margin: 0;">${feature.description}</p>
         </div>
-      `
-        )
+      `;
+        })
         .join('')}
     </div>
   </div>
@@ -669,21 +683,28 @@ function generateFeaturesHTML(element: Element): string {
     </div>
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       ${features
-        .map(
-          (feature: any) => `
-        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
+        .map((feature: any) => {
+          const hasImage = feature.image && feature.image.trim() !== '';
+          return `
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+          ${
+            hasImage
+              ? `<div style="flex-shrink: 0; width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden;">
+            <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>`
+              : `<div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
             <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               ${getIconSVG(feature.icon || 'check-circle')}
             </svg>
-          </div>
+          </div>`
+          }
           <div style="flex: 1;">
             <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827;">${feature.title}</h3>
             <p style="color: #6b7280; margin: 0;">${feature.description}</p>
           </div>
         </div>
-      `
-        )
+      `;
+        })
         .join('')}
     </div>
   </div>
@@ -708,24 +729,35 @@ function generateFeaturesHTML(element: Element): string {
     </div>
     <div style="display: flex; flex-direction: column; gap: 5rem;">
       ${features
-        .map(
-          (feature: any, index: number) => `
+        .map((feature: any, index: number) => {
+          const hasImage = feature.image && feature.image.trim() !== '';
+          return `
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; align-items: center;">
           <div style="${index % 2 === 1 ? 'order: 2;' : ''}">
-            <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            ${
+              !hasImage
+                ? `<div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
               <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 ${getIconSVG(feature.icon || 'check-circle')}
               </svg>
-            </div>
+            </div>`
+                : ''
+            }
             <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #111827;">${feature.title}</h3>
             <p style="font-size: 1.125rem; color: #6b7280; margin: 0;">${feature.description}</p>
           </div>
-          <div style="height: 16rem; background: #e5e7eb; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; ${index % 2 === 1 ? 'order: 1;' : ''}">
+          ${
+            hasImage
+              ? `<div style="height: 16rem; border-radius: 0.5rem; overflow: hidden; ${index % 2 === 1 ? 'order: 1;' : ''}">
+            <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>`
+              : `<div style="height: 16rem; background: #e5e7eb; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; ${index % 2 === 1 ? 'order: 1;' : ''}">
             <span style="color: #9ca3af;">Feature illustration</span>
-          </div>
+          </div>`
+          }
         </div>
-      `
-        )
+      `;
+        })
         .join('')}
     </div>
   </div>

@@ -169,6 +169,7 @@ export interface FeaturesProps {
     icon: string;
     title: string;
     description: string;
+    image?: string; // Optional feature image
   }>;
   // Background image options
   backgroundImage?: string;
