@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 interface DialogProps {
   open?: boolean;
@@ -39,7 +39,7 @@ export function DialogContent({
   return (
     <div
       className={cn(
-        "relative bg-background rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6",
+        'relative bg-background rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6',
         className
       )}
       {...props}
@@ -59,10 +59,7 @@ export function DialogHeader({
   ...props
 }: DialogHeaderProps) {
   return (
-    <div
-      className={cn("flex flex-col space-y-1.5 mb-4", className)}
-      {...props}
-    >
+    <div className={cn('flex flex-col space-y-1.5 mb-4', className)} {...props}>
       {children}
     </div>
   );
@@ -78,14 +75,13 @@ export function DialogTitle({
   ...props
 }: DialogTitleProps) {
   return (
-    <h2 className={cn("text-2xl font-semibold", className)} {...props}>
+    <h2 className={cn('text-2xl font-semibold', className)} {...props}>
       {children}
     </h2>
   );
 }
 
-interface DialogDescriptionProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {
+interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
   children: React.ReactNode;
 }
 
@@ -95,10 +91,7 @@ export function DialogDescription({
   ...props
 }: DialogDescriptionProps) {
   return (
-    <p
-      className={cn("text-sm text-muted-foreground", className)}
-      {...props}
-    >
+    <p className={cn('text-sm text-muted-foreground', className)} {...props}>
       {children}
     </p>
   );
@@ -114,11 +107,24 @@ export function DialogFooter({
   ...props
 }: DialogFooterProps) {
   return (
-    <div
-      className={cn("flex justify-end gap-2 mt-6", className)}
-      {...props}
-    >
+    <div className={cn('flex justify-end gap-2 mt-6', className)} {...props}>
       {children}
     </div>
   );
+}
+
+interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+  children: React.ReactNode;
+}
+
+export function DialogTrigger({
+  children,
+  asChild,
+  ...props
+}: DialogTriggerProps) {
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<any>, props);
+  }
+  return <button {...props}>{children}</button>;
 }
