@@ -410,15 +410,10 @@ export const Toolbar = ({
 
     setIsRepublishing(true);
     try {
-      // Get CSRF token
-      const csrfResponse = await fetch('/api/csrf');
-      const csrfData = await csrfResponse.json();
-
       const response = await fetch('/api/publish', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-csrf-token': csrfData.token,
         },
         body: JSON.stringify({ projectId: currentProject.id }),
       });
@@ -426,7 +421,7 @@ export const Toolbar = ({
       const data = await response.json();
 
       if (response.ok && data.success) {
-        alert('Page republished successfully!');
+        alert('Page republished successfully! Visit: ' + data.publishedUrl);
       } else {
         throw new Error(data.error || 'Failed to republish');
       }
