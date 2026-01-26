@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/auth-client';
-import { ExternalLink, Edit, Trash2 } from 'lucide-react';
+import { ExternalLink, Edit, Trash2, Crown, Sparkles } from 'lucide-react';
+import { UpgradePlanModal } from '@/components/dashboard/UpgradePlanModal';
 import type { Project } from '@/types';
 
 function DashboardContent() {
@@ -15,6 +17,11 @@ function DashboardContent() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const currentPlan = profile?.subscription_plan || 'free';
+  const isPremiumOrHigher =
+    currentPlan === 'premium' || currentPlan === 'enterprise';
 
   useEffect(() => {
     if (user) {
@@ -40,7 +47,10 @@ function DashboardContent() {
     }
   };
 
-  const handleDeleteProject = async (projectId: string, projectName: string) => {
+  const handleDeleteProject = async (
+    projectId: string,
+    projectName: string
+  ) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${projectName}"? This action cannot be undone.`
     );
@@ -91,22 +101,52 @@ function DashboardContent() {
               <CardTitle>Welcome back!</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
                   <strong>Email:</strong> {user?.email}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   <strong>Name:</strong> {profile?.display_name || 'Not set'}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Plan:</strong>{' '}
-                  <span className="capitalize">
-                    {profile?.subscription_plan || 'free'}
-                  </span>
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Plan:</strong>{' '}
+                  </p>
+                  <Badge
+                    variant={isPremiumOrHigher ? 'default' : 'secondary'}
+                    className={
+                      currentPlan === 'premium'
+                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
+                        : currentPlan === 'enterprise'
+                          ? 'bg-purple-500'
+                          : ''
+                    }
+                  >
+                    {currentPlan === 'premium' && (
+                      <Crown className="h-3 w-3 mr-1" />
+                    )}
+                    <span className="capitalize">{currentPlan}</span>
+                  </Badge>
+                  {!isPremiumOrHigher && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-yellow-600 border-yellow-500 hover:bg-yellow-50"
+                      onClick={() => setShowUpgradeModal(true)}
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Upgrade
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          <UpgradePlanModal
+            open={showUpgradeModal}
+            onOpenChange={setShowUpgradeModal}
+          />
 
           <Card>
             <CardHeader>
@@ -132,8 +172,8 @@ function DashboardContent() {
                 <p className="text-muted-foreground">Loading projects...</p>
               ) : projects.length === 0 ? (
                 <p className="text-muted-foreground">
-                  You don&apos;t have any projects yet. Create your first landing
-                  page by selecting a template!
+                  You don&apos;t have any projects yet. Create your first
+                  landing page by selecting a template!
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -187,7 +227,9 @@ function DashboardContent() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDeleteProject(project.id, project.name)}
+                          onClick={() =>
+                            handleDeleteProject(project.id, project.name)
+                          }
                           disabled={deletingId === project.id}
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
@@ -229,7 +271,8 @@ function DashboardContent() {
                 </Link>
               </div>
               <p className="text-xs text-muted-foreground mt-4">
-                Note: Analytics and Forms are available per project in the editor
+                Note: Analytics and Forms are available per project in the
+                editor
               </p>
             </CardContent>
           </Card>

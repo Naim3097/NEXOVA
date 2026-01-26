@@ -22,7 +22,12 @@ export function validateCsrf(request: NextRequest): boolean {
   if (origin) {
     const isValid = isOriginAllowed(origin, requestHost);
     if (!isValid) {
-      console.error('CSRF validation failed for origin:', origin, 'host:', requestHost);
+      console.error(
+        'CSRF validation failed for origin:',
+        origin,
+        'host:',
+        requestHost
+      );
     }
     return isValid;
   }
@@ -35,7 +40,12 @@ export function validateCsrf(request: NextRequest): boolean {
       const refererOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       const isValid = isOriginAllowed(refererOrigin, requestHost);
       if (!isValid) {
-        console.error('CSRF validation failed for referer:', refererOrigin, 'host:', requestHost);
+        console.error(
+          'CSRF validation failed for referer:',
+          refererOrigin,
+          'host:',
+          requestHost
+        );
       }
       return isValid;
     } catch (error) {
@@ -71,7 +81,10 @@ function isOriginAllowed(origin: string, requestHost: string | null): boolean {
 
     // For Vercel preview deployments, allow all vercel.app domains
     // This is safe because they're all from the same deployment
-    if (originHost.endsWith('.vercel.app') && requestHost.endsWith('.vercel.app')) {
+    if (
+      originHost.endsWith('.vercel.app') &&
+      requestHost.endsWith('.vercel.app')
+    ) {
       return true;
     }
 
@@ -79,7 +92,7 @@ function isOriginAllowed(origin: string, requestHost: string | null): boolean {
     const allowedOrigins = getAllowedOrigins();
     const normalizedOrigin = origin.replace(/\/$/, '');
 
-    return allowedOrigins.some(allowed => {
+    return allowedOrigins.some((allowed) => {
       const normalizedAllowed = allowed.replace(/\/$/, '');
       return normalizedOrigin === normalizedAllowed;
     });
@@ -122,3 +135,20 @@ export const CSRF_ERROR_RESPONSE = {
   error: 'CSRF validation failed',
   message: 'Request origin does not match expected origin',
 } as const;
+
+/**
+ * Client-side function to get CSRF token for requests.
+ * Since we use Origin/Referer header validation (Double Submit Cookie alternative),
+ * this function returns the current origin as a simple token.
+ * The actual protection comes from the browser's SOP enforcement of Origin headers.
+ *
+ * @returns A CSRF token string (current origin)
+ */
+export function getCsrfToken(): string {
+  if (typeof window === 'undefined') {
+    // Server-side rendering - return empty string
+    // The actual CSRF protection happens via Origin header validation
+    return '';
+  }
+  return window.location.origin;
+}

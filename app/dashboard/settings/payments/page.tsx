@@ -2,15 +2,38 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Eye, EyeOff, CheckCircle, XCircle, CreditCard, PlayCircle, Info } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+  PlayCircle,
+  Info,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import { TestCheckoutModal } from '@/components/payment/TestCheckoutModal';
+import { HelpButton } from '@/components/dashboard/HelpButton';
 
 export default function PaymentSettingsPage() {
   const router = useRouter();
@@ -35,7 +58,9 @@ export default function PaymentSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
         if (!user) {
           router.push('/login');
@@ -44,7 +69,9 @@ export default function PaymentSettingsPage() {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('leanx_api_key, leanx_collection_uuid, leanx_secret_key, leanx_merchant_id, leanx_enabled, leanx_environment')
+          .select(
+            'leanx_api_key, leanx_collection_uuid, leanx_secret_key, leanx_merchant_id, leanx_enabled, leanx_environment'
+          )
           .eq('id', user.id)
           .single();
 
@@ -57,7 +84,8 @@ export default function PaymentSettingsPage() {
             leanx_secret_key: profile.leanx_secret_key || '',
             leanx_merchant_id: profile.leanx_merchant_id || '',
             leanx_enabled: profile.leanx_enabled || false,
-            leanx_environment: (profile.leanx_environment as 'test' | 'live') || 'live',
+            leanx_environment:
+              (profile.leanx_environment as 'test' | 'live') || 'live',
           });
         }
       } catch (error) {
@@ -78,7 +106,9 @@ export default function PaymentSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         router.push('/login');
@@ -103,7 +133,6 @@ export default function PaymentSettingsPage() {
         title: 'Success',
         description: 'Payment settings saved successfully',
       });
-
     } catch (error) {
       console.error('Error saving settings:', error);
       toast({
@@ -128,10 +157,15 @@ export default function PaymentSettingsPage() {
 
   const handleTestCheckout = () => {
     // Validate that we have the required credentials
-    if (!formData.leanx_enabled || !formData.leanx_api_key || !formData.leanx_collection_uuid) {
+    if (
+      !formData.leanx_enabled ||
+      !formData.leanx_api_key ||
+      !formData.leanx_collection_uuid
+    ) {
       toast({
         title: 'Configuration Required',
-        description: 'Please enable and configure LeanX payment settings first.',
+        description:
+          'Please enable and configure LeanX payment settings first.',
         variant: 'destructive',
       });
       return;
@@ -163,6 +197,7 @@ export default function PaymentSettingsPage() {
             </p>
           </div>
           <div className="flex gap-3">
+            <HelpButton pageSource="payment_settings" />
             <Button
               onClick={handleSave}
               disabled={saving}
@@ -171,9 +206,25 @@ export default function PaymentSettingsPage() {
             >
               {saving ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Saving...
                 </>
@@ -186,7 +237,11 @@ export default function PaymentSettingsPage() {
             </Button>
             <Button
               onClick={handleTestCheckout}
-              disabled={!formData.leanx_enabled || !formData.leanx_api_key || !formData.leanx_collection_uuid}
+              disabled={
+                !formData.leanx_enabled ||
+                !formData.leanx_api_key ||
+                !formData.leanx_collection_uuid
+              }
               className="min-w-[180px]"
             >
               <PlayCircle className="w-4 h-4 mr-2" />
@@ -206,7 +261,9 @@ export default function PaymentSettingsPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold">LeanX Gateway</h3>
-              <p className="text-sm text-muted-foreground">Secure FPX & Bank processing.</p>
+              <p className="text-sm text-muted-foreground">
+                Secure FPX & Bank processing.
+              </p>
             </div>
           </div>
 
@@ -215,7 +272,9 @@ export default function PaymentSettingsPage() {
             <input
               type="checkbox"
               checked={formData.leanx_enabled}
-              onChange={(e) => setFormData({ ...formData, leanx_enabled: e.target.checked })}
+              onChange={(e) =>
+                setFormData({ ...formData, leanx_enabled: e.target.checked })
+              }
               className="sr-only peer"
             />
             <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
@@ -232,7 +291,9 @@ export default function PaymentSettingsPage() {
                 <Label htmlFor="environment">Environment</Label>
                 <Select
                   value={formData.leanx_environment}
-                  onValueChange={(value: 'test' | 'live') => setFormData({ ...formData, leanx_environment: value })}
+                  onValueChange={(value: 'test' | 'live') =>
+                    setFormData({ ...formData, leanx_environment: value })
+                  }
                 >
                   <SelectTrigger id="environment" className="mt-1">
                     <SelectValue />
@@ -251,7 +312,12 @@ export default function PaymentSettingsPage() {
                   id="collection_uuid"
                   type="text"
                   value={formData.leanx_collection_uuid}
-                  onChange={(e) => setFormData({ ...formData, leanx_collection_uuid: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      leanx_collection_uuid: e.target.value,
+                    })
+                  }
                   placeholder="Dc-..."
                   className="mt-1"
                 />
@@ -266,7 +332,9 @@ export default function PaymentSettingsPage() {
                   id="api_key"
                   type={showApiKey ? 'text' : 'password'}
                   value={formData.leanx_api_key}
-                  onChange={(e) => setFormData({ ...formData, leanx_api_key: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, leanx_api_key: e.target.value })
+                  }
                   placeholder="LP-..."
                   className="pr-10 font-mono text-sm"
                 />
@@ -275,7 +343,11 @@ export default function PaymentSettingsPage() {
                   onClick={() => setShowApiKey(!showApiKey)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showApiKey ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -288,7 +360,12 @@ export default function PaymentSettingsPage() {
                   id="secret_key"
                   type={showSecretKey ? 'text' : 'password'}
                   value={formData.leanx_secret_key}
-                  onChange={(e) => setFormData({ ...formData, leanx_secret_key: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      leanx_secret_key: e.target.value,
+                    })
+                  }
                   placeholder="c2d2..."
                   className="pr-10 font-mono text-sm"
                 />
@@ -297,7 +374,11 @@ export default function PaymentSettingsPage() {
                   onClick={() => setShowSecretKey(!showSecretKey)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showSecretKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showSecretKey ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -308,7 +389,8 @@ export default function PaymentSettingsPage() {
               <div>
                 <p className="font-semibold text-sm">Ready to Transact</p>
                 <p className="text-sm opacity-90 mt-1">
-                  This configuration allows you to fetch bank lists directly and process payments via the LeanX API.
+                  This configuration allows you to fetch bank lists directly and
+                  process payments via the LeanX API.
                 </p>
               </div>
             </div>
@@ -326,18 +408,37 @@ export default function PaymentSettingsPage() {
           <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800">
             <li>Log in to your LeanX merchant dashboard</li>
             <li>Navigate to Settings → API Credentials</li>
-            <li>Copy your <strong>Auth Token</strong> (starts with LP-...)</li>
-            <li>Create or find your <strong>Collection UUID</strong> (starts with Dc-... or CL-...)</li>
-            <li>Copy your <strong>Hash Key</strong> for webhook verification</li>
-            <li>Paste them here, select your environment, and click Save Settings</li>
+            <li>
+              Copy your <strong>Auth Token</strong> (starts with LP-...)
+            </li>
+            <li>
+              Create or find your <strong>Collection UUID</strong> (starts with
+              Dc-... or CL-...)
+            </li>
+            <li>
+              Copy your <strong>Hash Key</strong> for webhook verification
+            </li>
+            <li>
+              Paste them here, select your environment, and click Save Settings
+            </li>
           </ol>
           <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-xs text-yellow-800">
-              <strong>Required:</strong> Auth Token and Collection UUID are required for payments to work. Hash Key is recommended for webhook security.
+              <strong>Required:</strong> Auth Token and Collection UUID are
+              required for payments to work. Hash Key is recommended for webhook
+              security.
             </p>
           </div>
           <p className="text-xs text-blue-700 mt-3">
-            Don't have a LeanX account? <a href="https://leanx.io" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-blue-900">Sign up here</a>
+            Don't have a LeanX account?{' '}
+            <a
+              href="https://leanx.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold hover:text-blue-900"
+            >
+              Sign up here
+            </a>
           </p>
         </CardContent>
       </Card>

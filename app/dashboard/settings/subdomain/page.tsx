@@ -2,13 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Globe, CheckCircle, XCircle, Loader2, ExternalLink, Info, AlertTriangle, Copy, RefreshCw } from 'lucide-react';
+import {
+  ArrowLeft,
+  Globe,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  ExternalLink,
+  Info,
+  AlertTriangle,
+  Copy,
+  RefreshCw,
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { HelpButton } from '@/components/dashboard/HelpButton';
 
 interface DnsRecord {
   type: string;
@@ -32,14 +50,22 @@ export default function SubdomainSettingsPage() {
   const [checking, setChecking] = useState(false);
   const [currentSubdomain, setCurrentSubdomain] = useState<string | null>(null);
   const [newSubdomain, setNewSubdomain] = useState('');
-  const [availability, setAvailability] = useState<{ available: boolean; error: string | null } | null>(null);
+  const [availability, setAvailability] = useState<{
+    available: boolean;
+    error: string | null;
+  } | null>(null);
 
   // Custom domain state
   const [showCustomDomainDialog, setShowCustomDomainDialog] = useState(false);
   const [customDomain, setCustomDomain] = useState('');
-  const [currentCustomDomain, setCurrentCustomDomain] = useState<string | null>(null);
+  const [currentCustomDomain, setCurrentCustomDomain] = useState<string | null>(
+    null
+  );
   const [customDomainVerified, setCustomDomainVerified] = useState(false);
-  const [customDomainAvailability, setCustomDomainAvailability] = useState<{ available: boolean; error: string | null } | null>(null);
+  const [customDomainAvailability, setCustomDomainAvailability] = useState<{
+    available: boolean;
+    error: string | null;
+  } | null>(null);
   const [checkingCustomDomain, setCheckingCustomDomain] = useState(false);
   const [savingCustomDomain, setSavingCustomDomain] = useState(false);
   const [ownsDomain, setOwnsDomain] = useState(false);
@@ -52,7 +78,8 @@ export default function SubdomainSettingsPage() {
   const vercelAppSuffix = 'ide-page-builder.vercel.app';
 
   // Helper to get full subdomain URL
-  const getFullSubdomainUrl = (subdomain: string) => `${subdomain}-${vercelAppSuffix}`;
+  const getFullSubdomainUrl = (subdomain: string) =>
+    `${subdomain}-${vercelAppSuffix}`;
 
   // Default DNS records to show before domain is added to Vercel
   const defaultDnsRecords: DnsRecord[] = [
@@ -116,7 +143,9 @@ export default function SubdomainSettingsPage() {
       } else {
         toast({
           title: 'DNS Not Ready',
-          description: data.error || 'Please ensure your DNS records are configured correctly. It may take up to 48 hours for DNS changes to propagate.',
+          description:
+            data.error ||
+            'Please ensure your DNS records are configured correctly. It may take up to 48 hours for DNS changes to propagate.',
           variant: 'destructive',
         });
       }
@@ -159,7 +188,10 @@ export default function SubdomainSettingsPage() {
       setAvailability({ available: data.available, error: data.error });
     } catch (error) {
       console.error('Error checking availability:', error);
-      setAvailability({ available: false, error: 'Failed to check availability' });
+      setAvailability({
+        available: false,
+        error: 'Failed to check availability',
+      });
     } finally {
       setChecking(false);
     }
@@ -191,7 +223,8 @@ export default function SubdomainSettingsPage() {
       console.error('Error saving subdomain:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save subdomain',
+        description:
+          error instanceof Error ? error.message : 'Failed to save subdomain',
         variant: 'destructive',
       });
     } finally {
@@ -200,7 +233,11 @@ export default function SubdomainSettingsPage() {
   };
 
   const handleRemove = async () => {
-    if (!confirm('Are you sure you want to remove your subdomain? Your pages will only be accessible via path-based URLs.')) {
+    if (
+      !confirm(
+        'Are you sure you want to remove your subdomain? Your pages will only be accessible via path-based URLs.'
+      )
+    ) {
       return;
     }
 
@@ -251,10 +288,16 @@ export default function SubdomainSettingsPage() {
       });
 
       const data = await response.json();
-      setCustomDomainAvailability({ available: data.available, error: data.error });
+      setCustomDomainAvailability({
+        available: data.available,
+        error: data.error,
+      });
     } catch (error) {
       console.error('Error checking custom domain:', error);
-      setCustomDomainAvailability({ available: false, error: 'Failed to check domain' });
+      setCustomDomainAvailability({
+        available: false,
+        error: 'Failed to check domain',
+      });
     } finally {
       setCheckingCustomDomain(false);
     }
@@ -291,13 +334,17 @@ export default function SubdomainSettingsPage() {
 
       toast({
         title: 'Custom Domain Saved',
-        description: 'Please configure your DNS settings to point to our server.',
+        description:
+          'Please configure your DNS settings to point to our server.',
       });
     } catch (error) {
       console.error('Error saving custom domain:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save custom domain',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save custom domain',
         variant: 'destructive',
       });
     } finally {
@@ -306,7 +353,11 @@ export default function SubdomainSettingsPage() {
   };
 
   const handleRemoveCustomDomain = async () => {
-    if (!confirm('Are you sure you want to remove your custom domain? This action cannot be undone.')) {
+    if (
+      !confirm(
+        'Are you sure you want to remove your custom domain? This action cannot be undone.'
+      )
+    ) {
       return;
     }
 
@@ -378,16 +429,19 @@ export default function SubdomainSettingsPage() {
           Back to Dashboard
         </Button>
 
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center">
-            <Globe className="w-7 h-7 text-blue-600" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center">
+              <Globe className="w-7 h-7 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Domain Settings</h1>
+              <p className="text-muted-foreground mt-1">
+                Customize your published page URL
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">Domain Settings</h1>
-            <p className="text-muted-foreground mt-1">
-              Customize your published page URL
-            </p>
-          </div>
+          <HelpButton pageSource="subdomain_settings" />
         </div>
       </div>
 
@@ -397,11 +451,15 @@ export default function SubdomainSettingsPage() {
         <div className="text-sm">
           <p className="font-semibold mb-1">How domains work</p>
           <p className="opacity-90">
-            With a subdomain, your published pages will be accessible at:<br />
-            <code className="bg-blue-100 px-1 rounded">yourname-{vercelAppSuffix}</code>
+            With a subdomain, your published pages will be accessible at:
+            <br />
+            <code className="bg-blue-100 px-1 rounded">
+              yourname-{vercelAppSuffix}
+            </code>
           </p>
           <p className="opacity-90 mt-2">
-            With a custom domain, your pages will be accessible at:<br />
+            With a custom domain, your pages will be accessible at:
+            <br />
             <code className="bg-blue-100 px-1 rounded">www.yourdomain.com</code>
           </p>
         </div>
@@ -430,9 +488,13 @@ export default function SubdomainSettingsPage() {
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   {customDomainVerified ? (
-                    <p className="text-xs text-green-600 mt-1">Domain verified and active</p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Domain verified and active
+                    </p>
                   ) : (
-                    <p className="text-xs text-amber-600 mt-1">DNS verification pending</p>
+                    <p className="text-xs text-amber-600 mt-1">
+                      DNS verification pending
+                    </p>
                   )}
                 </div>
               </div>
@@ -469,24 +531,36 @@ export default function SubdomainSettingsPage() {
             {!customDomainVerified && dnsRecords.length > 0 && (
               <div className="border rounded-lg overflow-hidden bg-white">
                 <div className="px-4 py-2 bg-gray-50 border-b">
-                  <p className="text-sm font-medium text-gray-700">Required DNS Records</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    Required DNS Records
+                  </p>
                 </div>
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">Type</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">Name</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">Value</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Type
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Name
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Value
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {dnsRecords.map((record, index) => (
                       <tr key={index} className="border-t">
                         <td className="px-4 py-3 font-medium">{record.type}</td>
-                        <td className="px-4 py-3 font-mono text-sm">{record.name}</td>
+                        <td className="px-4 py-3 font-mono text-sm">
+                          {record.name}
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm truncate max-w-[200px]">{record.value}</span>
+                            <span className="font-mono text-sm truncate max-w-[200px]">
+                              {record.value}
+                            </span>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -567,7 +641,9 @@ export default function SubdomainSettingsPage() {
       {!currentCustomDomain && (
         <Card>
           <CardHeader>
-            <CardTitle>{currentSubdomain ? 'Change Subdomain' : 'Claim Your Subdomain'}</CardTitle>
+            <CardTitle>
+              {currentSubdomain ? 'Change Subdomain' : 'Claim Your Subdomain'}
+            </CardTitle>
             <CardDescription>
               Choose a unique subdomain for your published pages
             </CardDescription>
@@ -580,14 +656,18 @@ export default function SubdomainSettingsPage() {
                   id="subdomain"
                   value={newSubdomain}
                   onChange={(e) => {
-                    setNewSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                    setNewSubdomain(
+                      e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+                    );
                     setAvailability(null);
                   }}
                   onBlur={checkAvailability}
                   placeholder="yourname"
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-500 whitespace-nowrap">-{vercelAppSuffix}</span>
+                <span className="text-sm text-gray-500 whitespace-nowrap">
+                  -{vercelAppSuffix}
+                </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Use lowercase letters, numbers, and hyphens (3-63 characters)
@@ -603,11 +683,15 @@ export default function SubdomainSettingsPage() {
             )}
 
             {!checking && availability && (
-              <div className={`flex items-center gap-2 ${availability.available ? 'text-green-600' : 'text-red-600'}`}>
+              <div
+                className={`flex items-center gap-2 ${availability.available ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {availability.available ? (
                   <>
                     <CheckCircle className="w-4 h-4" />
-                    <span className="text-sm">This subdomain is available!</span>
+                    <span className="text-sm">
+                      This subdomain is available!
+                    </span>
                   </>
                 ) : (
                   <>
@@ -630,7 +714,13 @@ export default function SubdomainSettingsPage() {
 
             <Button
               onClick={handleSave}
-              disabled={saving || checking || !newSubdomain || newSubdomain.length < 3 || (availability !== null && !availability.available)}
+              disabled={
+                saving ||
+                checking ||
+                !newSubdomain ||
+                newSubdomain.length < 3 ||
+                (availability !== null && !availability.available)
+              }
               className="w-full"
             >
               {saving ? (
@@ -638,8 +728,10 @@ export default function SubdomainSettingsPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
                 </>
+              ) : currentSubdomain ? (
+                'Update Subdomain'
               ) : (
-                currentSubdomain ? 'Update Subdomain' : 'Claim Subdomain'
+                'Claim Subdomain'
               )}
             </Button>
           </CardContent>
@@ -648,30 +740,43 @@ export default function SubdomainSettingsPage() {
 
       {/* Note about republishing */}
       <p className="text-sm text-gray-500 text-center mt-4">
-        After setting your domain, you may need to republish your pages to update their URLs.
+        After setting your domain, you may need to republish your pages to
+        update their URLs.
       </p>
 
       {/* Custom Domain Dialog */}
-      <Dialog open={showCustomDomainDialog} onOpenChange={(open) => {
-        setShowCustomDomainDialog(open);
-        if (!open) resetCustomDomainForm();
-      }}>
+      <Dialog
+        open={showCustomDomainDialog}
+        onOpenChange={(open) => {
+          setShowCustomDomainDialog(open);
+          if (!open) resetCustomDomainForm();
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>How to use my own domain?</DialogTitle>
             <DialogDescription>
-              In order to point your page to your own domain, you&apos;ll need to update your zone record in your hosting control panel.
+              In order to point your page to your own domain, you&apos;ll need
+              to update your zone record in your hosting control panel.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             {/* Warning boxes */}
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-              <p>Unfortunately we can&apos;t help you with this settings as it is outside of our control. Please get help from your hosting provider</p>
+              <p>
+                Unfortunately we can&apos;t help you with this settings as it is
+                outside of our control. Please get help from your hosting
+                provider
+              </p>
             </div>
 
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-              <p>If you changed to a new subdomain or domain, the old record will be deleted and be free up after 24hours before you can use it again.</p>
+              <p>
+                If you changed to a new subdomain or domain, the old record will
+                be deleted and be free up after 24hours before you can use it
+                again.
+              </p>
             </div>
 
             {/* DNS Record Table */}
@@ -679,19 +784,29 @@ export default function SubdomainSettingsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">TYPE</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">NAME</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">VALUE</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      TYPE
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      NAME
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      VALUE
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {defaultDnsRecords.map((record, index) => (
                     <tr key={index} className="border-t">
                       <td className="px-4 py-3 font-medium">{record.type}</td>
-                      <td className="px-4 py-3 font-mono text-sm">{record.name}</td>
+                      <td className="px-4 py-3 font-mono text-sm">
+                        {record.name}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{record.value}</span>
+                          <span className="font-mono text-sm">
+                            {record.value}
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -710,25 +825,37 @@ export default function SubdomainSettingsPage() {
 
             <div className="text-sm text-gray-600 space-y-2">
               <p>
-                <strong>For root domains</strong> (e.g., example.com): Create an <code className="bg-gray-100 px-1 rounded">A</code> record pointing to <code className="bg-gray-100 px-1 rounded">76.76.21.21</code>
+                <strong>For root domains</strong> (e.g., example.com): Create an{' '}
+                <code className="bg-gray-100 px-1 rounded">A</code> record
+                pointing to{' '}
+                <code className="bg-gray-100 px-1 rounded">76.76.21.21</code>
               </p>
               <p>
-                <strong>For subdomains</strong> (e.g., www.example.com): Create a <code className="bg-gray-100 px-1 rounded">CNAME</code> record pointing to <code className="bg-gray-100 px-1 rounded">cname.vercel-dns.com</code>
+                <strong>For subdomains</strong> (e.g., www.example.com): Create
+                a <code className="bg-gray-100 px-1 rounded">CNAME</code> record
+                pointing to{' '}
+                <code className="bg-gray-100 px-1 rounded">
+                  cname.vercel-dns.com
+                </code>
               </p>
               <p>
-                After configuring DNS, click OK to save. You can verify your domain configuration on the settings page.
+                After configuring DNS, click OK to save. You can verify your
+                domain configuration on the settings page.
               </p>
             </div>
 
             {/* Domain Input */}
             <div>
-              <Label htmlFor="customDomain">Full Domain Name (https://www.example.com)</Label>
+              <Label htmlFor="customDomain">
+                Full Domain Name (https://www.example.com)
+              </Label>
               <Input
                 id="customDomain"
                 value={customDomain}
                 onChange={(e) => {
                   // Remove protocol if user pastes full URL
-                  let value = e.target.value.toLowerCase()
+                  let value = e.target.value
+                    .toLowerCase()
                     .replace('https://', '')
                     .replace('http://', '');
                   setCustomDomain(value);
@@ -751,12 +878,16 @@ export default function SubdomainSettingsPage() {
               </div>
             )}
 
-            {!checkingCustomDomain && customDomainAvailability && !customDomainAvailability.available && (
-              <div className="flex items-center gap-2 text-red-600">
-                <XCircle className="w-4 h-4" />
-                <span className="text-sm">{customDomainAvailability.error}</span>
-              </div>
-            )}
+            {!checkingCustomDomain &&
+              customDomainAvailability &&
+              !customDomainAvailability.available && (
+                <div className="flex items-center gap-2 text-red-600">
+                  <XCircle className="w-4 h-4" />
+                  <span className="text-sm">
+                    {customDomainAvailability.error}
+                  </span>
+                </div>
+              )}
 
             {/* Checkboxes */}
             <div className="space-y-3">
@@ -764,7 +895,9 @@ export default function SubdomainSettingsPage() {
                 <Checkbox
                   id="ownsDomain"
                   checked={ownsDomain}
-                  onCheckedChange={(checked: boolean | 'indeterminate') => setOwnsDomain(checked === true)}
+                  onCheckedChange={(checked: boolean | 'indeterminate') =>
+                    setOwnsDomain(checked === true)
+                  }
                 />
                 <Label htmlFor="ownsDomain" className="text-sm cursor-pointer">
                   I possess this domain name
@@ -775,9 +908,14 @@ export default function SubdomainSettingsPage() {
                 <Checkbox
                   id="hasDnsAccess"
                   checked={hasDnsAccess}
-                  onCheckedChange={(checked: boolean | 'indeterminate') => setHasDnsAccess(checked === true)}
+                  onCheckedChange={(checked: boolean | 'indeterminate') =>
+                    setHasDnsAccess(checked === true)
+                  }
                 />
-                <Label htmlFor="hasDnsAccess" className="text-sm cursor-pointer">
+                <Label
+                  htmlFor="hasDnsAccess"
+                  className="text-sm cursor-pointer"
+                >
                   I have an access to the DNS Manager to this domain name
                 </Label>
               </div>
@@ -787,10 +925,16 @@ export default function SubdomainSettingsPage() {
                   <Checkbox
                     id="understoodWarning"
                     checked={understoodWarning}
-                    onCheckedChange={(checked: boolean | 'indeterminate') => setUnderstoodWarning(checked === true)}
+                    onCheckedChange={(checked: boolean | 'indeterminate') =>
+                      setUnderstoodWarning(checked === true)
+                    }
                   />
-                  <Label htmlFor="understoodWarning" className="text-sm cursor-pointer text-blue-900">
-                    By choosing to use your own domain name, you can&apos;t revert back to our {vercelAppSuffix} subdomain.
+                  <Label
+                    htmlFor="understoodWarning"
+                    className="text-sm cursor-pointer text-blue-900"
+                  >
+                    By choosing to use your own domain name, you can&apos;t
+                    revert back to our {vercelAppSuffix} subdomain.
                     <br />
                     <span className="font-medium">I understood and agree</span>
                   </Label>
@@ -818,7 +962,8 @@ export default function SubdomainSettingsPage() {
                 !ownsDomain ||
                 !hasDnsAccess ||
                 !understoodWarning ||
-                (customDomainAvailability !== null && !customDomainAvailability.available)
+                (customDomainAvailability !== null &&
+                  !customDomainAvailability.available)
               }
             >
               {savingCustomDomain ? (
