@@ -134,11 +134,10 @@ export const MediaElement = React.memo(
       <img
         src={mediaUrl}
         alt={altText}
-        className={`object-cover ${getShadowClass()}`}
+        className={`object-cover ${getShadowClass()} w-full`}
         style={{
           ...getAspectRatioStyle(),
           ...getBorderRadiusStyle(),
-          width: '100%',
           maxWidth: '100%',
           height: 'auto',
         }}

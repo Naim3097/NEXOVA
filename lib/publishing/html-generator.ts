@@ -5008,10 +5008,11 @@ function generateMediaHTML(element: Element): string {
     return `border-radius: ${borderRadius};`;
   };
 
-  // Media element styles
+  // Media element styles - always use max-width: 100% to ensure responsive scaling on mobile
   const mediaStyles = `
     width: ${layout === 'full_width' ? '100%' : maxWidth};
-    max-width: ${layout === 'full_width' ? '100%' : maxWidth};
+    max-width: 100%;
+    height: auto;
     ${getAspectRatioStyle()}
     ${getBorderRadiusStyle()}
     ${getShadowStyle()}
@@ -5022,7 +5023,7 @@ function generateMediaHTML(element: Element): string {
   const captionHTML =
     showCaption && caption
       ? `
-    <p style="color: #4b5563; font-size: 0.875rem; text-align: center; margin-top: 0.75rem; max-width: ${layout === 'full_width' ? '100%' : maxWidth};">
+    <p style="color: #4b5563; font-size: 0.875rem; text-align: center; margin-top: 0.75rem; max-width: 100%; width: ${layout === 'full_width' ? '100%' : maxWidth};">
       ${escapeHTML(caption)}
     </p>
   `
