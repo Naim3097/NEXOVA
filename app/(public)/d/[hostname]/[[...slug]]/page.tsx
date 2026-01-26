@@ -8,7 +8,9 @@ interface CustomDomainPageProps {
   }>;
 }
 
-export default async function CustomDomainPage({ params }: CustomDomainPageProps) {
+export default async function CustomDomainPage({
+  params,
+}: CustomDomainPageProps) {
   const { hostname, slug } = await params;
 
   // Decode hostname in case it was URL encoded
@@ -29,11 +31,21 @@ export default async function CustomDomainPage({ params }: CustomDomainPageProps
   // Get the specific project slug or default to homepage
   const projectSlug = slug && slug.length > 0 ? slug[0] : null;
 
-  // Find user by custom domain
+  // Generate hostname variants for lookup (www and non-www)
+  const hostnameVariants: string[] = [decodedHostname];
+  if (decodedHostname.startsWith('www.')) {
+    // If it's www.domain.com, also check domain.com
+    hostnameVariants.push(decodedHostname.replace('www.', ''));
+  } else {
+    // If it's domain.com, also check www.domain.com
+    hostnameVariants.push(`www.${decodedHostname}`);
+  }
+
+  // Find user by custom domain (check both www and non-www versions)
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id, display_name, custom_domain, custom_domain_verified')
-    .eq('custom_domain', decodedHostname)
+    .in('custom_domain', hostnameVariants)
     .single();
 
   if (profileError || !profile) {
@@ -49,14 +61,16 @@ export default async function CustomDomainPage({ params }: CustomDomainPageProps
     // Fetch specific project by slug
     const { data, error } = await supabase
       .from('published_pages')
-      .select(`
+      .select(
+        `
         html_content,
         project_id,
         projects!inner (
           user_id,
           slug
         )
-      `)
+      `
+      )
       .eq('slug', projectSlug)
       .eq('projects.user_id', profile.id)
       .single();
@@ -70,13 +84,15 @@ export default async function CustomDomainPage({ params }: CustomDomainPageProps
     // Fetch user's latest published project
     const { data: projects } = await supabase
       .from('projects')
-      .select(`
+      .select(
+        `
         id,
         slug,
         published_pages!inner (
           html_content
         )
-      `)
+      `
+      )
       .eq('user_id', profile.id)
       .eq('status', 'published')
       .order('updated_at', { ascending: false })
@@ -138,10 +154,18 @@ export async function generateMetadata({ params }: CustomDomainPageProps) {
     }
   );
 
+  // Generate hostname variants for lookup (www and non-www)
+  const hostnameVariants: string[] = [decodedHostname];
+  if (decodedHostname.startsWith('www.')) {
+    hostnameVariants.push(decodedHostname.replace('www.', ''));
+  } else {
+    hostnameVariants.push(`www.${decodedHostname}`);
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('id, display_name')
-    .eq('custom_domain', decodedHostname)
+    .in('custom_domain', hostnameVariants)
     .single();
 
   if (!profile) {

@@ -64,12 +64,16 @@ export async function middleware(request: NextRequest) {
 
   // Legacy: Check if this is a nested subdomain request (old format)
   // e.g., subdomain.ide-page-builder.vercel.app
-  const isLegacySubdomain = hostnameWithoutPort !== mainDomainWithoutPort &&
-                            hostnameWithoutPort.endsWith(`.${mainDomainWithoutPort}`);
+  const isLegacySubdomain =
+    hostnameWithoutPort !== mainDomainWithoutPort &&
+    hostnameWithoutPort.endsWith(`.${mainDomainWithoutPort}`);
 
   if (isLegacySubdomain) {
     // Extract subdomain
-    const subdomain = hostnameWithoutPort.replace(`.${mainDomainWithoutPort}`, '');
+    const subdomain = hostnameWithoutPort.replace(
+      `.${mainDomainWithoutPort}`,
+      ''
+    );
 
     // Rewrite to subdomain route
     // e.g., johndoe.xide.app → /s/johndoe
@@ -86,14 +90,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if this might be a custom domain (not our main domain)
-  const isCustomDomain = !hostnameWithoutPort.includes(mainDomainWithoutPort) &&
-                         !hostnameWithoutPort.includes('localhost') &&
-                         !hostnameWithoutPort.includes('vercel.app');
+  const isCustomDomain =
+    !hostnameWithoutPort.includes(mainDomainWithoutPort) &&
+    !hostnameWithoutPort.includes('localhost') &&
+    !hostnameWithoutPort.includes('vercel.app');
 
   if (isCustomDomain) {
-    // Rewrite to custom domain route
+    // Normalize hostname: remove port and get the base hostname
     // e.g., www.acmecorp.com → /d/www.acmecorp.com
-    url.pathname = `/d/${hostname}${url.pathname}`;
+    // Also handles non-www: acmecorp.com → /d/acmecorp.com
+    // The page handler will check both www and non-www versions
+    const normalizedHostname = hostnameWithoutPort.toLowerCase();
+    url.pathname = `/d/${normalizedHostname}${url.pathname}`;
 
     response = NextResponse.rewrite(url);
 
