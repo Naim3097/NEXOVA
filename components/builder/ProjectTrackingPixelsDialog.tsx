@@ -20,6 +20,9 @@ interface TrackingPixelsConfig {
     enabled: boolean;
     pixelId: string | null;
     enableConversionsAPI?: boolean;
+    conversionsAPIToken?: string | null;
+    enableAdvancedMatching?: boolean;
+    testEventCode?: string | null;
   };
   tiktok?: {
     enabled: boolean;
@@ -52,9 +55,13 @@ export function ProjectTrackingPixelsDialog({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [useCustomPixels, setUseCustomPixels] = useState(false);
-  const [accountDefaults, setAccountDefaults] = useState<TrackingPixelsConfig | null>(null);
-  const [customConfig, setCustomConfig] = useState<TrackingPixelsConfig | null>(null);
+  const [accountDefaults, setAccountDefaults] =
+    useState<TrackingPixelsConfig | null>(null);
+  const [customConfig, setCustomConfig] = useState<TrackingPixelsConfig | null>(
+    null
+  );
   const [showFacebookPixel, setShowFacebookPixel] = useState(false);
+  const [showFacebookAPIToken, setShowFacebookAPIToken] = useState(false);
   const [showTikTokPixel, setShowTikTokPixel] = useState(false);
 
   useEffect(() => {
@@ -66,7 +73,9 @@ export function ProjectTrackingPixelsDialog({
   const loadConfiguration = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Fetch account defaults
@@ -165,7 +174,9 @@ export function ProjectTrackingPixelsDialog({
             {/* Use Custom Pixels Toggle */}
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
-                <h3 className="font-semibold">Use Custom Pixels for This Project</h3>
+                <h3 className="font-semibold">
+                  Use Custom Pixels for This Project
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Override account defaults with project-specific configuration
                 </p>
@@ -186,9 +197,12 @@ export function ProjectTrackingPixelsDialog({
               <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
                 <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-sm">Using Account Defaults</p>
+                  <p className="font-semibold text-sm">
+                    Using Account Defaults
+                  </p>
                   <p className="text-sm opacity-90 mt-1">
-                    This project is using your account-level pixel configuration. Enable custom pixels above to override.
+                    This project is using your account-level pixel
+                    configuration. Enable custom pixels above to override.
                   </p>
                 </div>
               </div>
@@ -215,17 +229,25 @@ export function ProjectTrackingPixelsDialog({
                       <div className="text-2xl">📘</div>
                       <div>
                         <h4 className="font-semibold">Facebook Pixel</h4>
-                        <p className="text-sm text-muted-foreground">Track Facebook ad conversions</p>
+                        <p className="text-sm text-muted-foreground">
+                          Track Facebook ad conversions
+                        </p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={activeConfig.facebook?.enabled || false}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          facebook: { ...activeConfig.facebook, enabled: e.target.checked, pixelId: activeConfig.facebook?.pixelId || null }
-                        })}
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            facebook: {
+                              ...activeConfig.facebook,
+                              enabled: e.target.checked,
+                              pixelId: activeConfig.facebook?.pixelId || null,
+                            },
+                          })
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -233,26 +255,204 @@ export function ProjectTrackingPixelsDialog({
                   </div>
 
                   {activeConfig.facebook?.enabled && (
-                    <div>
-                      <Label>Facebook Pixel ID</Label>
-                      <div className="relative mt-1">
-                        <Input
-                          type={showFacebookPixel ? 'text' : 'password'}
-                          value={activeConfig.facebook?.pixelId || ''}
-                          onChange={(e) => setCustomConfig({
-                            ...activeConfig,
-                            facebook: { ...activeConfig.facebook, enabled: true, pixelId: e.target.value }
-                          })}
-                          placeholder="123456789012345"
-                          className="pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowFacebookPixel(!showFacebookPixel)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
-                          {showFacebookPixel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Facebook Pixel ID *</Label>
+                        <div className="relative mt-1">
+                          <Input
+                            type={showFacebookPixel ? 'text' : 'password'}
+                            value={activeConfig.facebook?.pixelId || ''}
+                            onChange={(e) =>
+                              setCustomConfig({
+                                ...activeConfig,
+                                facebook: {
+                                  ...activeConfig.facebook,
+                                  enabled: true,
+                                  pixelId: e.target.value,
+                                },
+                              })
+                            }
+                            placeholder="123456789012345"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowFacebookPixel(!showFacebookPixel)
+                            }
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          >
+                            {showFacebookPixel ? (
+                              <EyeOff className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          15-16 digit number from your Facebook Business Manager
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={
+                              activeConfig.facebook?.enableConversionsAPI ||
+                              false
+                            }
+                            onChange={(e) =>
+                              setCustomConfig({
+                                ...activeConfig,
+                                facebook: {
+                                  ...activeConfig.facebook,
+                                  enabled: true,
+                                  pixelId:
+                                    activeConfig.facebook?.pixelId || null,
+                                  enableConversionsAPI: e.target.checked,
+                                },
+                              })
+                            }
+                            className="w-4 h-4 rounded border-gray-300"
+                          />
+                          <div>
+                            <span className="text-sm font-medium">
+                              Enable Facebook Conversions API
+                            </span>
+                            <p className="text-xs text-gray-500">
+                              Server-side tracking for better data accuracy
+                            </p>
+                          </div>
+                        </label>
+
+                        {activeConfig.facebook?.enableConversionsAPI && (
+                          <div className="ml-7 space-y-4 pt-2 border-l-2 border-blue-100 pl-4">
+                            <div>
+                              <Label>Conversion API Access Token *</Label>
+                              <div className="relative mt-1">
+                                <Input
+                                  type={
+                                    showFacebookAPIToken ? 'text' : 'password'
+                                  }
+                                  value={
+                                    activeConfig.facebook
+                                      ?.conversionsAPIToken || ''
+                                  }
+                                  onChange={(e) =>
+                                    setCustomConfig({
+                                      ...activeConfig,
+                                      facebook: {
+                                        ...activeConfig.facebook,
+                                        enabled: true,
+                                        pixelId:
+                                          activeConfig.facebook?.pixelId ||
+                                          null,
+                                        enableConversionsAPI: true,
+                                        conversionsAPIToken: e.target.value,
+                                      },
+                                    })
+                                  }
+                                  placeholder="EAAb..."
+                                  className="pr-10 font-mono text-sm"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setShowFacebookAPIToken(
+                                      !showFacebookAPIToken
+                                    )
+                                  }
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                  {showFacebookAPIToken ? (
+                                    <EyeOff className="w-4 h-4" />
+                                  ) : (
+                                    <Eye className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Generate in Events Manager → Settings →
+                                Conversions API
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label>Test Event Code (Optional)</Label>
+                              <Input
+                                type="text"
+                                value={
+                                  activeConfig.facebook?.testEventCode || ''
+                                }
+                                onChange={(e) =>
+                                  setCustomConfig({
+                                    ...activeConfig,
+                                    facebook: {
+                                      ...activeConfig.facebook,
+                                      enabled: true,
+                                      pixelId:
+                                        activeConfig.facebook?.pixelId || null,
+                                      enableConversionsAPI: true,
+                                      conversionsAPIToken:
+                                        activeConfig.facebook
+                                          ?.conversionsAPIToken || null,
+                                      testEventCode: e.target.value,
+                                    },
+                                  })
+                                }
+                                placeholder="TEST12345"
+                                className="mt-1"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Use for testing. Remove after verification.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={
+                              activeConfig.facebook?.enableAdvancedMatching ||
+                              false
+                            }
+                            onChange={(e) =>
+                              setCustomConfig({
+                                ...activeConfig,
+                                facebook: {
+                                  ...activeConfig.facebook,
+                                  enabled: true,
+                                  pixelId:
+                                    activeConfig.facebook?.pixelId || null,
+                                  enableAdvancedMatching: e.target.checked,
+                                },
+                              })
+                            }
+                            className="w-4 h-4 rounded border-gray-300"
+                          />
+                          <div>
+                            <span className="text-sm font-medium">
+                              Enable Advanced Matching
+                            </span>
+                            <p className="text-xs text-gray-500">
+                              Send hashed customer data for better attribution
+                            </p>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800 font-medium">
+                          Auto-tracked Events:
+                        </p>
+                        <ul className="text-xs text-blue-700 mt-1 space-y-0.5 list-disc list-inside">
+                          <li>PageView - When page loads</li>
+                          <li>AddToCart - When product added to cart</li>
+                          <li>InitiateCheckout - When form is submitted</li>
+                          <li>Purchase - When payment is completed</li>
+                        </ul>
                       </div>
                     </div>
                   )}
@@ -265,17 +465,25 @@ export function ProjectTrackingPixelsDialog({
                       <div className="text-2xl">🎵</div>
                       <div>
                         <h4 className="font-semibold">TikTok Pixel</h4>
-                        <p className="text-sm text-muted-foreground">Track TikTok ad campaigns</p>
+                        <p className="text-sm text-muted-foreground">
+                          Track TikTok ad campaigns
+                        </p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={activeConfig.tiktok?.enabled || false}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          tiktok: { ...activeConfig.tiktok, enabled: e.target.checked, pixelId: activeConfig.tiktok?.pixelId || null }
-                        })}
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            tiktok: {
+                              ...activeConfig.tiktok,
+                              enabled: e.target.checked,
+                              pixelId: activeConfig.tiktok?.pixelId || null,
+                            },
+                          })
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
@@ -289,10 +497,16 @@ export function ProjectTrackingPixelsDialog({
                         <Input
                           type={showTikTokPixel ? 'text' : 'password'}
                           value={activeConfig.tiktok?.pixelId || ''}
-                          onChange={(e) => setCustomConfig({
-                            ...activeConfig,
-                            tiktok: { ...activeConfig.tiktok, enabled: true, pixelId: e.target.value }
-                          })}
+                          onChange={(e) =>
+                            setCustomConfig({
+                              ...activeConfig,
+                              tiktok: {
+                                ...activeConfig.tiktok,
+                                enabled: true,
+                                pixelId: e.target.value,
+                              },
+                            })
+                          }
                           placeholder="C4XXXXXXXXXXXXXXXXXXX"
                           className="pr-10"
                         />
@@ -301,7 +515,11 @@ export function ProjectTrackingPixelsDialog({
                           onClick={() => setShowTikTokPixel(!showTikTokPixel)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                         >
-                          {showTikTokPixel ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showTikTokPixel ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -315,17 +533,25 @@ export function ProjectTrackingPixelsDialog({
                       <div className="text-2xl">🎯</div>
                       <div>
                         <h4 className="font-semibold">Google Ads</h4>
-                        <p className="text-sm text-muted-foreground">Track Google Ads conversions</p>
+                        <p className="text-sm text-muted-foreground">
+                          Track Google Ads conversions
+                        </p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         checked={activeConfig.google_ads?.enabled || false}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          google_ads: { ...activeConfig.google_ads, enabled: e.target.checked, tagId: activeConfig.google_ads?.tagId || null }
-                        })}
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            google_ads: {
+                              ...activeConfig.google_ads,
+                              enabled: e.target.checked,
+                              tagId: activeConfig.google_ads?.tagId || null,
+                            },
+                          })
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
@@ -338,10 +564,16 @@ export function ProjectTrackingPixelsDialog({
                       <Input
                         type="text"
                         value={activeConfig.google_ads?.tagId || ''}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          google_ads: { ...activeConfig.google_ads, enabled: true, tagId: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            google_ads: {
+                              ...activeConfig.google_ads,
+                              enabled: true,
+                              tagId: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="G-XXXXXXXXXX or AW-XXXXXXXXXX"
                         className="mt-1"
                       />
@@ -356,17 +588,29 @@ export function ProjectTrackingPixelsDialog({
                       <div className="text-2xl">📊</div>
                       <div>
                         <h4 className="font-semibold">Google Analytics 4</h4>
-                        <p className="text-sm text-muted-foreground">Track website analytics</p>
+                        <p className="text-sm text-muted-foreground">
+                          Track website analytics
+                        </p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={activeConfig.google_analytics?.enabled || false}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          google_analytics: { ...activeConfig.google_analytics, enabled: e.target.checked, measurementId: activeConfig.google_analytics?.measurementId || null }
-                        })}
+                        checked={
+                          activeConfig.google_analytics?.enabled || false
+                        }
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            google_analytics: {
+                              ...activeConfig.google_analytics,
+                              enabled: e.target.checked,
+                              measurementId:
+                                activeConfig.google_analytics?.measurementId ||
+                                null,
+                            },
+                          })
+                        }
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
@@ -378,11 +622,19 @@ export function ProjectTrackingPixelsDialog({
                       <Label>Measurement ID</Label>
                       <Input
                         type="text"
-                        value={activeConfig.google_analytics?.measurementId || ''}
-                        onChange={(e) => setCustomConfig({
-                          ...activeConfig,
-                          google_analytics: { ...activeConfig.google_analytics, enabled: true, measurementId: e.target.value }
-                        })}
+                        value={
+                          activeConfig.google_analytics?.measurementId || ''
+                        }
+                        onChange={(e) =>
+                          setCustomConfig({
+                            ...activeConfig,
+                            google_analytics: {
+                              ...activeConfig.google_analytics,
+                              enabled: true,
+                              measurementId: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="G-XXXXXXXXXX"
                         className="mt-1"
                       />
@@ -394,10 +646,7 @@ export function ProjectTrackingPixelsDialog({
 
             {/* Save Button */}
             <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={saving}>
