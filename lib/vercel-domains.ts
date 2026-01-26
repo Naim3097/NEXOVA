@@ -71,9 +71,97 @@ function getTeamParam(): string {
 }
 
 /**
- * Add a custom domain to the Vercel project
+ * Add a single domain to the Vercel project (internal helper)
  */
-export async function addDomainToVercel(domain: string): Promise<AddDomainResult> {
+async function addSingleDomainToVercel(
+  domain: string,
+  redirectTo?: string
+): Promise<{
+  success: boolean;
+  data?: VercelDomainResponse;
+  error?: string;
+}> {
+  const body: { name: string; redirect?: string; redirectStatusCode?: number } =
+    { name: domain };
+
+  // If redirectTo is specified, configure as a redirect domain
+  if (redirectTo) {
+    body.redirect = redirectTo;
+    body.redirectStatusCode = 308; // Permanent redirect
+  }
+
+  const response = await fetch(
+    `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains${getTeamParam()}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${VERCEL_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    // Handle specific error cases
+    if (data.error?.code === 'domain_already_in_use') {
+      // Check if it belongs to our project already
+      const status = await getDomainStatus(domain);
+      if (status.exists) {
+        return {
+          success: true,
+          data: status as unknown as VercelDomainResponse,
+        };
+      }
+      return {
+        success: false,
+        error: 'This domain is already in use by another Vercel project.',
+      };
+    }
+    if (data.error?.code === 'invalid_domain') {
+      return {
+        success: false,
+        error: 'Invalid domain format. Please enter a valid domain name.',
+      };
+    }
+    return {
+      success: false,
+      error: data.error?.message || 'Failed to add domain to Vercel.',
+    };
+  }
+
+  return { success: true, data };
+}
+
+/**
+ * Get the alternate domain variant (www vs non-www)
+ */
+function getAlternateDomain(domain: string): string | null {
+  if (domain.startsWith('www.')) {
+    // www.example.com -> example.com
+    return domain.replace('www.', '');
+  }
+
+  // Check if it's an apex domain (e.g., example.com)
+  const parts = domain.split('.');
+  if (parts.length === 2) {
+    // example.com -> www.example.com
+    return `www.${domain}`;
+  }
+
+  // For deeper subdomains like app.example.com, don't add alternate
+  return null;
+}
+
+/**
+ * Add a custom domain to the Vercel project
+ * Automatically adds both www and non-www variants for better user experience
+ */
+export async function addDomainToVercel(
+  domain: string
+): Promise<AddDomainResult> {
   if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
     return {
       success: false,
@@ -82,50 +170,64 @@ export async function addDomainToVercel(domain: string): Promise<AddDomainResult
   }
 
   try {
-    // Add domain to project
-    const response = await fetch(
-      `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains${getTeamParam()}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${VERCEL_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: domain }),
-      }
-    );
+    // Add the primary domain
+    const primaryResult = await addSingleDomainToVercel(domain);
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      // Handle specific error cases
-      if (data.error?.code === 'domain_already_in_use') {
-        return {
-          success: false,
-          error: 'This domain is already in use by another Vercel project.',
-        };
-      }
-      if (data.error?.code === 'invalid_domain') {
-        return {
-          success: false,
-          error: 'Invalid domain format. Please enter a valid domain name.',
-        };
-      }
+    if (!primaryResult.success) {
       return {
         success: false,
-        error: data.error?.message || 'Failed to add domain to Vercel.',
+        error: primaryResult.error,
       };
+    }
+
+    // Add the alternate domain variant (www <-> non-www) as a redirect
+    const alternateDomain = getAlternateDomain(domain);
+    if (alternateDomain) {
+      // Add alternate domain that redirects to the primary
+      const alternateResult = await addSingleDomainToVercel(
+        alternateDomain,
+        domain
+      );
+      if (!alternateResult.success) {
+        // Log but don't fail - the primary domain was added successfully
+        console.warn(
+          `Failed to add alternate domain ${alternateDomain}:`,
+          alternateResult.error
+        );
+      }
     }
 
     // Get domain configuration to show proper DNS records
     const config = await getDomainConfig(domain);
 
     // Build DNS records instructions
-    const dnsRecords = buildDnsInstructions(domain, data, config);
+    const dnsRecords = buildDnsInstructions(
+      domain,
+      primaryResult.data!,
+      config
+    );
+
+    // Add DNS records for alternate domain if it exists
+    if (alternateDomain) {
+      const isAlternateApex = !alternateDomain.startsWith('www.');
+      if (isAlternateApex) {
+        dnsRecords.push({
+          type: 'A',
+          name: '@',
+          value: '76.76.21.21',
+        });
+      } else {
+        dnsRecords.push({
+          type: 'CNAME',
+          name: 'www',
+          value: 'cname.vercel-dns.com',
+        });
+      }
+    }
 
     return {
       success: true,
-      domain: data,
+      domain: primaryResult.data,
       config: config || undefined,
       dnsRecords,
     };
@@ -139,9 +241,43 @@ export async function addDomainToVercel(domain: string): Promise<AddDomainResult
 }
 
 /**
- * Remove a custom domain from the Vercel project
+ * Remove a single domain from the Vercel project (internal helper)
  */
-export async function removeDomainFromVercel(domain: string): Promise<{ success: boolean; error?: string }> {
+async function removeSingleDomainFromVercel(
+  domain: string
+): Promise<{ success: boolean; error?: string }> {
+  const response = await fetch(
+    `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains/${encodeURIComponent(domain)}${getTeamParam()}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${VERCEL_TOKEN}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const data = await response.json();
+    // Not found is okay - already removed
+    if (data.error?.code === 'not_found') {
+      return { success: true };
+    }
+    return {
+      success: false,
+      error: data.error?.message || 'Failed to remove domain from Vercel.',
+    };
+  }
+
+  return { success: true };
+}
+
+/**
+ * Remove a custom domain from the Vercel project
+ * Also removes the alternate domain variant (www <-> non-www) if it exists
+ */
+export async function removeDomainFromVercel(
+  domain: string
+): Promise<{ success: boolean; error?: string }> {
   if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
     return {
       success: false,
@@ -150,25 +286,17 @@ export async function removeDomainFromVercel(domain: string): Promise<{ success:
   }
 
   try {
-    const response = await fetch(
-      `${VERCEL_API_URL}/v10/projects/${VERCEL_PROJECT_ID}/domains/${encodeURIComponent(domain)}${getTeamParam()}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${VERCEL_TOKEN}`,
-        },
-      }
-    );
+    // Remove primary domain
+    const primaryResult = await removeSingleDomainFromVercel(domain);
 
-    if (!response.ok) {
-      const data = await response.json();
-      return {
-        success: false,
-        error: data.error?.message || 'Failed to remove domain from Vercel.',
-      };
+    // Also try to remove alternate domain variant
+    const alternateDomain = getAlternateDomain(domain);
+    if (alternateDomain) {
+      await removeSingleDomainFromVercel(alternateDomain);
+      // Ignore errors for alternate - it might not exist
     }
 
-    return { success: true };
+    return primaryResult;
   } catch (error) {
     console.error('Error removing domain from Vercel:', error);
     return {
@@ -232,7 +360,9 @@ export async function verifyDomainOnVercel(domain: string): Promise<{
 /**
  * Get domain configuration from Vercel
  */
-export async function getDomainConfig(domain: string): Promise<VercelDomainConfig | null> {
+export async function getDomainConfig(
+  domain: string
+): Promise<VercelDomainConfig | null> {
   if (!VERCEL_TOKEN) {
     return null;
   }
@@ -331,8 +461,14 @@ function buildDnsInstructions(
   }
 
   // Add TXT verification record if domain is not yet verified
-  if (!domainData.verified && domainData.verification && domainData.verification.length > 0) {
-    const txtVerification = domainData.verification.find(v => v.type === 'TXT');
+  if (
+    !domainData.verified &&
+    domainData.verification &&
+    domainData.verification.length > 0
+  ) {
+    const txtVerification = domainData.verification.find(
+      (v) => v.type === 'TXT'
+    );
     if (txtVerification) {
       records.push({
         type: 'TXT',
@@ -375,7 +511,9 @@ export async function addSubdomainAlias(subdomain: string): Promise<{
   error?: string;
 }> {
   if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
-    console.warn('Vercel API credentials not configured. Subdomain alias not created.');
+    console.warn(
+      'Vercel API credentials not configured. Subdomain alias not created.'
+    );
     // Return success anyway - the subdomain will still work via middleware rewrite
     // once we have a custom domain or Vercel credentials configured
     return {
