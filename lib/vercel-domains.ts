@@ -138,7 +138,7 @@ async function addSingleDomainToVercel(
 /**
  * Get the alternate domain variant (www vs non-www)
  */
-function getAlternateDomain(domain: string): string | null {
+export function getAlternateDomain(domain: string): string | null {
   if (domain.startsWith('www.')) {
     // www.example.com -> example.com
     return domain.replace('www.', '');
@@ -237,6 +237,42 @@ export async function addDomainToVercel(
       success: false,
       error: 'Failed to connect to Vercel API. Please try again.',
     };
+  }
+}
+
+/**
+ * Ensure the alternate domain variant exists in Vercel
+ * This is used to retroactively add missing domain variants for existing domains
+ */
+export async function ensureAlternateDomainExists(
+  domain: string
+): Promise<{ success: boolean; alternateDomain?: string }> {
+  if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+    return { success: false };
+  }
+
+  const alternateDomain = getAlternateDomain(domain);
+  if (!alternateDomain) {
+    return { success: true }; // No alternate needed for deep subdomains
+  }
+
+  try {
+    // Check if alternate domain already exists
+    const alternateStatus = await getDomainStatus(alternateDomain);
+    if (alternateStatus.exists) {
+      return { success: true, alternateDomain };
+    }
+
+    // Add the alternate domain as a redirect to the primary
+    const result = await addSingleDomainToVercel(alternateDomain, domain);
+    if (result.success) {
+      console.log(`Added alternate domain ${alternateDomain} -> ${domain}`);
+    }
+
+    return { success: result.success, alternateDomain };
+  } catch (error) {
+    console.error('Error ensuring alternate domain exists:', error);
+    return { success: false };
   }
 }
 

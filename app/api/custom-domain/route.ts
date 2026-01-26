@@ -5,13 +5,17 @@ import {
   removeDomainFromVercel,
   verifyDomainOnVercel,
   getDomainStatus,
+  ensureAlternateDomainExists,
 } from '@/lib/vercel-domains';
 
 // GET: Get current custom domain settings
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -40,9 +44,16 @@ export async function GET() {
         misconfigured: status.config?.misconfigured,
       };
 
+      // Ensure alternate domain variant (www <-> non-www) exists in Vercel
+      // This retroactively fixes domains that were added before the auto-add feature
+      if (status.exists) {
+        await ensureAlternateDomainExists(profile.custom_domain);
+      }
+
       // Build DNS records to show user
       if (status.exists) {
-        const isApex = !profile.custom_domain.includes('.') ||
+        const isApex =
+          !profile.custom_domain.includes('.') ||
           profile.custom_domain.split('.').length === 2;
 
         dnsRecords = [];
@@ -64,8 +75,14 @@ export async function GET() {
         }
 
         // Add TXT verification if not verified
-        if (!status.verified && status.verification && status.verification.length > 0) {
-          const txtVerification = status.verification.find(v => v.type === 'TXT');
+        if (
+          !status.verified &&
+          status.verification &&
+          status.verification.length > 0
+        ) {
+          const txtVerification = status.verification.find(
+            (v) => v.type === 'TXT'
+          );
           if (txtVerification) {
             dnsRecords.push({
               type: 'TXT',
@@ -88,7 +105,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       customDomain: profile?.custom_domain || null,
-      verified: vercelStatus?.verified || profile?.custom_domain_verified || false,
+      verified:
+        vercelStatus?.verified || profile?.custom_domain_verified || false,
       vercelStatus,
       dnsRecords,
     });
@@ -105,7 +123,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -116,7 +137,10 @@ export async function POST(request: NextRequest) {
     // Handle verify action
     if (action === 'verify') {
       if (!domain) {
-        return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Domain is required' },
+          { status: 400 }
+        );
       }
 
       const verifyResult = await verifyDomainOnVercel(domain);
@@ -138,15 +162,20 @@ export async function POST(request: NextRequest) {
 
     // Default action: check availability
     if (!domain) {
-      return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Domain is required' },
+        { status: 400 }
+      );
     }
 
     // Validate domain format
-    const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}$/;
+    const domainRegex =
+      /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}$/;
     if (!domainRegex.test(domain)) {
       return NextResponse.json({
         available: false,
-        error: 'Invalid domain format. Please enter a valid domain (e.g., www.example.com)',
+        error:
+          'Invalid domain format. Please enter a valid domain (e.g., www.example.com)',
       });
     }
 
@@ -186,7 +215,10 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -203,11 +235,16 @@ export async function PUT(request: NextRequest) {
 
     if (domain) {
       // Validate domain format
-      const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}$/;
+      const domainRegex =
+        /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}$/;
       if (!domainRegex.test(domain)) {
-        return NextResponse.json({
-          error: 'Invalid domain format. Please enter a valid domain (e.g., www.example.com)',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error:
+              'Invalid domain format. Please enter a valid domain (e.g., www.example.com)',
+          },
+          { status: 400 }
+        );
       }
 
       // Check if domain is already taken by another user
@@ -219,13 +256,19 @@ export async function PUT(request: NextRequest) {
         .single();
 
       if (existing) {
-        return NextResponse.json({
-          error: 'This domain is already registered by another user.',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: 'This domain is already registered by another user.',
+          },
+          { status: 400 }
+        );
       }
 
       // Remove old domain from Vercel if exists
-      if (currentProfile?.custom_domain && currentProfile.custom_domain !== domain.toLowerCase()) {
+      if (
+        currentProfile?.custom_domain &&
+        currentProfile.custom_domain !== domain.toLowerCase()
+      ) {
         await removeDomainFromVercel(currentProfile.custom_domain);
       }
 
@@ -233,9 +276,12 @@ export async function PUT(request: NextRequest) {
       const vercelResult = await addDomainToVercel(domain.toLowerCase());
 
       if (!vercelResult.success) {
-        return NextResponse.json({
-          error: vercelResult.error || 'Failed to add domain to Vercel.',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: vercelResult.error || 'Failed to add domain to Vercel.',
+          },
+          { status: 400 }
+        );
       }
 
       // Update database
@@ -297,7 +343,10 @@ export async function PUT(request: NextRequest) {
 export async function DELETE() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -314,7 +363,10 @@ export async function DELETE() {
       // Remove from Vercel
       const removeResult = await removeDomainFromVercel(profile.custom_domain);
       if (!removeResult.success) {
-        console.error('Failed to remove domain from Vercel:', removeResult.error);
+        console.error(
+          'Failed to remove domain from Vercel:',
+          removeResult.error
+        );
         // Continue anyway to clear database
       }
     }
