@@ -1,13 +1,20 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
 import { TrackingPixelsIntegration } from '@/components/integrations/TrackingPixelsIntegration';
+import { PremiumFeatureGate } from '@/components/dashboard/PremiumFeatureGate';
 
-export default function IntegrationsPage() {
+function IntegrationsContent() {
   const router = useRouter();
 
   return (
@@ -50,9 +57,12 @@ export default function IntegrationsPage() {
       {/* Coming Soon Card */}
       <Card className="border-dashed">
         <CardHeader>
-          <CardTitle className="text-lg">More Integrations Coming Soon</CardTitle>
+          <CardTitle className="text-lg">
+            More Integrations Coming Soon
+          </CardTitle>
           <CardDescription>
-            We're working on adding more integrations to help you streamline your workflow.
+            We're working on adding more integrations to help you streamline
+            your workflow.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,5 +86,13 @@ export default function IntegrationsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function IntegrationsPage() {
+  return (
+    <PremiumFeatureGate featureName="Integrations">
+      <IntegrationsContent />
+    </PremiumFeatureGate>
   );
 }

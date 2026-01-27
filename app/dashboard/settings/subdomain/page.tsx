@@ -35,6 +35,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { HelpButton } from '@/components/dashboard/HelpButton';
+import { PremiumFeatureGate } from '@/components/dashboard/PremiumFeatureGate';
 
 interface DnsRecord {
   type: string;
@@ -42,7 +43,7 @@ interface DnsRecord {
   value: string;
 }
 
-export default function SubdomainSettingsPage() {
+function SubdomainSettingsContent() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -979,5 +980,13 @@ export default function SubdomainSettingsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function SubdomainSettingsPage() {
+  return (
+    <PremiumFeatureGate featureName="Custom Domain Settings">
+      <SubdomainSettingsContent />
+    </PremiumFeatureGate>
   );
 }

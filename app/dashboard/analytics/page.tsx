@@ -27,6 +27,7 @@ import {
   ExternalLink,
   AlertCircle,
 } from 'lucide-react';
+import { PremiumFeatureGate } from '@/components/dashboard/PremiumFeatureGate';
 
 interface GA4Stats {
   overview: {
@@ -50,9 +51,16 @@ interface GA4Stats {
   }>;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+];
 
-export default function AnalyticsOverviewPage() {
+function AnalyticsContent() {
   const router = useRouter();
   const [stats, setStats] = useState<GA4Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,8 +123,9 @@ export default function AnalyticsOverviewPage() {
               Connect Google Analytics First
             </h2>
             <p className="text-gray-600 mb-8">
-              To view analytics data, you need to connect your Google Analytics 4 property.
-              This will allow you to track traffic, conversions, and user behavior across all your sales pages.
+              To view analytics data, you need to connect your Google Analytics
+              4 property. This will allow you to track traffic, conversions, and
+              user behavior across all your sales pages.
             </p>
             <Button onClick={() => router.push('/dashboard/integrations')}>
               <ExternalLink className="w-4 h-4 mr-2" />
@@ -175,7 +184,10 @@ export default function AnalyticsOverviewPage() {
       dateStr = `${year}-${month}-${day}`;
     }
     return {
-      date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
       Users: item.users,
       Sessions: item.sessions,
       'Page Views': item.pageViews,
@@ -196,7 +208,9 @@ export default function AnalyticsOverviewPage() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics Overview</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Analytics Overview
+            </h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -219,7 +233,9 @@ export default function AnalyticsOverviewPage() {
               onClick={fetchStats}
               disabled={loading}
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+              />
               Refresh
             </Button>
           </div>
@@ -300,7 +316,9 @@ export default function AnalyticsOverviewPage() {
 
         {/* Traffic Over Time Chart */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Traffic Over Time</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            Traffic Over Time
+          </h2>
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={trafficData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -335,7 +353,9 @@ export default function AnalyticsOverviewPage() {
 
         {/* Top Traffic Sources */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Top Traffic Sources</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            Top Traffic Sources
+          </h2>
           {stats.trafficSources.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats.trafficSources}>
@@ -349,7 +369,9 @@ export default function AnalyticsOverviewPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-gray-500 text-center py-8">No traffic sources available</p>
+            <p className="text-gray-500 text-center py-8">
+              No traffic sources available
+            </p>
           )}
         </Card>
 
@@ -357,9 +379,12 @@ export default function AnalyticsOverviewPage() {
         {stats.overview.totalUsers === 0 && (
           <Card className="p-12 text-center">
             <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Analytics Data Yet</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No Analytics Data Yet
+            </h3>
             <p className="text-gray-600 mb-6">
-              Publish your pages and share them to start collecting analytics data from Google Analytics.
+              Publish your pages and share them to start collecting analytics
+              data from Google Analytics.
             </p>
             <Button onClick={() => router.push('/dashboard')}>
               Go to Dashboard
@@ -368,5 +393,13 @@ export default function AnalyticsOverviewPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AnalyticsOverviewPage() {
+  return (
+    <PremiumFeatureGate featureName="Analytics">
+      <AnalyticsContent />
+    </PremiumFeatureGate>
   );
 }
