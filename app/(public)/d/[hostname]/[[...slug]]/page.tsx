@@ -42,11 +42,14 @@ export default async function CustomDomainPage({
   }
 
   // Find user by custom domain (check both www and non-www versions)
-  const { data: profile, error: profileError } = await supabase
+  // Use .limit(1) instead of .single() to avoid 406 error with .in() filter
+  const { data: profiles, error: profileError } = await supabase
     .from('profiles')
     .select('id, display_name, custom_domain, custom_domain_verified')
     .in('custom_domain', hostnameVariants)
-    .single();
+    .limit(1);
+
+  const profile = profiles?.[0];
 
   if (profileError || !profile) {
     // Domain not registered with any user
@@ -162,11 +165,14 @@ export async function generateMetadata({ params }: CustomDomainPageProps) {
     hostnameVariants.push(`www.${decodedHostname}`);
   }
 
-  const { data: profile } = await supabase
+  // Use .limit(1) instead of .single() to avoid 406 error with .in() filter
+  const { data: profiles } = await supabase
     .from('profiles')
     .select('id, display_name')
     .in('custom_domain', hostnameVariants)
-    .single();
+    .limit(1);
+
+  const profile = profiles?.[0];
 
   if (!profile) {
     return { title: 'Page Not Found' };
