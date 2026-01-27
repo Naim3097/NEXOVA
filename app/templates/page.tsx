@@ -59,8 +59,11 @@ export default function TemplatesPage() {
 
   const categories = [
     { value: 'all', label: 'All Templates' },
-    { value: 'ebook', label: 'Ebook' },
+    { value: 'automotive', label: 'Automotive' },
+    { value: 'healthcare', label: 'Clinic' },
+    { value: 'services', label: 'Photography' },
     { value: 'ecommerce', label: 'E-commerce' },
+    { value: 'digital-products', label: 'Digital Products' },
   ];
 
   // Filter by category

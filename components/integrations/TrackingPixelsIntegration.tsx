@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import {
-  BarChart3,
   Save,
   Eye,
   EyeOff,
@@ -26,6 +25,8 @@ import {
   Unlink,
   ChevronDown,
 } from 'lucide-react';
+import { FaFacebookF } from 'react-icons/fa';
+import { SiTiktok, SiGoogleanalytics } from 'react-icons/si';
 
 interface TrackingPixelsConfig {
   facebook: {
@@ -341,16 +342,11 @@ function TrackingPixelsContent() {
     <div className="space-y-6">
       {/* Header with Save Button */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-[#5FC7CD]" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">Tracking Pixels</h2>
-            <p className="text-sm text-muted-foreground">
-              Configure tracking pixels for ad campaigns and analytics
-            </p>
-          </div>
+        <div>
+          <h2 className="text-2xl font-bold text-[#455263]">Tracking Pixels</h2>
+          <p className="text-sm text-muted-foreground">
+            Configure tracking pixels for ad campaigns and analytics
+          </p>
         </div>
         <Button onClick={handleSave} disabled={saving} variant="teal">
           <Save className="w-4 h-4 mr-2" />
@@ -374,8 +370,8 @@ function TrackingPixelsContent() {
       <Card>
         <div className="p-6 border-b flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-2xl">
-              📘
+            <div className="w-14 h-14 rounded-xl bg-[#1877F2]/10 flex items-center justify-center">
+              <FaFacebookF className="w-7 h-7 text-[#1877F2]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Facebook Pixel</h3>
@@ -575,8 +571,8 @@ function TrackingPixelsContent() {
       <Card>
         <div className="p-6 border-b flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center text-2xl">
-              🎵
+            <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center">
+              <SiTiktok className="w-7 h-7 text-white" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">TikTok Pixel</h3>
@@ -670,8 +666,35 @@ function TrackingPixelsContent() {
       <Card>
         <div className="p-6 border-b flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-yellow-50 flex items-center justify-center text-2xl">
-              🎯
+            <div className="w-14 h-14 rounded-xl bg-gray-50 flex items-center justify-center">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 192 192"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="8"
+                  y="62"
+                  width="56"
+                  height="130"
+                  rx="28"
+                  ry="28"
+                  transform="rotate(-20.5 36 127)"
+                  fill="#FBBC04"
+                />
+                <rect
+                  x="128"
+                  y="0"
+                  width="56"
+                  height="130"
+                  rx="28"
+                  ry="28"
+                  transform="rotate(-20.5 156 65)"
+                  fill="#4285F4"
+                />
+                <circle cx="26" cy="148" r="28" fill="#34A853" />
+              </svg>
             </div>
             <div>
               <h3 className="text-lg font-semibold">Google Ads</h3>
@@ -751,8 +774,8 @@ function TrackingPixelsContent() {
       <Card>
         <div className="p-6 border-b flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-green-50 flex items-center justify-center text-2xl">
-              📊
+            <div className="w-14 h-14 rounded-xl bg-[#E37400]/10 flex items-center justify-center">
+              <SiGoogleanalytics className="w-7 h-7 text-[#E37400]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Google Analytics 4</h3>

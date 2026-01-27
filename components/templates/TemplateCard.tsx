@@ -35,7 +35,7 @@ export function TemplateCard({
     <Card className="overflow-hidden hover:shadow-lg transition-all">
       {/* Thumbnail */}
       <div className="relative aspect-video bg-muted">
-        {!imageError ? (
+        {!imageError && template.thumbnail_url ? (
           <img
             src={template.thumbnail_url}
             alt={template.name}
@@ -106,12 +106,11 @@ export function TemplateCard({
 
 function getCategoryIcon(category: string): string {
   const icons: Record<string, string> = {
-    saas: '💻',
+    automotive: '🚗',
+    healthcare: '🏥',
+    services: '📸',
     ecommerce: '🛍️',
-    course: '📚',
-    leadgen: '🎯',
-    event: '🎉',
-    portfolio: '🎨',
+    'digital-products': '📚',
   };
   return icons[category] || '📄';
 }

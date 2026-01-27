@@ -14,7 +14,7 @@ import {
   HelpCircle,
   TrendingUp,
   Calendar,
-  DollarSign,
+  CreditCard,
   RefreshCw,
   ArrowLeft,
   Loader2,
@@ -270,7 +270,7 @@ function AdminDashboardContent() {
                     {stats?.total_users || 0}
                   </p>
                 </div>
-                <Users className="h-10 w-10 text-[#5FC7CD] opacity-80" />
+                <Users className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -280,11 +280,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">Premium Users</p>
-                  <p className="text-3xl font-bold text-yellow-600">
+                  <p className="text-3xl font-bold text-[#455263]">
                     {stats?.premium_users || 0}
                   </p>
                 </div>
-                <Crown className="h-10 w-10 text-yellow-500 opacity-80" />
+                <Crown className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -294,11 +294,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">Enterprise Users</p>
-                  <p className="text-3xl font-bold text-purple-600">
+                  <p className="text-3xl font-bold text-[#455263]">
                     {stats?.enterprise_users || 0}
                   </p>
                 </div>
-                <Building2 className="h-10 w-10 text-purple-500 opacity-80" />
+                <Building2 className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -308,11 +308,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">Monthly Revenue</p>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-3xl font-bold text-[#455263]">
                     RM{(stats?.monthly_revenue || 0).toLocaleString()}
                   </p>
                 </div>
-                <DollarSign className="h-10 w-10 text-green-500 opacity-80" />
+                <CreditCard className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -329,7 +329,7 @@ function AdminDashboardContent() {
                     {stats?.free_users || 0}
                   </p>
                 </div>
-                <Users className="h-8 w-8 text-[#969696] opacity-80" />
+                <Users className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -339,11 +339,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">Signups Today</p>
-                  <p className="text-2xl font-bold text-[#5FC7CD]">
+                  <p className="text-2xl font-bold text-[#455263]">
                     {stats?.new_signups_today || 0}
                   </p>
                 </div>
-                <Calendar className="h-8 w-8 text-[#5FC7CD] opacity-80" />
+                <Calendar className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -353,11 +353,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">Signups This Week</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-[#455263]">
                     {stats?.new_signups_week || 0}
                   </p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-green-400 opacity-80" />
+                <TrendingUp className="h-5 w-5 text-[#5FC7CD]" />
               </div>
             </CardContent>
           </Card>
@@ -367,11 +367,11 @@ function AdminDashboardContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#969696]">New Help Requests</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-2xl font-bold text-[#EF4444]">
                     {stats?.new_help_requests || 0}
                   </p>
                 </div>
-                <HelpCircle className="h-8 w-8 text-orange-400 opacity-80" />
+                <HelpCircle className="h-5 w-5 text-[#EF4444]" />
               </div>
             </CardContent>
           </Card>
