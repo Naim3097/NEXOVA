@@ -95,12 +95,12 @@ const SortableElement = ({
         <div
           {...attributes}
           {...listeners}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-10 z-10 cursor-grab active:cursor-grabbing bg-white border-2 rounded-lg p-2 shadow-lg ${
-            isSelected ? 'border-blue-500' : 'border-gray-300'
+          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-10 z-10 cursor-grab active:cursor-grabbing bg-white border-2 rounded-xl p-2 shadow-lg ${
+            isSelected ? 'border-[#5FC7CD]' : 'border-[#E2E8F0]'
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          <GripVertical className="w-4 h-4 text-gray-600" />
+          <GripVertical className="w-4 h-4 text-[#969696]" />
         </div>
       )}
 
@@ -108,9 +108,9 @@ const SortableElement = ({
       <div
         className={`${
           isSelected
-            ? 'ring-2 ring-blue-500 ring-offset-2'
+            ? 'ring-2 ring-[#5FC7CD] ring-offset-2'
             : isHovered
-              ? 'ring-2 ring-gray-300 ring-offset-2'
+              ? 'ring-2 ring-[#E2E8F0] ring-offset-2'
               : ''
         }`}
       >
@@ -273,8 +273,8 @@ export const Canvas = () => {
         break;
       default:
         elementContent = (
-          <div className="p-8 bg-gray-100 border-2 border-dashed border-gray-300 text-center">
-            <p className="text-gray-500">
+          <div className="p-8 bg-[#F8FAFC] border-2 border-dashed border-[#E2E8F0] rounded-xl text-center">
+            <p className="text-[#969696]">
               Unknown element type: {element.type}
             </p>
           </div>
@@ -304,7 +304,7 @@ export const Canvas = () => {
 
   return (
     <div
-      className="flex-1 bg-gray-100 overflow-auto"
+      className="flex-1 bg-[#F8FAFC] overflow-auto"
       onClick={handleCanvasClick}
     >
       {/* Canvas container with viewport simulation */}
@@ -320,9 +320,9 @@ export const Canvas = () => {
             /* Empty state */
             <div className="flex items-center justify-center min-h-screen">
               <div className="text-center max-w-md px-4">
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <div className="w-24 h-24 bg-[#F8FAFC] rounded-full mx-auto mb-6 flex items-center justify-center border border-[#E2E8F0]">
                   <svg
-                    className="w-12 h-12 text-gray-400"
+                    className="w-12 h-12 text-[#969696]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -335,10 +335,10 @@ export const Canvas = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h3 className="text-2xl font-bold text-[#455263] mb-2">
                   Start Building
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-[#969696]">
                   Add elements from the library on the left to start building
                   your page.
                 </p>

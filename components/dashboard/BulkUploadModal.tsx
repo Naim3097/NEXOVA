@@ -387,13 +387,15 @@ export default function BulkUploadModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="relative bg-white rounded-2xl border-[#E2E8F0] shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-semibold">Bulk Upload Products</h2>
+        <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0]">
+          <h2 className="text-xl font-semibold text-[#455263]">
+            Bulk Upload Products
+          </h2>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-gray-100 rounded-full"
+            className="p-1 hover:bg-[#F8FAFC] rounded-full"
           >
             <X size={20} />
           </button>
@@ -402,14 +404,14 @@ export default function BulkUploadModal({
         {/* Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           {/* Download Template */}
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mb-6 p-4 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-xl">
             <div className="flex items-start gap-3">
-              <FileSpreadsheet className="text-blue-600 mt-0.5" size={20} />
+              <FileSpreadsheet className="text-[#5FC7CD] mt-0.5" size={20} />
               <div className="flex-1">
-                <p className="text-sm text-blue-900 font-medium">
+                <p className="text-sm text-[#455263] font-medium">
                   Need a template?
                 </p>
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="text-sm text-[#969696] mt-1">
                   Download our Excel template with the correct column headers.
                 </p>
                 <Button
@@ -427,14 +429,14 @@ export default function BulkUploadModal({
 
           {/* File Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#455263] mb-2">
               Upload Excel or CSV File
             </label>
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
                 file
                   ? 'border-green-300 bg-green-50'
-                  : 'border-gray-300 hover:border-blue-400'
+                  : 'border-[#E2E8F0] hover:border-[#5FC7CD]'
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -454,11 +456,11 @@ export default function BulkUploadModal({
                 </div>
               ) : (
                 <>
-                  <Upload className="mx-auto text-gray-400" size={32} />
-                  <p className="mt-2 text-sm text-gray-600">
+                  <Upload className="mx-auto text-[#969696]" size={32} />
+                  <p className="mt-2 text-sm text-[#969696]">
                     Click to upload or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Supports .xlsx, .xls, .csv
                   </p>
                 </>
@@ -468,56 +470,56 @@ export default function BulkUploadModal({
 
           {/* Parse Error */}
           {parseError && (
-            <div className="mb-6 p-4 bg-red-50 rounded-lg flex items-start gap-3">
-              <AlertCircle className="text-red-600 mt-0.5" size={20} />
-              <p className="text-sm text-red-700">{parseError}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+              <AlertCircle className="text-[#EF4444] mt-0.5" size={20} />
+              <p className="text-sm text-[#EF4444]">{parseError}</p>
             </div>
           )}
 
           {/* Parsed Products Preview */}
           {parsedProducts.length > 0 && !uploadResult?.success && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+              <h3 className="text-sm font-medium text-[#455263] mb-2">
                 Preview ({parsedProducts.length} products found)
               </h3>
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
                 <div className="max-h-64 overflow-y-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
+                    <thead className="bg-[#F8FAFC] sticky top-0">
                       <tr>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">
+                        <th className="px-3 py-2 text-left font-medium text-[#969696]">
                           Code
                         </th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">
+                        <th className="px-3 py-2 text-left font-medium text-[#969696]">
                           Name
                         </th>
-                        <th className="px-3 py-2 text-right font-medium text-gray-600">
+                        <th className="px-3 py-2 text-right font-medium text-[#969696]">
                           Price
                         </th>
-                        <th className="px-3 py-2 text-left font-medium text-gray-600">
+                        <th className="px-3 py-2 text-left font-medium text-[#969696]">
                           Variations
                         </th>
-                        <th className="px-3 py-2 text-right font-medium text-gray-600">
+                        <th className="px-3 py-2 text-right font-medium text-[#969696]">
                           Stock
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-[#E2E8F0]">
                       {parsedProducts.slice(0, 10).map((product, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-3 py-2 text-gray-900">
+                        <tr key={index} className="hover:bg-[#F8FAFC]">
+                          <td className="px-3 py-2 text-[#455263]">
                             {product.code}
                           </td>
-                          <td className="px-3 py-2 text-gray-900 truncate max-w-[150px]">
+                          <td className="px-3 py-2 text-[#455263] truncate max-w-[150px]">
                             {product.name}
                           </td>
-                          <td className="px-3 py-2 text-right text-gray-900">
+                          <td className="px-3 py-2 text-right text-[#455263]">
                             {product.currency} {product.base_price.toFixed(2)}
                           </td>
-                          <td className="px-3 py-2 text-gray-600 text-xs">
+                          <td className="px-3 py-2 text-[#969696] text-xs">
                             {product.variations &&
                             product.variations.length > 0 ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-xl bg-[#5FC7CD]/10 text-[#5FC7CD]">
                                 {product.variations[0].options.length} sizes
                                 {product.variations[0].options.some(
                                   (o) => o.priceAdjustment > 0
@@ -528,10 +530,10 @@ export default function BulkUploadModal({
                                 )}
                               </span>
                             ) : (
-                              <span className="text-gray-400">-</span>
+                              <span className="text-[#969696]">-</span>
                             )}
                           </td>
-                          <td className="px-3 py-2 text-right text-gray-900">
+                          <td className="px-3 py-2 text-right text-[#455263]">
                             {product.stock}
                           </td>
                         </tr>
@@ -540,7 +542,7 @@ export default function BulkUploadModal({
                   </table>
                 </div>
                 {parsedProducts.length > 10 && (
-                  <div className="px-3 py-2 bg-gray-50 text-sm text-gray-500 text-center">
+                  <div className="px-3 py-2 bg-[#F8FAFC] text-sm text-[#969696] text-center">
                     ... and {parsedProducts.length - 10} more products
                   </div>
                 )}
@@ -551,17 +553,17 @@ export default function BulkUploadModal({
           {/* Upload Result */}
           {uploadResult && (
             <div
-              className={`mb-6 p-4 rounded-lg ${uploadResult.success ? 'bg-green-50' : 'bg-red-50'}`}
+              className={`mb-6 p-4 rounded-xl ${uploadResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
             >
               <div className="flex items-start gap-3">
                 {uploadResult.success ? (
                   <CheckCircle2 className="text-green-600 mt-0.5" size={20} />
                 ) : (
-                  <AlertCircle className="text-red-600 mt-0.5" size={20} />
+                  <AlertCircle className="text-[#EF4444] mt-0.5" size={20} />
                 )}
                 <div>
                   <p
-                    className={`font-medium ${uploadResult.success ? 'text-green-900' : 'text-red-900'}`}
+                    className={`font-medium ${uploadResult.success ? 'text-green-900' : 'text-[#EF4444]'}`}
                   >
                     {uploadResult.success
                       ? uploadResult.message
@@ -576,7 +578,7 @@ export default function BulkUploadModal({
                       </p>
                     )}
                   {uploadResult.errors && uploadResult.errors.length > 0 && (
-                    <ul className="mt-2 text-sm text-red-700 list-disc list-inside">
+                    <ul className="mt-2 text-sm text-[#EF4444] list-disc list-inside">
                       {uploadResult.errors.slice(0, 5).map((err, i) => (
                         <li key={i}>
                           Row {err.row}: {err.error}
@@ -596,12 +598,13 @@ export default function BulkUploadModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t bg-gray-50">
+        <div className="flex items-center justify-end gap-3 p-4 border-t border-[#E2E8F0] bg-[#F8FAFC]">
           <Button variant="outline" onClick={handleClose}>
             {uploadResult?.success ? 'Close' : 'Cancel'}
           </Button>
           {!uploadResult?.success && (
             <Button
+              variant="teal"
               onClick={handleUpload}
               disabled={parsedProducts.length === 0 || uploading}
             >

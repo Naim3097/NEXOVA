@@ -15,6 +15,11 @@ import {
   Crown,
   ArrowUpCircle,
   Shield,
+  Plus,
+  FileText,
+  Globe,
+  ChevronRight,
+  Eye,
 } from 'lucide-react';
 import { UpgradePlanModal } from '@/components/dashboard/UpgradePlanModal';
 import { HelpButton } from '@/components/dashboard/HelpButton';
@@ -80,10 +85,7 @@ function DashboardContent() {
         throw new Error(data.error || 'Failed to delete project');
       }
 
-      // Remove from local state
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
-
-      // Show success message
       alert('Project deleted successfully');
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -93,78 +95,99 @@ function DashboardContent() {
     }
   };
 
+  // Count stats
+  const totalViews = projects.reduce(
+    (sum, p) => sum + ((p as any).view_count || 0),
+    0
+  );
+  const maxProjects =
+    currentPlan === 'enterprise'
+      ? 'Unlimited'
+      : currentPlan === 'premium'
+        ? 20
+        : 5;
+
   return (
     <div className="min-h-screen">
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-2">
-            <HelpButton pageSource="dashboard" />
-            {isAdmin && (
-              <Link href="/dashboard/admin">
-                <Button variant="outline" size="sm">
-                  <Shield className="h-4 w-4 mr-1" />
-                  Admin
-                </Button>
-              </Link>
-            )}
-            <Button variant="outline" onClick={signOut}>
-              Sign out
-            </Button>
-          </div>
+      {/* Page Header */}
+      <div className="px-6 lg:px-8 pt-8 pb-2 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#455263] tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[#969696] mt-1">
+            Manage your websites and creative projects.
+          </p>
         </div>
-      </header>
+        <div className="flex items-center gap-2">
+          <HelpButton pageSource="dashboard" />
+          {isAdmin && (
+            <Link href="/dashboard/admin">
+              <Button variant="outline" size="sm">
+                <Shield className="h-4 w-4 mr-1" />
+                Admin
+              </Button>
+            </Link>
+          )}
+          <Button variant="outline" onClick={signOut}>
+            Sign out
+          </Button>
+        </div>
+      </div>
 
-      <main className="px-4 sm:px-6 lg:px-8 py-8">
+      <main className="px-6 lg:px-8 py-6">
         <div className="grid gap-6">
+          {/* Welcome Card with Stats */}
           <Card>
             <CardHeader>
-              <CardTitle>Welcome back!</CardTitle>
+              <CardTitle className="text-[#455263]">
+                Welcome back, Nexova!
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Email:</strong> {user?.email}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Name:</strong> {profile?.display_name || 'Not set'}
-                </p>
-                <div className="flex items-center gap-3">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Plan:</strong>{' '}
-                  </p>
-                  <Badge
-                    variant={isPremiumOrHigher ? 'default' : 'secondary'}
-                    className={
-                      currentPlan === 'premium'
-                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
-                        : currentPlan === 'enterprise'
-                          ? 'bg-purple-500'
-                          : ''
-                    }
-                  >
-                    {currentPlan === 'premium' && (
-                      <Crown className="h-3 w-3 mr-1" />
-                    )}
-                    <span className="capitalize">{currentPlan}</span>
-                  </Badge>
-                  {currentPlan !== 'enterprise' && (
-                    <Button
-                      size="sm"
-                      variant="outline"
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="border border-[#E2E8F0] rounded-xl p-4 flex flex-col gap-3">
+                  <p className="text-xs text-[#969696]">Current Plan</p>
+                  <div className="flex items-center gap-3">
+                    <Badge
+                      variant={isPremiumOrHigher ? 'default' : 'teal'}
                       className={
                         currentPlan === 'premium'
-                          ? 'text-purple-600 border-purple-500 hover:bg-purple-50'
-                          : 'text-yellow-600 border-yellow-500 hover:bg-yellow-50'
+                          ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
+                          : currentPlan === 'enterprise'
+                            ? 'bg-purple-500'
+                            : ''
                       }
-                      onClick={() => setShowUpgradeModal(true)}
                     >
-                      <ArrowUpCircle className="h-3 w-3 mr-1" />
-                      {currentPlan === 'premium'
-                        ? 'Upgrade to Enterprise'
-                        : 'Upgrade'}
-                    </Button>
-                  )}
+                      {currentPlan === 'premium' && (
+                        <Crown className="h-3 w-3 mr-1" />
+                      )}
+                      <span className="capitalize">{currentPlan} Tier</span>
+                    </Badge>
+                    {currentPlan !== 'enterprise' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-[#5FC7CD] border-[#5FC7CD] hover:bg-[#5FC7CD]/10 h-7 px-3"
+                        onClick={() => setShowUpgradeModal(true)}
+                      >
+                        <ArrowUpCircle className="h-3 w-3 mr-1" />
+                        Upgrade
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="border border-[#E2E8F0] rounded-xl p-4">
+                  <p className="text-xs text-[#969696] mb-1">Active Projects</p>
+                  <p className="text-xl font-bold text-[#5FC7CD]">
+                    {projects.length} / {maxProjects}
+                  </p>
+                </div>
+                <div className="border border-[#E2E8F0] rounded-xl p-4">
+                  <p className="text-xs text-[#969696] mb-1">Total Views</p>
+                  <p className="text-xl font-bold text-[#5FC7CD]">
+                    {totalViews.toLocaleString()}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -175,132 +198,168 @@ function DashboardContent() {
             onOpenChange={setShowUpgradeModal}
           />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Start</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Get started by choosing a professionally designed template for
-                your landing page.
+          {/* CTA + Quick Actions Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Create New Project CTA */}
+            <div className="lg:col-span-3 rounded-2xl bg-gradient-to-r from-[#8273B5] to-[#5FC7CD] p-8 text-white">
+              <h2 className="text-xl font-bold mb-2">Create New Project</h2>
+              <p className="text-sm text-white/80 mb-6">
+                Start from scratch or choose a professionally designed template.
               </p>
               <Link href="/templates">
-                <Button className="w-full">Browse Templates</Button>
+                <Button
+                  variant="teal"
+                  className="bg-white/20 hover:bg-white/30 border border-white/30"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New Site
+                </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
 
+            {/* Quick Actions */}
+            <Card className="lg:col-span-2">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-[#455263]">
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link
+                  href="/templates"
+                  className="flex items-center justify-between p-3 rounded-xl border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#5FC7CD]/10">
+                      <FileText className="h-4 w-4 text-[#5FC7CD]" />
+                    </div>
+                    <span className="text-sm font-medium text-[#455263]">
+                      Browse Templates
+                    </span>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-[#969696] group-hover:text-[#5FC7CD] transition-colors" />
+                </Link>
+                <Link
+                  href="/dashboard/settings/subdomain"
+                  className="flex items-center justify-between p-3 rounded-xl border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8273B5]/10">
+                      <Globe className="h-4 w-4 text-[#8273B5]" />
+                    </div>
+                    <span className="text-sm font-medium text-[#455263]">
+                      Import Domain
+                    </span>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-[#969696] group-hover:text-[#5FC7CD] transition-colors" />
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Projects */}
           <Card>
-            <CardHeader>
-              <CardTitle>Your Projects</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-[#455263]">Recent Projects</CardTitle>
+              {projects.length > 0 && (
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-[#5FC7CD] hover:underline font-medium"
+                >
+                  View All
+                </Link>
+              )}
             </CardHeader>
             <CardContent>
               {loading ? (
-                <p className="text-muted-foreground">Loading projects...</p>
+                <p className="text-[#969696]">Loading projects...</p>
               ) : projects.length === 0 ? (
-                <p className="text-muted-foreground">
+                <p className="text-[#969696]">
                   You don&apos;t have any projects yet. Create your first
                   landing page by selecting a template!
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {projects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {project.name}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-gray-500">
-                            Status:{' '}
-                            <span
-                              className={
-                                project.status === 'published'
-                                  ? 'text-green-600 font-medium'
-                                  : 'text-gray-600'
-                              }
-                            >
-                              {project.status}
-                            </span>
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            Updated:{' '}
-                            {new Date(project.updated_at).toLocaleDateString()}
-                          </span>
+                  {projects.map((project) => {
+                    const initial = project.name.charAt(0).toUpperCase();
+                    const isPublished = project.status === 'published';
+                    const updatedAt = new Date(project.updated_at);
+                    const now = new Date();
+                    const diffMs = now.getTime() - updatedAt.getTime();
+                    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const timeAgo =
+                      diffHrs < 1
+                        ? 'Just now'
+                        : diffHrs < 24
+                          ? `Last edited ${diffHrs} hours ago`
+                          : `Last edited ${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+
+                    return (
+                      <div
+                        key={project.id}
+                        className="flex items-center justify-between p-4 rounded-xl hover:bg-[#F8FAFC] transition-all"
+                      >
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5FC7CD] text-white font-bold text-sm flex-shrink-0">
+                            {initial}
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-[#455263] truncate">
+                              {project.name}
+                            </h3>
+                            <div className="flex items-center gap-3 mt-0.5">
+                              <Badge
+                                variant={isPublished ? 'success' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {isPublished ? 'Published' : 'Draft'}
+                              </Badge>
+                              <span className="text-xs text-[#969696]">
+                                {timeAgo}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {project.published_url && (
-                          <Link
-                            href={project.published_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Button variant="outline" size="sm">
-                              <ExternalLink className="h-4 w-4 mr-1" />
-                              View
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {project.published_url && (
+                            <Link
+                              href={project.published_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-[#969696] hover:text-[#5FC7CD]"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          )}
+                          <Link href={`/projects/${project.id}/edit`}>
+                            <Button variant="teal" size="sm">
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit Site
                             </Button>
                           </Link>
-                        )}
-                        <Link href={`/projects/${project.id}/edit`}>
-                          <Button size="sm">
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-[#969696] hover:text-[#EF4444]"
+                            onClick={() =>
+                              handleDeleteProject(project.id, project.name)
+                            }
+                            disabled={deletingId === project.id}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                        </Link>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() =>
-                            handleDeleteProject(project.id, project.name)
-                          }
-                          disabled={deletingId === project.id}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          {deletingId === project.id ? 'Deleting...' : 'Delete'}
-                        </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link href="/dashboard/products">
-                  <Button variant="outline" className="w-full">
-                    Manage Products
-                  </Button>
-                </Link>
-                <Link href="/dashboard/transactions">
-                  <Button variant="outline" className="w-full">
-                    View Transactions
-                  </Button>
-                </Link>
-                <Link href="/dashboard/settings/payments">
-                  <Button variant="outline" className="w-full">
-                    Payment Settings
-                  </Button>
-                </Link>
-                <Link href="/dashboard/settings/subdomain">
-                  <Button variant="outline" className="w-full">
-                    Subdomain Settings
-                  </Button>
-                </Link>
-              </div>
-              <p className="text-xs text-muted-foreground mt-4">
-                Note: Analytics and Forms are available per project in the
-                editor
-              </p>
             </CardContent>
           </Card>
         </div>

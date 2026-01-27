@@ -105,16 +105,16 @@ export default async function CustomDomainPage({
     if (!projects || !projects.published_pages) {
       // Show a nice "coming soon" page
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
           <div className="text-center max-w-md px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-[#455263] mb-4">
               {profile.display_name || decodedHostname}
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-[#969696] mb-8">
               Coming soon! This page is under construction.
             </p>
-            <div className="inline-block px-6 py-3 bg-white rounded-full shadow-lg">
-              <span className="text-gray-500">Powered by X.IDE</span>
+            <div className="inline-block px-6 py-3 bg-white rounded-full shadow-lg border border-[#E2E8F0]">
+              <span className="text-[#969696]">Powered by X.IDE</span>
             </div>
           </div>
         </div>

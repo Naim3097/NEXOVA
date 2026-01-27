@@ -330,7 +330,7 @@ function TrackingPixelsContent() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5FC7CD]"></div>
           </div>
         </CardContent>
       </Card>
@@ -342,8 +342,8 @@ function TrackingPixelsContent() {
       {/* Header with Save Button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-orange-600" />
+          <div className="w-12 h-12 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
+            <BarChart3 className="w-6 h-6 text-[#5FC7CD]" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Tracking Pixels</h2>
@@ -352,14 +352,14 @@ function TrackingPixelsContent() {
             </p>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} variant="teal">
           <Save className="w-4 h-4 mr-2" />
           {saving ? 'Saving...' : 'Save All'}
         </Button>
       </div>
 
       {/* Info Box */}
-      <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
+      <div className="flex gap-3 p-4 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-lg text-[#455263]">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div>
           <p className="font-semibold text-sm">Default Configuration</p>
@@ -396,7 +396,7 @@ function TrackingPixelsContent() {
               }
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#5FC7CD]"></div>
           </label>
         </div>
 
@@ -421,7 +421,7 @@ function TrackingPixelsContent() {
                 <button
                   type="button"
                   onClick={() => setShowFacebookPixel(!showFacebookPixel)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969696] hover:text-[#455263]"
                 >
                   {showFacebookPixel ? (
                     <EyeOff className="w-4 h-4" />
@@ -430,7 +430,7 @@ function TrackingPixelsContent() {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 15-16 digit number from your Facebook Business Manager
               </p>
             </div>
@@ -455,7 +455,7 @@ function TrackingPixelsContent() {
                   <span className="text-sm font-medium">
                     Enable Facebook Conversions API
                   </span>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[#969696]">
                     Server-side tracking for better data accuracy
                   </p>
                 </div>
@@ -489,7 +489,7 @@ function TrackingPixelsContent() {
                         onClick={() =>
                           setShowFacebookAPIToken(!showFacebookAPIToken)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969696] hover:text-[#455263]"
                       >
                         {showFacebookAPIToken ? (
                           <EyeOff className="w-4 h-4" />
@@ -498,7 +498,7 @@ function TrackingPixelsContent() {
                         )}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Generate in Events Manager → Settings → Conversions API
                     </p>
                   </div>
@@ -523,7 +523,7 @@ function TrackingPixelsContent() {
                       placeholder="TEST12345"
                       className="mt-1"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Use for testing. Remove after verification.
                     </p>
                   </div>
@@ -549,18 +549,18 @@ function TrackingPixelsContent() {
                   <span className="text-sm font-medium">
                     Enable Advanced Matching
                   </span>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[#969696]">
                     Send hashed customer data for better attribution
                   </p>
                 </div>
               </label>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800 font-medium">
+            <div className="mt-4 p-3 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-lg">
+              <p className="text-sm text-[#455263] font-medium">
                 Auto-tracked Events:
               </p>
-              <ul className="text-xs text-blue-700 mt-1 space-y-0.5 list-disc list-inside">
+              <ul className="text-xs text-[#5FC7CD] mt-1 space-y-0.5 list-disc list-inside">
                 <li>PageView - When page loads</li>
                 <li>AddToCart - When product added to cart</li>
                 <li>InitiateCheckout - When form is submitted</li>
@@ -597,7 +597,7 @@ function TrackingPixelsContent() {
               }
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#5FC7CD]"></div>
           </label>
         </div>
 
@@ -622,7 +622,7 @@ function TrackingPixelsContent() {
                 <button
                   type="button"
                   onClick={() => setShowTikTokPixel(!showTikTokPixel)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969696] hover:text-[#455263]"
                 >
                   {showTikTokPixel ? (
                     <EyeOff className="w-4 h-4" />
@@ -631,7 +631,7 @@ function TrackingPixelsContent() {
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 Found in TikTok Events Manager
               </p>
             </div>
@@ -656,7 +656,7 @@ function TrackingPixelsContent() {
                   <span className="text-sm font-medium">
                     Enable TikTok Events API
                   </span>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[#969696]">
                     Server-side tracking for better data accuracy
                   </p>
                 </div>
@@ -695,7 +695,7 @@ function TrackingPixelsContent() {
               }
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#5FC7CD]"></div>
           </label>
         </div>
 
@@ -716,7 +716,7 @@ function TrackingPixelsContent() {
                 placeholder="G-XXXXXXXXXX or AW-XXXXXXXXXX"
                 className="mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 G- for Analytics, AW- for Ads
               </p>
             </div>
@@ -739,7 +739,7 @@ function TrackingPixelsContent() {
                 placeholder="AW-XXXXXXXXXX/XXXXXXXXXXXXXXXX"
                 className="mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 Extract from your conversion event snippet
               </p>
             </div>
@@ -776,7 +776,7 @@ function TrackingPixelsContent() {
               }
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#5FC7CD]"></div>
           </label>
         </div>
 
@@ -801,7 +801,7 @@ function TrackingPixelsContent() {
                 placeholder="G-XXXXXXXXXX"
                 className="mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 Found in Google Analytics 4 property settings. This embeds
                 tracking on your published pages.
               </p>
@@ -814,7 +814,7 @@ function TrackingPixelsContent() {
                   <h4 className="font-medium text-gray-900">
                     Analytics Dashboard Connection
                   </h4>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-[#969696] mt-1">
                     Connect your Google account to view analytics data directly
                     in your dashboard.
                   </p>
@@ -931,8 +931,8 @@ function TrackingPixelsContent() {
               )}
 
               {!ga4Connected && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-lg">
+                  <p className="text-sm text-[#455263]">
                     Connecting allows you to view traffic, conversions, and user
                     behavior in the Analytics dashboard without leaving this
                     app.
@@ -953,7 +953,7 @@ function TrackingPixelsLoading() {
     <Card>
       <CardContent className="pt-6">
         <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5FC7CD]"></div>
         </div>
       </CardContent>
     </Card>

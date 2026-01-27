@@ -71,16 +71,14 @@ export default function SignupPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Check your email</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-[#455263]">Check your email</CardTitle>
+          <CardDescription className="text-[#969696]">
             We&apos;ve sent you a confirmation link. Please check your email to
             verify your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Redirecting to dashboard...
-          </p>
+          <p className="text-sm text-[#969696]">Redirecting to dashboard...</p>
         </CardContent>
       </Card>
     );
@@ -89,15 +87,17 @@ export default function SignupPage() {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-bold text-[#455263]">
+          Create an account
+        </CardTitle>
+        <CardDescription className="text-[#969696]">
           Get started with your free account
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-3 text-sm text-[#EF4444] bg-red-50 border border-red-200 rounded-xl">
               {error}
             </div>
           )}
@@ -139,7 +139,7 @@ export default function SignupPage() {
               required
               disabled={loading}
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#969696]">
               Must be at least 8 characters
             </p>
           </div>
@@ -163,9 +163,12 @@ export default function SignupPage() {
             {loading ? 'Creating account...' : 'Create account'}
           </Button>
 
-          <div className="text-sm text-center text-muted-foreground">
+          <div className="text-sm text-center text-[#969696]">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link
+              href="/login"
+              className="text-[#5FC7CD] hover:text-[#4bb5bb] hover:underline"
+            >
               Sign in
             </Link>
           </div>

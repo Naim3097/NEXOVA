@@ -8,7 +8,9 @@ import { Suspense, useEffect, useState } from 'react';
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const [verifying, setVerifying] = useState(true);
-  const [verificationStatus, setVerificationStatus] = useState<'success' | 'pending' | 'failed' | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<
+    'success' | 'pending' | 'failed' | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null);
@@ -23,7 +25,8 @@ function PaymentSuccessContent() {
         const responseCode = searchParams.get('response_code');
 
         // Get order ID from URL or localStorage (from test checkout)
-        let invoiceRef = searchParams.get('order') || searchParams.get('invoice_ref');
+        let invoiceRef =
+          searchParams.get('order') || searchParams.get('invoice_ref');
 
         if (!invoiceRef && typeof window !== 'undefined') {
           invoiceRef = localStorage.getItem('last_invoice_ref');
@@ -33,17 +36,26 @@ function PaymentSuccessContent() {
 
         // Check for explicit success indicators in URL
         const successIndicators = ['1', '00', 'success', 'SUCCESS', '2000'];
-        const hasSuccessParam = successIndicators.some(indicator =>
-          status?.includes(indicator) ||
-          billStatus?.includes(indicator) ||
-          responseCode?.includes(indicator)
+        const hasSuccessParam = successIndicators.some(
+          (indicator) =>
+            status?.includes(indicator) ||
+            billStatus?.includes(indicator) ||
+            responseCode?.includes(indicator)
         );
 
         // Check for explicit failure indicators in URL
-        const failureIndicators = ['failed', 'FAILED', 'cancelled', 'CANCELLED', 'declined', 'DECLINED'];
-        const hasFailureParam = failureIndicators.some(indicator =>
-          status?.toLowerCase().includes(indicator.toLowerCase()) ||
-          billStatus?.toLowerCase().includes(indicator.toLowerCase())
+        const failureIndicators = [
+          'failed',
+          'FAILED',
+          'cancelled',
+          'CANCELLED',
+          'declined',
+          'DECLINED',
+        ];
+        const hasFailureParam = failureIndicators.some(
+          (indicator) =>
+            status?.toLowerCase().includes(indicator.toLowerCase()) ||
+            billStatus?.toLowerCase().includes(indicator.toLowerCase())
         );
 
         // If we have explicit URL status, trust it initially
@@ -61,13 +73,18 @@ function PaymentSuccessContent() {
         // STEP 2: Manual API verification (fallback when URL params are missing/unreliable)
         if (!invoiceRef) {
           setVerificationStatus('failed');
-          setErrorMessage('No invoice reference found. Unable to verify payment.');
+          setErrorMessage(
+            'No invoice reference found. Unable to verify payment.'
+          );
           setVerifying(false);
           return;
         }
 
         // Get CSRF token from meta tag
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const csrfToken =
+          document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') || '';
 
         const response = await fetch('/api/payments/verify', {
           method: 'POST',
@@ -94,14 +111,20 @@ function PaymentSuccessContent() {
         } else {
           // Verification API call failed - show failed status, NOT success
           setVerificationStatus('failed');
-          setErrorMessage(data.error || 'Unable to verify payment status with LeanX API');
+          setErrorMessage(
+            data.error || 'Unable to verify payment status with LeanX API'
+          );
         }
       } catch (error) {
         console.error('Payment verification error:', error);
         // If verification fails, show FAILED status, NOT success
         setVerificationStatus('failed');
-        setErrorMessage(error instanceof Error ? error.message : 'Payment verification error');
-        setDebugInfo({ error: error instanceof Error ? error.message : String(error) });
+        setErrorMessage(
+          error instanceof Error ? error.message : 'Payment verification error'
+        );
+        setDebugInfo({
+          error: error instanceof Error ? error.message : String(error),
+        });
       } finally {
         setVerifying(false);
       }
@@ -115,12 +138,16 @@ function PaymentSuccessContent() {
   // Show loading state while verifying
   if (verifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center space-y-4">
-            <Loader2 className="w-16 h-16 text-blue-600 animate-spin" />
-            <h2 className="text-xl font-semibold text-gray-900">Verifying Payment...</h2>
-            <p className="text-gray-600 text-center">Please wait while we confirm your payment.</p>
+            <Loader2 className="w-16 h-16 text-[#5FC7CD] animate-spin" />
+            <h2 className="text-xl font-semibold text-[#455263]">
+              Verifying Payment...
+            </h2>
+            <p className="text-[#969696] text-center">
+              Please wait while we confirm your payment.
+            </p>
           </div>
         </div>
       </div>
@@ -130,29 +157,34 @@ function PaymentSuccessContent() {
   // Show pending state if payment is still processing
   if (verificationStatus === 'pending' || verificationStatus === 'processing') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 via-orange-50 to-blue-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full border border-[#E2E8F0]">
           <div className="flex justify-center mb-6">
             <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-4">
               <AlertCircle className="w-16 h-16 text-white" />
             </div>
           </div>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Payment Processing</h1>
-            <p className="text-gray-600 text-lg">
-              Your payment is being processed. You will receive a confirmation email shortly.
+            <h1 className="text-3xl font-bold text-[#455263] mb-3">
+              Payment Processing
+            </h1>
+            <p className="text-[#969696] text-lg">
+              Your payment is being processed. You will receive a confirmation
+              email shortly.
             </p>
           </div>
           {orderId && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <div className="text-sm text-gray-500 mb-1">Order Reference</div>
-              <div className="font-mono text-gray-900 font-semibold">{orderId}</div>
+            <div className="bg-[#F8FAFC] rounded-xl p-4 mb-6 border border-[#E2E8F0]">
+              <div className="text-sm text-[#969696] mb-1">Order Reference</div>
+              <div className="font-mono text-[#455263] font-semibold">
+                {orderId}
+              </div>
             </div>
           )}
           <div className="space-y-3">
             <Link
               href="/dashboard"
-              className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#5FC7CD] to-[#8273B5] text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
             >
               Go to Dashboard
               <ArrowRight className="w-4 h-4" />
@@ -166,23 +198,26 @@ function PaymentSuccessContent() {
   // Show failed state if payment failed
   if (verificationStatus === 'failed') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full border border-[#E2E8F0]">
           <div className="flex justify-center mb-6">
             <div className="bg-gradient-to-br from-red-400 to-red-600 rounded-full p-4">
               <AlertCircle className="w-16 h-16 text-white" />
             </div>
           </div>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Payment Failed</h1>
-            <p className="text-gray-600 text-lg">
-              Unfortunately, your payment could not be processed. Please try again.
+            <h1 className="text-3xl font-bold text-[#455263] mb-3">
+              Payment Failed
+            </h1>
+            <p className="text-[#969696] text-lg">
+              Unfortunately, your payment could not be processed. Please try
+              again.
             </p>
           </div>
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
               <p className="text-sm text-red-800">{errorMessage}</p>
             </div>
           )}
@@ -190,11 +225,11 @@ function PaymentSuccessContent() {
           {/* Debug Info (per LeanX Integration Guide section 4.3) */}
           {debugInfo && (
             <details className="mb-6">
-              <summary className="cursor-pointer text-sm font-semibold text-gray-700 hover:text-gray-900">
+              <summary className="cursor-pointer text-sm font-semibold text-[#455263] hover:text-[#455263]/80">
                 Show Debug Info
               </summary>
-              <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3 overflow-auto max-h-48">
-                <pre className="text-xs text-gray-700 whitespace-pre-wrap">
+              <div className="mt-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-3 overflow-auto max-h-48">
+                <pre className="text-xs text-[#455263] whitespace-pre-wrap">
                   {JSON.stringify(debugInfo, null, 2)}
                 </pre>
               </div>
@@ -203,23 +238,25 @@ function PaymentSuccessContent() {
 
           {/* Order Reference */}
           {orderId && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <div className="text-sm text-gray-500 mb-1">Order Reference</div>
-              <div className="font-mono text-gray-900 font-semibold text-sm">{orderId}</div>
+            <div className="bg-[#F8FAFC] rounded-xl p-4 mb-6 border border-[#E2E8F0]">
+              <div className="text-sm text-[#969696] mb-1">Order Reference</div>
+              <div className="font-mono text-[#455263] font-semibold text-sm">
+                {orderId}
+              </div>
             </div>
           )}
 
           <div className="space-y-3">
             <Link
               href="/dashboard/settings/payments"
-              className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#5FC7CD] to-[#8273B5] text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
             >
               Try Again
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/dashboard"
-              className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-all"
+              className="flex items-center justify-center gap-2 w-full bg-[#F8FAFC] text-[#455263] font-semibold py-3 px-6 rounded-xl hover:bg-[#E2E8F0] transition-all border border-[#E2E8F0]"
             >
               Back to Dashboard
             </Link>
@@ -230,8 +267,8 @@ function PaymentSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full border border-[#E2E8F0]">
         {/* Success Icon */}
         <div className="flex justify-center mb-6">
           <div className="relative">
@@ -244,26 +281,30 @@ function PaymentSuccessContent() {
 
         {/* Success Message */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+          <h1 className="text-3xl font-bold text-[#455263] mb-3">
             Payment Successful!
           </h1>
-          <p className="text-gray-600 text-lg">
-            Thank you for your purchase. Your payment has been processed successfully.
+          <p className="text-[#969696] text-lg">
+            Thank you for your purchase. Your payment has been processed
+            successfully.
           </p>
         </div>
 
         {/* Order Details */}
         {orderId && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="text-sm text-gray-500 mb-1">Order Reference</div>
-            <div className="font-mono text-gray-900 font-semibold">{orderId}</div>
+          <div className="bg-[#F8FAFC] rounded-xl p-4 mb-6 border border-[#E2E8F0]">
+            <div className="text-sm text-[#969696] mb-1">Order Reference</div>
+            <div className="font-mono text-[#455263] font-semibold">
+              {orderId}
+            </div>
           </div>
         )}
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-blue-800">
-            A confirmation email has been sent to your email address with your order details and receipt.
+        <div className="bg-[#5FC7CD]/10 border border-[#5FC7CD]/30 rounded-xl p-4 mb-6">
+          <p className="text-sm text-[#455263]">
+            A confirmation email has been sent to your email address with your
+            order details and receipt.
           </p>
         </div>
 
@@ -271,7 +312,7 @@ function PaymentSuccessContent() {
         <div className="space-y-3">
           <Link
             href="/dashboard"
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+            className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#5FC7CD] to-[#8273B5] text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
           >
             Go to Dashboard
             <ArrowRight className="w-4 h-4" />
@@ -279,15 +320,15 @@ function PaymentSuccessContent() {
 
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-all"
+            className="flex items-center justify-center gap-2 w-full bg-[#F8FAFC] text-[#455263] font-semibold py-3 px-6 rounded-xl hover:bg-[#E2E8F0] transition-all border border-[#E2E8F0]"
           >
             Back to Home
           </Link>
         </div>
 
         {/* Footer Note */}
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="mt-8 pt-6 border-t border-[#E2E8F0] text-center">
+          <p className="text-xs text-[#969696]">
             Powered by LeanX Payment Gateway
           </p>
         </div>
@@ -298,11 +339,13 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD]"></div>
+        </div>
+      }
+    >
       <PaymentSuccessContent />
     </Suspense>
   );

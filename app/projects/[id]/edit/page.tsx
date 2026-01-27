@@ -74,7 +74,11 @@ export default function ProjectEditorPage() {
         if (!exists) {
           acc.push(element);
         } else {
-          console.warn('Duplicate element found in database:', element.id, element.type);
+          console.warn(
+            'Duplicate element found in database:',
+            element.id,
+            element.type
+          );
         }
         return acc;
       }, [] as Element[]);
@@ -100,10 +104,10 @@ export default function ProjectEditorPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="h-screen bg-gray-50 flex items-center justify-center">
+        <div className="h-screen bg-[#F8FAFC] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading project...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD] mx-auto mb-4"></div>
+            <p className="text-[#969696]">Loading project...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -113,13 +117,15 @@ export default function ProjectEditorPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <div className="h-screen bg-gray-50 flex items-center justify-center">
-          <Card className="max-w-md">
+        <div className="h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <Card className="max-w-md rounded-2xl border-[#E2E8F0]">
             <CardHeader>
-              <CardTitle>Error Loading Project</CardTitle>
+              <CardTitle className="text-[#455263]">
+                Error Loading Project
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">{error}</p>
+              <p className="text-[#969696] mb-4">{error}</p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -127,7 +133,10 @@ export default function ProjectEditorPage() {
                 >
                   Retry
                 </Button>
-                <Button onClick={() => router.push('/dashboard')}>
+                <Button
+                  variant="teal"
+                  onClick={() => router.push('/dashboard')}
+                >
                   Back to Dashboard
                 </Button>
               </div>
@@ -158,7 +167,7 @@ export default function ProjectEditorPage() {
             <ElementLibrary />
 
             {/* Canvas */}
-            <div className="flex-1 overflow-auto bg-gray-50">
+            <div className="flex-1 overflow-auto bg-[#F8FAFC]">
               <Canvas />
             </div>
 

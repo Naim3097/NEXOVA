@@ -2,11 +2,30 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, Download, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  ArrowLeft,
+  Download,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import type { Transaction, TransactionStats } from '@/types';
@@ -18,20 +37,36 @@ export default function TransactionsDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<TransactionStats | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [viewMode, setViewMode] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
+  const [viewMode, setViewMode] = useState<'weekly' | 'monthly' | 'yearly'>(
+    'monthly'
+  );
   const [exporting, setExporting] = useState(false);
 
   const currentDate = new Date();
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
   // Fetch stats and transactions
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         router.push('/login');
@@ -39,11 +74,13 @@ export default function TransactionsDashboardPage() {
       }
 
       // Fetch transaction stats using the database function
-      const { data: statsData, error: statsError } = await supabase
-        .rpc('get_transaction_stats', {
+      const { data: statsData, error: statsError } = await supabase.rpc(
+        'get_transaction_stats',
+        {
           p_user_id: user.id,
           p_project_id: null,
-        });
+        }
+      );
 
       if (statsError) throw statsError;
 
@@ -52,17 +89,17 @@ export default function TransactionsDashboardPage() {
       }
 
       // Fetch all transactions
-      const { data: transactionsData, error: transactionsError } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const { data: transactionsData, error: transactionsError } =
+        await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100);
 
       if (transactionsError) throw transactionsError;
 
       setTransactions(transactionsData || []);
-
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -83,7 +120,9 @@ export default function TransactionsDashboardPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const url = new URL('/api/transactions/export', window.location.origin);
@@ -163,13 +202,15 @@ export default function TransactionsDashboardPage() {
     }
   };
 
-  const isCurrentMonth = currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear();
+  const isCurrentMonth =
+    currentMonth === currentDate.getMonth() &&
+    currentYear === currentDate.getFullYear();
 
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-center items-center h-64">
-          <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
+          <RefreshCw className="w-8 h-8 animate-spin text-[#969696]" />
         </div>
       </div>
     );
@@ -204,7 +245,9 @@ export default function TransactionsDashboardPage() {
               onClick={fetchData}
               disabled={loading}
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+              />
               Refresh
             </Button>
 
@@ -282,21 +325,21 @@ export default function TransactionsDashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">
-                Transaction Statistics - {monthNames[currentMonth]} {currentYear}
+                Transaction Statistics - {monthNames[currentMonth]}{' '}
+                {currentYear}
               </CardTitle>
               {isCurrentMonth && (
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <Badge
+                  variant="secondary"
+                  className="bg-green-100 text-green-800"
+                >
                   Current
                 </Badge>
               )}
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePreviousMonth}
-              >
+              <Button variant="ghost" size="sm" onClick={handlePreviousMonth}>
                 <ChevronLeft className="w-4 h-4" />
                 Previous
               </Button>
@@ -339,26 +382,28 @@ export default function TransactionsDashboardPage() {
           </div>
 
           {/* Chart Placeholder */}
-          <div className="bg-gray-50 rounded-lg p-8 text-center">
-            <p className="text-gray-500">
+          <div className="bg-[#F8FAFC] rounded-2xl p-8 text-center">
+            <p className="text-[#969696]">
               Chart visualization will be displayed here
             </p>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm text-[#969696] mt-2">
               Showing {viewMode} transaction data
             </p>
           </div>
 
           {/* Summary */}
           <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="text-center p-4 bg-red-50 rounded-lg">
+            <div className="text-center p-4 bg-red-50 rounded-2xl">
               <p className="text-2xl font-bold text-red-600">RM 0.00</p>
-              <p className="text-sm text-gray-600 mt-1">Failed Transactions</p>
+              <p className="text-sm text-[#969696] mt-1">Failed Transactions</p>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-center p-4 bg-green-50 rounded-2xl">
               <p className="text-2xl font-bold text-green-600">
                 {formatCurrency(stats?.total_revenue || 0)}
               </p>
-              <p className="text-sm text-gray-600 mt-1">Successful Transactions</p>
+              <p className="text-sm text-[#969696] mt-1">
+                Successful Transactions
+              </p>
             </div>
           </div>
         </CardContent>
@@ -375,8 +420,8 @@ export default function TransactionsDashboardPage() {
         <CardContent>
           {transactions.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No transactions yet</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-[#969696]">No transactions yet</p>
+              <p className="text-sm text-[#969696] mt-1">
                 Transactions will appear here once customers make payments
               </p>
             </div>
@@ -404,19 +449,27 @@ export default function TransactionsDashboardPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{transaction.product_name}</p>
-                          {transaction.has_bump_offer && transaction.bump_offer_accepted && (
-                            <p className="text-xs text-gray-500">
-                              + {transaction.bump_offer_name}
-                            </p>
-                          )}
+                          <p className="font-medium">
+                            {transaction.product_name}
+                          </p>
+                          {transaction.has_bump_offer &&
+                            transaction.bump_offer_accepted && (
+                              <p className="text-xs text-[#969696]">
+                                + {transaction.bump_offer_name}
+                              </p>
+                            )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {transaction.customer_email || transaction.customer_name || '-'}
+                        {transaction.customer_email ||
+                          transaction.customer_name ||
+                          '-'}
                       </TableCell>
                       <TableCell className="font-semibold">
-                        {formatCurrency(transaction.total_amount, transaction.currency)}
+                        {formatCurrency(
+                          transaction.total_amount,
+                          transaction.currency
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusBadge(transaction.status)}>

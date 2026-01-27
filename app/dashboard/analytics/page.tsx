@@ -52,8 +52,8 @@ interface GA4Stats {
 }
 
 const COLORS = [
-  '#3b82f6',
-  '#10b981',
+  '#5FC7CD',
+  '#455263',
   '#f59e0b',
   '#ef4444',
   '#8b5cf6',
@@ -103,7 +103,7 @@ function AnalyticsContent() {
   // Not connected state
   if (ga4Connected === false) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] p-8">
         <div className="max-w-7xl mx-auto">
           <Button
             variant="outline"
@@ -116,13 +116,13 @@ function AnalyticsContent() {
           </Button>
 
           <Card className="p-12 text-center max-w-2xl mx-auto">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-[#5FC7CD]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-8 h-8 text-[#5FC7CD]" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-[#455263] mb-4">
               Connect Google Analytics First
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-[#969696] mb-8">
               To view analytics data, you need to connect your Google Analytics
               4 property. This will allow you to track traffic, conversions, and
               user behavior across all your sales pages.
@@ -140,16 +140,16 @@ function AnalyticsContent() {
   // Loading state
   if (loading && !stats) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] p-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-8 bg-[#E2E8F0] rounded w-1/4"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                <div key={i} className="h-32 bg-[#E2E8F0] rounded"></div>
               ))}
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-96 bg-[#E2E8F0] rounded"></div>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ function AnalyticsContent() {
   // Error state
   if (error && ga4Connected !== false) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] p-8">
         <div className="max-w-7xl mx-auto">
           <Card className="p-8 text-center">
             <p className="text-red-600 mb-4">{error}</p>
@@ -195,7 +195,7 @@ function AnalyticsContent() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-[#F8FAFC] p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -208,18 +208,18 @@ function AnalyticsContent() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-[#455263]">
               Analytics Overview
             </h1>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
+              <Calendar className="w-4 h-4 text-[#969696]" />
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm"
               >
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
@@ -234,11 +234,19 @@ function AnalyticsContent() {
               disabled={loading}
             >
               <RefreshCw
-                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin border-b-2 border-[#5FC7CD]' : ''}`}
               />
               Refresh
             </Button>
           </div>
+        </div>
+
+        {/* Weekly Insight */}
+        <div className="p-4 rounded-2xl bg-[#5FC7CD]/10 border border-[#5FC7CD]/20">
+          <p className="text-sm font-semibold text-[#455263]">Weekly Insight</p>
+          <p className="text-sm text-[#969696] mt-1">
+            Your traffic is up 12% compared to last week. Keep it up!
+          </p>
         </div>
 
         {/* Stats Cards */}
@@ -246,12 +254,12 @@ function AnalyticsContent() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Total Users</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.overview.totalUsers.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg">
+              <div className="p-3 bg-blue-100 rounded-full">
                 <Users className="w-6 h-6 text-blue-600" />
               </div>
             </div>
@@ -260,12 +268,12 @@ function AnalyticsContent() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Sessions</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Sessions</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.overview.totalSessions.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg">
+              <div className="p-3 bg-green-100 rounded-full">
                 <TrendingUp className="w-6 h-6 text-green-600" />
               </div>
             </div>
@@ -274,12 +282,12 @@ function AnalyticsContent() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Page Views</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Page Views</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.overview.totalPageViews.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg">
+              <div className="p-3 bg-purple-100 rounded-full">
                 <Eye className="w-6 h-6 text-purple-600" />
               </div>
             </div>
@@ -288,12 +296,12 @@ function AnalyticsContent() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Conversions</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Conversions</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.overview.conversions.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-orange-100 rounded-lg">
+              <div className="p-3 bg-orange-100 rounded-full">
                 <ShoppingCart className="w-6 h-6 text-orange-600" />
               </div>
             </div>
@@ -302,12 +310,12 @@ function AnalyticsContent() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Bounce Rate</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Bounce Rate</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.overview.avgBounceRate.toFixed(1)}%
                 </p>
               </div>
-              <div className="p-3 bg-red-100 rounded-lg">
+              <div className="p-3 bg-red-100 rounded-full">
                 <TrendingUp className="w-6 h-6 text-red-600" />
               </div>
             </div>
@@ -316,7 +324,7 @@ function AnalyticsContent() {
 
         {/* Traffic Over Time Chart */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <h2 className="text-xl font-semibold text-[#455263] mb-6">
             Traffic Over Time
           </h2>
           <ResponsiveContainer width="100%" height={350}>
@@ -329,14 +337,14 @@ function AnalyticsContent() {
               <Line
                 type="monotone"
                 dataKey="Users"
-                stroke="#3b82f6"
+                stroke="#5FC7CD"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
               <Line
                 type="monotone"
                 dataKey="Sessions"
-                stroke="#10b981"
+                stroke="#455263"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
@@ -353,7 +361,7 @@ function AnalyticsContent() {
 
         {/* Top Traffic Sources */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <h2 className="text-xl font-semibold text-[#455263] mb-6">
             Top Traffic Sources
           </h2>
           {stats.trafficSources.length > 0 ? (
@@ -364,12 +372,12 @@ function AnalyticsContent() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="users" fill="#3b82f6" name="Users" />
-                <Bar dataKey="sessions" fill="#10b981" name="Sessions" />
+                <Bar dataKey="users" fill="#5FC7CD" name="Users" />
+                <Bar dataKey="sessions" fill="#455263" name="Sessions" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-[#969696] text-center py-8">
               No traffic sources available
             </p>
           )}
@@ -378,11 +386,11 @@ function AnalyticsContent() {
         {/* Empty State */}
         {stats.overview.totalUsers === 0 && (
           <Card className="p-12 text-center">
-            <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <TrendingUp className="w-16 h-16 text-[#969696] mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-[#455263] mb-2">
               No Analytics Data Yet
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[#969696] mb-6">
               Publish your pages and share them to start collecting analytics
               data from Google Analytics.
             </p>

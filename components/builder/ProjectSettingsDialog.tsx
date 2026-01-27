@@ -2,7 +2,11 @@
 
 import { useState, useRef } from 'react';
 import { useAtomValue } from 'jotai';
-import { currentProjectAtom, elementsAtom, sortedElementsAtom } from '@/store/builder';
+import {
+  currentProjectAtom,
+  elementsAtom,
+  sortedElementsAtom,
+} from '@/store/builder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -172,9 +176,14 @@ export function ProjectSettingsDialog({
       // Build success message with conversion details
       const details: string[] = [];
       if (convertedTemplate.source !== 'native') {
-        details.push(`Converted from ${formatSourceName(convertedTemplate.source)} format`);
+        details.push(
+          `Converted from ${formatSourceName(convertedTemplate.source)} format`
+        );
       }
-      if (convertedTemplate.conversionNotes && convertedTemplate.conversionNotes.length > 0) {
+      if (
+        convertedTemplate.conversionNotes &&
+        convertedTemplate.conversionNotes.length > 0
+      ) {
         details.push(...convertedTemplate.conversionNotes);
       }
 
@@ -192,7 +201,8 @@ export function ProjectSettingsDialog({
       console.error('Import error:', error);
       setImportStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to import template',
+        message:
+          error instanceof Error ? error.message : 'Failed to import template',
       });
     } finally {
       setImporting(false);
@@ -220,30 +230,32 @@ export function ProjectSettingsDialog({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-[#E2E8F0]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-[#E2E8F0]">
           <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-semibold">Project Settings</h2>
+            <Settings className="w-5 h-5 text-[#5FC7CD]" />
+            <h2 className="text-xl font-semibold text-[#455263]">
+              Project Settings
+            </h2>
           </div>
           <button
             onClick={() => onOpenChange(false)}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-[#969696] hover:text-[#455263]"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="border-b px-6">
+        <div className="border-b border-[#E2E8F0] px-6">
           <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('export')}
               className={`py-3 px-2 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'export'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-[#5FC7CD] text-[#5FC7CD]'
+                  : 'border-transparent text-[#969696] hover:text-[#455263]'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -255,8 +267,8 @@ export function ProjectSettingsDialog({
               onClick={() => setActiveTab('import')}
               className={`py-3 px-2 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'import'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-[#5FC7CD] text-[#5FC7CD]'
+                  : 'border-transparent text-[#969696] hover:text-[#455263]'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -272,73 +284,85 @@ export function ProjectSettingsDialog({
           {activeTab === 'export' && (
             <div className="space-y-6">
               {/* Project Info */}
-              <Card className="p-4 bg-gray-50">
-                <h3 className="font-semibold text-sm mb-2">Current Project</h3>
-                <p className="text-gray-900 font-medium">
+              <Card className="p-4 bg-[#F8FAFC] border-[#E2E8F0]">
+                <h3 className="font-semibold text-sm mb-2 text-[#455263]">
+                  Current Project
+                </h3>
+                <p className="text-[#455263] font-medium">
                   {currentProject?.name || 'Untitled Project'}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {elements.length} {elements.length === 1 ? 'element' : 'elements'}
+                <p className="text-sm text-[#969696] mt-1">
+                  {elements.length}{' '}
+                  {elements.length === 1 ? 'element' : 'elements'}
                 </p>
               </Card>
 
               {/* Export Options */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-sm text-gray-900">Export Options</h3>
+                <h3 className="font-semibold text-sm text-[#455263]">
+                  Export Options
+                </h3>
 
                 {/* JSON Export */}
                 <Card
-                  className="p-4 border-2 border-gray-200 hover:border-blue-500 cursor-pointer transition-colors"
+                  className="p-4 border-2 border-[#E2E8F0] hover:border-[#5FC7CD] cursor-pointer transition-colors rounded-2xl"
                   onClick={handleExportJSON}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileJson className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-[#5FC7CD]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <FileJson className="w-6 h-6 text-[#5FC7CD]" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">Export as JSON Template</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Download your project as a JSON file. This format can be imported back into
-                        the builder to recreate your page structure.
+                      <h4 className="font-semibold text-[#455263]">
+                        Export as JSON Template
+                      </h4>
+                      <p className="text-sm text-[#969696] mt-1">
+                        Download your project as a JSON file. This format can be
+                        imported back into the builder to recreate your page
+                        structure.
                       </p>
-                      <p className="text-xs text-blue-600 mt-2">
-                        Best for: Backup, sharing templates, transferring between projects
+                      <p className="text-xs text-[#5FC7CD] mt-2">
+                        Best for: Backup, sharing templates, transferring
+                        between projects
                       </p>
                     </div>
-                    <Download className="w-5 h-5 text-gray-400" />
+                    <Download className="w-5 h-5 text-[#969696]" />
                   </div>
                 </Card>
 
                 {/* HTML Export */}
                 <Card
-                  className="p-4 border-2 border-gray-200 hover:border-green-500 cursor-pointer transition-colors"
+                  className="p-4 border-2 border-[#E2E8F0] hover:border-green-500 cursor-pointer transition-colors rounded-2xl"
                   onClick={handleExportHTML}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <FileCode className="w-6 h-6 text-green-600" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900">Export as HTML</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Download your page as a standalone HTML file with all styles included. Ready
-                        to host anywhere.
+                      <h4 className="font-semibold text-[#455263]">
+                        Export as HTML
+                      </h4>
+                      <p className="text-sm text-[#969696] mt-1">
+                        Download your page as a standalone HTML file with all
+                        styles included. Ready to host anywhere.
                       </p>
                       <p className="text-xs text-green-600 mt-2">
-                        Best for: Self-hosting, sharing as a static page, offline viewing
+                        Best for: Self-hosting, sharing as a static page,
+                        offline viewing
                       </p>
                     </div>
-                    <Download className="w-5 h-5 text-gray-400" />
+                    <Download className="w-5 h-5 text-[#969696]" />
                   </div>
                 </Card>
               </div>
 
               {/* Info */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-800">
-                  <strong>Note:</strong> Payment elements and integrations may require
-                  reconfiguration after import, as API keys and credentials are not exported for
-                  security reasons.
+                  <strong>Note:</strong> Payment elements and integrations may
+                  require reconfiguration after import, as API keys and
+                  credentials are not exported for security reasons.
                 </p>
               </div>
             </div>
@@ -347,44 +371,49 @@ export function ProjectSettingsDialog({
           {activeTab === 'import' && (
             <div className="space-y-6">
               {/* Import Instructions */}
-              <Card className="p-4 bg-blue-50 border-blue-200">
+              <Card className="p-4 bg-[#5FC7CD]/10 border-[#5FC7CD]/20 rounded-2xl">
                 <div className="flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Sparkles className="w-5 h-5 text-[#5FC7CD] flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-sm text-blue-900 mb-2">Smart Template Import</h3>
-                    <p className="text-sm text-blue-800">
-                      Upload a JSON template file from any supported page builder. Our converter will
-                      automatically detect the format and convert it to work with our builder.
+                    <h3 className="font-semibold text-sm text-[#455263] mb-2">
+                      Smart Template Import
+                    </h3>
+                    <p className="text-sm text-[#455263]">
+                      Upload a JSON template file from any supported page
+                      builder. Our converter will automatically detect the
+                      format and convert it to work with our builder.
                     </p>
                   </div>
                 </div>
               </Card>
 
               {/* Supported Formats */}
-              <Card className="p-4 bg-gray-50">
-                <h3 className="font-semibold text-sm text-gray-900 mb-3">Supported Formats</h3>
+              <Card className="p-4 bg-[#F8FAFC] border-[#E2E8F0] rounded-2xl">
+                <h3 className="font-semibold text-sm text-[#455263] mb-3">
+                  Supported Formats
+                </h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Native (Our format)</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Product Page JSON</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Elementor</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Webflow</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>ClickFunnels</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-[#455263]">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span>Generic JSON</span>
                   </div>
@@ -393,8 +422,13 @@ export function ProjectSettingsDialog({
 
               {/* File Upload */}
               <div className="space-y-4">
-                <Label htmlFor="template-file">Select Template File</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                <Label
+                  htmlFor="template-file"
+                  className="text-[#455263] font-medium"
+                >
+                  Select Template File
+                </Label>
+                <div className="border-2 border-dashed border-[#E2E8F0] rounded-2xl p-8 text-center hover:border-[#5FC7CD] transition-colors">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -410,16 +444,18 @@ export function ProjectSettingsDialog({
                   >
                     {importing ? (
                       <>
-                        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                        <span className="text-sm text-gray-600">Importing template...</span>
+                        <Loader2 className="w-10 h-10 text-[#5FC7CD] animate-spin" />
+                        <span className="text-sm text-[#969696]">
+                          Importing template...
+                        </span>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-10 h-10 text-gray-400" />
-                        <span className="text-sm text-gray-600">
+                        <Upload className="w-10 h-10 text-[#969696]" />
+                        <span className="text-sm text-[#455263]">
                           Click to select a <strong>.json</strong> template file
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-[#969696]">
                           or drag and drop here
                         </span>
                       </>
@@ -431,19 +467,19 @@ export function ProjectSettingsDialog({
               {/* Import Status */}
               {importStatus.type && (
                 <Card
-                  className={`p-4 ${
+                  className={`p-4 rounded-2xl ${
                     importStatus.type === 'success'
                       ? 'bg-green-50 border-green-200'
                       : importStatus.type === 'info'
-                      ? 'bg-blue-50 border-blue-200'
-                      : 'bg-red-50 border-red-200'
+                        ? 'bg-[#5FC7CD]/10 border-[#5FC7CD]/20'
+                        : 'bg-red-50 border-red-200'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     {importStatus.type === 'success' ? (
                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     ) : importStatus.type === 'info' ? (
-                      <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <Info className="w-5 h-5 text-[#5FC7CD] flex-shrink-0 mt-0.5" />
                     ) : (
                       <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     )}
@@ -453,40 +489,42 @@ export function ProjectSettingsDialog({
                           importStatus.type === 'success'
                             ? 'text-green-800'
                             : importStatus.type === 'info'
-                            ? 'text-blue-800'
-                            : 'text-red-800'
+                              ? 'text-[#455263]'
+                              : 'text-red-800'
                         }`}
                       >
                         {importStatus.message}
                       </p>
-                      {importStatus.details && importStatus.details.length > 0 && (
-                        <ul className="mt-2 space-y-1">
-                          {importStatus.details.map((detail, index) => (
-                            <li
-                              key={index}
-                              className={`text-xs ${
-                                importStatus.type === 'success'
-                                  ? 'text-green-700'
-                                  : importStatus.type === 'info'
-                                  ? 'text-blue-700'
-                                  : 'text-red-700'
-                              }`}
-                            >
-                              • {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {importStatus.details &&
+                        importStatus.details.length > 0 && (
+                          <ul className="mt-2 space-y-1">
+                            {importStatus.details.map((detail, index) => (
+                              <li
+                                key={index}
+                                className={`text-xs ${
+                                  importStatus.type === 'success'
+                                    ? 'text-green-700'
+                                    : importStatus.type === 'info'
+                                      ? 'text-[#455263]'
+                                      : 'text-red-700'
+                                }`}
+                              >
+                                • {detail}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                     </div>
                   </div>
                 </Card>
               )}
 
               {/* Warning */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-800">
-                  <strong>Warning:</strong> Importing a template will replace all current elements
-                  on this page. Make sure to save or export your current work first if needed.
+                  <strong>Warning:</strong> Importing a template will replace
+                  all current elements on this page. Make sure to save or export
+                  your current work first if needed.
                 </p>
               </div>
             </div>
@@ -494,7 +532,7 @@ export function ProjectSettingsDialog({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t bg-gray-50">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-[#E2E8F0] bg-[#F8FAFC]">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>

@@ -410,7 +410,7 @@ function SubdomainSettingsContent() {
     return (
       <div className="container mx-auto py-8 px-4 max-w-2xl">
         <div className="flex justify-center items-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#969696]" />
         </div>
       </div>
     );
@@ -432,12 +432,14 @@ function SubdomainSettingsContent() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Globe className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
+              <Globe className="w-7 h-7 text-[#5FC7CD]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Domain Settings</h1>
-              <p className="text-muted-foreground mt-1">
+              <h1 className="text-3xl font-bold text-[#455263]">
+                Domain Settings
+              </h1>
+              <p className="text-[#969696] mt-1">
                 Customize your published page URL
               </p>
             </div>
@@ -447,28 +449,30 @@ function SubdomainSettingsContent() {
       </div>
 
       {/* Info Box */}
-      <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 mb-6">
+      <div className="flex gap-3 p-4 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-2xl text-[#455263] mb-6">
         <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="text-sm">
           <p className="font-semibold mb-1">How domains work</p>
           <p className="opacity-90">
             With a subdomain, your published pages will be accessible at:
             <br />
-            <code className="bg-blue-100 px-1 rounded">
+            <code className="bg-[#5FC7CD]/10 px-1 rounded">
               yourname-{vercelAppSuffix}
             </code>
           </p>
           <p className="opacity-90 mt-2">
             With a custom domain, your pages will be accessible at:
             <br />
-            <code className="bg-blue-100 px-1 rounded">www.yourdomain.com</code>
+            <code className="bg-[#5FC7CD]/10 px-1 rounded">
+              www.yourdomain.com
+            </code>
           </p>
         </div>
       </div>
 
       {/* Current Custom Domain Status */}
       {currentCustomDomain && (
-        <Card className="mb-6 border-purple-200 bg-purple-50">
+        <Card className="mb-6 border-[#5FC7CD]/20 bg-[#5FC7CD]/5">
           <CardContent className="pt-6 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -478,12 +482,12 @@ function SubdomainSettingsContent() {
                   <AlertTriangle className="w-5 h-5 text-amber-600" />
                 )}
                 <div>
-                  <p className="font-medium text-purple-900">Custom Domain</p>
+                  <p className="font-medium text-[#455263]">Custom Domain</p>
                   <a
                     href={`https://${currentCustomDomain}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-purple-700 hover:underline flex items-center gap-1"
+                    className="text-sm text-[#5FC7CD] hover:underline flex items-center gap-1"
                   >
                     {currentCustomDomain}
                     <ExternalLink className="w-3 h-3" />
@@ -506,7 +510,7 @@ function SubdomainSettingsContent() {
                     size="sm"
                     onClick={verifyDns}
                     disabled={verifyingDns}
-                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+                    className="text-[#5FC7CD] hover:text-[#4bb5bb] hover:bg-[#F8FAFC]"
                   >
                     {verifyingDns ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -521,7 +525,7 @@ function SubdomainSettingsContent() {
                   size="sm"
                   onClick={handleRemoveCustomDomain}
                   disabled={savingCustomDomain}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-[#EF4444] hover:text-red-700 hover:bg-red-50"
                 >
                   Remove
                 </Button>
@@ -530,22 +534,22 @@ function SubdomainSettingsContent() {
 
             {/* DNS Records for existing domain */}
             {!customDomainVerified && dnsRecords.length > 0 && (
-              <div className="border rounded-lg overflow-hidden bg-white">
-                <div className="px-4 py-2 bg-gray-50 border-b">
-                  <p className="text-sm font-medium text-gray-700">
+              <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white">
+                <div className="px-4 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                  <p className="text-sm font-medium text-[#455263]">
                     Required DNS Records
                   </p>
                 </div>
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b">
+                  <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
                     <tr>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      <th className="px-4 py-2 text-left font-medium text-[#969696]">
                         Type
                       </th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      <th className="px-4 py-2 text-left font-medium text-[#969696]">
                         Name
                       </th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      <th className="px-4 py-2 text-left font-medium text-[#969696]">
                         Value
                       </th>
                     </tr>
@@ -584,18 +588,18 @@ function SubdomainSettingsContent() {
 
       {/* Current Subdomain Status */}
       {currentSubdomain && !currentCustomDomain && (
-        <Card className="mb-6 border-green-200 bg-green-50">
+        <Card className="mb-6 border-green-200 bg-green-100">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5 text-green-700" />
                 <div>
-                  <p className="font-medium text-green-900">Active Subdomain</p>
+                  <p className="font-medium text-[#455263]">Active Subdomain</p>
                   <a
                     href={`https://${getFullSubdomainUrl(currentSubdomain)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-green-700 hover:underline flex items-center gap-1"
+                    className="text-sm text-[#5FC7CD] hover:underline flex items-center gap-1"
                   >
                     {getFullSubdomainUrl(currentSubdomain)}
                     <ExternalLink className="w-3 h-3" />
@@ -607,7 +611,7 @@ function SubdomainSettingsContent() {
                 size="sm"
                 onClick={handleRemove}
                 disabled={saving}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-[#EF4444] hover:text-red-700 hover:bg-red-50"
               >
                 Remove
               </Button>
@@ -666,18 +670,18 @@ function SubdomainSettingsContent() {
                   placeholder="yourname"
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-500 whitespace-nowrap">
+                <span className="text-sm text-[#969696] whitespace-nowrap">
                   -{vercelAppSuffix}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#969696] mt-1">
                 Use lowercase letters, numbers, and hyphens (3-63 characters)
               </p>
             </div>
 
             {/* Availability Status */}
             {checking && (
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-[#969696]">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">Checking availability...</span>
               </div>
@@ -705,9 +709,9 @@ function SubdomainSettingsContent() {
 
             {/* Preview */}
             {newSubdomain && newSubdomain.length >= 3 && (
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Preview URL</p>
-                <p className="text-sm font-mono text-gray-700">
+              <div className="p-3 bg-[#F8FAFC] rounded-2xl">
+                <p className="text-xs text-[#969696] mb-1">Preview URL</p>
+                <p className="text-sm font-mono text-[#455263]">
                   https://{getFullSubdomainUrl(newSubdomain)}
                 </p>
               </div>
@@ -740,7 +744,7 @@ function SubdomainSettingsContent() {
       )}
 
       {/* Note about republishing */}
-      <p className="text-sm text-gray-500 text-center mt-4">
+      <p className="text-sm text-[#969696] text-center mt-4">
         After setting your domain, you may need to republish your pages to
         update their URLs.
       </p>
@@ -764,7 +768,7 @@ function SubdomainSettingsContent() {
 
           <div className="space-y-4">
             {/* Warning boxes */}
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm">
               <p>
                 Unfortunately we can&apos;t help you with this settings as it is
                 outside of our control. Please get help from your hosting
@@ -772,7 +776,7 @@ function SubdomainSettingsContent() {
               </p>
             </div>
 
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm">
               <p>
                 If you changed to a new subdomain or domain, the old record will
                 be deleted and be free up after 24hours before you can use it
@@ -781,17 +785,17 @@ function SubdomainSettingsContent() {
             </div>
 
             {/* DNS Record Table */}
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50">
+                <thead className="bg-[#F8FAFC]">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    <th className="px-4 py-2 text-left font-medium text-[#969696]">
                       TYPE
                     </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    <th className="px-4 py-2 text-left font-medium text-[#969696]">
                       NAME
                     </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    <th className="px-4 py-2 text-left font-medium text-[#969696]">
                       VALUE
                     </th>
                   </tr>
@@ -824,18 +828,18 @@ function SubdomainSettingsContent() {
               </table>
             </div>
 
-            <div className="text-sm text-gray-600 space-y-2">
+            <div className="text-sm text-[#969696] space-y-2">
               <p>
                 <strong>For root domains</strong> (e.g., example.com): Create an{' '}
-                <code className="bg-gray-100 px-1 rounded">A</code> record
+                <code className="bg-[#F8FAFC] px-1 rounded">A</code> record
                 pointing to{' '}
-                <code className="bg-gray-100 px-1 rounded">76.76.21.21</code>
+                <code className="bg-[#F8FAFC] px-1 rounded">76.76.21.21</code>
               </p>
               <p>
                 <strong>For subdomains</strong> (e.g., www.example.com): Create
-                a <code className="bg-gray-100 px-1 rounded">CNAME</code> record
-                pointing to{' '}
-                <code className="bg-gray-100 px-1 rounded">
+                a <code className="bg-[#F8FAFC] px-1 rounded">CNAME</code>{' '}
+                record pointing to{' '}
+                <code className="bg-[#F8FAFC] px-1 rounded">
                   cname.vercel-dns.com
                 </code>
               </p>
@@ -867,13 +871,13 @@ function SubdomainSettingsContent() {
                 className="mt-1"
               />
               {!customDomain && (
-                <p className="text-xs text-red-500 mt-1">Value is required</p>
+                <p className="text-xs text-[#EF4444] mt-1">Value is required</p>
               )}
             </div>
 
             {/* Domain availability status */}
             {checkingCustomDomain && (
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-[#969696]">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">Checking domain...</span>
               </div>
@@ -921,7 +925,7 @@ function SubdomainSettingsContent() {
                 </Label>
               </div>
 
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="p-3 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-2xl">
                 <div className="flex items-start gap-2">
                   <Checkbox
                     id="understoodWarning"
@@ -932,7 +936,7 @@ function SubdomainSettingsContent() {
                   />
                   <Label
                     htmlFor="understoodWarning"
-                    className="text-sm cursor-pointer text-blue-900"
+                    className="text-sm cursor-pointer text-[#455263]"
                   >
                     By choosing to use your own domain name, you can&apos;t
                     revert back to our {vercelAppSuffix} subdomain.

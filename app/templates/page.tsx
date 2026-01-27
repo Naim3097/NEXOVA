@@ -104,116 +104,118 @@ export default function TemplatesPage() {
 
         {/* Main Content */}
         <div className="flex-1 overflow-auto bg-background">
-        {/* Header */}
-        <div className="border-b bg-card">
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold mb-2">Template Gallery</h1>
-            <p className="text-muted-foreground">
-              Choose a professionally designed template to start building your
-              landing page
-            </p>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative max-w-md">
-              <input
-                type="text"
-                placeholder="Search templates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 bg-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
-
-          {/* Category Filter */}
-          <div className="mb-8">
-            <div className="flex gap-2 flex-wrap">
-              {categories.map((category) => (
-                <button
-                  key={category.value}
-                  onClick={() => setSelectedCategory(category.value)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    selectedCategory === category.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted hover:bg-muted/80'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Templates Grid */}
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-destructive">{error}</p>
-              <button
-                onClick={fetchTemplates}
-                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg"
-              >
-                Try Again
-              </button>
-            </div>
-          ) : filteredTemplates.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground mb-2">
-                {searchQuery
-                  ? `No templates found matching "${searchQuery}"`
-                  : 'No templates found in this category'}
+          {/* Header */}
+          <div className="border-b border-[#E2E8F0] bg-card">
+            <div className="container mx-auto px-4 py-8">
+              <h1 className="text-3xl font-bold mb-2 text-[#455263] tracking-tight">
+                Template Gallery
+              </h1>
+              <p className="text-muted-foreground">
+                Choose a professionally designed template to start building your
+                landing page
               </p>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="text-primary hover:underline text-sm"
-                >
-                  Clear search
-                </button>
-              )}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTemplates.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  onPreview={handlePreview}
-                  onUseTemplate={handleUseTemplate}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+          </div>
 
-        {/* Preview Modal */}
-        <TemplatePreviewModal
-          template={previewTemplate}
-          open={showPreview}
-          onClose={() => setShowPreview(false)}
-          onUseTemplate={handleUseTemplate}
-        />
+          {/* Main Content */}
+          <div className="container mx-auto px-4 py-8">
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <input
+                  type="text"
+                  placeholder="Search templates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 bg-background border rounded-xl border-[#E2E8F0] focus:outline-none focus:ring-1 focus:ring-[#5FC7CD] focus:border-[#5FC7CD]"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="mb-8">
+              <div className="flex gap-2 flex-wrap">
+                {categories.map((category) => (
+                  <button
+                    key={category.value}
+                    onClick={() => setSelectedCategory(category.value)}
+                    className={`px-4 py-2 font-medium transition-colors ${
+                      selectedCategory === category.value
+                        ? 'bg-[#455263] text-white rounded-xl'
+                        : 'bg-white border border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC] rounded-xl'
+                    }`}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Templates Grid */}
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD]"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-destructive">{error}</p>
+                <button
+                  onClick={fetchTemplates}
+                  className="mt-4 px-4 py-2 bg-[#455263] text-white rounded-xl"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : filteredTemplates.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground mb-2">
+                  {searchQuery
+                    ? `No templates found matching "${searchQuery}"`
+                    : 'No templates found in this category'}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-primary hover:underline text-sm"
+                  >
+                    Clear search
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTemplates.map((template) => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    onPreview={handlePreview}
+                    onUseTemplate={handleUseTemplate}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Preview Modal */}
+          <TemplatePreviewModal
+            template={previewTemplate}
+            open={showPreview}
+            onClose={() => setShowPreview(false)}
+            onUseTemplate={handleUseTemplate}
+          />
         </div>
       </div>
     </ProtectedRoute>

@@ -149,7 +149,7 @@ export default function PaymentSettingsPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5FC7CD]"></div>
         </div>
       </div>
     );
@@ -183,7 +183,7 @@ export default function PaymentSettingsPage() {
           variant="ghost"
           size="sm"
           onClick={() => router.push('/dashboard')}
-          className="mb-4"
+          className="mb-4 text-[#5FC7CD]"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
@@ -191,7 +191,9 @@ export default function PaymentSettingsPage() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Payment Settings</h1>
+            <h1 className="text-3xl font-bold text-[#455263] tracking-tight">
+              Payment Settings
+            </h1>
             <p className="text-muted-foreground mt-1">
               Configure your LeanX payment gateway integration
             </p>
@@ -242,6 +244,7 @@ export default function PaymentSettingsPage() {
                 !formData.leanx_api_key ||
                 !formData.leanx_collection_uuid
               }
+              variant="teal"
               className="min-w-[180px]"
             >
               <PlayCircle className="w-4 h-4 mr-2" />
@@ -256,8 +259,8 @@ export default function PaymentSettingsPage() {
         {/* Gateway Header with Toggle */}
         <div className="p-6 border-b flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <CreditCard className="w-7 h-7 text-indigo-600" />
+            <div className="w-14 h-14 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-[#5FC7CD]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">LeanX Gateway</h3>
@@ -277,7 +280,7 @@ export default function PaymentSettingsPage() {
               }
               className="sr-only peer"
             />
-            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gray-900"></div>
+            <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#5FC7CD]"></div>
           </label>
         </div>
 
@@ -341,7 +344,7 @@ export default function PaymentSettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969696] hover:text-[#455263]"
                 >
                   {showApiKey ? (
                     <EyeOff className="w-4 h-4" />
@@ -372,7 +375,7 @@ export default function PaymentSettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowSecretKey(!showSecretKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#969696] hover:text-[#455263]"
                 >
                   {showSecretKey ? (
                     <EyeOff className="w-4 h-4" />
@@ -384,7 +387,7 @@ export default function PaymentSettingsPage() {
             </div>
 
             {/* Info Box */}
-            <div className="flex gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
+            <div className="flex gap-3 p-4 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-xl text-[#455263]">
               <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-sm">Ready to Transact</p>
@@ -399,13 +402,13 @@ export default function PaymentSettingsPage() {
       </Card>
 
       {/* Information Card */}
-      <Card className="border-blue-200 bg-blue-50">
+      <Card className="border-[#5FC7CD]/20 bg-[#5FC7CD]/10">
         <CardContent className="pt-6">
-          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+          <h3 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
             <Info className="w-5 h-5" />
             How to get your LeanX credentials:
           </h3>
-          <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800">
+          <ol className="list-decimal list-inside space-y-1 text-sm text-[#455263]">
             <li>Log in to your LeanX merchant dashboard</li>
             <li>Navigate to Settings → API Credentials</li>
             <li>
@@ -429,13 +432,13 @@ export default function PaymentSettingsPage() {
               security.
             </p>
           </div>
-          <p className="text-xs text-blue-700 mt-3">
+          <p className="text-xs text-[#5FC7CD] mt-3">
             Don't have a LeanX account?{' '}
             <a
               href="https://leanx.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline font-semibold hover:text-blue-900"
+              className="underline font-semibold hover:text-[#455263]"
             >
               Sign up here
             </a>

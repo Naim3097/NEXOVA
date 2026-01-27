@@ -79,7 +79,10 @@ function NewProjectForm() {
     }
   };
 
-  const createProductsFromTemplate = async (projectId: string, template: any) => {
+  const createProductsFromTemplate = async (
+    projectId: string,
+    template: any
+  ) => {
     try {
       // Find pricing element in template
       const pricingElement = template.data?.elements?.find(
@@ -118,7 +121,9 @@ function NewProjectForm() {
         return;
       }
 
-      console.log(`Created ${createdProducts?.length || 0} products from template`);
+      console.log(
+        `Created ${createdProducts?.length || 0} products from template`
+      );
 
       // Update the pricing element to reference the created product IDs
       if (createdProducts && createdProducts.length > 0) {
@@ -127,17 +132,22 @@ function NewProjectForm() {
           .update({
             props: {
               ...pricingElement.props,
-              plans: pricingElement.props.plans.map((plan: any, index: number) => ({
-                ...plan,
-                product_id: createdProducts[index]?.id || null,
-              })),
+              plans: pricingElement.props.plans.map(
+                (plan: any, index: number) => ({
+                  ...plan,
+                  product_id: createdProducts[index]?.id || null,
+                })
+              ),
             },
           })
           .eq('project_id', projectId)
           .eq('type', 'pricing');
 
         if (updateError) {
-          console.error('Error linking products to pricing element:', updateError);
+          console.error(
+            'Error linking products to pricing element:',
+            updateError
+          );
         }
       }
     } catch (err) {
@@ -237,16 +247,18 @@ function NewProjectForm() {
 
   if (!templateSlug) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Card className="max-w-md rounded-2xl border-[#E2E8F0]">
           <CardHeader>
-            <CardTitle>No Template Selected</CardTitle>
+            <CardTitle className="text-[#455263]">
+              No Template Selected
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-[#969696] mb-4">
               Please select a template from the gallery to create a new project.
             </p>
-            <Button onClick={() => router.push('/templates')}>
+            <Button variant="teal" onClick={() => router.push('/templates')}>
               Browse Templates
             </Button>
           </CardContent>
@@ -257,27 +269,27 @@ function NewProjectForm() {
 
   if (!template && !error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card>
+        <Card className="rounded-2xl border-[#E2E8F0]">
           <CardHeader>
-            <CardTitle>Create New Project</CardTitle>
+            <CardTitle className="text-[#455263]">Create New Project</CardTitle>
             {template && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[#969696]">
                 Using template: {template.name}
               </p>
             )}
           </CardHeader>
           <CardContent>
             {error ? (
-              <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg">
+              <div className="mb-4 p-4 bg-[#EF4444]/10 text-[#EF4444] rounded-xl">
                 <p className="mb-3">{error}</p>
                 {limitReached && (
                   <div className="flex gap-2">
@@ -291,9 +303,9 @@ function NewProjectForm() {
                     </Button>
                     <Button
                       type="button"
+                      variant="teal"
                       size="sm"
                       onClick={() => router.push('/pricing')}
-                      className="bg-blue-600 hover:bg-blue-700"
                     >
                       Upgrade to Pro
                     </Button>
@@ -327,19 +339,21 @@ function NewProjectForm() {
               </div>
 
               {template && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">Template Preview</h4>
+                <div className="p-4 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+                  <h4 className="font-semibold mb-2 text-[#455263]">
+                    Template Preview
+                  </h4>
                   <div className="space-y-1 text-sm">
                     <p>
-                      <span className="text-muted-foreground">Industry:</span>{' '}
+                      <span className="text-[#969696]">Industry:</span>{' '}
                       {template.industry}
                     </p>
                     <p>
-                      <span className="text-muted-foreground">Sections:</span>{' '}
+                      <span className="text-[#969696]">Sections:</span>{' '}
                       {template.data?.elements?.length || 0}
                     </p>
                     <p>
-                      <span className="text-muted-foreground">Includes:</span>{' '}
+                      <span className="text-[#969696]">Includes:</span>{' '}
                       {template.data?.elements
                         ?.map((e: any) => e.type)
                         .join(', ') || 'N/A'}
@@ -358,7 +372,12 @@ function NewProjectForm() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading} className="flex-1">
+                <Button
+                  type="submit"
+                  variant="teal"
+                  disabled={loading}
+                  className="flex-1"
+                >
                   {loading ? 'Creating...' : 'Create Project'}
                 </Button>
               </div>
@@ -375,8 +394,8 @@ export default function NewProjectPage() {
     <ProtectedRoute>
       <Suspense
         fallback={
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD]"></div>
           </div>
         }
       >

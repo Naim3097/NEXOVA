@@ -161,41 +161,41 @@ export default function SubscriptionCheckoutPage() {
                         <button
                           type="button"
                           onClick={() => setBillingInterval('monthly')}
-                          className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
+                          className={`flex-1 p-4 border-2 rounded-xl transition-colors ${
                             billingInterval === 'monthly'
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:border-muted-foreground'
+                              ? 'border-[#5FC7CD] bg-[#5FC7CD]/5'
+                              : 'border-[#E2E8F0] hover:border-[#969696]'
                           }`}
                         >
-                          <div className="font-semibold text-foreground">
+                          <div className="font-semibold text-[#455263]">
                             Monthly
                           </div>
-                          <div className="text-2xl font-bold mt-1 text-foreground">
+                          <div className="text-2xl font-bold mt-1 text-[#455263]">
                             $29
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-[#969696]">
                             per month
                           </div>
                         </button>
                         <button
                           type="button"
                           onClick={() => setBillingInterval('yearly')}
-                          className={`flex-1 p-4 border-2 rounded-lg transition-colors relative ${
+                          className={`flex-1 p-4 border-2 rounded-xl transition-colors relative ${
                             billingInterval === 'yearly'
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:border-muted-foreground'
+                              ? 'border-[#5FC7CD] bg-[#5FC7CD]/5'
+                              : 'border-[#E2E8F0] hover:border-[#969696]'
                           }`}
                         >
-                          <div className="absolute -top-2 -right-2 bg-chart-2 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                          <div className="absolute -top-2 -right-2 bg-green-700 text-white text-xs px-2 py-1 rounded-full font-semibold">
                             Save 17%
                           </div>
-                          <div className="font-semibold text-foreground">
+                          <div className="font-semibold text-[#455263]">
                             Yearly
                           </div>
-                          <div className="text-2xl font-bold mt-1 text-foreground">
+                          <div className="text-2xl font-bold mt-1 text-[#455263]">
                             $290
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-[#969696]">
                             ~$24/month
                           </div>
                         </button>
@@ -235,7 +235,7 @@ export default function SubscriptionCheckoutPage() {
                           placeholder="1234 5678 9012 3456"
                           maxLength={19}
                         />
-                        <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#969696]" />
                       </div>
                     </div>
 
@@ -294,7 +294,7 @@ export default function SubscriptionCheckoutPage() {
 
                     {/* Error Message */}
                     {error && (
-                      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive">
+                      <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4 text-[#EF4444]">
                         {error}
                       </div>
                     )}
@@ -334,7 +334,7 @@ export default function SubscriptionCheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-foreground mb-3">
+                    <h3 className="font-semibold text-[#455263] mb-3">
                       Pro Plan Includes:
                     </h3>
                     <ul className="space-y-2">
@@ -352,43 +352,41 @@ export default function SubscriptionCheckoutPage() {
                           key={feature}
                           className="flex items-start gap-2 text-sm"
                         >
-                          <Check className="w-4 h-4 text-chart-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            {feature}
-                          </span>
+                          <Check className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+                          <span className="text-[#969696]">{feature}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="border-t pt-4">
+                  <div className="border-t border-[#E2E8F0] pt-4">
                     <div className="flex justify-between mb-2">
-                      <span className="text-muted-foreground">
+                      <span className="text-[#969696]">
                         Pro Plan ({billingInterval})
                       </span>
-                      <span className="font-semibold text-foreground">
+                      <span className="font-semibold text-[#455263]">
                         ${pricing[billingInterval]}
                       </span>
                     </div>
                     {billingInterval === 'yearly' && (
-                      <div className="flex justify-between mb-2 text-sm text-chart-2">
+                      <div className="flex justify-between mb-2 text-sm text-green-700">
                         <span>Savings (vs monthly)</span>
                         <span>-$58</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-lg font-bold border-t pt-2">
-                      <span className="text-foreground">Total Due Today</span>
-                      <span className="text-foreground">
+                    <div className="flex justify-between text-lg font-bold border-t border-[#E2E8F0] pt-2">
+                      <span className="text-[#455263]">Total Due Today</span>
+                      <span className="text-[#455263]">
                         ${pricing[billingInterval]}
                       </span>
                     </div>
                   </div>
 
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm">
-                    <p className="font-semibold text-foreground mb-1">
+                  <div className="bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-2xl p-3 text-sm">
+                    <p className="font-semibold text-[#455263] mb-1">
                       14-Day Money-Back Guarantee
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className="text-[#969696]">
                       Try Pro risk-free. Get a full refund if you're not
                       satisfied within 14 days.
                     </p>

@@ -155,7 +155,7 @@ function HelpRequestsContent() {
       { color: string; icon: React.ReactNode }
     > = {
       new: {
-        color: 'bg-blue-100 text-blue-800',
+        color: 'bg-[#5FC7CD]/10 text-[#5FC7CD]',
         icon: <AlertCircle className="h-3 w-3" />,
       },
       in_progress: {
@@ -171,7 +171,7 @@ function HelpRequestsContent() {
         icon: <CheckCircle className="h-3 w-3" />,
       },
       closed: {
-        color: 'bg-gray-100 text-gray-800',
+        color: 'bg-[#969696]/10 text-[#969696]',
         icon: <CheckCircle className="h-3 w-3" />,
       },
     };
@@ -186,10 +186,10 @@ function HelpRequestsContent() {
 
   const getPriorityBadge = (priority: string) => {
     const priorityConfig: Record<string, string> = {
-      low: 'bg-gray-100 text-gray-600',
-      normal: 'bg-blue-100 text-blue-600',
+      low: 'bg-[#969696]/10 text-[#969696]',
+      normal: 'bg-[#5FC7CD]/10 text-[#5FC7CD]',
       high: 'bg-orange-100 text-orange-600',
-      urgent: 'bg-red-100 text-red-600',
+      urgent: 'bg-red-100 text-[#EF4444]',
     };
     return (
       <Badge className={priorityConfig[priority] || priorityConfig.normal}>
@@ -202,14 +202,14 @@ function HelpRequestsContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">
+          <h1 className="text-2xl font-bold text-[#EF4444] mb-2">
             Access Denied
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[#969696] mb-4">
             You do not have permission to access this page.
           </p>
           <Link href="/dashboard">
-            <Button>
+            <Button variant="teal">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -222,14 +222,14 @@ function HelpRequestsContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#969696]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <header className="bg-white border-b border-[#E2E8F0] sticky top-0 z-10">
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/dashboard/admin">
@@ -238,7 +238,7 @@ function HelpRequestsContent() {
                 Admin
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">Help Requests</h1>
+            <h1 className="text-2xl font-bold text-[#455263]">Help Requests</h1>
           </div>
           <Button
             variant="outline"
@@ -256,11 +256,11 @@ function HelpRequestsContent() {
 
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-2xl border-[#E2E8F0]">
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-4">
               <div className="w-48">
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-[#455263] mb-1 block">
                   Status
                 </label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -278,7 +278,7 @@ function HelpRequestsContent() {
                 </Select>
               </div>
               <div className="w-48">
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-[#455263] mb-1 block">
                   Type
                 </label>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -299,16 +299,16 @@ function HelpRequestsContent() {
         </Card>
 
         {/* Help Requests List */}
-        <Card>
+        <Card className="rounded-2xl border-[#E2E8F0]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#455263]">
               <HelpCircle className="h-5 w-5" />
               Help Requests ({helpRequests.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             {helpRequests.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
+              <p className="text-[#969696] text-center py-8">
                 No help requests found.
               </p>
             ) : (
@@ -316,7 +316,7 @@ function HelpRequestsContent() {
                 {helpRequests.map((request) => (
                   <div
                     key={request.id}
-                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="border border-[#E2E8F0] rounded-2xl p-4 hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                     onClick={() => {
                       setSelectedRequest(request);
                       setAdminNotes(request.admin_notes || '');
@@ -333,13 +333,13 @@ function HelpRequestsContent() {
                               : 'Help'}
                           </Badge>
                         </div>
-                        <h4 className="font-semibold">
+                        <h4 className="font-semibold text-[#455263]">
                           {request.subject || 'No subject'}
                         </h4>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        <p className="text-sm text-[#969696] mt-1 line-clamp-2">
                           {request.message}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-xs text-[#969696]">
                           <span className="flex items-center gap-1">
                             <User className="h-3 w-3" />
                             {request.user_name}
@@ -435,28 +435,32 @@ function HelpRequestsContent() {
                 </div>
 
                 {/* User Info */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium mb-3">User Information</h4>
+                <div className="bg-[#F8FAFC] rounded-2xl p-4">
+                  <h4 className="font-medium mb-3 text-[#455263]">
+                    User Information
+                  </h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span>{selectedRequest.user_name}</span>
+                      <User className="h-4 w-4 text-[#969696]" />
+                      <span className="text-[#455263]">
+                        {selectedRequest.user_name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-gray-400" />
+                      <Mail className="h-4 w-4 text-[#969696]" />
                       <a
                         href={`mailto:${selectedRequest.user_email}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-[#5FC7CD] hover:underline"
                       >
                         {selectedRequest.user_email}
                       </a>
                     </div>
                     {selectedRequest.user_phone && (
                       <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-gray-400" />
+                        <Phone className="h-4 w-4 text-[#969696]" />
                         <a
                           href={`tel:${selectedRequest.user_phone}`}
-                          className="text-blue-600 hover:underline"
+                          className="text-[#5FC7CD] hover:underline"
                         >
                           {selectedRequest.user_phone}
                         </a>
@@ -472,8 +476,8 @@ function HelpRequestsContent() {
 
                 {/* Message */}
                 <div>
-                  <h4 className="font-medium mb-2">Message</h4>
-                  <div className="bg-white border rounded-lg p-4 whitespace-pre-wrap">
+                  <h4 className="font-medium mb-2 text-[#455263]">Message</h4>
+                  <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 whitespace-pre-wrap text-[#455263]">
                     {selectedRequest.message}
                   </div>
                 </div>
@@ -481,15 +485,17 @@ function HelpRequestsContent() {
                 {/* Page Source */}
                 {selectedRequest.page_source && (
                   <div>
-                    <h4 className="font-medium mb-2">Page Source</h4>
-                    <p className="text-sm text-gray-600">
+                    <h4 className="font-medium mb-2 text-[#455263]">
+                      Page Source
+                    </h4>
+                    <p className="text-sm text-[#969696]">
                       {selectedRequest.page_source}
                     </p>
                   </div>
                 )}
 
                 {/* Timestamps */}
-                <div className="text-xs text-gray-500 space-y-1">
+                <div className="text-xs text-[#969696] space-y-1">
                   <p>
                     Created:{' '}
                     {new Date(selectedRequest.created_at).toLocaleString()}
@@ -510,7 +516,9 @@ function HelpRequestsContent() {
 
                 {/* Admin Notes */}
                 <div>
-                  <h4 className="font-medium mb-2">Admin Notes</h4>
+                  <h4 className="font-medium mb-2 text-[#455263]">
+                    Admin Notes
+                  </h4>
                   <Textarea
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
@@ -519,6 +527,7 @@ function HelpRequestsContent() {
                   />
                   <Button
                     size="sm"
+                    variant="teal"
                     className="mt-2"
                     onClick={handleSaveNotes}
                     disabled={
@@ -538,7 +547,7 @@ function HelpRequestsContent() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="flex gap-2 pt-4 border-t">
+                <div className="flex gap-2 pt-4 border-t border-[#E2E8F0]">
                   <Button
                     variant="outline"
                     onClick={() =>

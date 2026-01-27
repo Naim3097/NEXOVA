@@ -550,20 +550,20 @@ export const ElementLibrary = () => {
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full relative">
+    <div className="w-80 bg-white border-r border-[#E2E8F0] flex flex-col h-full relative">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-start justify-between">
+      <div className="p-4 border-b border-[#E2E8F0] flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Elements</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-lg font-semibold text-[#455263]">Elements</h2>
+          <p className="text-sm text-[#969696] mt-1">
             Click to add elements to your page
           </p>
         </div>
         <button
           onClick={() => setIsOpen(false)}
-          className="md:hidden p-1 hover:bg-gray-100 rounded"
+          className="md:hidden p-1 hover:bg-[#F8FAFC] rounded"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-[#969696]" />
         </button>
       </div>
 
@@ -574,17 +574,17 @@ export const ElementLibrary = () => {
             <button
               key={template.type}
               onClick={() => handleAddElement(template)}
-              className="w-full text-left p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              className="w-full text-left p-4 border-2 border-[#E2E8F0] rounded-xl hover:border-[#5FC7CD] hover:bg-[#F8FAFC] transition-all group"
             >
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <div className="flex-shrink-0 w-10 h-10 bg-[#F8FAFC] rounded-xl flex items-center justify-center group-hover:bg-[#5FC7CD]/10 transition-colors">
                   {template.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 mb-1">
+                  <h3 className="font-semibold text-[#455263] mb-1">
                     {template.label}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-[#969696]">
                     {template.description}
                   </p>
                 </div>
@@ -595,9 +595,9 @@ export const ElementLibrary = () => {
       </div>
 
       {/* Footer info */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <div className="text-xs text-gray-500">
-          <p className="font-medium text-gray-700 mb-1">
+      <div className="p-4 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="text-xs text-[#969696]">
+          <p className="font-medium text-[#455263] mb-1">
             {elementCount} {elementCount === 1 ? 'element' : 'elements'} on page
           </p>
           <p>Tip: Click on elements in the canvas to edit their properties</p>

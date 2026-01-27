@@ -3,11 +3,27 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Save, Upload, User, Lock, Mail, Shield, Trash2, Camera } from 'lucide-react';
+import {
+  ArrowLeft,
+  Save,
+  Upload,
+  User,
+  Lock,
+  Mail,
+  Shield,
+  Trash2,
+  Camera,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -266,7 +282,7 @@ function AccountContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <div className="container mx-auto py-8 px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
@@ -281,12 +297,14 @@ function AccountContent() {
           </Button>
 
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center">
-              <User className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
+              <User className="w-7 h-7 text-[#5FC7CD]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Account Settings</h1>
-              <p className="text-muted-foreground mt-1">
+              <h1 className="text-3xl font-bold text-[#455263]">
+                Account Settings
+              </h1>
+              <p className="text-[#969696] mt-1">
                 Manage your profile and account preferences
               </p>
             </div>
@@ -295,13 +313,17 @@ function AccountContent() {
 
         <div className="space-y-6">
           {/* Profile Picture */}
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <Camera className="w-5 h-5 text-gray-600" />
+                <Camera className="w-5 h-5 text-[#455263]" />
                 <div>
-                  <CardTitle>Profile Picture</CardTitle>
-                  <CardDescription>Upload a profile picture for your account</CardDescription>
+                  <CardTitle className="text-[#455263]">
+                    Profile Picture
+                  </CardTitle>
+                  <CardDescription className="text-[#969696]">
+                    Upload a profile picture for your account
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -309,7 +331,7 @@ function AccountContent() {
               <div className="flex items-center gap-6">
                 {/* Avatar Preview */}
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200">
+                  <div className="w-24 h-24 rounded-full bg-[#F8FAFC] flex items-center justify-center overflow-hidden border-2 border-[#E2E8F0]">
                     {avatarPreview ? (
                       <img
                         src={avatarPreview}
@@ -317,12 +339,12 @@ function AccountContent() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <User className="w-12 h-12 text-gray-400" />
+                      <User className="w-12 h-12 text-[#969696]" />
                     )}
                   </div>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors shadow-lg"
+                    className="absolute bottom-0 right-0 w-8 h-8 bg-[#5FC7CD] rounded-full flex items-center justify-center hover:bg-[#5FC7CD]/90 transition-colors shadow-lg"
                   >
                     <Upload className="w-4 h-4 text-white" />
                   </button>
@@ -337,7 +359,7 @@ function AccountContent() {
                     onChange={handleAvatarChange}
                     className="hidden"
                   />
-                  <p className="text-sm text-gray-600 mb-2">
+                  <p className="text-sm text-[#969696] mb-2">
                     JPG, PNG or GIF. Max size 2MB.
                   </p>
                   {avatarFile && (
@@ -367,13 +389,17 @@ function AccountContent() {
           </Card>
 
           {/* Profile Information */}
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-gray-600" />
+                <Mail className="w-5 h-5 text-[#455263]" />
                 <div>
-                  <CardTitle>Profile Information</CardTitle>
-                  <CardDescription>Update your account details</CardDescription>
+                  <CardTitle className="text-[#455263]">
+                    Profile Information
+                  </CardTitle>
+                  <CardDescription className="text-[#969696]">
+                    Update your account details
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -385,9 +411,9 @@ function AccountContent() {
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="mt-1 bg-gray-50"
+                  className="mt-1 bg-[#F8FAFC]"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   Email cannot be changed. Contact support if needed.
                 </p>
               </div>
@@ -406,12 +432,12 @@ function AccountContent() {
 
               <div>
                 <Label>Subscription Plan</Label>
-                <div className="mt-1 px-3 py-2 bg-gray-50 border rounded-md">
-                  <span className="capitalize font-medium">
+                <div className="mt-1 px-3 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                  <span className="capitalize font-medium text-[#455263]">
                     {profile?.subscription_plan || 'free'}
                   </span>
                   {profile?.subscription_plan === 'free' && (
-                    <span className="ml-2 text-xs text-gray-500">
+                    <span className="ml-2 text-xs text-[#969696]">
                       • Limited features
                     </span>
                   )}
@@ -419,10 +445,7 @@ function AccountContent() {
               </div>
 
               <div className="pt-2">
-                <Button
-                  onClick={handleUpdateProfile}
-                  disabled={loading}
-                >
+                <Button onClick={handleUpdateProfile} disabled={loading}>
                   <Save className="w-4 h-4 mr-2" />
                   {loading ? 'Saving...' : 'Save Profile'}
                 </Button>
@@ -431,13 +454,17 @@ function AccountContent() {
           </Card>
 
           {/* Change Password */}
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <Lock className="w-5 h-5 text-gray-600" />
+                <Lock className="w-5 h-5 text-[#455263]" />
                 <div>
-                  <CardTitle>Change Password</CardTitle>
-                  <CardDescription>Update your password to keep your account secure</CardDescription>
+                  <CardTitle className="text-[#455263]">
+                    Change Password
+                  </CardTitle>
+                  <CardDescription className="text-[#969696]">
+                    Update your password to keep your account secure
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -479,22 +506,27 @@ function AccountContent() {
           </Card>
 
           {/* Account Actions */}
-          <Card className="border-red-200">
+          <Card className="rounded-2xl border-red-200">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <Trash2 className="w-5 h-5 text-red-600" />
                 <div>
                   <CardTitle className="text-red-900">Danger Zone</CardTitle>
-                  <CardDescription>Irreversible account actions</CardDescription>
+                  <CardDescription className="text-[#969696]">
+                    Irreversible account actions
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <h3 className="font-semibold text-red-900 mb-2">Delete Account</h3>
+                <h3 className="font-semibold text-red-900 mb-2">
+                  Delete Account
+                </h3>
                 <p className="text-sm text-red-800 mb-4">
-                  Permanently delete your account and all associated data. This action cannot be undone.
-                  All your projects, transactions, and settings will be permanently removed.
+                  Permanently delete your account and all associated data. This
+                  action cannot be undone. All your projects, transactions, and
+                  settings will be permanently removed.
                 </p>
                 <Button
                   variant="destructive"

@@ -291,6 +291,7 @@ export interface PricingProps {
     buttonText: string;
     buttonUrl?: string; // Optional if using payment integration
     highlighted?: boolean;
+    image?: string; // Plan/package image URL
     // Payment integration fields
     enablePayment?: boolean; // Enable LeanX payment for this plan
     productId?: string; // Internal product ID for payment

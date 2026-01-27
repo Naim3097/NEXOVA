@@ -458,13 +458,13 @@ export const Toolbar = ({
       case 'saved':
         return 'text-green-600';
       case 'saving':
-        return 'text-blue-600';
+        return 'text-[#5FC7CD]';
       case 'unsaved':
         return 'text-orange-600';
       case 'error':
         return 'text-red-600';
       default:
-        return 'text-gray-600';
+        return 'text-[#969696]';
     }
   };
 
@@ -525,10 +525,13 @@ export const Toolbar = ({
   };
 
   return (
-    <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4">
+    <div className="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-4">
       {/* Left section - Project info */}
       <div className="flex items-center gap-2 md:gap-4">
-        <Link href="/dashboard" className="text-blue-600 hover:text-blue-700">
+        <Link
+          href="/dashboard"
+          className="text-[#5FC7CD] hover:text-[#5FC7CD]/80"
+        >
           <svg
             className="w-6 h-6"
             fill="none"
@@ -565,7 +568,7 @@ export const Toolbar = ({
         </div>
 
         <div className="hidden md:block">
-          <h1 className="text-lg font-semibold text-gray-900">
+          <h1 className="text-lg font-semibold text-[#455263]">
             {projectName || currentProject?.name || 'Untitled Project'}
           </h1>
           <p className={`text-xs ${getSaveStatusColor()}`}>
@@ -577,7 +580,7 @@ export const Toolbar = ({
       {/* Center section - Editor controls */}
       <div className="flex items-center gap-2">
         {/* Undo/Redo */}
-        <div className="flex items-center gap-1 border-r border-gray-200 pr-2">
+        <div className="flex items-center gap-1 border-r border-[#E2E8F0] pr-2">
           <Button
             variant="ghost"
             size="sm"
@@ -599,7 +602,7 @@ export const Toolbar = ({
         </div>
 
         {/* Viewport switcher */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-[#F8FAFC] rounded-xl p-1">
           <Button
             variant={viewportMode === 'desktop' ? 'default' : 'ghost'}
             size="sm"
@@ -669,9 +672,9 @@ export const Toolbar = ({
             <ChevronDown className="w-3 h-3 ml-1" />
           </Button>
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[60]">
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-[60]">
               <button
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F8FAFC] text-sm text-[#455263] w-full text-left"
                 onClick={() => {
                   setMenuOpen(false);
                   setSeoDialogOpen(true);
@@ -681,7 +684,7 @@ export const Toolbar = ({
                 SEO Settings
               </button>
               <button
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F8FAFC] text-sm text-[#455263] w-full text-left"
                 onClick={() => {
                   setMenuOpen(false);
                   setTrackingPixelsDialogOpen(true);
@@ -691,7 +694,7 @@ export const Toolbar = ({
                 Tracking Pixels
               </button>
               <button
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-sm text-gray-700 w-full text-left"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F8FAFC] text-sm text-[#455263] w-full text-left"
                 onClick={() => {
                   setMenuOpen(false);
                   setProjectSettingsOpen(true);

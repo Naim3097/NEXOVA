@@ -3,10 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { FileText, Download, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/auth-client';
@@ -38,7 +51,9 @@ export default function BillingHistoryPage() {
       setLoading(true);
       setError(null);
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user) {
         setError('Not authenticated');
@@ -56,7 +71,9 @@ export default function BillingHistoryPage() {
       setBillingHistory(data || []);
     } catch (err) {
       console.error('Error fetching billing history:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load billing history');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load billing history'
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +100,10 @@ export default function BillingHistoryPage() {
       refunded: { variant: 'outline', label: 'Refunded' },
     };
 
-    const config = statusConfig[status] || { variant: 'secondary', label: status };
+    const config = statusConfig[status] || {
+      variant: 'secondary',
+      label: status,
+    };
 
     return (
       <Badge variant={config.variant} className="capitalize">
@@ -95,8 +115,8 @@ export default function BillingHistoryPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5FC7CD]"></div>
         </div>
       </ProtectedRoute>
     );
@@ -104,17 +124,22 @@ export default function BillingHistoryPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-[#F8FAFC] py-8 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/dashboard/subscription" className="text-blue-600 hover:text-blue-700 flex items-center gap-2 mb-4">
+            <Link
+              href="/dashboard/subscription"
+              className="text-[#5FC7CD] hover:text-[#4bb5bb] flex items-center gap-2 mb-4"
+            >
               ← Back to Subscription
             </Link>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Billing History</h1>
-                <p className="text-gray-600 mt-2">
+                <h1 className="text-3xl font-bold text-[#455263]">
+                  Billing History
+                </h1>
+                <p className="text-[#969696] mt-2">
                   View and download your invoices
                 </p>
               </div>
@@ -138,16 +163,16 @@ export default function BillingHistoryPage() {
             </CardHeader>
             <CardContent>
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-6">
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-[#EF4444] mb-6">
                   {error}
                 </div>
               )}
 
               {billingHistory.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">No billing history yet</p>
-                  <p className="text-sm text-gray-500">
+                  <FileText className="w-12 h-12 text-[#969696] mx-auto mb-4" />
+                  <p className="text-[#969696] mb-2">No billing history yet</p>
+                  <p className="text-sm text-[#969696]">
                     Your invoices will appear here after your first payment
                   </p>
                 </div>
@@ -180,9 +205,7 @@ export default function BillingHistoryPage() {
                           <TableCell>
                             {record.currency} ${record.amount.toFixed(2)}
                           </TableCell>
-                          <TableCell>
-                            {getStatusBadge(record.status)}
-                          </TableCell>
+                          <TableCell>{getStatusBadge(record.status)}</TableCell>
                           <TableCell className="capitalize">
                             {record.payment_method || 'N/A'}
                           </TableCell>
@@ -190,7 +213,9 @@ export default function BillingHistoryPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDownloadInvoice(record.invoice_number)}
+                              onClick={() =>
+                                handleDownloadInvoice(record.invoice_number)
+                              }
                               disabled={record.status !== 'paid'}
                             >
                               <Download className="w-4 h-4" />
@@ -214,23 +239,26 @@ export default function BillingHistoryPage() {
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-6">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Total Paid</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      ${billingHistory
+                    <p className="text-sm text-[#969696] mb-1">Total Paid</p>
+                    <p className="text-2xl font-bold text-[#455263]">
+                      $
+                      {billingHistory
                         .filter((r) => r.status === 'paid')
                         .reduce((sum, r) => sum + r.amount, 0)
                         .toFixed(2)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Total Invoices</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-[#969696] mb-1">
+                      Total Invoices
+                    </p>
+                    <p className="text-2xl font-bold text-[#455263]">
                       {billingHistory.length}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Last Payment</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm text-[#969696] mb-1">Last Payment</p>
+                    <p className="text-2xl font-bold text-[#455263]">
                       {billingHistory[0]?.paid_at
                         ? formatDate(billingHistory[0].paid_at)
                         : 'N/A'}

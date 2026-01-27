@@ -31,32 +31,32 @@ export default function SubscriptionSuccessPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+            <div className="bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-foreground">What's next?</h3>
+                <Sparkles className="w-5 h-5 text-[#5FC7CD]" />
+                <h3 className="font-semibold text-[#455263]">What's next?</h3>
               </div>
-              <ul className="space-y-3 text-sm text-muted-foreground">
+              <ul className="space-y-3 text-sm text-[#969696]">
                 <li className="flex items-start gap-2">
-                  <span className="font-semibold min-w-[20px] text-foreground">
+                  <span className="font-semibold min-w-[20px] text-[#455263]">
                     1.
                   </span>
                   <span>Create unlimited projects without restrictions</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-semibold min-w-[20px] text-foreground">
+                  <span className="font-semibold min-w-[20px] text-[#455263]">
                     2.
                   </span>
                   <span>Connect your custom domain from project settings</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-semibold min-w-[20px] text-foreground">
+                  <span className="font-semibold min-w-[20px] text-[#455263]">
                     3.
                   </span>
                   <span>Access advanced analytics for deeper insights</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="font-semibold min-w-[20px] text-foreground">
+                  <span className="font-semibold min-w-[20px] text-[#455263]">
                     4.
                   </span>
                   <span>
@@ -66,7 +66,7 @@ export default function SubscriptionSuccessPage() {
               </ul>
             </div>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-[#969696]">
               <p>A confirmation email has been sent to your inbox.</p>
               <p className="mt-1">
                 You can manage your subscription anytime from your dashboard.

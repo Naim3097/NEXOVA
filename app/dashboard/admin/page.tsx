@@ -140,7 +140,7 @@ function AdminDashboardContent() {
       { color: string; icon: React.ReactNode }
     > = {
       new: {
-        color: 'bg-blue-100 text-blue-800',
+        color: 'bg-[#5FC7CD]/10 text-[#5FC7CD]',
         icon: <AlertCircle className="h-3 w-3" />,
       },
       in_progress: {
@@ -156,7 +156,7 @@ function AdminDashboardContent() {
         icon: <CheckCircle className="h-3 w-3" />,
       },
       closed: {
-        color: 'bg-gray-100 text-gray-800',
+        color: 'bg-[#969696]/10 text-[#969696]',
         icon: <CheckCircle className="h-3 w-3" />,
       },
     };
@@ -171,10 +171,10 @@ function AdminDashboardContent() {
 
   const getPriorityBadge = (priority: string) => {
     const priorityConfig: Record<string, string> = {
-      low: 'bg-gray-100 text-gray-600',
-      normal: 'bg-blue-100 text-blue-600',
+      low: 'bg-[#969696]/10 text-[#969696]',
+      normal: 'bg-[#5FC7CD]/10 text-[#5FC7CD]',
       high: 'bg-orange-100 text-orange-600',
-      urgent: 'bg-red-100 text-red-600',
+      urgent: 'bg-red-100 text-[#EF4444]',
     };
     return (
       <Badge className={priorityConfig[priority] || priorityConfig.normal}>
@@ -187,14 +187,14 @@ function AdminDashboardContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">
+          <h1 className="text-2xl font-bold text-[#EF4444] mb-2">
             Access Denied
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[#969696] mb-4">
             You do not have permission to access this page.
           </p>
           <Link href="/dashboard">
-            <Button>
+            <Button variant="teal">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -207,14 +207,14 @@ function AdminDashboardContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#969696]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <header className="bg-white border-b border-[#E2E8F0] sticky top-0 z-10">
         <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/dashboard">
@@ -223,7 +223,9 @@ function AdminDashboardContent() {
                 Dashboard
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold text-[#455263]">
+              Admin Dashboard
+            </h1>
             <Badge
               variant="secondary"
               className="bg-purple-100 text-purple-700"
@@ -252,32 +254,32 @@ function AdminDashboardContent() {
 
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-[#EF4444] px-4 py-3 rounded-xl mb-6">
             {error}
           </div>
         )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total Users</p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-sm text-[#969696]">Total Users</p>
+                  <p className="text-3xl font-bold text-[#455263]">
                     {stats?.total_users || 0}
                   </p>
                 </div>
-                <Users className="h-10 w-10 text-blue-500 opacity-80" />
+                <Users className="h-10 w-10 text-[#5FC7CD] opacity-80" />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Premium Users</p>
+                  <p className="text-sm text-[#969696]">Premium Users</p>
                   <p className="text-3xl font-bold text-yellow-600">
                     {stats?.premium_users || 0}
                   </p>
@@ -287,11 +289,11 @@ function AdminDashboardContent() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Enterprise Users</p>
+                  <p className="text-sm text-[#969696]">Enterprise Users</p>
                   <p className="text-3xl font-bold text-purple-600">
                     {stats?.enterprise_users || 0}
                   </p>
@@ -301,11 +303,11 @@ function AdminDashboardContent() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Monthly Revenue</p>
+                  <p className="text-sm text-[#969696]">Monthly Revenue</p>
                   <p className="text-3xl font-bold text-green-600">
                     RM{(stats?.monthly_revenue || 0).toLocaleString()}
                   </p>
@@ -318,37 +320,39 @@ function AdminDashboardContent() {
 
         {/* Secondary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Free Users</p>
-                  <p className="text-2xl font-bold">{stats?.free_users || 0}</p>
+                  <p className="text-sm text-[#969696]">Free Users</p>
+                  <p className="text-2xl font-bold text-[#455263]">
+                    {stats?.free_users || 0}
+                  </p>
                 </div>
-                <Users className="h-8 w-8 text-gray-400 opacity-80" />
+                <Users className="h-8 w-8 text-[#969696] opacity-80" />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Signups Today</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-sm text-[#969696]">Signups Today</p>
+                  <p className="text-2xl font-bold text-[#5FC7CD]">
                     {stats?.new_signups_today || 0}
                   </p>
                 </div>
-                <Calendar className="h-8 w-8 text-blue-400 opacity-80" />
+                <Calendar className="h-8 w-8 text-[#5FC7CD] opacity-80" />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Signups This Week</p>
+                  <p className="text-sm text-[#969696]">Signups This Week</p>
                   <p className="text-2xl font-bold text-green-600">
                     {stats?.new_signups_week || 0}
                   </p>
@@ -358,11 +362,11 @@ function AdminDashboardContent() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl border-[#E2E8F0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">New Help Requests</p>
+                  <p className="text-sm text-[#969696]">New Help Requests</p>
                   <p className="text-2xl font-bold text-orange-600">
                     {stats?.new_help_requests || 0}
                   </p>
@@ -374,9 +378,9 @@ function AdminDashboardContent() {
         </div>
 
         {/* Help Requests Section */}
-        <Card>
+        <Card className="rounded-2xl border-[#E2E8F0]">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#455263]">
               <HelpCircle className="h-5 w-5" />
               Recent Help Requests & Inquiries
             </CardTitle>
@@ -388,7 +392,7 @@ function AdminDashboardContent() {
           </CardHeader>
           <CardContent>
             {helpRequests.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
+              <p className="text-[#969696] text-center py-8">
                 No help requests yet.
               </p>
             ) : (
@@ -396,7 +400,7 @@ function AdminDashboardContent() {
                 {helpRequests.map((request) => (
                   <div
                     key={request.id}
-                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    className="border border-[#E2E8F0] rounded-2xl p-4 hover:bg-[#F8FAFC] transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -409,13 +413,13 @@ function AdminDashboardContent() {
                               : 'Help'}
                           </Badge>
                         </div>
-                        <h4 className="font-semibold">
+                        <h4 className="font-semibold text-[#455263]">
                           {request.subject || 'No subject'}
                         </h4>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        <p className="text-sm text-[#969696] mt-1 line-clamp-2">
                           {request.message}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-xs text-[#969696]">
                           <span>{request.user_name}</span>
                           <span>{request.user_email}</span>
                           <span className="capitalize">

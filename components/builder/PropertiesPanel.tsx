@@ -48,18 +48,18 @@ const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg mb-3">
+    <div className="border border-[#E2E8F0] rounded-xl mb-3">
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-[#F8FAFC]"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-gray-500" />
+            <ChevronDown className="w-4 h-4 text-[#969696]" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-500" />
+            <ChevronRight className="w-4 h-4 text-[#969696]" />
           )}
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-[#455263]">
             Item {index + 1}
           </span>
         </div>
@@ -75,7 +75,7 @@ const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
       </div>
 
       {isExpanded && (
-        <div className="p-3 pt-0 space-y-3 border-t border-gray-200">
+        <div className="p-3 pt-0 space-y-3 border-t border-[#E2E8F0]">
           {schema.map((field) => (
             <div key={field.key}>
               <Label className="text-xs">{field.label}</Label>
@@ -83,14 +83,14 @@ const ArrayItemEditor: React.FC<ArrayItemEditorProps> = ({
                 <textarea
                   value={item[field.key] || ''}
                   onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={3}
                 />
               ) : field.type === 'select' ? (
                 <select
                   value={item[field.key] || ''}
                   onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   {field.options?.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -178,7 +178,7 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
 
       <div className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-xs text-gray-500 text-center py-4">
+          <p className="text-xs text-[#969696] text-center py-4">
             No items. Click "Add" to create one.
           </p>
         ) : (
@@ -238,11 +238,11 @@ export const PropertiesPanel = () => {
 
   if (!selectedElement) {
     return (
-      <div className="w-80 bg-white border-l border-gray-200 flex items-center justify-center p-8 md:relative absolute md:z-0 z-20 right-0 top-0 shadow-xl md:shadow-none">
+      <div className="w-80 bg-white border-l border-[#E2E8F0] flex items-center justify-center p-8 md:relative absolute md:z-0 z-20 right-0 top-0 shadow-xl md:shadow-none">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div className="w-16 h-16 bg-[#F8FAFC] rounded-full mx-auto mb-4 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-gray-400"
+              className="w-8 h-8 text-[#969696]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -255,10 +255,10 @@ export const PropertiesPanel = () => {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-[#455263] mb-2">
             No Element Selected
           </h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#969696]">
             Click on an element in the canvas to edit its properties
           </p>
         </div>
@@ -302,12 +302,12 @@ export const PropertiesPanel = () => {
 
     // Common props for all elements
     const commonSection = (
-      <div className="space-y-4 pb-6 border-b border-gray-200">
+      <div className="space-y-4 pb-6 border-b border-[#E2E8F0]">
         <div>
-          <Label className="text-xs font-semibold text-gray-500 uppercase">
+          <Label className="text-xs font-semibold text-[#969696] uppercase">
             Element Type
           </Label>
-          <p className="mt-1 text-sm font-medium text-gray-900 capitalize">
+          <p className="mt-1 text-sm font-medium text-[#455263] capitalize">
             {type}
           </p>
         </div>
@@ -326,7 +326,7 @@ export const PropertiesPanel = () => {
                   id="variant"
                   value={props.variant || 'centered'}
                   onChange={(e) => handlePropChange('variant', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="centered">Centered</option>
                   <option value="image_left">Image Left</option>
@@ -374,8 +374,8 @@ export const PropertiesPanel = () => {
                   }
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     props.showCtaButton !== false
-                      ? 'bg-blue-600'
-                      : 'bg-gray-300'
+                      ? 'bg-[#5FC7CD]'
+                      : 'bg-[#E2E8F0]'
                   }`}
                 >
                   <span
@@ -441,12 +441,12 @@ export const PropertiesPanel = () => {
                     maxSizeMB={5}
                   />
                   {props.variant === 'centered' && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Optional small icon displayed above headline
                     </p>
                   )}
                   {props.variant === 'image_bg' && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Full-width background image with overlay
                     </p>
                   )}
@@ -470,15 +470,15 @@ export const PropertiesPanel = () => {
                     }
                     className="w-full mt-2"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Adjust the darkness of the overlay on the background image
                   </p>
                 </div>
               )}
 
               {/* Text Styling Section */}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-[#455263] mb-3">
                   Text Styling
                 </h4>
 
@@ -515,7 +515,7 @@ export const PropertiesPanel = () => {
                     onChange={(e) =>
                       handlePropChange('headlineSize', e.target.value)
                     }
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                    className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                   >
                     <option value="3xl">Small (3xl)</option>
                     <option value="4xl">Medium (4xl)</option>
@@ -558,7 +558,7 @@ export const PropertiesPanel = () => {
                     onChange={(e) =>
                       handlePropChange('subheadlineSize', e.target.value)
                     }
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                    className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                   >
                     <option value="base">Small (base)</option>
                     <option value="lg">Medium (lg)</option>
@@ -570,8 +570,8 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Button Styling Section */}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-[#455263] mb-3">
                   Button Styling
                 </h4>
 
@@ -638,7 +638,7 @@ export const PropertiesPanel = () => {
                   id="variant"
                   value={props.variant || 'grid'}
                   onChange={(e) => handlePropChange('variant', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="grid">Grid</option>
                   <option value="list">List</option>
@@ -690,8 +690,8 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image
                   </h4>
                   <Label>Background Image (optional)</Label>
@@ -763,7 +763,7 @@ export const PropertiesPanel = () => {
                   id="variant"
                   value={props.variant || 'grid'}
                   onChange={(e) => handlePropChange('variant', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="grid">Grid</option>
                   <option value="slider">Slider</option>
@@ -804,8 +804,8 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image
                   </h4>
                   <Label>Background Image (optional)</Label>
@@ -877,7 +877,7 @@ export const PropertiesPanel = () => {
                   id="variant"
                   value={props.variant || 'single_column'}
                   onChange={(e) => handlePropChange('variant', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="single_column">Single Column</option>
                   <option value="two_column">Two Columns</option>
@@ -912,8 +912,8 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image
                   </h4>
                   <Label>Background Image (optional)</Label>
@@ -985,7 +985,7 @@ export const PropertiesPanel = () => {
                   id="variant"
                   value={props.variant || 'centered'}
                   onChange={(e) => handlePropChange('variant', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="centered">Centered</option>
                   <option value="split">Split</option>
@@ -1028,8 +1028,8 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Button Customization Section */}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-[#455263] mb-3">
                   Button Customization
                 </h4>
 
@@ -1048,7 +1048,7 @@ export const PropertiesPanel = () => {
                           handlePropChange('buttonUrl', 'https://');
                         }
                       }}
-                      className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                      className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                     >
                       <option value="section">Scroll to Section</option>
                       <option value="external">External Link</option>
@@ -1064,7 +1064,7 @@ export const PropertiesPanel = () => {
                         onChange={(e) =>
                           handlePropChange('buttonUrl', e.target.value)
                         }
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                        className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                       >
                         <option value="#">Top of Page</option>
                         <option value="#booking">Booking Form</option>
@@ -1090,7 +1090,7 @@ export const PropertiesPanel = () => {
                             </option>
                           ))}
                       </select>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#969696] mt-1">
                         Select a section to scroll to when clicked
                       </p>
                     </div>
@@ -1106,7 +1106,7 @@ export const PropertiesPanel = () => {
                         placeholder="https://example.com"
                         className="mt-1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#969696] mt-1">
                         Enter the full URL including https://
                       </p>
                     </div>
@@ -1166,7 +1166,7 @@ export const PropertiesPanel = () => {
                       onChange={(e) =>
                         handlePropChange('buttonSize', e.target.value)
                       }
-                      className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                      className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                     >
                       <option value="sm">Small</option>
                       <option value="md">Medium</option>
@@ -1182,7 +1182,7 @@ export const PropertiesPanel = () => {
                       onChange={(e) =>
                         handlePropChange('buttonFontSize', e.target.value)
                       }
-                      className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                      className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                     >
                       <option value="0.875rem">Small (14px)</option>
                       <option value="1rem">Normal (16px)</option>
@@ -1195,8 +1195,8 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Background Color/Gradient Section */}
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+              <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-[#455263] mb-3">
                   Background Style
                 </h4>
 
@@ -1222,7 +1222,7 @@ export const PropertiesPanel = () => {
                           );
                         }
                       }}
-                      className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                      className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                     >
                       <option value="gradient">Gradient</option>
                       <option value="solid">Solid Color</option>
@@ -1258,7 +1258,7 @@ export const PropertiesPanel = () => {
                         <Label>Gradient Colors</Label>
                         <div className="grid grid-cols-2 gap-2 mt-1">
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">
+                            <p className="text-xs text-[#969696] mb-1">
                               Start Color
                             </p>
                             <div className="flex gap-1">
@@ -1297,7 +1297,7 @@ export const PropertiesPanel = () => {
                             </div>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">
+                            <p className="text-xs text-[#969696] mb-1">
                               End Color
                             </p>
                             <div className="flex gap-1">
@@ -1354,7 +1354,7 @@ export const PropertiesPanel = () => {
                               bgGradient: `linear-gradient(${newDirection}, ${startColor} 0%, ${endColor} 100%)`,
                             });
                           }}
-                          className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                          className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                         >
                           <option value="to right">Left to Right</option>
                           <option value="to left">Right to Left</option>
@@ -1425,11 +1425,11 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image (Optional)
                   </h4>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-[#969696] mb-2">
                     Adding an image will overlay your background color/gradient
                   </p>
                   <ImageUpload
@@ -1457,7 +1457,7 @@ export const PropertiesPanel = () => {
                         }
                         className="w-full mt-2"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#969696] mt-1">
                         CTA sections use a black overlay by default
                       </p>
                     </div>
@@ -1480,7 +1480,7 @@ export const PropertiesPanel = () => {
                   value={props.message || ''}
                   onChange={(e) => handlePropChange('message', e.target.value)}
                   placeholder="Limited Time Offer - 25% Off All Products!"
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
               </div>
@@ -1680,7 +1680,7 @@ export const PropertiesPanel = () => {
                   id="layout"
                   value={props.layout || 'split'}
                   onChange={(e) => handlePropChange('layout', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="left">Left Aligned</option>
                   <option value="center">Center Aligned</option>
@@ -1720,17 +1720,17 @@ export const PropertiesPanel = () => {
 
                 <div className="space-y-2">
                   {!props.menuItems || props.menuItems.length === 0 ? (
-                    <p className="text-xs text-gray-500 text-center py-4">
+                    <p className="text-xs text-[#969696] text-center py-4">
                       No menu items. Click "Add" to create one.
                     </p>
                   ) : (
                     props.menuItems.map((item: any, index: number) => (
                       <div
                         key={index}
-                        className="border border-gray-200 rounded-lg p-3"
+                        className="border border-[#E2E8F0] rounded-xl p-3"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-[#455263]">
                             Item {index + 1}
                           </span>
                           <button
@@ -1776,7 +1776,7 @@ export const PropertiesPanel = () => {
                                 };
                                 handlePropChange('menuItems', newMenuItems);
                               }}
-                              className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                              className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                             >
                               <option value="#">Top of Page</option>
                               {sectionOptions.map((option) => (
@@ -1846,7 +1846,7 @@ export const PropertiesPanel = () => {
                             url: e.target.value,
                           })
                         }
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                        className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                       >
                         <option value="#">Top of Page</option>
                         {sectionOptions.map((option) => (
@@ -1955,7 +1955,7 @@ export const PropertiesPanel = () => {
                   id="layout"
                   value={props.layout || 'cards'}
                   onChange={(e) => handlePropChange('layout', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="cards">Cards</option>
                   <option value="table">Table</option>
@@ -1963,7 +1963,7 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Payment Integration Toggle */}
-              <div className="border border-gray-200 rounded-md p-3 bg-blue-50">
+              <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -1984,7 +1984,7 @@ export const PropertiesPanel = () => {
                     Enable LeanX Payment Gateway
                   </Label>
                 </div>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-[#969696] mt-2">
                   When enabled, plan buttons will process payments via LeanX
                   instead of redirecting to URLs
                 </p>
@@ -1992,17 +1992,17 @@ export const PropertiesPanel = () => {
 
               {/* Product Selector for Pricing Plans */}
               {currentProject && (
-                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-2">
                     Add from Inventory
                   </h4>
-                  <p className="text-xs text-gray-600 mb-3">
+                  <p className="text-xs text-[#969696] mb-3">
                     Select products from your inventory to create pricing plans
                     or{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-[#5FC7CD] hover:underline font-medium"
                     >
                       manage products
                     </a>
@@ -2029,6 +2029,7 @@ export const PropertiesPanel = () => {
                           productId: product.id,
                           priceNumeric: product.base_price,
                           stock: product.stock,
+                          image: product.image_url || '',
                         },
                       ];
                       handlePropChange('plans', newPlans);
@@ -2039,18 +2040,18 @@ export const PropertiesPanel = () => {
 
               {/* Plans List (Read-only with remove option) */}
               {(props.plans || []).length > 0 && (
-                <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Added Products/Plans
                   </h4>
                   <div className="space-y-3">
                     {(props.plans || []).map((plan: any, planIndex: number) => (
                       <div
                         key={planIndex}
-                        className="border border-gray-200 rounded-md p-3 bg-gray-50"
+                        className="border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="text-sm font-semibold text-gray-900">
+                          <h5 className="text-sm font-semibold text-[#455263]">
                             {plan.name}
                           </h5>
                           <button
@@ -2066,7 +2067,33 @@ export const PropertiesPanel = () => {
                             Remove
                           </button>
                         </div>
-                        <div className="space-y-1 text-xs text-gray-600">
+                        {/* Plan Image */}
+                        {plan.image && (
+                          <div className="mb-2 rounded-lg overflow-hidden">
+                            <img
+                              src={plan.image}
+                              alt={plan.name}
+                              className="w-full h-24 object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="mb-2">
+                          <Label className="text-xs">Image URL</Label>
+                          <Input
+                            value={plan.image || ''}
+                            onChange={(e) => {
+                              const newPlans = [...(props.plans || [])];
+                              newPlans[planIndex] = {
+                                ...newPlans[planIndex],
+                                image: e.target.value,
+                              };
+                              handlePropChange('plans', newPlans);
+                            }}
+                            placeholder="https://example.com/image.jpg"
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div className="space-y-1 text-xs text-[#969696]">
                           <p>
                             <strong>Price:</strong> {plan.currency || 'RM'}{' '}
                             {plan.price || plan.priceNumeric}
@@ -2092,12 +2119,12 @@ export const PropertiesPanel = () => {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">
+                  <p className="text-xs text-[#969696] mt-3">
                     To edit product details, go to the{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline"
+                      className="text-[#5FC7CD] hover:underline"
                     >
                       Products page
                     </a>
@@ -2107,8 +2134,8 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image
                   </h4>
                   <Label>Background Image (optional)</Label>
@@ -2168,17 +2195,17 @@ export const PropertiesPanel = () => {
 
               {/* Bump Offer Section - Only available with payment integration and 2+ plans */}
               {props.enablePaymentIntegration && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="font-semibold text-sm text-gray-700 mb-2">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <div className="font-semibold text-sm text-[#455263] mb-2">
                     Bump Offer (Upsell)
                   </div>
 
                   {(props.plans || []).length < 2 ? (
-                    <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
-                      <p className="text-sm text-gray-600">
+                    <div className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                      <p className="text-sm text-[#969696]">
                         Add at least 2 plans to enable bump offer functionality.
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#969696] mt-1">
                         Current plans: {(props.plans || []).length}
                       </p>
                     </div>
@@ -2227,7 +2254,7 @@ export const PropertiesPanel = () => {
                                     : parseInt(e.target.value)
                                 )
                               }
-                              className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                              className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                             >
                               <option value="">-- Select a plan --</option>
                               {(props.plans || []).map(
@@ -2239,7 +2266,7 @@ export const PropertiesPanel = () => {
                                 )
                               )}
                             </select>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-[#969696] mt-1">
                               This plan will be offered as an upsell before
                               checkout
                             </p>
@@ -2300,12 +2327,12 @@ export const PropertiesPanel = () => {
                                 )
                               }
                               placeholder="Get this exclusive offer at a special price!"
-                              className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                              className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                               rows={2}
                             />
                           </div>
 
-                          <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
+                          <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-[#969696]">
                             <strong>How it works:</strong> When customer clicks
                             a plan button, the bump offer modal appears. If
                             accepted, the bump offer plan is added to their
@@ -2346,7 +2373,7 @@ export const PropertiesPanel = () => {
                     handlePropChange('description', e.target.value)
                   }
                   placeholder="Building amazing products that make a difference."
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
               </div>
@@ -2441,8 +2468,8 @@ export const PropertiesPanel = () => {
 
               {/* Background Image Section */}
               {currentProject && (
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Background Image
                   </h4>
                   <Label>Background Image (optional)</Label>
@@ -2508,22 +2535,22 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Products
               </div>
 
               {/* Product Selector from Database */}
               {currentProject && (
-                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-2">
                     Add from Inventory
                   </h4>
-                  <p className="text-xs text-gray-600 mb-3">
+                  <p className="text-xs text-[#969696] mb-3">
                     Select products from your inventory or{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-[#5FC7CD] hover:underline font-medium"
                     >
                       manage products
                     </a>
@@ -2551,8 +2578,8 @@ export const PropertiesPanel = () => {
 
               {/* Products List (Read-only with remove option) */}
               {currentProject && (props.products || []).length > 0 && (
-                <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Added Products
                   </h4>
                   <div className="space-y-2">
@@ -2560,7 +2587,7 @@ export const PropertiesPanel = () => {
                       (product: any, index: number) => (
                         <div
                           key={product.id || index}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
+                          className="flex items-center justify-between p-2 bg-[#F8FAFC] rounded border border-[#E2E8F0]"
                         >
                           <div className="flex items-center gap-2 flex-1">
                             {product.image && (
@@ -2571,10 +2598,10 @@ export const PropertiesPanel = () => {
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">
+                              <p className="text-sm font-medium text-[#455263] truncate">
                                 {product.name}
                               </p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-[#969696]">
                                 {product.currency || 'RM'}{' '}
                                 {typeof product.price === 'number'
                                   ? product.price.toFixed(2)
@@ -2600,12 +2627,12 @@ export const PropertiesPanel = () => {
                       )
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-[#969696] mt-2">
                     To edit product details, go to the{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline"
+                      className="text-[#5FC7CD] hover:underline"
                     >
                       Products page
                     </a>
@@ -2613,7 +2640,7 @@ export const PropertiesPanel = () => {
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Button Styling
               </div>
 
@@ -2660,7 +2687,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('buttonSize', e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="sm">Small</option>
                   <option value="md">Medium</option>
@@ -2691,16 +2718,16 @@ export const PropertiesPanel = () => {
                 </div>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Bump Offer (Upsell)
               </div>
 
               {(props.products || []).length < 2 ? (
-                <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
-                  <p className="text-sm text-gray-600">
+                <div className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                  <p className="text-sm text-[#969696]">
                     Add at least 2 products to enable bump offer functionality.
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Current products: {(props.products || []).length}
                   </p>
                 </div>
@@ -2741,7 +2768,7 @@ export const PropertiesPanel = () => {
                               e.target.value
                             )
                           }
-                          className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                          className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                         >
                           <option value="">-- Select a product --</option>
                           {(props.products || []).map((product: any) => (
@@ -2750,7 +2777,7 @@ export const PropertiesPanel = () => {
                             </option>
                           ))}
                         </select>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-[#969696] mt-1">
                           This product will be offered as an upsell before
                           checkout
                         </p>
@@ -2802,12 +2829,12 @@ export const PropertiesPanel = () => {
                             )
                           }
                           placeholder="Get this exclusive offer at a special price!"
-                          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                          className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                           rows={2}
                         />
                       </div>
 
-                      <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
+                      <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-[#969696]">
                         <strong>How it works:</strong> When customer clicks Pay,
                         the bump offer modal appears. If accepted, the product
                         is added to their order. If skipped, they proceed to
@@ -2818,7 +2845,7 @@ export const PropertiesPanel = () => {
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Messages
               </div>
 
@@ -2854,7 +2881,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Form Content
               </div>
 
@@ -2877,12 +2904,12 @@ export const PropertiesPanel = () => {
                     handlePropChange('description', e.target.value)
                   }
                   placeholder="Fill out the form below and we'll get back to you soon."
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Field Labels
               </div>
 
@@ -2934,11 +2961,11 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Field Configuration
               </div>
 
-              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="showPhone" className="cursor-pointer">
                     Show Phone Field
@@ -3022,7 +3049,7 @@ export const PropertiesPanel = () => {
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Submit Button
               </div>
 
@@ -3074,11 +3101,11 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Google Sheets Integration
               </div>
 
-              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="google_sheets_enabled"
@@ -3113,7 +3140,7 @@ export const PropertiesPanel = () => {
                       }
                       placeholder="https://docs.google.com/spreadsheets/d/..."
                     />
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Share your Google Sheet with:{' '}
                       {process.env.NEXT_PUBLIC_GOOGLE_SERVICE_ACCOUNT_EMAIL ||
                         'service account email not configured'}
@@ -3154,7 +3181,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 WhatsApp Configuration
               </div>
 
@@ -3168,7 +3195,7 @@ export const PropertiesPanel = () => {
                   }
                   placeholder="60123456789"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   Include country code (e.g., 60 for Malaysia)
                 </p>
               </div>
@@ -3180,15 +3207,15 @@ export const PropertiesPanel = () => {
                   value={props.message || ''}
                   onChange={(e) => handlePropChange('message', e.target.value)}
                   placeholder="Hi! I'm interested in your product."
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   Message that will be pre-filled when chat opens (optional)
                 </p>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Button Style
               </div>
 
@@ -3236,7 +3263,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('buttonSize', e.target.value)
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="sm">Small</option>
                   <option value="md">Medium</option>
@@ -3244,7 +3271,7 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Button Position
               </div>
 
@@ -3254,12 +3281,12 @@ export const PropertiesPanel = () => {
                   id="position"
                   value={props.position || 'fixed'}
                   onChange={(e) => handlePropChange('position', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="fixed">Fixed (Floating)</option>
                   <option value="inline">Inline</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   Fixed: Button floats on the page. Inline: Button appears in
                   the content flow.
                 </p>
@@ -3274,7 +3301,7 @@ export const PropertiesPanel = () => {
                     onChange={(e) =>
                       handlePropChange('fixedPosition', e.target.value)
                     }
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   >
                     <option value="bottom-right">Bottom Right</option>
                     <option value="bottom-left">Bottom Left</option>
@@ -3284,7 +3311,7 @@ export const PropertiesPanel = () => {
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Icon & Tooltip
               </div>
 
@@ -3314,7 +3341,7 @@ export const PropertiesPanel = () => {
                     }
                     placeholder="https://example.com/icon.png"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Leave blank to use default WhatsApp icon
                   </p>
                 </div>
@@ -3331,7 +3358,7 @@ export const PropertiesPanel = () => {
                     }
                     placeholder="Need help? Chat with us!"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Shows on hover for fixed buttons
                   </p>
                 </div>
@@ -3339,7 +3366,7 @@ export const PropertiesPanel = () => {
 
               {props.position === 'inline' && (
                 <>
-                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+                  <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                     Headline
                   </div>
 
@@ -3370,7 +3397,7 @@ export const PropertiesPanel = () => {
                           }
                           placeholder="Want to know more about this product?"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-[#969696] mt-1">
                           Text displayed above the button
                         </p>
                       </div>
@@ -3411,7 +3438,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Booking Form Header
               </div>
 
@@ -3434,12 +3461,12 @@ export const PropertiesPanel = () => {
                     handlePropChange('description', e.target.value)
                   }
                   placeholder="Select your preferred date and time slot"
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Service Details
               </div>
 
@@ -3469,7 +3496,7 @@ export const PropertiesPanel = () => {
                   }
                   placeholder="0"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   Set to 0 for free services
                 </p>
               </div>
@@ -3493,7 +3520,7 @@ export const PropertiesPanel = () => {
                   id="currency"
                   value={props.currency || 'MYR'}
                   onChange={(e) => handlePropChange('currency', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="MYR">MYR (RM)</option>
                   <option value="SGD">SGD ($)</option>
@@ -3502,7 +3529,7 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Time Slots Configuration
               </div>
 
@@ -3539,7 +3566,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('slotDuration', parseInt(e.target.value))
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value={15}>15 minutes</option>
                   <option value={30}>30 minutes</option>
@@ -3550,10 +3577,10 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Available Days
               </div>
-              <div className="space-y-2 border border-gray-200 rounded-md p-3 bg-gray-50">
+              <div className="space-y-2 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                 {[
                   'Sunday',
                   'Monday',
@@ -3595,11 +3622,11 @@ export const PropertiesPanel = () => {
                 ))}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Customer Fields
               </div>
 
-              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="showName" className="cursor-pointer">
                     Show Name Field
@@ -3752,7 +3779,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('defaultCountryCode', e.target.value)
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="MY">🇲🇾 Malaysia (+60)</option>
                   <option value="SG">🇸🇬 Singapore (+65)</option>
@@ -3765,7 +3792,7 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Submit Button
               </div>
 
@@ -3820,11 +3847,11 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Google Sheets Integration
               </div>
 
-              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-blue-50">
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="google_sheets_enabled"
@@ -3859,7 +3886,7 @@ export const PropertiesPanel = () => {
                       }
                       placeholder="https://docs.google.com/spreadsheets/d/..."
                     />
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-[#969696] mt-1">
                       Connect your Google account in Integrations to enable this
                       feature.
                     </p>
@@ -3867,7 +3894,7 @@ export const PropertiesPanel = () => {
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Footer Links
               </div>
 
@@ -3925,7 +3952,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Form Header
               </div>
 
@@ -3948,16 +3975,16 @@ export const PropertiesPanel = () => {
                     handlePropChange('description', e.target.value)
                   }
                   placeholder="Fill in the form to complete your order"
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   rows={2}
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Customer Fields
               </div>
 
-              <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="showName" className="cursor-pointer">
                     Show Name Field
@@ -4009,7 +4036,7 @@ export const PropertiesPanel = () => {
                   </>
                 )}
 
-                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-3">
                   <Label htmlFor="showMobile" className="cursor-pointer">
                     Show Mobile Field
                   </Label>
@@ -4067,7 +4094,7 @@ export const PropertiesPanel = () => {
                         onChange={(e) =>
                           handlePropChange('defaultCountryCode', e.target.value)
                         }
-                        className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                        className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                       >
                         <option value="MY">Malaysia (+60)</option>
                         <option value="SG">Singapore (+65)</option>
@@ -4082,7 +4109,7 @@ export const PropertiesPanel = () => {
                   </>
                 )}
 
-                <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-3">
                   <Label htmlFor="showEmail" className="cursor-pointer">
                     Show Email Field
                   </Label>
@@ -4134,22 +4161,22 @@ export const PropertiesPanel = () => {
                 )}
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Products
               </div>
 
               {/* Product Selector from Database (same as Payment Button) */}
               {currentProject && (
-                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-2">
                     Add from Inventory
                   </h4>
-                  <p className="text-xs text-gray-600 mb-3">
+                  <p className="text-xs text-[#969696] mb-3">
                     Select products from your inventory or{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-[#5FC7CD] hover:underline font-medium"
                     >
                       manage products
                     </a>
@@ -4196,9 +4223,9 @@ export const PropertiesPanel = () => {
 
               {/* Products List (Read-only with remove option) */}
               {currentProject && (props.products || []).length > 0 && (
-                <div className="border border-gray-300 rounded-md p-3 mt-3">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 mt-3">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-gray-700">
+                    <h4 className="text-sm font-semibold text-[#455263]">
                       Added Products ({(props.products || []).length})
                     </h4>
                     {(props.products || []).length > 1 && (
@@ -4219,7 +4246,7 @@ export const PropertiesPanel = () => {
                         return (
                           <div
                             key={product.id || index}
-                            className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
+                            className="flex items-center justify-between p-2 bg-[#F8FAFC] rounded border border-[#E2E8F0]"
                           >
                             <div className="flex items-center gap-2 flex-1">
                               {product.image && (
@@ -4230,10 +4257,10 @@ export const PropertiesPanel = () => {
                                 />
                               )}
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
+                                <p className="text-sm font-medium text-[#455263] truncate">
                                   {product.name}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-[#969696]">
                                   {product.currency || 'RM'}{' '}
                                   {typeof product.price === 'number'
                                     ? product.price.toFixed(2)
@@ -4242,7 +4269,7 @@ export const PropertiesPanel = () => {
                                     ` • Stock: ${product.stock}`}
                                 </p>
                                 {hasVariations && (
-                                  <p className="text-xs text-blue-600">
+                                  <p className="text-xs text-[#5FC7CD]">
                                     {product.variations[0].options.length}{' '}
                                     {product.variations[0].name.toLowerCase()}{' '}
                                     variants
@@ -4270,12 +4297,12 @@ export const PropertiesPanel = () => {
                       }
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-[#969696] mt-2">
                     To edit product details, go to the{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline"
+                      className="text-[#5FC7CD] hover:underline"
                     >
                       Products page
                     </a>
@@ -4341,13 +4368,13 @@ export const PropertiesPanel = () => {
                     </svg>
                     Sync from Inventory
                   </button>
-                  <p className="text-xs text-gray-500 mt-1 text-center">
+                  <p className="text-xs text-[#969696] mt-1 text-center">
                     Update products with latest data from inventory
                   </p>
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Submit Button
               </div>
 
@@ -4388,16 +4415,16 @@ export const PropertiesPanel = () => {
               </div>
 
               {/* Bump Offer Section - Only available with 2+ products */}
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Bump Offer (Upsell)
               </div>
 
               {(props.products || []).length < 2 ? (
-                <div className="p-3 bg-gray-100 border border-gray-200 rounded-md">
-                  <p className="text-sm text-gray-600">
+                <div className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                  <p className="text-sm text-[#969696]">
                     Add at least 2 products to enable bump offer functionality.
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     Current products: {(props.products || []).length}
                   </p>
                 </div>
@@ -4441,7 +4468,7 @@ export const PropertiesPanel = () => {
                               e.target.value
                             )
                           }
-                          className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm"
+                          className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                         >
                           <option value="">-- Select a product --</option>
                           {(props.products || []).map((product: any) => (
@@ -4450,7 +4477,7 @@ export const PropertiesPanel = () => {
                             </option>
                           ))}
                         </select>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-[#969696] mt-1">
                           This product will be offered as an upsell before
                           checkout
                         </p>
@@ -4502,12 +4529,12 @@ export const PropertiesPanel = () => {
                             )
                           }
                           placeholder="Get this exclusive offer at a special price!"
-                          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                          className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                           rows={2}
                         />
                       </div>
 
-                      <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-gray-600">
+                      <div className="p-2 bg-white border border-yellow-300 rounded text-xs text-[#969696]">
                         <strong>How it works:</strong> When customer clicks Pay,
                         the bump offer modal appears. If accepted, the product
                         is added to their order. If skipped, they proceed to
@@ -4518,7 +4545,7 @@ export const PropertiesPanel = () => {
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Footer Links
               </div>
 
@@ -4556,7 +4583,7 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Company Info
               </div>
 
@@ -4586,7 +4613,7 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Styling
               </div>
 
@@ -4622,7 +4649,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Header
               </div>
 
@@ -4646,7 +4673,7 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Layout
               </div>
 
@@ -4656,7 +4683,7 @@ export const PropertiesPanel = () => {
                   id="layout-carousel"
                   value={props.layout || 'grid'}
                   onChange={(e) => handlePropChange('layout', e.target.value)}
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="grid">Grid</option>
                   <option value="carousel">Carousel</option>
@@ -4671,7 +4698,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('columns', parseInt(e.target.value))
                   }
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value={2}>2 Columns</option>
                   <option value={3}>3 Columns</option>
@@ -4687,7 +4714,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('cardStyle', e.target.value)
                   }
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
                 >
                   <option value="minimal">Minimal</option>
                   <option value="bordered">Bordered</option>
@@ -4728,27 +4755,46 @@ export const PropertiesPanel = () => {
                 </Label>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="showAddToCart-carousel"
+                  checked={props.showAddToCart ?? true}
+                  onChange={(e) =>
+                    handlePropChange('showAddToCart', e.target.checked)
+                  }
+                  className="w-4 h-4"
+                />
+                <Label
+                  htmlFor="showAddToCart-carousel"
+                  className="cursor-pointer"
+                >
+                  Show Add to Cart Button
+                </Label>
+              </div>
+
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Products
               </div>
 
               {/* Product Selector from Database */}
               {currentProject && (
-                <div className="border border-gray-300 rounded-md p-3 bg-blue-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-2">
                     Add from Inventory
                   </h4>
-                  <p className="text-xs text-gray-600 mb-3">
+                  <p className="text-xs text-[#969696] mb-3">
                     Select products from your inventory or{' '}
                     <a
                       href="/dashboard/products"
                       target="_blank"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-[#5FC7CD] hover:underline font-medium"
                     >
                       manage products
                     </a>
                   </p>
                   <ProductSelector
+                    enableBulkSelect={true}
                     onSelect={(product) => {
                       const newProducts = [
                         ...(props.products || []),
@@ -4766,14 +4812,31 @@ export const PropertiesPanel = () => {
                       ];
                       handlePropChange('products', newProducts);
                     }}
+                    onBulkSelect={(products) => {
+                      const newProducts = [
+                        ...(props.products || []),
+                        ...products.map((product) => ({
+                          id: product.id,
+                          code: product.code,
+                          name: product.name,
+                          description: product.description || '',
+                          base_price: product.base_price,
+                          currency: product.currency,
+                          image_url: product.image_url || '',
+                          status: product.status,
+                          variations: product.variations || [],
+                        })),
+                      ];
+                      handlePropChange('products', newProducts);
+                    }}
                   />
                 </div>
               )}
 
               {/* Products List */}
               {currentProject && (props.products || []).length > 0 && (
-                <div className="border border-gray-300 rounded-md p-3 mt-3">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="border border-[#E2E8F0] rounded-xl p-3 mt-3">
+                  <h4 className="text-sm font-semibold text-[#455263] mb-3">
                     Added Products ({(props.products || []).length})
                   </h4>
                   <div className="space-y-2">
@@ -4781,7 +4844,7 @@ export const PropertiesPanel = () => {
                       (product: any, index: number) => (
                         <div
                           key={product.id || index}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200"
+                          className="flex items-center justify-between p-2 bg-[#F8FAFC] rounded border border-[#E2E8F0]"
                         >
                           <div className="flex items-center gap-2 flex-1">
                             {product.image_url && (
@@ -4792,10 +4855,10 @@ export const PropertiesPanel = () => {
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">
+                              <p className="text-sm font-medium text-[#455263] truncate">
                                 {product.name}
                               </p>
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-[#969696]">
                                 {product.currency || 'RM'}{' '}
                                 {typeof product.base_price === 'number'
                                   ? product.base_price.toFixed(2)
@@ -4882,13 +4945,13 @@ export const PropertiesPanel = () => {
                     </svg>
                     Sync from Inventory
                   </button>
-                  <p className="text-xs text-gray-500 mt-1 text-center">
+                  <p className="text-xs text-[#969696] mt-1 text-center">
                     Update products with latest data from inventory
                   </p>
                 </div>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Colors
               </div>
 
@@ -5007,7 +5070,7 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-gray-700 mb-2">
+              <div className="font-semibold text-sm text-[#455263] mb-2">
                 Media Type
               </div>
 
@@ -5018,7 +5081,7 @@ export const PropertiesPanel = () => {
                   className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
                     props.mediaType === 'image'
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   Image
@@ -5029,14 +5092,14 @@ export const PropertiesPanel = () => {
                   className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
                     props.mediaType === 'video'
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
                   }`}
                 >
                   Video
                 </button>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-4">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
                 Media Source
               </div>
 
@@ -5055,7 +5118,7 @@ export const PropertiesPanel = () => {
                       : 'https://youtube.com/watch?v=... or video URL'
                   }
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   {props.mediaType === 'video'
                     ? 'Supports YouTube, Vimeo, or direct video file URLs'
                     : 'Paste image URL or upload below'}
@@ -5064,7 +5127,7 @@ export const PropertiesPanel = () => {
 
               {/* Upload Button for Images */}
               {props.mediaType === 'image' && currentProject && (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+                <div className="border-2 border-dashed border-[#E2E8F0] rounded-xl p-4 text-center hover:border-[#5FC7CD] transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -5091,7 +5154,7 @@ export const PropertiesPanel = () => {
                         document.getElementById('media-upload-label');
                       if (uploadLabel) {
                         uploadLabel.innerHTML =
-                          '<p class="text-sm font-medium text-blue-600">Uploading...</p>';
+                          '<p class="text-sm font-medium text-[#5FC7CD]">Uploading...</p>';
                       }
 
                       try {
@@ -5158,7 +5221,7 @@ export const PropertiesPanel = () => {
                   <label htmlFor="media-upload" className="cursor-pointer">
                     <div
                       id="media-upload-label"
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-[#969696] hover:text-[#455263]"
                     >
                       <p className="text-sm font-medium">
                         Click to upload image
@@ -5175,7 +5238,7 @@ export const PropertiesPanel = () => {
                   <img
                     src={props.mediaUrl}
                     alt="Preview"
-                    className="w-full h-32 object-cover rounded-md border border-gray-200"
+                    className="w-full h-32 object-cover rounded-xl border border-[#E2E8F0]"
                     onError={(e) => {
                       // Show placeholder on error
                       (e.target as HTMLImageElement).style.display = 'none';
@@ -5195,12 +5258,12 @@ export const PropertiesPanel = () => {
                   />
                   <div
                     id="media-preview-error"
-                    className="w-full h-32 bg-gray-100 rounded-md border border-gray-200 items-center justify-center text-gray-500 text-xs text-center p-2"
+                    className="w-full h-32 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] items-center justify-center text-[#969696] text-xs text-center p-2"
                     style={{ display: 'none' }}
                   >
                     <div>
                       <p>Preview unavailable</p>
-                      <p className="mt-1 text-blue-600 break-all">
+                      <p className="mt-1 text-[#5FC7CD] break-all">
                         {props.mediaUrl.substring(0, 50)}...
                       </p>
                     </div>
@@ -5248,10 +5311,10 @@ export const PropertiesPanel = () => {
               {/* Video Options */}
               {props.mediaType === 'video' && (
                 <>
-                  <div className="font-semibold text-sm text-gray-700 mb-2 mt-4">
+                  <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
                     Video Options
                   </div>
-                  <div className="space-y-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                  <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="autoplay" className="cursor-pointer">
                         Autoplay
@@ -5312,7 +5375,7 @@ export const PropertiesPanel = () => {
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Layout
               </div>
 
@@ -5322,7 +5385,7 @@ export const PropertiesPanel = () => {
                   id="layout"
                   value={props.layout || 'contained'}
                   onChange={(e) => handlePropChange('layout', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="full_width">Full Width</option>
                   <option value="contained">Contained (Centered)</option>
@@ -5341,7 +5404,7 @@ export const PropertiesPanel = () => {
                     onChange={(e) =>
                       handlePropChange('maxWidth', e.target.value)
                     }
-                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                   >
                     <option value="400px">Small (400px)</option>
                     <option value="600px">Medium (600px)</option>
@@ -5360,7 +5423,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('aspectRatio', e.target.value)
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="auto">Auto (Original)</option>
                   <option value="16:9">16:9 (Widescreen)</option>
@@ -5378,7 +5441,7 @@ export const PropertiesPanel = () => {
                   onChange={(e) =>
                     handlePropChange('borderRadius', e.target.value)
                   }
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="0">None</option>
                   <option value="4px">Small</option>
@@ -5395,7 +5458,7 @@ export const PropertiesPanel = () => {
                   id="shadow"
                   value={props.shadow || 'none'}
                   onChange={(e) => handlePropChange('shadow', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="none">None</option>
                   <option value="sm">Small</option>
@@ -5405,7 +5468,7 @@ export const PropertiesPanel = () => {
                 </select>
               </div>
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Caption
               </div>
 
@@ -5445,7 +5508,7 @@ export const PropertiesPanel = () => {
                       onChange={(e) =>
                         handlePropChange('captionPosition', e.target.value)
                       }
-                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                      className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                     >
                       <option value="above">Above Media</option>
                       <option value="below">Below Media</option>
@@ -5454,7 +5517,7 @@ export const PropertiesPanel = () => {
                 </>
               )}
 
-              <div className="font-semibold text-sm text-gray-700 mb-2 mt-6">
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Styling
               </div>
 
@@ -5488,7 +5551,7 @@ export const PropertiesPanel = () => {
                   id="paddingY"
                   value={props.paddingY || '2rem'}
                   onChange={(e) => handlePropChange('paddingY', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
                 >
                   <option value="0">None</option>
                   <option value="1rem">Small</option>
@@ -5505,7 +5568,7 @@ export const PropertiesPanel = () => {
         return (
           <>
             {commonSection}
-            <div className="pt-6 text-sm text-gray-600">
+            <div className="pt-6 text-sm text-[#969696]">
               <p>No editable properties for this element type.</p>
             </div>
           </>
@@ -5514,20 +5577,20 @@ export const PropertiesPanel = () => {
   };
 
   return (
-    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full md:relative absolute md:z-0 z-20 right-0 top-0 shadow-xl md:shadow-none">
+    <div className="w-80 bg-white border-l border-[#E2E8F0] flex flex-col h-full md:relative absolute md:z-0 z-20 right-0 top-0 shadow-xl md:shadow-none">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-start justify-between">
+      <div className="p-4 border-b border-[#E2E8F0] flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Properties</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-lg font-semibold text-[#455263]">Properties</h2>
+          <p className="text-sm text-[#969696] mt-1">
             Edit the selected element
           </p>
         </div>
         <button
           onClick={() => setIsOpen(false)}
-          className="md:hidden p-1 hover:bg-gray-100 rounded"
+          className="md:hidden p-1 hover:bg-[#F8FAFC] rounded"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-[#969696]" />
         </button>
       </div>
 
@@ -5535,7 +5598,7 @@ export const PropertiesPanel = () => {
       <div className="flex-1 overflow-y-auto p-4">{renderPropsEditor()}</div>
 
       {/* Actions */}
-      <div className="p-4 border-t border-gray-200 space-y-2">
+      <div className="p-4 border-t border-[#E2E8F0] space-y-2">
         <Button variant="outline" className="w-full" onClick={handleDuplicate}>
           <Copy className="w-4 h-4 mr-2" />
           Duplicate Element

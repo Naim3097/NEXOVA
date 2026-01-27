@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, AlertCircle, CreditCard, Building2, Wallet, Shield } from 'lucide-react';
+import {
+  X,
+  Loader2,
+  AlertCircle,
+  CreditCard,
+  Building2,
+  Wallet,
+  Shield,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -67,15 +75,23 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
       }
 
       if (!data.banks || data.banks.length === 0) {
-        throw new Error('No active payment methods found. Please check your LeanX Portal settings.');
+        throw new Error(
+          'No active payment methods found. Please check your LeanX Portal settings.'
+        );
       }
 
       // Transform banks to match the expected format
       const transformedBanks: Bank[] = data.banks.map((bank: any) => ({
-        payment_service_id: bank.id ? parseInt(bank.id) : bank.payment_service_id,
+        payment_service_id: bank.id
+          ? parseInt(bank.id)
+          : bank.payment_service_id,
         payment_service_name: bank.name || bank.payment_service_name,
         type: bank.type || 'WEB_PAYMENT',
-        icon: bank.icon || (bank.type === 'DIGITAL_PAYMENT' ? 'ri-wallet-3-line' : 'ri-bank-line'),
+        icon:
+          bank.icon ||
+          (bank.type === 'DIGITAL_PAYMENT'
+            ? 'ri-wallet-3-line'
+            : 'ri-bank-line'),
       }));
 
       console.log('Transformed banks:', transformedBanks);
@@ -157,17 +173,18 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-[#E2E8F0]">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Test Checkout</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Test Amount: <strong className="text-gray-900">RM {TEST_AMOUNT}</strong>
+            <h2 className="text-2xl font-bold text-[#455263]">Test Checkout</h2>
+            <p className="text-sm text-[#969696] mt-1">
+              Test Amount:{' '}
+              <strong className="text-[#455263]">RM {TEST_AMOUNT}</strong>
             </p>
           </div>
           <button
             onClick={onClose}
             disabled={processing}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 transition-colors"
+            className="text-[#969696] hover:text-[#455263] disabled:opacity-50 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -176,10 +193,10 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Settings Preview */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4">
             <div className="text-sm">
-              <span className="text-gray-600 font-medium">Environment:</span>
-              <span className="ml-2 text-gray-900 font-semibold">
+              <span className="text-[#455263] font-medium">Environment:</span>
+              <span className="ml-2 text-[#455263] font-semibold">
                 {environment === 'live' ? 'Live Production' : 'Test Mode'}
               </span>
             </div>
@@ -187,8 +204,8 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
           {/* Loading State */}
           {loadingBanks && (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-600">
-              <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
+            <div className="flex flex-col items-center justify-center py-12 text-[#969696]">
+              <Loader2 className="w-10 h-10 animate-spin text-[#5FC7CD] mb-4" />
               <p>Fetching payment methods...</p>
             </div>
           )}
@@ -209,7 +226,7 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
             <>
               {/* Bank Selection */}
               <div>
-                <Label className="text-base font-semibold text-gray-900 mb-3 block">
+                <Label className="text-base font-semibold text-[#455263] mb-3 block">
                   Select Payment Method
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
@@ -220,16 +237,18 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
                       onClick={() => setSelectedBank(bank)}
                       disabled={processing}
                       className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 text-center ${
-                        selectedBank?.payment_service_id === bank.payment_service_id
-                          ? 'border-blue-600 bg-blue-50 shadow-md'
-                          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                        selectedBank?.payment_service_id ===
+                        bank.payment_service_id
+                          ? 'border-[#5FC7CD] bg-[#5FC7CD]/10 shadow-md'
+                          : 'border-[#E2E8F0] hover:border-[#5FC7CD]/50 hover:shadow-sm'
                       } ${processing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          selectedBank?.payment_service_id === bank.payment_service_id
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-blue-600'
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          selectedBank?.payment_service_id ===
+                          bank.payment_service_id
+                            ? 'bg-[#5FC7CD] text-white'
+                            : 'bg-[#F8FAFC] text-[#5FC7CD]'
                         }`}
                       >
                         {bank.type === 'WEB_PAYMENT' ? (
@@ -238,10 +257,10 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
                           <Wallet className="w-5 h-5" />
                         )}
                       </div>
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-[#455263]">
                         {bank.payment_service_name}
                       </div>
-                      <div className="text-xs text-gray-500 uppercase">
+                      <div className="text-xs text-[#969696] uppercase">
                         {bank.type.replace('_', ' ')}
                       </div>
                     </button>
@@ -251,7 +270,7 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
               {/* Customer Details */}
               <div>
-                <Label className="text-base font-semibold text-gray-900 mb-3 block">
+                <Label className="text-base font-semibold text-[#455263] mb-3 block">
                   Customer Details (Test)
                 </Label>
                 <div className="grid gap-4">
@@ -302,7 +321,7 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
 
         {/* Footer */}
         {!loadingBanks && !error && banks.length > 0 && (
-          <div className="border-t p-6 space-y-4">
+          <div className="border-t border-[#E2E8F0] p-6 space-y-4">
             <div className="flex gap-3">
               <Button
                 onClick={onClose}
@@ -315,7 +334,8 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
               <Button
                 onClick={handleProcessPayment}
                 disabled={!selectedBank || processing}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                variant="teal"
+                className="flex-1"
               >
                 {processing ? (
                   <>
@@ -330,7 +350,7 @@ export const TestCheckoutModal: React.FC<TestCheckoutModalProps> = ({
                 )}
               </Button>
             </div>
-            <div className="flex items-center justify-center text-sm text-gray-500">
+            <div className="flex items-center justify-center text-sm text-[#969696]">
               <Shield className="w-4 h-4 mr-1" />
               Secured by LeanX Payment Gateway
             </div>

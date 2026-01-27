@@ -37,7 +37,11 @@ interface AnalyticsStats {
   formSubmissions: number;
   buttonClicks: number;
   conversionRate: number;
-  trafficOverTime: Array<{ date: string; page_views: number; unique_visitors: number }>;
+  trafficOverTime: Array<{
+    date: string;
+    page_views: number;
+    unique_visitors: number;
+  }>;
   deviceBreakdown: Record<string, number>;
   topSources: Array<{ source: string; count: number }>;
   dateRange: {
@@ -47,7 +51,14 @@ interface AnalyticsStats {
   };
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+];
 
 export default function AnalyticsPage() {
   const params = useParams();
@@ -66,8 +77,11 @@ export default function AnalyticsPage() {
       setError(null);
 
       // Fetch from GA4 API with date range mapping
-      const dateRangeParam = dateRange === '7' ? '7d' : dateRange === '30' ? '30d' : '90d';
-      const response = await fetch(`/api/analytics/ga4?projectId=${projectId}&dateRange=${dateRangeParam}`);
+      const dateRangeParam =
+        dateRange === '7' ? '7d' : dateRange === '30' ? '30d' : '90d';
+      const response = await fetch(
+        `/api/analytics/ga4?projectId=${projectId}&dateRange=${dateRangeParam}`
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -82,9 +96,12 @@ export default function AnalyticsPage() {
         uniqueVisitors: ga4Data.data.overview.totalUsers,
         formSubmissions: ga4Data.data.overview.conversions || 0,
         buttonClicks: 0, // Not tracked in GA4 by default
-        conversionRate: ga4Data.data.overview.totalUsers > 0
-          ? ((ga4Data.data.overview.conversions || 0) / ga4Data.data.overview.totalUsers) * 100
-          : 0,
+        conversionRate:
+          ga4Data.data.overview.totalUsers > 0
+            ? ((ga4Data.data.overview.conversions || 0) /
+                ga4Data.data.overview.totalUsers) *
+              100
+            : 0,
         trafficOverTime: ga4Data.data.dailyStats.map((day: any) => ({
           date: day.date,
           page_views: day.pageViews,
@@ -96,7 +113,9 @@ export default function AnalyticsPage() {
           count: source.sessions,
         })),
         dateRange: {
-          start: new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000).toISOString(),
+          start: new Date(
+            Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000
+          ).toISOString(),
           end: new Date().toISOString(),
           days: parseInt(dateRange),
         },
@@ -117,7 +136,9 @@ export default function AnalyticsPage() {
   const handleExport = async () => {
     try {
       setExporting(true);
-      const response = await fetch(`/api/analytics/export?projectId=${projectId}&days=${dateRange}`);
+      const response = await fetch(
+        `/api/analytics/export?projectId=${projectId}&days=${dateRange}`
+      );
 
       if (!response.ok) {
         throw new Error('Failed to export analytics');
@@ -142,16 +163,16 @@ export default function AnalyticsPage() {
 
   if (loading && !stats) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] p-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-8 bg-[#E2E8F0] rounded-xl w-1/4"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                <div key={i} className="h-32 bg-[#E2E8F0] rounded-2xl"></div>
               ))}
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-96 bg-[#E2E8F0] rounded-2xl"></div>
           </div>
         </div>
       </div>
@@ -160,10 +181,10 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] p-8">
         <div className="max-w-7xl mx-auto">
           <Card className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-[#EF4444] mb-4">{error}</p>
             <Button onClick={fetchStats}>Try Again</Button>
           </Card>
         </div>
@@ -174,10 +195,12 @@ export default function AnalyticsPage() {
   if (!stats) return null;
 
   // Prepare device breakdown data for pie chart
-  const deviceData = Object.entries(stats.deviceBreakdown || {}).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    value,
-  }));
+  const deviceData = Object.entries(stats.deviceBreakdown || {}).map(
+    ([name, value]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      value,
+    })
+  );
 
   // Prepare traffic over time data for line chart
   // GA4 returns dates in YYYYMMDD format, so we need to parse them correctly
@@ -191,14 +214,17 @@ export default function AnalyticsPage() {
       dateStr = `${year}-${month}-${day}`;
     }
     return {
-      date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
       'Page Views': item.page_views,
       'Unique Visitors': item.unique_visitors,
     };
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-[#F8FAFC] p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -211,16 +237,16 @@ export default function AnalyticsPage() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+            <h1 className="text-3xl font-bold text-[#455263]">Analytics</h1>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
+              <Calendar className="w-4 h-4 text-[#969696]" />
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="border border-[#E2E8F0] rounded-xl px-3 py-2 text-sm"
               >
                 <option value="7">Last 7 days</option>
                 <option value="30">Last 30 days</option>
@@ -234,7 +260,9 @@ export default function AnalyticsPage() {
               onClick={fetchStats}
               disabled={loading}
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+              />
               Refresh
             </Button>
 
@@ -255,13 +283,13 @@ export default function AnalyticsPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Page Views</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Page Views</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.pageViews.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-[#5FC7CD]/10 rounded-2xl">
+                <TrendingUp className="w-6 h-6 text-[#5FC7CD]" />
               </div>
             </div>
           </Card>
@@ -269,12 +297,12 @@ export default function AnalyticsPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Unique Visitors</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Unique Visitors</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.uniqueVisitors.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg">
+              <div className="p-3 bg-green-100 rounded-2xl">
                 <Users className="w-6 h-6 text-green-600" />
               </div>
             </div>
@@ -283,12 +311,12 @@ export default function AnalyticsPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Button Clicks</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Button Clicks</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.buttonClicks.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-orange-100 rounded-lg">
+              <div className="p-3 bg-orange-100 rounded-2xl">
                 <MousePointer className="w-6 h-6 text-orange-600" />
               </div>
             </div>
@@ -297,15 +325,15 @@ export default function AnalyticsPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Form Submissions</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-sm text-[#969696]">Form Submissions</p>
+                <p className="text-3xl font-bold text-[#455263] mt-2">
                   {stats.formSubmissions.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#969696] mt-1">
                   {stats.conversionRate}% conversion rate
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg">
+              <div className="p-3 bg-purple-100 rounded-2xl">
                 <FileText className="w-6 h-6 text-purple-600" />
               </div>
             </div>
@@ -314,7 +342,9 @@ export default function AnalyticsPage() {
 
         {/* Traffic Over Time Chart */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Traffic Over Time</h2>
+          <h2 className="text-xl font-semibold text-[#455263] mb-6">
+            Traffic Over Time
+          </h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trafficData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -344,7 +374,9 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Device Breakdown */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Device Breakdown</h2>
+            <h2 className="text-xl font-semibold text-[#455263] mb-6">
+              Device Breakdown
+            </h2>
             {deviceData.length > 0 ? (
               <>
                 <ResponsiveContainer width="100%" height={250}>
@@ -354,13 +386,18 @@ export default function AnalyticsPage() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                      label={({ name, percent }) =>
+                        `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
+                      }
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
                       {deviceData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -368,38 +405,53 @@ export default function AnalyticsPage() {
                 </ResponsiveContainer>
                 <div className="mt-4 space-y-2">
                   {deviceData.map((device, index) => (
-                    <div key={device.name} className="flex items-center justify-between text-sm">
+                    <div
+                      key={device.name}
+                      className="flex items-center justify-between text-sm"
+                    >
                       <div className="flex items-center gap-2">
                         <div
                           className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          style={{
+                            backgroundColor: COLORS[index % COLORS.length],
+                          }}
                         ></div>
-                        <span className="text-gray-700">{device.name}</span>
+                        <span className="text-[#969696]">{device.name}</span>
                       </div>
-                      <span className="font-medium text-gray-900">{device.value}</span>
+                      <span className="font-medium text-[#455263]">
+                        {device.value}
+                      </span>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <p className="text-gray-500 text-center py-8">No device data available</p>
+              <p className="text-[#969696] text-center py-8">
+                No device data available
+              </p>
             )}
           </Card>
 
           {/* Top Traffic Sources */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Top Traffic Sources</h2>
+            <h2 className="text-xl font-semibold text-[#455263] mb-6">
+              Top Traffic Sources
+            </h2>
             {stats.topSources.length > 0 ? (
               <div className="space-y-4">
                 {stats.topSources.map((source, index) => (
                   <div key={source.source} className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700 font-medium">{source.source}</span>
-                      <span className="text-gray-900 font-semibold">{source.count} visits</span>
+                      <span className="text-[#969696] font-medium">
+                        {source.source}
+                      </span>
+                      <span className="text-[#455263] font-semibold">
+                        {source.count} visits
+                      </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-[#E2E8F0] rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        className="bg-[#5FC7CD] h-2 rounded-full transition-all"
                         style={{
                           width: `${(source.count / stats.topSources[0].count) * 100}%`,
                         }}
@@ -409,7 +461,9 @@ export default function AnalyticsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">No traffic sources available</p>
+              <p className="text-[#969696] text-center py-8">
+                No traffic sources available
+              </p>
             )}
           </Card>
         </div>
@@ -417,9 +471,11 @@ export default function AnalyticsPage() {
         {/* Empty State */}
         {stats.pageViews === 0 && (
           <Card className="p-12 text-center">
-            <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Analytics Data Yet</h3>
-            <p className="text-gray-600 mb-6">
+            <TrendingUp className="w-16 h-16 text-[#969696] mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-[#455263] mb-2">
+              No Analytics Data Yet
+            </h3>
+            <p className="text-[#969696] mb-6">
               Publish your page and share it to start collecting analytics data.
             </p>
             <Button onClick={() => router.push(`/projects/${projectId}/edit`)}>

@@ -379,15 +379,15 @@ export default function ProductModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl border-[#E2E8F0] max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-xl font-bold">
+        <div className="sticky top-0 bg-white border-b border-[#E2E8F0] px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-xl font-bold text-[#455263]">
             {product ? 'Edit Product' : 'Add Product'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-[#969696] hover:text-[#455263]"
           >
             <X size={24} />
           </button>
@@ -396,7 +396,7 @@ export default function ProductModal({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-[#EF4444] text-sm">
               {error}
             </div>
           )}
@@ -404,10 +404,12 @@ export default function ProductModal({
           <div className="space-y-4">
             {/* Basic Information */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Basic Information</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#455263]">
+                Basic Information
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Product Code / SKU *
                   </label>
                   <Input
@@ -421,7 +423,7 @@ export default function ProductModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Product Name *
                   </label>
                   <Input
@@ -437,7 +439,7 @@ export default function ProductModal({
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[#455263] mb-1">
                   Description
                 </label>
                 <textarea
@@ -446,14 +448,14 @@ export default function ProductModal({
                     setFormData({ ...formData, description: e.target.value })
                   }
                   placeholder="Product description..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5FC7CD] focus:border-[#5FC7CD]"
                   rows={3}
                 />
               </div>
 
               {/* Image Upload */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#455263] mb-2">
                   Product Image
                 </label>
                 {formData.image_url ? (
@@ -461,13 +463,13 @@ export default function ProductModal({
                     <img
                       src={formData.image_url}
                       alt="Product"
-                      className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                      className="w-full h-48 object-cover rounded-xl border border-[#E2E8F0]"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-2 bg-white rounded-full text-gray-700 hover:bg-gray-100"
+                        className="p-2 bg-white rounded-full text-[#455263] hover:bg-[#F8FAFC]"
                         title="Replace image"
                       >
                         <Upload size={20} />
@@ -477,7 +479,7 @@ export default function ProductModal({
                         onClick={() =>
                           setFormData({ ...formData, image_url: '' })
                         }
-                        className="p-2 bg-red-500 rounded-full text-white hover:bg-red-600"
+                        className="p-2 bg-[#EF4444] rounded-full text-white hover:bg-[#EF4444]/90"
                         title="Remove image"
                       >
                         <X size={20} />
@@ -487,20 +489,20 @@ export default function ProductModal({
                 ) : (
                   <div
                     onClick={() => !uploading && fileInputRef.current?.click()}
-                    className={`w-full max-w-xs h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors ${uploading ? 'cursor-not-allowed opacity-50' : ''}`}
+                    className={`w-full max-w-xs h-48 border-2 border-dashed border-[#E2E8F0] rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#5FC7CD] hover:bg-[#5FC7CD]/10 transition-colors ${uploading ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     {uploading ? (
                       <>
-                        <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-2" />
-                        <p className="text-sm text-gray-600">Uploading...</p>
+                        <Loader2 className="w-10 h-10 text-[#5FC7CD] animate-spin mb-2" />
+                        <p className="text-sm text-[#969696]">Uploading...</p>
                       </>
                     ) : (
                       <>
-                        <ImageIcon className="w-10 h-10 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600">
+                        <ImageIcon className="w-10 h-10 text-[#969696] mb-2" />
+                        <p className="text-sm text-[#969696]">
                           Click to upload image
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">Max 5MB</p>
+                        <p className="text-xs text-[#969696] mt-1">Max 5MB</p>
                       </>
                     )}
                   </div>
@@ -515,7 +517,7 @@ export default function ProductModal({
                 />
                 {/* URL Input as Alternative */}
                 <div className="mt-2">
-                  <p className="text-xs text-gray-500 mb-1">
+                  <p className="text-xs text-[#969696] mb-1">
                     Or enter image URL:
                   </p>
                   <Input
@@ -532,10 +534,12 @@ export default function ProductModal({
 
             {/* Pricing & Stock */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Pricing & Stock</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#455263]">
+                Pricing & Stock
+              </h3>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Base Price *
                   </label>
                   <Input
@@ -553,7 +557,7 @@ export default function ProductModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Currency
                   </label>
                   <select
@@ -561,7 +565,7 @@ export default function ProductModal({
                     onChange={(e) =>
                       setFormData({ ...formData, currency: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5FC7CD] focus:border-[#5FC7CD]"
                   >
                     <option value="RM">RM (MYR)</option>
                     <option value="USD">USD</option>
@@ -570,7 +574,7 @@ export default function ProductModal({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Stock
                   </label>
                   <Input
@@ -591,7 +595,9 @@ export default function ProductModal({
             {/* Product Variations */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold">Variations (Optional)</h3>
+                <h3 className="text-lg font-semibold text-[#455263]">
+                  Variations (Optional)
+                </h3>
                 <Button
                   type="button"
                   onClick={addVariation}
@@ -602,7 +608,7 @@ export default function ProductModal({
                   Add Variation
                 </Button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-[#969696] mb-3">
                 Add product variations like sizes or colors
               </p>
               {formData.variations.length > 0 && (
@@ -610,12 +616,12 @@ export default function ProductModal({
                   {formData.variations.map((variation, vIndex) => (
                     <div
                       key={variation.id}
-                      className="border border-gray-200 rounded-lg p-4"
+                      className="border border-[#E2E8F0] rounded-xl p-4"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex gap-3 flex-1">
                           <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                            <label className="block text-xs font-medium text-[#455263] mb-1">
                               Variation Name
                             </label>
                             <Input
@@ -628,7 +634,7 @@ export default function ProductModal({
                             />
                           </div>
                           <div className="w-32">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                            <label className="block text-xs font-medium text-[#455263] mb-1">
                               Type
                             </label>
                             <select
@@ -636,7 +642,7 @@ export default function ProductModal({
                               onChange={(e) =>
                                 updateVariation(vIndex, 'type', e.target.value)
                               }
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl text-sm"
                             >
                               <option value="size">Size</option>
                               <option value="color">Color</option>
@@ -647,7 +653,7 @@ export default function ProductModal({
                         <button
                           type="button"
                           onClick={() => removeVariation(vIndex)}
-                          className="text-red-600 hover:text-red-800 ml-3"
+                          className="text-[#EF4444] hover:text-[#EF4444]/80 ml-3"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -656,13 +662,13 @@ export default function ProductModal({
                       {/* Options */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-[#455263]">
                             Options
                           </span>
                           <button
                             type="button"
                             onClick={() => addVariationOption(vIndex)}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs text-[#5FC7CD] hover:text-[#5FC7CD]/80"
                           >
                             + Add Option
                           </button>
@@ -672,7 +678,7 @@ export default function ProductModal({
                             {variation.options.map((option, oIndex) => (
                               <div
                                 key={oIndex}
-                                className="flex gap-2 items-center bg-gray-50 p-2 rounded"
+                                className="flex gap-2 items-center bg-[#F8FAFC] p-2 rounded-xl"
                               >
                                 {variation.type === 'color' && (
                                   <input
@@ -686,7 +692,7 @@ export default function ProductModal({
                                         e.target.value
                                       )
                                     }
-                                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+                                    className="w-8 h-8 rounded border border-[#E2E8F0] cursor-pointer"
                                   />
                                 )}
                                 <Input
@@ -718,7 +724,7 @@ export default function ProductModal({
                                   className="w-24"
                                 />
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-[#969696]">
                                     +/-
                                   </span>
                                   <Input
@@ -738,7 +744,7 @@ export default function ProductModal({
                                   />
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-[#969696]">
                                     Stock:
                                   </span>
                                   <Input
@@ -762,7 +768,7 @@ export default function ProductModal({
                                   onClick={() =>
                                     removeVariationOption(vIndex, oIndex)
                                   }
-                                  className="text-red-500 hover:text-red-700"
+                                  className="text-[#EF4444] hover:text-[#EF4444]/80"
                                 >
                                   <X size={16} />
                                 </button>
@@ -770,7 +776,7 @@ export default function ProductModal({
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-500 py-2">
+                          <p className="text-xs text-[#969696] py-2">
                             No options added yet
                           </p>
                         )}
@@ -784,7 +790,7 @@ export default function ProductModal({
             {/* Quantity Pricing */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-[#455263]">
                   Bulk Pricing (Optional)
                 </h3>
                 <Button
@@ -797,7 +803,7 @@ export default function ProductModal({
                   Add Tier
                 </Button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-[#969696] mb-3">
                 Set discounted prices for bulk purchases
               </p>
               {formData.quantity_pricing.length > 0 && (
@@ -818,7 +824,7 @@ export default function ProductModal({
                         }
                         className="w-32"
                       />
-                      <span className="text-gray-500">→</span>
+                      <span className="text-[#969696]">→</span>
                       <Input
                         type="number"
                         step="0.01"
@@ -834,13 +840,13 @@ export default function ProductModal({
                         }
                         className="w-32"
                       />
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-[#455263]">
                         {formData.currency}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeQuantityPricing(index)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-[#EF4444] hover:text-[#EF4444]/80"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -853,7 +859,7 @@ export default function ProductModal({
             {/* Bundle Pricing */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-[#455263]">
                   Bundle Pricing (Optional)
                 </h3>
                 <Button
@@ -866,7 +872,7 @@ export default function ProductModal({
                   Add Bundle
                 </Button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-[#969696] mb-3">
                 Set fixed total prices for quantity bundles (e.g., Buy 1 = RM39,
                 Buy 2 = RM75, Buy 3 = RM100)
               </p>
@@ -883,9 +889,9 @@ export default function ProductModal({
                     return (
                       <div
                         key={index}
-                        className="flex gap-2 items-center bg-gray-50 p-2 rounded-md"
+                        className="flex gap-2 items-center bg-[#F8FAFC] p-2 rounded-xl"
                       >
-                        <span className="text-sm text-gray-600">Buy</span>
+                        <span className="text-sm text-[#455263]">Buy</span>
                         <Input
                           type="number"
                           min="1"
@@ -900,8 +906,8 @@ export default function ProductModal({
                           }
                           className="w-20"
                         />
-                        <span className="text-gray-500">=</span>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-[#969696]">=</span>
+                        <span className="text-sm text-[#455263]">
                           {formData.currency}
                         </span>
                         <Input
@@ -927,7 +933,7 @@ export default function ProductModal({
                         <button
                           type="button"
                           onClick={() => removeBundlePricing(index)}
-                          className="text-red-600 hover:text-red-800 ml-auto"
+                          className="text-[#EF4444] hover:text-[#EF4444]/80 ml-auto"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -937,8 +943,8 @@ export default function ProductModal({
                 </div>
               )}
               {formData.bundle_pricing.length > 0 && (
-                <div className="mt-3 p-3 bg-blue-50 rounded-md">
-                  <p className="text-xs text-blue-700">
+                <div className="mt-3 p-3 bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-xl">
+                  <p className="text-xs text-[#455263]">
                     <strong>Preview:</strong>{' '}
                     {formData.bundle_pricing.map((tier, i) => (
                       <span key={i}>
@@ -954,10 +960,12 @@ export default function ProductModal({
 
             {/* Internal Notes & Status */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Additional Info</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#455263]">
+                Additional Info
+              </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Internal Notes
                   </label>
                   <textarea
@@ -966,15 +974,15 @@ export default function ProductModal({
                       setFormData({ ...formData, notes: e.target.value })
                     }
                     placeholder="Private notes for internal use only..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5FC7CD] focus:border-[#5FC7CD]"
                     rows={3}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#969696] mt-1">
                     These notes are only visible to you
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-[#455263] mb-1">
                     Status
                   </label>
                   <select
@@ -985,7 +993,7 @@ export default function ProductModal({
                         status: e.target.value as 'active' | 'inactive',
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5FC7CD] focus:border-[#5FC7CD]"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -1000,7 +1008,7 @@ export default function ProductModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" variant="teal" disabled={saving}>
               {saving
                 ? 'Saving...'
                 : product

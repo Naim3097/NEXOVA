@@ -32,7 +32,7 @@ export function TemplateCard({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-all">
       {/* Thumbnail */}
       <div className="relative aspect-video bg-muted">
         {!imageError ? (
@@ -91,7 +91,12 @@ export function TemplateCard({
         >
           Preview
         </Button>
-        <Button className="flex-1" size="sm" onClick={() => onUseTemplate(template)}>
+        <Button
+          variant="teal"
+          className="flex-1"
+          size="sm"
+          onClick={() => onUseTemplate(template)}
+        >
           Use Template
         </Button>
       </CardFooter>

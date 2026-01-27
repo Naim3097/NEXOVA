@@ -208,7 +208,7 @@ function generateHeadContent(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${seo.title || project.name}</title>
   <meta name="description" content="${seo.description || project.description || ''}">
-  ${seo.keywords ? `<meta name="keywords" content="${seo.keywords.join(', ')}">` : ''}
+  ${seo.keywords ? `<meta name="keywords" content="${Array.isArray(seo.keywords) ? seo.keywords.join(', ') : seo.keywords}">` : ''}
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="${seo.ogType || 'website'}">
@@ -2072,6 +2072,15 @@ function generatePricingHTML(element: Element): string {
         .map(
           (plan: any) => `
         <div style="background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; display: flex; flex-direction: column; ${plan.highlighted ? 'border: 2px solid #3b82f6; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);' : ''}">
+          ${
+            plan.image
+              ? `
+            <div style="width: 100%; height: 12rem; margin-bottom: 1rem; border-radius: 0.75rem; overflow: hidden;">
+              <img src="${plan.image}" alt="${plan.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          `
+              : ''
+          }
           ${
             plan.highlighted
               ? `

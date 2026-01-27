@@ -49,15 +49,17 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-bold text-[#455263]">
+          Welcome back
+        </CardTitle>
+        <CardDescription className="text-[#969696]">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-3 text-sm text-[#EF4444] bg-red-50 border border-red-200 rounded-xl">
               {error}
             </div>
           )}
@@ -80,7 +82,7 @@ export default function LoginPage() {
               <Label htmlFor="password">Password</Label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-[#5FC7CD] hover:text-[#4bb5bb] hover:underline"
               >
                 Forgot password?
               </Link>
@@ -102,9 +104,12 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </Button>
 
-          <div className="text-sm text-center text-muted-foreground">
+          <div className="text-sm text-center text-[#969696]">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link
+              href="/signup"
+              className="text-[#5FC7CD] hover:text-[#4bb5bb] hover:underline"
+            >
               Sign up
             </Link>
           </div>

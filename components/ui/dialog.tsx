@@ -39,7 +39,7 @@ export function DialogContent({
   return (
     <div
       className={cn(
-        'relative bg-background rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6',
+        'relative bg-white rounded-2xl shadow-lg border border-[#E2E8F0] max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6',
         className
       )}
       {...props}
@@ -75,7 +75,10 @@ export function DialogTitle({
   ...props
 }: DialogTitleProps) {
   return (
-    <h2 className={cn('text-2xl font-semibold', className)} {...props}>
+    <h2
+      className={cn('text-2xl font-semibold text-[#455263]', className)}
+      {...props}
+    >
       {children}
     </h2>
   );
@@ -91,7 +94,7 @@ export function DialogDescription({
   ...props
 }: DialogDescriptionProps) {
   return (
-    <p className={cn('text-sm text-muted-foreground', className)} {...props}>
+    <p className={cn('text-sm text-[#969696]', className)} {...props}>
       {children}
     </p>
   );

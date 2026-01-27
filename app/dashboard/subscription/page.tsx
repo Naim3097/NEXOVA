@@ -285,13 +285,13 @@ export default function SubscriptionManagementPage() {
 
               {/* Warnings */}
               {isCancelled && (
-                <div className="bg-chart-4/10 border border-chart-4/30 rounded-lg p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-chart-4 mt-0.5" />
+                <div className="bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-2xl p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#5FC7CD] mt-0.5" />
                   <div>
-                    <p className="font-semibold text-foreground">
+                    <p className="font-semibold text-[#455263]">
                       Subscription Cancelled
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-[#969696] mt-1">
                       Your Pro features will remain active until{' '}
                       {status?.subscription &&
                         formatDate(status.subscription.current_period_end)}
@@ -302,13 +302,13 @@ export default function SubscriptionManagementPage() {
               )}
 
               {isPastDue && (
-                <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-destructive mt-0.5" />
+                <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#EF4444] mt-0.5" />
                   <div>
-                    <p className="font-semibold text-foreground">
+                    <p className="font-semibold text-[#455263]">
                       Payment Failed
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-[#969696] mt-1">
                       Your recent payment failed. Please update your payment
                       method to continue your Pro subscription.
                     </p>
@@ -318,7 +318,7 @@ export default function SubscriptionManagementPage() {
 
               {/* Features List */}
               <div>
-                <h4 className="font-semibold text-foreground mb-3">
+                <h4 className="font-semibold text-[#455263] mb-3">
                   {isPro ? 'Pro Features' : 'Your Plan Includes'}
                 </h4>
                 <ul className="space-y-2">
@@ -413,27 +413,31 @@ export default function SubscriptionManagementPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-[#969696] mb-4">
                   Get unlimited projects, custom domains, advanced analytics,
                   and priority support for just $29/month.
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-card rounded-lg p-4 border">
-                    <h4 className="font-semibold text-foreground mb-2">
+                  <div className="bg-card rounded-2xl p-4 border-[#E2E8F0]">
+                    <h4 className="font-semibold text-[#455263] mb-2">
                       Monthly
                     </h4>
-                    <p className="text-2xl font-bold text-primary mb-1">$29</p>
-                    <p className="text-sm text-muted-foreground">per month</p>
+                    <p className="text-2xl font-bold text-[#5FC7CD] mb-1">
+                      $29
+                    </p>
+                    <p className="text-sm text-[#969696]">per month</p>
                   </div>
-                  <div className="bg-card rounded-lg p-4 border relative">
-                    <div className="absolute -top-2 -right-2 bg-chart-2 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  <div className="bg-card rounded-2xl p-4 border-[#E2E8F0] relative">
+                    <div className="absolute -top-2 -right-2 bg-green-700 text-white text-xs px-2 py-1 rounded-full font-semibold">
                       Save 17%
                     </div>
-                    <h4 className="font-semibold text-foreground mb-2">
+                    <h4 className="font-semibold text-[#455263] mb-2">
                       Yearly
                     </h4>
-                    <p className="text-2xl font-bold text-primary mb-1">$290</p>
-                    <p className="text-sm text-muted-foreground">~$24/month</p>
+                    <p className="text-2xl font-bold text-[#5FC7CD] mb-1">
+                      $290
+                    </p>
+                    <p className="text-sm text-[#969696]">~$24/month</p>
                   </div>
                 </div>
               </CardContent>

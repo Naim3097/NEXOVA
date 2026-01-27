@@ -16,60 +16,61 @@ import {
   Home,
   Layers,
   Globe,
+  ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { currentProjectAtom } from '@/store/builder';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [
   {
     name: 'Dashboard',
     href: '/dashboard',
     icon: Home,
-    description: 'Overview & projects',
+    isDynamic: false,
   },
   {
     name: 'Builder',
-    href: '/builder', // This will be dynamically replaced
+    href: '/builder',
     icon: Layers,
-    description: 'Visual page builder',
-    isDynamic: true, // Flag to indicate dynamic href
+    isDynamic: true,
   },
   {
     name: 'Templates',
     href: '/templates',
     icon: FileText,
-    description: 'Pre-built designs',
+    isDynamic: false,
   },
   {
     name: 'Analytics',
     href: '/dashboard/analytics',
     icon: TrendingUp,
-    description: 'Track performance',
+    isDynamic: false,
   },
   {
     name: 'Payments',
     href: '/dashboard/settings/payments',
     icon: CreditCard,
-    description: 'Payment settings',
+    isDynamic: false,
   },
   {
     name: 'Products',
     href: '/dashboard/products',
     icon: Package,
-    description: 'Manage inventory',
+    isDynamic: false,
   },
   {
     name: 'Integrations',
     href: '/dashboard/integrations',
     icon: Zap,
-    description: 'Connect tools',
+    isDynamic: false,
   },
   {
     name: 'Subdomain',
     href: '/dashboard/settings/subdomain',
     icon: Globe,
-    description: 'Custom URL',
+    isDynamic: false,
   },
 ];
 
@@ -78,17 +79,28 @@ interface BuilderSidebarProps {
   onToggle?: () => void;
 }
 
-export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebarProps) {
+export function BuilderSidebar({
+  isCollapsed = false,
+  onToggle,
+}: BuilderSidebarProps) {
   const pathname = usePathname();
   const currentProject = useAtomValue(currentProjectAtom);
+  const { profile } = useAuth();
+
+  const displayName = profile?.display_name || 'User';
+  const planLabel = profile?.subscription_plan
+    ? profile.subscription_plan.charAt(0).toUpperCase() +
+      profile.subscription_plan.slice(1) +
+      ' Plan'
+    : 'Free Plan';
+  const initial = displayName.charAt(0).toUpperCase();
 
   // Function to get the correct href for navigation items
-  const getHref = (item: typeof navigation[0]) => {
-    // For Builder link, if we're editing a real project (not temp/guest), stay on that project
+  const getHref = (item: (typeof navigation)[0]) => {
     if (item.isDynamic && currentProject) {
       const projectId = currentProject.id;
-      // Check if it's a real project (not a temp or guest project)
-      const isRealProject = projectId &&
+      const isRealProject =
+        projectId &&
         !projectId.startsWith('temp-project-') &&
         !projectId.startsWith('guest-project');
 
@@ -100,30 +112,46 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
   };
 
   // Function to check if a navigation item is active
-  const isActive = (item: typeof navigation[0]) => {
+  const isActive = (item: (typeof navigation)[0]) => {
     const href = getHref(item);
-    // For builder, also consider project edit pages as active
     if (item.name === 'Builder') {
-      return pathname === '/builder' || pathname?.startsWith('/projects/') && pathname?.endsWith('/edit');
+      return (
+        pathname === '/builder' ||
+        (pathname?.startsWith('/projects/') && pathname?.endsWith('/edit'))
+      );
+    }
+    // Dashboard should only match exactly, not sub-routes
+    if (href === '/dashboard') {
+      return pathname === '/dashboard';
     }
     return pathname === href || pathname?.startsWith(href + '/');
   };
 
   return (
-    <aside className={cn(
-      "flex-shrink-0 h-screen border-r bg-white transition-all duration-300",
-      isCollapsed ? "w-20" : "w-64"
-    )}>
+    <aside
+      className={cn(
+        'flex flex-col flex-shrink-0 h-screen border-r border-[#E2E8F0] bg-white transition-all duration-300',
+        isCollapsed ? 'w-20' : 'w-64'
+      )}
+    >
       {/* Logo and Toggle */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b border-[#E2E8F0] px-4">
         {!isCollapsed && (
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">X.IDE</span>
+          <Link href="/" className="flex items-center">
+            <img
+              src="/images/logo-nexova.webp"
+              alt="Nexova"
+              className="h-6 w-auto"
+            />
           </Link>
         )}
         {isCollapsed && (
           <Link href="/" className="flex items-center justify-center w-full">
-            <span className="text-xl font-bold">X</span>
+            <img
+              src="/images/logo-nexova.webp"
+              alt="Nexova"
+              className="h-8 w-auto object-contain"
+            />
           </Link>
         )}
         {onToggle && !isCollapsed && (
@@ -140,7 +168,7 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
         {navigation.map((item) => {
           const Icon = item.icon;
           const itemIsActive = isActive(item);
@@ -151,29 +179,25 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
               key={item.name}
               href={href}
               className={cn(
-                'flex items-center rounded-lg transition-colors group relative',
+                'flex items-center rounded-xl transition-all group relative',
                 isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5',
                 itemIsActive
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-[#5FC7CD] text-white'
+                  : 'text-[#455263] hover:bg-[#F8FAFC]'
               )}
               title={isCollapsed ? item.name : undefined}
             >
               <Icon className="h-5 w-5 flex-shrink-0" />
               {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{item.name}</div>
-                  {!itemIsActive && (
-                    <div className="text-xs text-gray-500 truncate">{item.description}</div>
-                  )}
-                </div>
+                <span className="text-sm font-medium truncate">
+                  {item.name}
+                </span>
               )}
 
               {/* Tooltip for collapsed state */}
               {isCollapsed && (
-                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 pointer-events-none">
+                <div className="absolute left-full ml-2 px-3 py-2 bg-[#455263] text-white text-sm rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 pointer-events-none">
                   <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-gray-300">{item.description}</div>
                 </div>
               )}
             </Link>
@@ -183,7 +207,7 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
 
       {/* Expand button when collapsed */}
       {isCollapsed && onToggle && (
-        <div className="border-t p-2">
+        <div className="border-t border-[#E2E8F0] p-2">
           <Button
             variant="ghost"
             size="sm"
@@ -208,20 +232,36 @@ export function BuilderSidebar({ isCollapsed = false, onToggle }: BuilderSidebar
         </div>
       )}
 
-      {/* User Section */}
+      {/* User Profile Section */}
       {!isCollapsed && (
-        <div className="border-t p-4">
+        <div className="border-t border-[#E2E8F0] p-4">
           <Link
             href="/account"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-medium text-[#455263] hover:bg-[#F8FAFC] transition-all"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
-              <User className="h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FFCE33] text-[#455263] font-bold text-sm flex-shrink-0">
+              {initial}
             </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium">Account</div>
-              <div className="text-xs text-gray-500">Manage profile</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-[#455263] truncate">
+                {displayName}
+              </div>
+              <div className="text-xs text-[#969696]">{planLabel}</div>
             </div>
+            <ChevronUp className="h-4 w-4 text-[#969696] flex-shrink-0" />
+          </Link>
+        </div>
+      )}
+
+      {/* Collapsed user avatar */}
+      {isCollapsed && (
+        <div className="border-t border-[#E2E8F0] p-2 flex justify-center">
+          <Link
+            href="/account"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFCE33] text-[#455263] font-bold text-sm"
+            title={displayName}
+          >
+            {initial}
           </Link>
         </div>
       )}

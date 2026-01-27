@@ -13,7 +13,14 @@ interface PricingElementProps {
 }
 
 export const PricingElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover, viewportMode = 'desktop' }: PricingElementProps) => {
+  ({
+    props,
+    isSelected,
+    isHovered,
+    onSelect,
+    onHover,
+    viewportMode = 'desktop',
+  }: PricingElementProps) => {
     const {
       title,
       subtitle,
@@ -22,7 +29,7 @@ export const PricingElement = React.memo(
       backgroundImage,
       backgroundOpacity = 70,
       bgColor = '#000000',
-      enablePaymentIntegration = false
+      enablePaymentIntegration = false,
     } = props;
 
     // Determine grid columns based on viewport mode
@@ -73,7 +80,9 @@ export const PricingElement = React.memo(
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">{title}</h2>
             {subtitle && (
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">{subtitle}</p>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                {subtitle}
+              </p>
             )}
           </div>
 
@@ -84,11 +93,18 @@ export const PricingElement = React.memo(
                 <div
                   key={index}
                   className={`bg-white rounded-2xl shadow-lg p-8 flex flex-col ${
-                    plan.highlighted
-                      ? 'ring-2 ring-blue-500 shadow-xl'
-                      : ''
+                    plan.highlighted ? 'ring-2 ring-blue-500 shadow-xl' : ''
                   }`}
                 >
+                  {plan.image && (
+                    <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
+                      <img
+                        src={plan.image}
+                        alt={plan.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   {plan.highlighted && (
                     <div className="bg-blue-500 text-white text-sm font-semibold px-3 py-1 rounded-full self-start mb-4">
                       Most Popular
@@ -163,7 +179,9 @@ export const PricingElement = React.memo(
                         <div className="text-2xl font-bold text-gray-900">
                           {plan.currency} {plan.price}
                         </div>
-                        <div className="text-sm text-gray-600">/ {plan.period}</div>
+                        <div className="text-sm text-gray-600">
+                          / {plan.period}
+                        </div>
                       </td>
                     ))}
                   </tr>
@@ -220,7 +238,8 @@ export const PricingElement = React.memo(
                 💳 LeanX Payment Integration Enabled
               </p>
               <p className="text-xs text-blue-700 text-center mt-1">
-                On published pages, these buttons will process secure payments via LeanX Gateway
+                On published pages, these buttons will process secure payments
+                via LeanX Gateway
               </p>
             </div>
           )}

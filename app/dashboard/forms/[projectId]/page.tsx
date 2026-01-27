@@ -2,11 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Download, Trash2, ArrowLeft, RefreshCw, Inbox } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/auth-client';
@@ -165,7 +184,7 @@ export default function FormSubmissionsPage() {
   };
 
   // Get unique form IDs
-  const uniqueFormIds = Array.from(new Set(submissions.map(s => s.form_id)));
+  const uniqueFormIds = Array.from(new Set(submissions.map((s) => s.form_id)));
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -175,8 +194,8 @@ export default function FormSubmissionsPage() {
   // Get all unique field names from submissions
   const getAllFieldNames = () => {
     const fields = new Set<string>();
-    submissions.forEach(submission => {
-      Object.keys(submission.data || {}).forEach(key => fields.add(key));
+    submissions.forEach((submission) => {
+      Object.keys(submission.data || {}).forEach((key) => fields.add(key));
     });
     return Array.from(fields);
   };
@@ -212,7 +231,9 @@ export default function FormSubmissionsPage() {
               onClick={fetchSubmissions}
               disabled={loading}
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+              />
               Refresh
             </Button>
 
@@ -282,7 +303,7 @@ export default function FormSubmissionsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Forms</SelectItem>
-                {uniqueFormIds.map(formId => (
+                {uniqueFormIds.map((formId) => (
                   <SelectItem key={formId} value={formId}>
                     Form: {formId}
                   </SelectItem>
@@ -304,14 +325,17 @@ export default function FormSubmissionsPage() {
         <CardContent>
           {loading ? (
             <div className="flex justify-center py-8">
-              <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
+              <RefreshCw className="w-6 h-6 animate-spin text-[#969696]" />
             </div>
           ) : submissions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Inbox className="w-12 h-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No submissions yet</h3>
-              <p className="text-muted-foreground text-sm">
-                Form submissions will appear here once users start submitting forms.
+              <Inbox className="w-12 h-12 text-[#969696] mb-4" />
+              <h3 className="text-lg font-semibold text-[#455263] mb-2">
+                No submissions yet
+              </h3>
+              <p className="text-[#969696] text-sm">
+                Form submissions will appear here once users start submitting
+                forms.
               </p>
             </div>
           ) : (
@@ -321,7 +345,7 @@ export default function FormSubmissionsPage() {
                   <TableRow>
                     <TableHead>Submitted At</TableHead>
                     <TableHead>Form ID</TableHead>
-                    {fieldNames.map(field => (
+                    {fieldNames.map((field) => (
                       <TableHead key={field}>{field}</TableHead>
                     ))}
                     <TableHead>IP Address</TableHead>
@@ -339,7 +363,7 @@ export default function FormSubmissionsPage() {
                           {submission.form_id}
                         </Badge>
                       </TableCell>
-                      {fieldNames.map(field => (
+                      {fieldNames.map((field) => (
                         <TableCell key={field}>
                           {submission.data?.[field] || '-'}
                         </TableCell>

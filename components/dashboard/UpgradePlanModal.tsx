@@ -232,15 +232,15 @@ export function UpgradePlanModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border-[#E2E8F0]">
         {step === 'plans' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl flex items-center gap-2">
-                <ArrowUpCircle className="h-6 w-6 text-yellow-500" />
+              <DialogTitle className="text-2xl flex items-center gap-2 text-[#455263]">
+                <ArrowUpCircle className="h-6 w-6 text-[#5FC7CD]" />
                 Upgrade Your Plan
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-[#969696]">
                 Choose the plan that best fits your needs. Unlock powerful
                 features to grow your business.
               </DialogDescription>
@@ -249,7 +249,7 @@ export function UpgradePlanModal({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               {/* Free Plan */}
               <div
-                className={`relative rounded-xl border-2 p-6 ${currentPlan === 'free' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                className={`relative rounded-2xl border-2 p-6 ${currentPlan === 'free' ? 'border-[#5FC7CD] bg-[#5FC7CD]/5' : 'border-[#E2E8F0]'}`}
               >
                 {currentPlan === 'free' && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -257,14 +257,14 @@ export function UpgradePlanModal({
                   </Badge>
                 )}
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-foreground">Free</h3>
+                  <h3 className="text-xl font-bold text-[#455263]">Free</h3>
                   <div className="mt-2">
-                    <span className="text-3xl font-bold text-foreground">
+                    <span className="text-3xl font-bold text-[#455263]">
                       RM0
                     </span>
-                    <span className="text-muted-foreground">/month</span>
+                    <span className="text-[#969696]">/month</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-[#969696] mt-2">
                     Get started for free
                   </p>
                 </div>
@@ -279,34 +279,35 @@ export function UpgradePlanModal({
 
               {/* Premium Plan */}
               <div
-                className={`relative rounded-xl border-2 p-6 ${currentPlan === 'premium' ? 'border-chart-4 bg-chart-4/5' : 'border-chart-4'} shadow-lg`}
+                className={`relative rounded-2xl border-2 p-6 ${currentPlan === 'premium' ? 'border-[#5FC7CD] bg-[#5FC7CD]/5' : 'border-[#5FC7CD]'} shadow-lg`}
               >
                 {currentPlan === 'premium' ? (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-chart-4 text-foreground">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#5FC7CD] text-white">
                     Current Plan
                   </Badge>
                 ) : (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-chart-4 to-chart-5">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#5FC7CD] to-[#455263]">
                     Most Popular
                   </Badge>
                 )}
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold flex items-center justify-center gap-2 text-foreground">
-                    <Crown className="h-5 w-5 text-chart-4" />
+                  <h3 className="text-xl font-bold flex items-center justify-center gap-2 text-[#455263]">
+                    <Crown className="h-5 w-5 text-[#5FC7CD]" />
                     Premium
                   </h3>
                   <div className="mt-2">
-                    <span className="text-3xl font-bold text-foreground">
+                    <span className="text-3xl font-bold text-[#455263]">
                       RM79
                     </span>
-                    <span className="text-muted-foreground">/month</span>
+                    <span className="text-[#969696]">/month</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-[#969696] mt-2">
                     Everything you need to scale
                   </p>
                 </div>
                 <Button
-                  className="w-full bg-gradient-to-r from-chart-4 to-chart-5 hover:from-chart-4/90 hover:to-chart-5/90"
+                  variant="teal"
+                  className="w-full"
                   onClick={() => handleUpgrade('premium')}
                   disabled={currentPlan === 'premium' || loading === 'premium'}
                 >
@@ -325,30 +326,30 @@ export function UpgradePlanModal({
 
               {/* Enterprise Plan */}
               <div
-                className={`relative rounded-xl border-2 p-6 ${currentPlan === 'enterprise' ? 'border-chart-3 bg-chart-3/5' : 'border-border'}`}
+                className={`relative rounded-2xl border-2 p-6 ${currentPlan === 'enterprise' ? 'border-[#455263] bg-[#455263]/5' : 'border-[#E2E8F0]'}`}
               >
                 {currentPlan === 'enterprise' && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-chart-3">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#455263]">
                     Current Plan
                   </Badge>
                 )}
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold flex items-center justify-center gap-2 text-foreground">
-                    <Building2 className="h-5 w-5 text-chart-3" />
+                  <h3 className="text-xl font-bold flex items-center justify-center gap-2 text-[#455263]">
+                    <Building2 className="h-5 w-5 text-[#455263]" />
                     Enterprise
                   </h3>
                   <div className="mt-2">
-                    <span className="text-3xl font-bold text-foreground">
+                    <span className="text-3xl font-bold text-[#455263]">
                       Custom
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-[#969696] mt-2">
                     For large scale operations
                   </p>
                 </div>
                 <Button
                   variant="outline"
-                  className="w-full border-chart-3 text-chart-3 hover:bg-chart-3/10"
+                  className="w-full border-[#455263] text-[#455263] hover:bg-[#455263]/10"
                   onClick={() => handleUpgrade('enterprise')}
                   disabled={
                     currentPlan === 'enterprise' || loading === 'enterprise'
@@ -370,31 +371,31 @@ export function UpgradePlanModal({
 
             {/* Feature Comparison Table */}
             <div className="mt-8">
-              <h4 className="font-semibold text-foreground mb-4">
+              <h4 className="font-semibold text-[#455263] mb-4">
                 Feature Comparison
               </h4>
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
                 <table className="w-full table-fixed">
-                  <thead className="bg-muted">
+                  <thead className="bg-[#F8FAFC]">
                     <tr>
-                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground w-[40%]">
+                      <th className="text-left px-4 py-3 text-sm font-medium text-[#969696] w-[40%]">
                         Feature
                       </th>
-                      <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground w-[20%]">
+                      <th className="text-center px-4 py-3 text-sm font-medium text-[#969696] w-[20%]">
                         Free
                       </th>
-                      <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground w-[20%]">
+                      <th className="text-center px-4 py-3 text-sm font-medium text-[#969696] w-[20%]">
                         Premium
                       </th>
-                      <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground w-[20%]">
+                      <th className="text-center px-4 py-3 text-sm font-medium text-[#969696] w-[20%]">
                         Enterprise
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-[#E2E8F0]">
                     {planFeatures.map((feature, index) => (
-                      <tr key={index} className="hover:bg-muted/50">
-                        <td className="px-4 py-3 text-sm text-foreground">
+                      <tr key={index} className="hover:bg-[#F8FAFC]">
+                        <td className="px-4 py-3 text-sm text-[#455263]">
                           {feature.name}
                         </td>
                         <td className="px-4 py-3">
@@ -419,7 +420,7 @@ export function UpgradePlanModal({
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center mt-4">
+            <p className="text-xs text-[#969696] text-center mt-4">
               All plans include access to the page builder, publishing, and form
               submissions. Premium features unlock when you upgrade.
             </p>
@@ -427,11 +428,11 @@ export function UpgradePlanModal({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl flex items-center gap-2">
-                <CreditCard className="h-6 w-6 text-chart-4" />
+              <DialogTitle className="text-2xl flex items-center gap-2 text-[#455263]">
+                <CreditCard className="h-6 w-6 text-[#5FC7CD]" />
                 Select Payment Method
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-[#969696]">
                 Choose your preferred payment method to complete your Premium
                 subscription.
               </DialogDescription>
@@ -448,20 +449,18 @@ export function UpgradePlanModal({
             </Button>
 
             {/* Order Summary */}
-            <div className="bg-chart-4/10 border border-chart-4/30 rounded-lg p-4 mb-6">
+            <div className="bg-[#5FC7CD]/10 border border-[#5FC7CD]/20 rounded-xl p-4 mb-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h4 className="font-semibold flex items-center gap-2 text-foreground">
-                    <Crown className="h-4 w-4 text-chart-4" />
+                  <h4 className="font-semibold flex items-center gap-2 text-[#455263]">
+                    <Crown className="h-4 w-4 text-[#5FC7CD]" />
                     Premium Plan
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Monthly subscription
-                  </p>
+                  <p className="text-sm text-[#969696]">Monthly subscription</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">RM79</p>
-                  <p className="text-xs text-muted-foreground">/month</p>
+                  <p className="text-2xl font-bold text-[#455263]">RM79</p>
+                  <p className="text-xs text-[#969696]">/month</p>
                 </div>
               </div>
             </div>
@@ -469,7 +468,7 @@ export function UpgradePlanModal({
             {/* FPX / Online Banking */}
             {fpxBanks.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-medium mb-3 text-sm text-muted-foreground">
+                <h4 className="font-medium mb-3 text-sm text-[#969696]">
                   Online Banking (FPX)
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -479,8 +478,8 @@ export function UpgradePlanModal({
                       onClick={() => handleBankSelect(bank.id)}
                       disabled={loading === 'bank'}
                       className={`
-                        p-3 border rounded-lg text-center hover:border-chart-4 hover:bg-chart-4/5 transition-colors
-                        ${selectedBank === bank.id ? 'border-chart-4 bg-chart-4/5' : 'border-border'}
+                        p-3 border rounded-xl text-center hover:border-[#5FC7CD] hover:bg-[#5FC7CD]/5 transition-colors
+                        ${selectedBank === bank.id ? 'border-[#5FC7CD] bg-[#5FC7CD]/5' : 'border-[#E2E8F0]'}
                         ${loading === 'bank' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                       `}
                     >
@@ -492,10 +491,10 @@ export function UpgradePlanModal({
                         />
                       ) : (
                         <div className="h-8 flex items-center justify-center mb-1">
-                          <CreditCard className="h-6 w-6 text-muted-foreground" />
+                          <CreditCard className="h-6 w-6 text-[#969696]" />
                         </div>
                       )}
-                      <p className="text-xs text-foreground truncate">
+                      <p className="text-xs text-[#455263] truncate">
                         {bank.name}
                       </p>
                       {selectedBank === bank.id && loading === 'bank' && (
@@ -510,7 +509,7 @@ export function UpgradePlanModal({
             {/* E-Wallets */}
             {eWallets.length > 0 && (
               <div>
-                <h4 className="font-medium mb-3 text-sm text-muted-foreground">
+                <h4 className="font-medium mb-3 text-sm text-[#969696]">
                   E-Wallets
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -520,8 +519,8 @@ export function UpgradePlanModal({
                       onClick={() => handleBankSelect(wallet.id)}
                       disabled={loading === 'bank'}
                       className={`
-                        p-3 border rounded-lg text-center hover:border-chart-4 hover:bg-chart-4/5 transition-colors
-                        ${selectedBank === wallet.id ? 'border-chart-4 bg-chart-4/5' : 'border-border'}
+                        p-3 border rounded-xl text-center hover:border-[#5FC7CD] hover:bg-[#5FC7CD]/5 transition-colors
+                        ${selectedBank === wallet.id ? 'border-[#5FC7CD] bg-[#5FC7CD]/5' : 'border-[#E2E8F0]'}
                         ${loading === 'bank' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                       `}
                     >
@@ -549,12 +548,12 @@ export function UpgradePlanModal({
             )}
 
             {banks.length === 0 && !loading && (
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-center text-[#969696] py-8">
                 No payment methods available. Please contact support.
               </p>
             )}
 
-            <p className="text-xs text-muted-foreground text-center mt-6">
+            <p className="text-xs text-[#969696] text-center mt-6">
               Your subscription will be activated immediately after successful
               payment. You can cancel anytime from your account settings.
             </p>

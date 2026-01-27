@@ -52,10 +52,13 @@ export default function BuilderPage() {
 
   const handleSignUp = () => {
     // Save current work to localStorage before redirecting
-    localStorage.setItem('guestBuilderData', JSON.stringify({
-      timestamp: Date.now(),
-      message: 'Your work has been saved. Sign up to continue.',
-    }));
+    localStorage.setItem(
+      'guestBuilderData',
+      JSON.stringify({
+        timestamp: Date.now(),
+        message: 'Your work has been saved. Sign up to continue.',
+      })
+    );
     router.push('/signup?return=/builder');
   };
 
@@ -63,8 +66,8 @@ export default function BuilderPage() {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#E2E8F0] border-t-[#455263] mx-auto mb-4"></div>
+          <p className="text-[#969696]">Loading...</p>
         </div>
       </div>
     );
@@ -82,15 +85,15 @@ export default function BuilderPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Guest Mode Banner */}
         {isGuestMode && showGuestBanner && (
-          <div className="bg-blue-50 border-b border-blue-200 px-6 py-3">
+          <div className="bg-[#F8FAFC] border-b border-[#E2E8F0] px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600" />
+                <AlertCircle className="h-5 w-5 text-[#5FC7CD]" />
                 <div>
-                  <p className="text-sm font-medium text-blue-900">
+                  <p className="text-sm font-medium text-[#455263]">
                     You're using Guest Mode
                   </p>
-                  <p className="text-xs text-blue-700">
+                  <p className="text-xs text-[#969696]">
                     Sign up to save your work and publish your pages
                   </p>
                 </div>
@@ -100,15 +103,11 @@ export default function BuilderPage() {
                   size="sm"
                   variant="ghost"
                   onClick={() => setShowGuestBanner(false)}
-                  className="text-blue-900 hover:text-blue-950"
+                  className="text-[#969696] hover:text-[#455263]"
                 >
                   Dismiss
                 </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSignUp}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
+                <Button size="sm" variant="teal" onClick={handleSignUp}>
                   Sign Up Free
                 </Button>
               </div>
@@ -130,7 +129,7 @@ export default function BuilderPage() {
           <ElementLibrary />
 
           {/* Canvas */}
-          <div className="flex-1 overflow-auto bg-gray-50">
+          <div className="flex-1 overflow-auto bg-[#F8FAFC]">
             <Canvas />
           </div>
 

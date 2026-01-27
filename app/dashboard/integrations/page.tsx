@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
 import { TrackingPixelsIntegration } from '@/components/integrations/TrackingPixelsIntegration';
 import { PremiumFeatureGate } from '@/components/dashboard/PremiumFeatureGate';
@@ -25,18 +25,20 @@ function IntegrationsContent() {
           variant="ghost"
           size="sm"
           onClick={() => router.push('/dashboard')}
-          className="mb-4"
+          className="mb-4 text-[#5FC7CD]"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
 
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center">
-            <Zap className="w-7 h-7 text-purple-600" />
+          <div className="w-14 h-14 rounded-xl bg-[#5FC7CD]/10 flex items-center justify-center">
+            <Sparkles className="w-7 h-7 text-[#5FC7CD]" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Integrations</h1>
+            <h1 className="text-3xl font-bold text-[#455263] tracking-tight">
+              Integrations
+            </h1>
             <p className="text-muted-foreground mt-1">
               Connect your favorite tools and services
             </p>
