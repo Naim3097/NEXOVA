@@ -4797,7 +4797,36 @@ function generateProductCarouselHTML(element: Element): string {
         }
         @media (max-width: 480px) {
           #product-carousel-${sanitizedId} > div > div:last-child {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} > div:last-child {
+            padding: 10px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} h3 {
+            font-size: 14px !important;
+            margin-bottom: 2px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} p {
+            font-size: 11px !important;
+            -webkit-line-clamp: 2 !important;
+            margin-bottom: 6px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} button[onclick*="toggleDropdown"] {
+            padding: 8px 10px !important;
+            font-size: 12px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} button[onclick*="addToCart"] {
+            padding: 8px !important;
+            font-size: 13px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} button[onclick*="addToCart"] svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+          #product-carousel-${sanitizedId} .product-card-${sanitizedId} [style*="font-weight: 700"] {
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
           }
         }
       </style>

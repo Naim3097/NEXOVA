@@ -105,7 +105,7 @@ export const ProductCarouselElement = React.memo(
 
     // Determine grid columns based on viewport mode and column setting
     const getGridCols = () => {
-      if (viewportMode === 'mobile') return 'grid-cols-1';
+      if (viewportMode === 'mobile') return 'grid-cols-2';
       if (viewportMode === 'tablet')
         return columns >= 3 ? 'grid-cols-2' : 'grid-cols-2';
       return `grid-cols-${columns}`;
@@ -346,7 +346,9 @@ export const ProductCarouselElement = React.memo(
               )}
 
               {/* Product Grid */}
-              <div className={`grid ${getGridCols()} gap-6`}>
+              <div
+                className={`grid ${getGridCols()} ${viewportMode === 'mobile' ? 'gap-3' : 'gap-6'}`}
+              >
                 {visibleProducts.map((product) => {
                   const hasVariations =
                     product.variations && product.variations.length > 0;
