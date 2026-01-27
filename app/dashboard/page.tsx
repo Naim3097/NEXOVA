@@ -148,15 +148,21 @@ function DashboardContent() {
                     )}
                     <span className="capitalize">{currentPlan}</span>
                   </Badge>
-                  {!isPremiumOrHigher && (
+                  {currentPlan !== 'enterprise' && (
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-yellow-600 border-yellow-500 hover:bg-yellow-50"
+                      className={
+                        currentPlan === 'premium'
+                          ? 'text-purple-600 border-purple-500 hover:bg-purple-50'
+                          : 'text-yellow-600 border-yellow-500 hover:bg-yellow-50'
+                      }
                       onClick={() => setShowUpgradeModal(true)}
                     >
                       <ArrowUpCircle className="h-3 w-3 mr-1" />
-                      Upgrade
+                      {currentPlan === 'premium'
+                        ? 'Upgrade to Enterprise'
+                        : 'Upgrade'}
                     </Button>
                   )}
                 </div>
