@@ -13,7 +13,7 @@ import {
   Edit,
   Trash2,
   Crown,
-  Sparkles,
+  ArrowUpCircle,
   Shield,
 } from 'lucide-react';
 import { UpgradePlanModal } from '@/components/dashboard/UpgradePlanModal';
@@ -155,7 +155,7 @@ function DashboardContent() {
                       className="text-yellow-600 border-yellow-500 hover:bg-yellow-50"
                       onClick={() => setShowUpgradeModal(true)}
                     >
-                      <Sparkles className="h-3 w-3 mr-1" />
+                      <ArrowUpCircle className="h-3 w-3 mr-1" />
                       Upgrade
                     </Button>
                   )}

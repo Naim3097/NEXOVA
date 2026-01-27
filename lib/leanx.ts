@@ -119,100 +119,123 @@ export async function getLeanXBankList(
     const errors: string[] = [];
 
     // Query all combinations in parallel
-    await Promise.all(combinations.map(async (combo) => {
-      try {
-        const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/list-payment-services`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'auth-token': config.authToken,
-          },
-          body: JSON.stringify({
-            payment_type: combo.type,
-            payment_status: 'active',
-            payment_model_reference_id: combo.model,
-          }),
-        });
-
-        const data = await response.json();
-
-        console.log(`LeanX ${combo.label} response:`, {
-          response_code: data.response_code,
-          has_data: !!data.data,
-        });
-
-        // Parse the response - handle multiple possible structures
-        let extracted: any[] = [];
-
-        // CASE A: Standard/Flat Response (Common for B2C)
-        if (Array.isArray(data.data)) {
-          extracted = data.data;
-        }
-        // CASE B: First-level Object Wrapper
-        else if (data.data?.payment_services) {
-          extracted = data.data.payment_services;
-        }
-        // CASE C: Deep Nested List (Common for B2B / Enterprise)
-        // Structure: data.data.list.data[0].WEB_PAYMENT or data.data.list.data[0].DIGITAL_PAYMENT
-        else if (data.data?.list?.data && Array.isArray(data.data.list.data)) {
-          const firstItem = data.data.list.data[0];
-          if (firstItem) {
-            // Dynamically grab key based on request type
-            if (combo.type === 'WEB_PAYMENT') {
-              extracted = firstItem.WEB_PAYMENT || [];
-            } else if (combo.type === 'DIGITAL_PAYMENT') {
-              extracted = firstItem.DIGITAL_PAYMENT || [];
+    await Promise.all(
+      combinations.map(async (combo) => {
+        try {
+          const response = await fetch(
+            `${LEANX_API_HOST}/api/v1/merchant/list-payment-services`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'auth-token': config.authToken,
+              },
+              body: JSON.stringify({
+                payment_type: combo.type,
+                payment_status: 'active',
+                payment_model_reference_id: combo.model,
+              }),
             }
-          }
-        }
+          );
 
-        // Normalize and add to collection
-        if (extracted && extracted.length > 0) {
-          // Filter for only active payment services
-          const activeBanks = extracted.filter((b: any) => {
-            // Check various possible status fields
-            const status = b.status || b.payment_status || b.payment_service_status || '';
-            const isActive = !status || status.toLowerCase() === 'active' || status === '1' || status === true;
-            return isActive && b.payment_service_id;
+          const data = await response.json();
+
+          console.log(`LeanX ${combo.label} response:`, {
+            response_code: data.response_code,
+            has_data: !!data.data,
           });
 
-          const tagged = activeBanks.map((b: any) => ({
-            id: b.payment_service_id,
-            // STRIP SUFFIX: Converts "Maybank2u B2B" -> "Maybank2u"
-            name: (b.name || b.payment_service_name || '').replace(/ B2B$/i, '').trim(),
-            type: combo.type as 'WEB_PAYMENT' | 'DIGITAL_PAYMENT',
-            icon: combo.type === 'WEB_PAYMENT' ? 'ri-bank-line' : 'ri-wallet-3-line',
-            logo: b.payment_service_logo,
-          }));
-          allBanks = [...allBanks, ...tagged];
+          // Parse the response - handle multiple possible structures
+          let extracted: any[] = [];
 
-          console.log(`Found ${tagged.length} active banks for ${combo.label} (${extracted.length} total)`);
+          // CASE A: Standard/Flat Response (Common for B2C)
+          if (Array.isArray(data.data)) {
+            extracted = data.data;
+          }
+          // CASE B: First-level Object Wrapper
+          else if (data.data?.payment_services) {
+            extracted = data.data.payment_services;
+          }
+          // CASE C: Deep Nested List (Common for B2B / Enterprise)
+          // Structure: data.data.list.data[0].WEB_PAYMENT or data.data.list.data[0].DIGITAL_PAYMENT
+          else if (
+            data.data?.list?.data &&
+            Array.isArray(data.data.list.data)
+          ) {
+            const firstItem = data.data.list.data[0];
+            if (firstItem) {
+              // Dynamically grab key based on request type
+              if (combo.type === 'WEB_PAYMENT') {
+                extracted = firstItem.WEB_PAYMENT || [];
+              } else if (combo.type === 'DIGITAL_PAYMENT') {
+                extracted = firstItem.DIGITAL_PAYMENT || [];
+              }
+            }
+          }
+
+          // Normalize and add to collection
+          if (extracted && extracted.length > 0) {
+            // Filter for only active payment services
+            const activeBanks = extracted.filter((b: any) => {
+              // Check various possible status fields
+              const status =
+                b.status || b.payment_status || b.payment_service_status || '';
+              const isActive =
+                !status ||
+                status.toLowerCase() === 'active' ||
+                status === '1' ||
+                status === true;
+              return isActive && b.payment_service_id;
+            });
+
+            const tagged = activeBanks.map((b: any) => ({
+              id: b.payment_service_id,
+              // STRIP SUFFIX: Converts "Maybank2u B2B" -> "Maybank2u"
+              name: (b.name || b.payment_service_name || '')
+                .replace(/ B2B$/i, '')
+                .trim(),
+              type: combo.type as 'WEB_PAYMENT' | 'DIGITAL_PAYMENT',
+              icon:
+                combo.type === 'WEB_PAYMENT'
+                  ? 'ri-bank-line'
+                  : 'ri-wallet-3-line',
+              logo: b.payment_service_logo,
+            }));
+            allBanks = [...allBanks, ...tagged];
+
+            console.log(
+              `Found ${tagged.length} active banks for ${combo.label} (${extracted.length} total)`
+            );
+          }
+        } catch (error) {
+          console.error(`Error fetching ${combo.label}:`, error);
+          errors.push(
+            `${combo.label}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
         }
-
-      } catch (error) {
-        console.error(`Error fetching ${combo.label}:`, error);
-        errors.push(`${combo.label}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
-    }));
+      })
+    );
 
     // Deduplicate banks by payment_service_id
-    const uniqueBanks = allBanks.filter((bank, index, self) =>
-      index === self.findIndex(b => b.id === bank.id)
+    const uniqueBanks = allBanks.filter(
+      (bank, index, self) => index === self.findIndex((b) => b.id === bank.id)
     );
 
     console.log('LeanX Auto-Detection complete:', {
       total_banks: uniqueBanks.length,
-      web_payment: uniqueBanks.filter(b => b.type === 'WEB_PAYMENT').length,
-      digital_payment: uniqueBanks.filter(b => b.type === 'DIGITAL_PAYMENT').length,
+      web_payment: uniqueBanks.filter((b) => b.type === 'WEB_PAYMENT').length,
+      digital_payment: uniqueBanks.filter((b) => b.type === 'DIGITAL_PAYMENT')
+        .length,
       errors: errors.length,
     });
 
     if (uniqueBanks.length === 0) {
       return {
         success: false,
-        error: errors.length > 0
-          ? `Failed to fetch banks: ${errors.join('; ')}`
-          : 'No active banks found. Please check your LeanX account configuration.',
+        error:
+          errors.length > 0
+            ? `Failed to fetch banks: ${errors.join('; ')}`
+            : 'No active banks found. Please check your LeanX account configuration.',
       };
     }
 
@@ -220,7 +243,6 @@ export async function getLeanXBankList(
       success: true,
       banks: uniqueBanks,
     };
-
   } catch (error) {
     console.error('LeanX Bank List Error:', error);
     return {
@@ -267,14 +289,17 @@ export async function createLeanXPayment(
       payment_service_id: payment.paymentServiceId,
     });
 
-    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/create-bill-silent`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': config.authToken,
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `${LEANX_API_HOST}/api/v1/merchant/create-bill-silent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': config.authToken,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     const result: LeanXPaymentResponse = await response.json();
 
@@ -282,6 +307,8 @@ export async function createLeanXPayment(
       response_code: result.response_code,
       description: result.description,
       has_data: !!result.data,
+      breakdown_errors: result.breakdown_errors,
+      full_response: JSON.stringify(result),
     });
 
     // Success response code is 2000
@@ -296,10 +323,12 @@ export async function createLeanXPayment(
     } else {
       return {
         success: false,
-        error: result.breakdown_errors || result.description || 'Payment creation failed',
+        error:
+          result.breakdown_errors ||
+          result.description ||
+          'Payment creation failed',
       };
     }
-
   } catch (error) {
     console.error('LeanX API Error:', error);
     return {
@@ -338,9 +367,10 @@ export async function verifyLeanXPayment(
   queryType: 'bill_no' | 'invoice_ref' = 'bill_no'
 ): Promise<PaymentResponse> {
   try {
-    const payload = queryType === 'bill_no'
-      ? { bill_no: billNoOrInvoiceRef }
-      : { invoice_ref: billNoOrInvoiceRef };
+    const payload =
+      queryType === 'bill_no'
+        ? { bill_no: billNoOrInvoiceRef }
+        : { invoice_ref: billNoOrInvoiceRef };
 
     console.log('Verifying LeanX payment:', {
       host: LEANX_API_HOST,
@@ -348,14 +378,17 @@ export async function verifyLeanXPayment(
       value: billNoOrInvoiceRef,
     });
 
-    const response = await fetch(`${LEANX_API_HOST}/api/v1/merchant/transaction-status`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': config.authToken,
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `${LEANX_API_HOST}/api/v1/merchant/transaction-status`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': config.authToken,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     const result: LeanXTransactionStatusResponse = await response.json();
 
@@ -371,9 +404,15 @@ export async function verifyLeanXPayment(
       let internalStatus = result.data.status;
       if (result.data.status === 'success' || result.data.status === 'paid') {
         internalStatus = 'completed';
-      } else if (result.data.status === 'pending' || result.data.status === 'processing') {
+      } else if (
+        result.data.status === 'pending' ||
+        result.data.status === 'processing'
+      ) {
         internalStatus = 'processing';
-      } else if (result.data.status === 'failed' || result.data.status === 'declined') {
+      } else if (
+        result.data.status === 'failed' ||
+        result.data.status === 'declined'
+      ) {
         internalStatus = 'failed';
       } else if (result.data.status === 'cancelled') {
         internalStatus = 'cancelled';
@@ -390,10 +429,12 @@ export async function verifyLeanXPayment(
     } else {
       return {
         success: false,
-        error: result.breakdown_errors || result.description || 'Transaction status check failed',
+        error:
+          result.breakdown_errors ||
+          result.description ||
+          'Transaction status check failed',
       };
     }
-
   } catch (error) {
     console.error('LeanX Verification Error:', error);
     return {
@@ -418,7 +459,7 @@ export async function processLeanXPayment(
 ): Promise<PaymentResponse> {
   try {
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Mock validation
     if (paymentDetails.cardNumber.length !== 16) {
@@ -436,7 +477,6 @@ export async function processLeanXPayment(
       status: 'completed',
       message: 'Payment processed successfully',
     };
-
   } catch (error) {
     console.error('LeanX Payment Processing Error:', error);
     return {
@@ -476,7 +516,6 @@ export function validateLeanXWebhook(
 
     // Timing-safe comparison
     return crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
-
   } catch (error) {
     console.error('Webhook validation error:', error);
     return false;
@@ -554,7 +593,7 @@ export async function processLeanXSubscription(
     // });
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // Mock validation
     const cardNumber = request.payment_method.card_number.replace(/\s/g, '');
@@ -579,7 +618,6 @@ export async function processLeanXSubscription(
       customer_id: mockCustomerId,
       transaction_id: mockTransactionId,
     };
-
   } catch (error) {
     console.error('LeanX subscription processing error:', error);
     return {
@@ -617,7 +655,7 @@ export async function cancelLeanXSubscription(
     // });
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // MOCK SUCCESS RESPONSE
     console.log('Mock: Cancelling subscription', request.subscription_id);
@@ -625,7 +663,6 @@ export async function cancelLeanXSubscription(
     return {
       success: true,
     };
-
   } catch (error) {
     console.error('LeanX subscription cancellation error:', error);
     return {

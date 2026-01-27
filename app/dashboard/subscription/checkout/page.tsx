@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai';
 import { profileAtom } from '@/store/auth';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +24,9 @@ export default function SubscriptionCheckoutPage() {
   const profile = useAtomValue(profileAtom);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>(
+    'monthly'
+  );
 
   // Form state
   const [formData, setFormData] = useState({
@@ -84,7 +93,9 @@ export default function SubscriptionCheckoutPage() {
       router.push('/dashboard/subscription/success');
     } catch (err) {
       console.error('Subscription error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to process payment');
+      setError(
+        err instanceof Error ? err.message : 'Failed to process payment'
+      );
     } finally {
       setLoading(false);
     }
@@ -94,13 +105,11 @@ export default function SubscriptionCheckoutPage() {
   if (profile?.subscription_plan === 'pro') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <Card className="max-w-md">
             <CardHeader>
               <CardTitle>Already Subscribed</CardTitle>
-              <CardDescription>
-                You're already on the Pro plan!
-              </CardDescription>
+              <CardDescription>You're already on the Pro plan!</CardDescription>
             </CardHeader>
             <CardFooter>
               <Button onClick={() => router.push('/dashboard')}>
@@ -115,15 +124,20 @@ export default function SubscriptionCheckoutPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-background py-12 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 flex items-center gap-2 mb-4">
+            <Link
+              href="/dashboard"
+              className="text-primary hover:text-primary/80 flex items-center gap-2 mb-4"
+            >
               ← Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Upgrade to Pro</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-foreground">
+              Upgrade to Pro
+            </h1>
+            <p className="text-muted-foreground mt-2">
               Get unlimited projects, custom domains, and priority support
             </p>
           </div>
@@ -149,29 +163,41 @@ export default function SubscriptionCheckoutPage() {
                           onClick={() => setBillingInterval('monthly')}
                           className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
                             billingInterval === 'monthly'
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground'
                           }`}
                         >
-                          <div className="font-semibold">Monthly</div>
-                          <div className="text-2xl font-bold mt-1">$29</div>
-                          <div className="text-sm text-gray-600">per month</div>
+                          <div className="font-semibold text-foreground">
+                            Monthly
+                          </div>
+                          <div className="text-2xl font-bold mt-1 text-foreground">
+                            $29
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            per month
+                          </div>
                         </button>
                         <button
                           type="button"
                           onClick={() => setBillingInterval('yearly')}
                           className={`flex-1 p-4 border-2 rounded-lg transition-colors relative ${
                             billingInterval === 'yearly'
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:border-muted-foreground'
                           }`}
                         >
-                          <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                          <div className="absolute -top-2 -right-2 bg-chart-2 text-white text-xs px-2 py-1 rounded-full font-semibold">
                             Save 17%
                           </div>
-                          <div className="font-semibold">Yearly</div>
-                          <div className="text-2xl font-bold mt-1">$290</div>
-                          <div className="text-sm text-gray-600">~$24/month</div>
+                          <div className="font-semibold text-foreground">
+                            Yearly
+                          </div>
+                          <div className="text-2xl font-bold mt-1 text-foreground">
+                            $290
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            ~$24/month
+                          </div>
                         </button>
                       </div>
                     </div>
@@ -183,7 +209,9 @@ export default function SubscriptionCheckoutPage() {
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('email', e.target.value)
+                        }
                         required
                         placeholder="your@email.com"
                       />
@@ -198,7 +226,10 @@ export default function SubscriptionCheckoutPage() {
                           type="text"
                           value={formData.cardNumber}
                           onChange={(e) =>
-                            handleInputChange('cardNumber', formatCardNumber(e.target.value))
+                            handleInputChange(
+                              'cardNumber',
+                              formatCardNumber(e.target.value)
+                            )
                           }
                           required
                           placeholder="1234 5678 9012 3456"
@@ -215,7 +246,9 @@ export default function SubscriptionCheckoutPage() {
                         id="cardName"
                         type="text"
                         value={formData.cardName}
-                        onChange={(e) => handleInputChange('cardName', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('cardName', e.target.value)
+                        }
                         required
                         placeholder="John Doe"
                       />
@@ -230,7 +263,10 @@ export default function SubscriptionCheckoutPage() {
                           type="text"
                           value={formData.expiryDate}
                           onChange={(e) =>
-                            handleInputChange('expiryDate', formatExpiryDate(e.target.value))
+                            handleInputChange(
+                              'expiryDate',
+                              formatExpiryDate(e.target.value)
+                            )
                           }
                           required
                           placeholder="MM/YY"
@@ -244,7 +280,10 @@ export default function SubscriptionCheckoutPage() {
                           type="text"
                           value={formData.cvv}
                           onChange={(e) =>
-                            handleInputChange('cvv', e.target.value.replace(/\D/g, '').substring(0, 4))
+                            handleInputChange(
+                              'cvv',
+                              e.target.value.replace(/\D/g, '').substring(0, 4)
+                            )
                           }
                           required
                           placeholder="123"
@@ -255,7 +294,7 @@ export default function SubscriptionCheckoutPage() {
 
                     {/* Error Message */}
                     {error && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive">
                         {error}
                       </div>
                     )}
@@ -263,7 +302,7 @@ export default function SubscriptionCheckoutPage() {
                     {/* Submit Button */}
                     <Button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full"
                       size="lg"
                       disabled={loading}
                     >
@@ -272,13 +311,15 @@ export default function SubscriptionCheckoutPage() {
                       ) : (
                         <>
                           <Lock className="w-4 h-4 mr-2" />
-                          Subscribe - ${pricing[billingInterval]}/{billingInterval === 'monthly' ? 'month' : 'year'}
+                          Subscribe - ${pricing[billingInterval]}/
+                          {billingInterval === 'monthly' ? 'month' : 'year'}
                         </>
                       )}
                     </Button>
 
-                    <p className="text-xs text-gray-500 text-center">
-                      By subscribing, you agree to our Terms of Service and Privacy Policy. You can cancel anytime.
+                    <p className="text-xs text-muted-foreground text-center">
+                      By subscribing, you agree to our Terms of Service and
+                      Privacy Policy. You can cancel anytime.
                     </p>
                   </form>
                 </CardContent>
@@ -293,7 +334,9 @@ export default function SubscriptionCheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="font-semibold mb-3">Pro Plan Includes:</h3>
+                    <h3 className="font-semibold text-foreground mb-3">
+                      Pro Plan Includes:
+                    </h3>
                     <ul className="space-y-2">
                       {[
                         'Unlimited projects',
@@ -305,9 +348,14 @@ export default function SubscriptionCheckoutPage() {
                         'Form submissions',
                         'Auto-save & versions',
                       ].map((feature) => (
-                        <li key={feature} className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{feature}</span>
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2 text-sm"
+                        >
+                          <Check className="w-4 h-4 text-chart-2 flex-shrink-0 mt-0.5" />
+                          <span className="text-muted-foreground">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -315,27 +363,34 @@ export default function SubscriptionCheckoutPage() {
 
                   <div className="border-t pt-4">
                     <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Pro Plan ({billingInterval})</span>
-                      <span className="font-semibold">${pricing[billingInterval]}</span>
+                      <span className="text-muted-foreground">
+                        Pro Plan ({billingInterval})
+                      </span>
+                      <span className="font-semibold text-foreground">
+                        ${pricing[billingInterval]}
+                      </span>
                     </div>
                     {billingInterval === 'yearly' && (
-                      <div className="flex justify-between mb-2 text-sm text-green-600">
+                      <div className="flex justify-between mb-2 text-sm text-chart-2">
                         <span>Savings (vs monthly)</span>
                         <span>-$58</span>
                       </div>
                     )}
                     <div className="flex justify-between text-lg font-bold border-t pt-2">
-                      <span>Total Due Today</span>
-                      <span>${pricing[billingInterval]}</span>
+                      <span className="text-foreground">Total Due Today</span>
+                      <span className="text-foreground">
+                        ${pricing[billingInterval]}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                    <p className="font-semibold text-blue-900 mb-1">
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm">
+                    <p className="font-semibold text-foreground mb-1">
                       14-Day Money-Back Guarantee
                     </p>
-                    <p className="text-blue-700">
-                      Try Pro risk-free. Get a full refund if you're not satisfied within 14 days.
+                    <p className="text-muted-foreground">
+                      Try Pro risk-free. Get a full refund if you're not
+                      satisfied within 14 days.
                     </p>
                   </div>
                 </CardContent>

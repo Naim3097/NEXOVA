@@ -96,9 +96,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get system LeanX credentials from environment variables only (no hardcoded fallbacks)
-    const systemAuthToken = process.env.LEANX_SYSTEM_AUTH_TOKEN;
-    const systemCollectionUuid = process.env.LEANX_SYSTEM_COLLECTION_UUID;
+    // Get LeanX credentials from environment variables
+    // Use the same credentials as the regular payment API (LEANX_AUTH_TOKEN, LEANX_COLLECTION_UUID)
+    const systemAuthToken = process.env.LEANX_AUTH_TOKEN;
+    const systemCollectionUuid = process.env.LEANX_COLLECTION_UUID;
 
     if (!systemAuthToken || !systemCollectionUuid) {
       console.error('CRITICAL: LeanX subscription credentials not configured');
@@ -170,7 +171,23 @@ export async function POST(request: NextRequest) {
     // Create LeanX payment
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
     const callbackUrl = `${baseUrl}/api/subscription/webhook`;
-    const returnUrl = `${baseUrl}/dashboard?subscription=success&order=${orderId}`;
+    // Return URL - user will be redirected here after payment (success or cancel)
+    // The subscription page will check the actual payment status
+    const returnUrl = `${baseUrl}/dashboard/subscription?order=${orderId}`;
+
+    console.log('[Subscription Payment] Creating LeanX payment:', {
+      orderId,
+      amount: PREMIUM_PRICE,
+      bankId,
+      customerEmail: user.email,
+      customerName:
+        profile.display_name || user.email?.split('@')[0] || 'Customer',
+      customerPhone: profile.phone || '',
+      callbackUrl,
+      returnUrl,
+      collectionUuid: systemCollectionUuid,
+      authTokenLength: systemAuthToken?.length,
+    });
 
     const leanxResult = await createLeanXPayment(
       {
@@ -187,7 +204,7 @@ export async function POST(request: NextRequest) {
         customerEmail: user.email,
         customerName:
           profile.display_name || user.email?.split('@')[0] || 'Customer',
-        customerPhone: profile.phone || '',
+        customerPhone: profile.phone || '0000000000', // LeanX requires a non-empty phone number
         callbackUrl,
         returnUrl,
         paymentServiceId: bankId,
@@ -195,6 +212,11 @@ export async function POST(request: NextRequest) {
     );
 
     if (!leanxResult.success) {
+      console.error('[Subscription Payment] LeanX payment failed:', {
+        error: leanxResult.error,
+        orderId,
+      });
+
       // Update subscription to failed
       await supabase
         .from('subscriptions')

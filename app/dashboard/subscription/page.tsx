@@ -5,10 +5,24 @@ import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai';
 import { profileAtom } from '@/store/auth';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, CreditCard, Calendar, AlertCircle, TrendingUp, Sparkles } from 'lucide-react';
+import {
+  Check,
+  CreditCard,
+  Calendar,
+  AlertCircle,
+  TrendingUp,
+  Sparkles,
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface SubscriptionStatus {
@@ -59,14 +73,20 @@ export default function SubscriptionManagementPage() {
       setStatus(data);
     } catch (err) {
       console.error('Error fetching subscription:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load subscription');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load subscription'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel your Pro subscription? You will retain access until the end of your billing period.')) {
+    if (
+      !confirm(
+        'Are you sure you want to cancel your Pro subscription? You will retain access until the end of your billing period.'
+      )
+    ) {
       return;
     }
 
@@ -86,7 +106,9 @@ export default function SubscriptionManagementPage() {
       fetchSubscriptionStatus();
     } catch (err) {
       console.error('Error cancelling subscription:', err);
-      alert(err instanceof Error ? err.message : 'Failed to cancel subscription');
+      alert(
+        err instanceof Error ? err.message : 'Failed to cancel subscription'
+      );
     } finally {
       setCancelling(false);
     }
@@ -103,8 +125,8 @@ export default function SubscriptionManagementPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </ProtectedRoute>
     );
@@ -113,13 +135,13 @@ export default function SubscriptionManagementPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <Card className="max-w-md">
             <CardHeader>
               <CardTitle>Error</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">{error}</p>
+              <p className="text-muted-foreground">{error}</p>
             </CardContent>
             <CardFooter>
               <Button onClick={() => router.push('/dashboard')}>
@@ -138,15 +160,20 @@ export default function SubscriptionManagementPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-background py-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 flex items-center gap-2 mb-4">
+            <Link
+              href="/dashboard"
+              className="text-primary hover:text-primary/80 flex items-center gap-2 mb-4"
+            >
               ← Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Subscription Management</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-foreground">
+              Subscription Management
+            </h1>
+            <p className="text-muted-foreground mt-2">
               Manage your subscription and billing
             </p>
           </div>
@@ -157,8 +184,11 @@ export default function SubscriptionManagementPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    {isPro && <Sparkles className="w-5 h-5 text-blue-600" />}
-                    Current Plan: {status?.profile.subscription_plan === 'pro' ? 'Pro' : 'Free'}
+                    {isPro && <Sparkles className="w-5 h-5 text-primary" />}
+                    Current Plan:{' '}
+                    {status?.profile.subscription_plan === 'pro'
+                      ? 'Pro'
+                      : 'Free'}
                   </CardTitle>
                   <CardDescription>
                     {status?.subscription && (
@@ -173,8 +203,8 @@ export default function SubscriptionManagementPage() {
                     status?.profile.subscription_status === 'active'
                       ? 'default'
                       : status?.profile.subscription_status === 'cancelled'
-                      ? 'destructive'
-                      : 'secondary'
+                        ? 'destructive'
+                        : 'secondary'
                   }
                   className="capitalize"
                 >
@@ -186,29 +216,37 @@ export default function SubscriptionManagementPage() {
               {/* Project Usage */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Projects</span>
-                  <span className="text-sm text-gray-600">
-                    {status?.projects.current} / {isPro ? 'Unlimited' : status?.projects.max_allowed}
+                  <span className="text-sm font-medium text-foreground">
+                    Projects
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {status?.projects.current} /{' '}
+                    {isPro ? 'Unlimited' : status?.projects.max_allowed}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className={`h-2 rounded-full ${
-                      status?.projects.can_create ? 'bg-blue-600' : 'bg-red-600'
+                      status?.projects.can_create
+                        ? 'bg-primary'
+                        : 'bg-destructive'
                     }`}
                     style={{
                       width: isPro
                         ? '50%'
                         : `${Math.min(
-                            ((status?.projects.current || 0) / (status?.projects.max_allowed || 1)) * 100,
+                            ((status?.projects.current || 0) /
+                              (status?.projects.max_allowed || 1)) *
+                              100,
                             100
                           )}%`,
                     }}
                   />
                 </div>
                 {!status?.projects.can_create && !isPro && (
-                  <p className="text-sm text-red-600 mt-2">
-                    You've reached your project limit. Upgrade to Pro for unlimited projects.
+                  <p className="text-sm text-destructive mt-2">
+                    You've reached your project limit. Upgrade to Pro for
+                    unlimited projects.
                   </p>
                 )}
               </div>
@@ -217,21 +255,27 @@ export default function SubscriptionManagementPage() {
               {status?.subscription && (
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3">
-                    <CreditCard className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <CreditCard className="w-5 h-5 text-muted-foreground mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Amount</p>
-                      <p className="text-sm text-gray-600">
-                        {status.subscription.currency} ${status.subscription.amount}/{status.subscription.billing_interval === 'monthly' ? 'mo' : 'yr'}
+                      <p className="text-sm font-medium text-foreground">
+                        Amount
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {status.subscription.currency} $
+                        {status.subscription.amount}/
+                        {status.subscription.billing_interval === 'monthly'
+                          ? 'mo'
+                          : 'yr'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">
+                      <p className="text-sm font-medium text-foreground">
                         {isCancelled ? 'Ends On' : 'Renews On'}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         {formatDate(status.subscription.current_period_end)}
                       </p>
                     </div>
@@ -241,25 +285,32 @@ export default function SubscriptionManagementPage() {
 
               {/* Warnings */}
               {isCancelled && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
+                <div className="bg-chart-4/10 border border-chart-4/30 rounded-lg p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-chart-4 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-orange-900">Subscription Cancelled</p>
-                    <p className="text-sm text-orange-700 mt-1">
-                      Your Pro features will remain active until {status?.subscription && formatDate(status.subscription.current_period_end)}.
-                      After that, you'll be downgraded to the Free plan.
+                    <p className="font-semibold text-foreground">
+                      Subscription Cancelled
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your Pro features will remain active until{' '}
+                      {status?.subscription &&
+                        formatDate(status.subscription.current_period_end)}
+                      . After that, you'll be downgraded to the Free plan.
                     </p>
                   </div>
                 </div>
               )}
 
               {isPastDue && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-destructive mt-0.5" />
                   <div>
-                    <p className="font-semibold text-red-900">Payment Failed</p>
-                    <p className="text-sm text-red-700 mt-1">
-                      Your recent payment failed. Please update your payment method to continue your Pro subscription.
+                    <p className="font-semibold text-foreground">
+                      Payment Failed
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your recent payment failed. Please update your payment
+                      method to continue your Pro subscription.
                     </p>
                   </div>
                 </div>
@@ -267,7 +318,7 @@ export default function SubscriptionManagementPage() {
 
               {/* Features List */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3">
+                <h4 className="font-semibold text-foreground mb-3">
                   {isPro ? 'Pro Features' : 'Your Plan Includes'}
                 </h4>
                 <ul className="space-y-2">
@@ -316,7 +367,7 @@ export default function SubscriptionManagementPage() {
             <CardFooter className="flex gap-3">
               {!isPro && (
                 <Button
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1"
                   onClick={() => router.push('/pricing')}
                 >
                   <TrendingUp className="w-4 h-4 mr-2" />
@@ -335,8 +386,10 @@ export default function SubscriptionManagementPage() {
               )}
               {isPro && isCancelled && (
                 <Button
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                  onClick={() => router.push('/dashboard/subscription/checkout')}
+                  className="flex-1"
+                  onClick={() =>
+                    router.push('/dashboard/subscription/checkout')
+                  }
                 >
                   Reactivate Subscription
                 </Button>
@@ -352,36 +405,41 @@ export default function SubscriptionManagementPage() {
 
           {/* Upgrade Banner for Free Users */}
           {!isPro && (
-            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/10">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-blue-600" />
+                  <Sparkles className="w-5 h-5 text-primary" />
                   <CardTitle>Unlock More with Pro</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 mb-4">
-                  Get unlimited projects, custom domains, advanced analytics, and priority support for just $29/month.
+                <p className="text-muted-foreground mb-4">
+                  Get unlimited projects, custom domains, advanced analytics,
+                  and priority support for just $29/month.
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-lg p-4 border border-blue-100">
-                    <h4 className="font-semibold text-gray-900 mb-2">Monthly</h4>
-                    <p className="text-2xl font-bold text-blue-600 mb-1">$29</p>
-                    <p className="text-sm text-gray-600">per month</p>
+                  <div className="bg-card rounded-lg p-4 border">
+                    <h4 className="font-semibold text-foreground mb-2">
+                      Monthly
+                    </h4>
+                    <p className="text-2xl font-bold text-primary mb-1">$29</p>
+                    <p className="text-sm text-muted-foreground">per month</p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border border-blue-100 relative">
-                    <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  <div className="bg-card rounded-lg p-4 border relative">
+                    <div className="absolute -top-2 -right-2 bg-chart-2 text-white text-xs px-2 py-1 rounded-full font-semibold">
                       Save 17%
                     </div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Yearly</h4>
-                    <p className="text-2xl font-bold text-blue-600 mb-1">$290</p>
-                    <p className="text-sm text-gray-600">~$24/month</p>
+                    <h4 className="font-semibold text-foreground mb-2">
+                      Yearly
+                    </h4>
+                    <p className="text-2xl font-bold text-primary mb-1">$290</p>
+                    <p className="text-sm text-muted-foreground">~$24/month</p>
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full"
                   size="lg"
                   onClick={() => router.push('/pricing')}
                 >
