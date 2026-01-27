@@ -1,64 +1,90 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-20 sm:py-32">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-          {/* Left Column - Text Content */}
-          <div className="flex flex-col text-left">
-            <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium mb-6 w-fit">
-              <span className="text-blue-600 font-semibold">NEW RELEASE V2.0</span>
-            </div>
+    <section className="relative z-20 bg-white pt-8 pb-[30vw] md:pb-[20vw] lg:pb-[15vw]">
+      {/* Background Gradients/Decorations could go here */}
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="text-center max-w-4xl mx-auto mb-2">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-black mb-4 leading-tight">
+            Build <span className="text-[#4FD1C5]">•</span> Edit <span className="text-[#4FD1C5]">•</span> Sell
+            <br />
+            All in one flow
+          </h1>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6">
-              Build landing pages for your business.
-            </h1>
+          <p className="text-lg text-gray-500 mb-6 max-w-2xl mx-auto leading-relaxed">
+            Stop stitching tools together. The only professional builder with native payments and live inventory baked directly into the design process.
+          </p>
 
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-              The professional drag-and-drop builder designed for performance. Create high-converting pages without writing code.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <Link href="/builder">
-                <Button size="lg" className="bg-black hover:bg-gray-800 text-white text-base px-8 h-12">
-                  Start Building Free
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="text-base px-8 h-12">
-                View Demo
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/builder">
+              <Button size="lg" className="bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] hover:opacity-90 text-white rounded-full px-8 h-12 text-base font-medium shadow-lg border-0">
+                Create Landing Page Now
               </Button>
-            </div>
+            </Link>
+            <Button size="lg" className="bg-black hover:bg-gray-800 text-white rounded-full px-8 h-12 text-base font-medium">
+              View Demo
+            </Button>
+          </div>
+        </div>
 
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <span>✓ No credit card required</span>
-              <span>✓ Free tier available</span>
+        {/* Hero Assets */}
+        <div className="relative max-w-6xl mx-auto mt-0 z-20">
+          {/* Decorative Dotted Lines */}
+          <div className="absolute inset-0 -z-10 pointer-events-none hidden md:block scale-125 -top-20">
+            <svg className="w-full h-full overflow-visible" viewBox="0 0 1000 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+               {/* Left Curve Layer 1 */}
+               <path d="M150 400 Q 100 200, 250 100" stroke="#E5E7EB" strokeWidth="2" strokeDasharray="6 6" fill="none"/>
+               {/* Left Curve Layer 2 (Offset) */}
+               <path d="M130 400 Q 80 200, 230 100" stroke="#E5E7EB" strokeWidth="2" strokeDasharray="6 6" fill="none" opacity="0.6" />
+               
+               {/* Right Curve Layer 1 */}
+               <path d="M850 400 Q 900 200, 750 100" stroke="#E5E7EB" strokeWidth="2" strokeDasharray="6 6" fill="none"/>
+               {/* Right Curve Layer 2 (Offset) */}
+               <path d="M870 400 Q 920 200, 770 100" stroke="#E5E7EB" strokeWidth="2" strokeDasharray="6 6" fill="none" opacity="0.6" />
+            </svg>
+          </div>
+
+          <div className="relative z-10 -mb-[50vw] md:-mb-[35vw] lg:-mb-[30vw]">
+            <Image
+              src="/assets/landing/hero-section-asset.png"
+              alt="Nexova Builder Interface"
+              width={1200}
+              height={800}
+              quality={100}
+              priority
+              className="w-full h-auto drop-shadow-2xl"
+            />
+          </div>
+
+          {/* Floating Element 1 - Left */}
+          <div className="absolute top-0 -left-4 md:left-4 lg:-left-8 animate-float-slow hidden md:block z-30">
+            <div className="p-2">
+              <Image
+                src="/assets/landing/hero-element-1.png"
+                alt="Analytics Widget"
+                width={160}
+                height={160}
+                className="w-[120px] md:w-[160px]"
+              />
             </div>
           </div>
 
-          {/* Right Column - Builder Preview */}
-          <div className="relative">
-            <div className="relative rounded-lg border-2 border-gray-200 bg-white shadow-2xl overflow-hidden">
-              {/* Browser Chrome */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 border-b">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-              </div>
-
-              {/* Canvas Preview */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-12">
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-gray-200 mb-4">Builder Canvas</div>
-                  <p className="text-gray-400 text-lg">Drag and drop components here</p>
-                </div>
-              </div>
-            </div>
+          {/* Floating Element 2 - Right */}
+          <div className="absolute top-12 -right-4 md:right-4 lg:-right-8 animate-float hidden md:block z-30">
+             {/* Removed background box for Element 2 as requested */}
+            <Image
+              src="/assets/landing/hero-element-2.png"
+              alt="Interaction Widget"
+              width={160}
+              height={160}
+              className="w-[120px] md:w-[160px]"
+            />
           </div>
         </div>
       </div>

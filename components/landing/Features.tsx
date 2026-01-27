@@ -1,60 +1,71 @@
 'use client';
 
-import { Layout, Smartphone, Code2 } from 'lucide-react';
+import Image from 'next/image';
 
 const features = [
   {
-    icon: Layout,
-    title: 'Visual Editor',
-    description: 'Drag, drop, and customize elements on a free-form canvas. What you see is exactly what you get.',
+    image: '/assets/landing/layer-1.png',
+    title: 'Build',
   },
   {
-    icon: Smartphone,
-    title: 'Responsive by Default',
-    description: 'Pages automatically adapt to mobile, tablet, and desktop screens without extra configuration.',
+    image: '/assets/landing/layer-2.png',
+    title: 'Edit',
   },
   {
-    icon: Code2,
-    title: 'Clean Code Export',
-    description: 'Download your work as semantic HTML and JSON. No lock-in, host anywhere you want.',
+    image: '/assets/landing/layer-3.png',
+    title: 'Sell',
   },
 ];
 
 export function Features() {
   return (
-    <section id="features" className="py-20 sm:py-32 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Designed for productivity
+    <section className="py-20 sm:py-32 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="text-center mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA]">
+              nexova unifies the
+              <br />
+              entire lifecycle
+            </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Everything you need to build and deploy, streamlined into one powerful interface.
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            We combined professional grade design tools with immediate business infrastructure. It's not just a page builder; it's a revenue engine with faster settlements and zero bloat.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <div
-                key={index}
-                className="relative rounded-lg border border-gray-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow"
-              >
-                <div className="mb-3 sm:mb-4">
-                  <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gray-100">
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+        <div className="relative max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12 relative z-10">
+            {features.map((feature, index) => (
+              <div key={index} className="flex flex-col items-center group relative">
+                {/* Connector Line (Fixed Position relative to grid cell, behind the box) */}
+                {index < features.length - 1 && (
+                    <div className="hidden md:block absolute top-[calc(50%-1.5rem)] -right-[calc(3rem/2+2px+1.5rem)] w-12 h-[3px] rounded-full bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] z-0" 
+                         style={{ right: '-3rem', top: 'calc(50% - 2rem)' }} // Manually adjusting to vertically center with the box, ignoring the text label
+                    ></div>
+                  )}
+
+                {/* Gradient Border Box */}
+                <div className="relative p-[2px] rounded-3xl bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] w-full aspect-square mb-6 transition-transform duration-300 group-hover:-translate-y-2 z-10 bg-white">
+                  <div className="bg-white rounded-[22px] w-full h-full flex items-center justify-center p-8 relative overflow-hidden"> 
+                     <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500">
+                        <Image 
+                          src={feature.image} 
+                          alt={feature.title}
+                          fill
+                          className="object-contain"
+                        />
+                     </div>
                   </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+
+                {/* Label */}
+                <h3 className="text-gray-400 font-medium text-lg tracking-wide">
                   {feature.title}
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600">
-                  {feature.description}
-                </p>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </section>
