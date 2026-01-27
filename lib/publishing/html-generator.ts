@@ -263,12 +263,16 @@ function generateStyles(): string {
 
     html {
       scroll-behavior: smooth;
+      overflow-x: hidden;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       line-height: 1.6;
       color: #333;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
     }
 
     section {
@@ -2961,10 +2965,15 @@ function generateWhatsAppButtonHTML(element: Element): string {
   `;
 
   // Use different container styles - fixed needs position !important to override CSS rules
+  // Use a class for responsive positioning on mobile
   const containerStyle =
     position === 'fixed'
       ? `position: fixed !important; ${positionStyles[fixedPosition as keyof typeof positionStyles]} z-index: 9999;`
       : 'padding: 5rem 1rem; text-align: center;';
+
+  // Generate unique class name for responsive styles
+  const responsiveClass =
+    position === 'fixed' ? `wa-fixed-${fixedPosition}` : '';
 
   // Use div for fixed position to avoid section CSS rules
   const containerTag = position === 'fixed' ? 'div' : 'section';
@@ -2977,7 +2986,7 @@ function generateWhatsAppButtonHTML(element: Element): string {
   const sanitizedId = sanitizeId(element.id);
 
   return `
-<${containerTag} id="${element.type}-${element.order}" style="${containerStyle}">
+<${containerTag} id="${element.type}-${element.order}" class="${responsiveClass}" style="${containerStyle}">
   ${
     position === 'inline' && showHeadline
       ? `
@@ -3068,6 +3077,33 @@ ${
     75%, 100% {
       transform: scale(1.5);
       opacity: 0;
+    }
+  }
+
+  /* Responsive positioning for WhatsApp button on mobile */
+  @media (max-width: 640px) {
+    .wa-fixed-bottom-right {
+      right: 0.75rem !important;
+      bottom: 0.75rem !important;
+    }
+    .wa-fixed-bottom-left {
+      left: 0.75rem !important;
+      bottom: 0.75rem !important;
+    }
+    .wa-fixed-top-right {
+      right: 0.75rem !important;
+      top: 0.75rem !important;
+    }
+    .wa-fixed-top-left {
+      left: 0.75rem !important;
+      top: 0.75rem !important;
+    }
+    .wa-fixed-bottom-right a,
+    .wa-fixed-bottom-left a,
+    .wa-fixed-top-right a,
+    .wa-fixed-top-left a {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.8rem !important;
     }
   }
 </style>
