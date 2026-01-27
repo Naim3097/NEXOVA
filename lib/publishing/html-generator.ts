@@ -376,6 +376,26 @@ function generateStyles(): string {
         gap: 1rem !important;
         padding: 0 0.5rem;
       }
+
+      /* Responsive form_with_payment variant/size grid - single column on mobile */
+      .variant-options-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.375rem !important;
+      }
+
+      /* Responsive product header in form_with_payment - stack on mobile */
+      .product-header-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+      }
+
+      .product-header-grid > div:nth-child(2) {
+        justify-content: flex-start !important;
+      }
+
+      .product-header-grid > div:nth-child(3) {
+        text-align: left !important;
+      }
     }
 
     @media (min-width: 769px) and (max-width: 1024px) {
@@ -3238,7 +3258,7 @@ function generateFormWithPaymentHTML(element: Element): string {
             return `
             <div style="margin-bottom: 0.75rem;">
               <div style="font-size: 0.75rem; font-weight: 500; color: #6b7280; margin-bottom: 0.5rem;">${variation.name}</div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+              <div class="variant-options-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
                 ${optionsHTML}
               </div>
             </div>
@@ -3249,7 +3269,7 @@ function generateFormWithPaymentHTML(element: Element): string {
         return `
         <div style="border-bottom: 1px solid #f3f4f6;">
           <!-- Product Header (clickable to expand) -->
-          <div id="product-header-${sanitizedId}-${product.id}" onclick="toggleProductExpand_${sanitizedId}('${product.id}')" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: flex-start; cursor: pointer;">
+          <div id="product-header-${sanitizedId}-${product.id}" class="product-header-grid" onclick="toggleProductExpand_${sanitizedId}('${product.id}')" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: flex-start; cursor: pointer;">
             <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
               <span id="expand-icon-${sanitizedId}-${product.id}" style="color: #9ca3af; margin-top: 0.125rem;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -3302,7 +3322,7 @@ function generateFormWithPaymentHTML(element: Element): string {
             </span>`;
 
         return `
-        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: flex-start;">
+        <div class="product-header-grid" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f3f4f6; align-items: flex-start;">
           <div>
             <div style="font-weight: 500; color: #111827;">${product.name}</div>
             <div style="color: #3b82f6; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
@@ -3403,7 +3423,7 @@ function generateFormWithPaymentHTML(element: Element): string {
         products.length > 0
           ? `
       <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
-        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+        <div class="product-header-grid" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
           <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
           <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Qty</div>
           <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Amount</div>
