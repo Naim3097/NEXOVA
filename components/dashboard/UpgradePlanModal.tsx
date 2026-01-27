@@ -18,6 +18,7 @@ import {
   Loader2,
   ArrowLeft,
   CreditCard,
+  Lock,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCsrfToken } from '@/lib/csrf';
@@ -206,17 +207,23 @@ export function UpgradePlanModal({
     setSelectedBank(null);
   };
 
-  const renderFeatureValue = (value: boolean | string) => {
+  const renderFeatureValue = (
+    value: boolean | string,
+    isFreePlan: boolean = false
+  ) => {
     if (typeof value === 'string') {
       return (
         <span className="text-sm font-medium text-foreground">{value}</span>
       );
     }
-    return value ? (
-      <Check className="h-5 w-5 text-chart-2 mx-auto" />
-    ) : (
-      <span className="text-muted-foreground text-lg">—</span>
-    );
+    if (value) {
+      return <Check className="h-5 w-5 text-chart-2 mx-auto" />;
+    }
+    // Show lock icon for free plan features that are locked
+    if (isFreePlan) {
+      return <Lock className="h-4 w-4 text-muted-foreground mx-auto" />;
+    }
+    return <span className="text-muted-foreground text-lg">—</span>;
   };
 
   // Group banks by type
@@ -392,7 +399,7 @@ export function UpgradePlanModal({
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center">
-                            {renderFeatureValue(feature.free)}
+                            {renderFeatureValue(feature.free, true)}
                           </div>
                         </td>
                         <td className="px-4 py-3">
