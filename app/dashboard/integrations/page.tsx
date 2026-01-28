@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { GoogleSheetsIntegration } from '@/components/integrations/GoogleSheetsIntegration';
+import { GoogleCalendarIntegration } from '@/components/integrations/GoogleCalendarIntegration';
 import { TrackingPixelsIntegration } from '@/components/integrations/TrackingPixelsIntegration';
 import { PremiumFeatureGate } from '@/components/dashboard/PremiumFeatureGate';
 
@@ -49,6 +50,11 @@ function IntegrationsContent() {
       {/* Google Sheets Integration */}
       <div className="mb-8">
         <GoogleSheetsIntegration />
+      </div>
+
+      {/* Google Calendar Integration */}
+      <div className="mb-8">
+        <GoogleCalendarIntegration />
       </div>
 
       {/* Coming Soon Card */}

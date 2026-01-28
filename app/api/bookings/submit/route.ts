@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { appendLeadToSheet } from '@/lib/google-sheets';
+import { createCalendarEvent } from '@/lib/google-calendar';
 
 /**
  * Public endpoint for booking form submission
@@ -90,10 +91,7 @@ export async function POST(request: NextRequest) {
 
     if (projectError || !project) {
       console.error('Project not found:', projectError);
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
     // Get element configuration to check for Google Sheets (optional - don't fail if not found)
@@ -130,9 +128,10 @@ export async function POST(request: NextRequest) {
     const actualElementId = element?.id || element_id;
 
     // Extract metadata - ensure valid IP or null for inet type columns
-    const rawIp = request.headers.get('x-forwarded-for') ||
-                  request.headers.get('x-real-ip') ||
-                  null;
+    const rawIp =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      null;
     // Extract first IP if multiple (x-forwarded-for can be comma-separated)
     const ip_address = rawIp ? rawIp.split(',')[0].trim() : null;
     const user_agent = request.headers.get('user-agent') || '';
@@ -158,7 +157,8 @@ export async function POST(request: NextRequest) {
         service_name: service_name || 'Booking',
         service_price: service_price || 0,
         duration: duration || 60,
-        payment_status: payment_status || (service_price > 0 ? 'pending' : 'not_required'),
+        payment_status:
+          payment_status || (service_price > 0 ? 'pending' : 'not_required'),
         transaction_id: transaction_id || null,
         payment_method: payment_method || null,
         status: 'confirmed',
@@ -172,7 +172,8 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       // Check if bookings table doesn't exist - fall back to leads table
-      if (insertError.code === '42P01') { // Table doesn't exist
+      if (insertError.code === '42P01') {
+        // Table doesn't exist
         console.log('Bookings table not found, falling back to leads table');
 
         // Insert into leads table instead with booking data in custom_fields
@@ -214,12 +215,10 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Continue with Google Sheets integration using lead data (if element found)
+        // Continue with Google Sheets & Calendar integration using lead data (if element found)
         if (element?.props) {
-          await handleGoogleSheetsIntegration(
-            element.props,
-            project.user_id,
-            {
+          await Promise.all([
+            handleGoogleSheetsIntegration(element.props, project.user_id, {
               bookingRef,
               customer_name,
               customer_email,
@@ -233,12 +232,29 @@ export async function POST(request: NextRequest) {
               payment_status,
               ip_address,
               referrer,
-            }
-          );
+            }),
+            handleGoogleCalendarIntegration(element.props, project.user_id, {
+              bookingRef,
+              customer_name,
+              customer_email,
+              customer_phone,
+              customer_remark,
+              booking_date,
+              time_slot,
+              service_name,
+              service_price,
+              duration,
+            }),
+          ]);
         }
 
         // Track analytics event
-        await trackAnalyticsEvent(supabase, project_id, actualElementId, lead?.id || bookingRef);
+        await trackAnalyticsEvent(
+          supabase,
+          project_id,
+          actualElementId,
+          lead?.id || bookingRef
+        );
 
         return NextResponse.json({
           success: true,
@@ -255,12 +271,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Google Sheets integration (if element found)
+    // Google Sheets & Calendar integration (if element found)
     if (element?.props) {
-      await handleGoogleSheetsIntegration(
-        element.props,
-        project.user_id,
-        {
+      await Promise.all([
+        handleGoogleSheetsIntegration(element.props, project.user_id, {
           bookingRef,
           customer_name,
           customer_email,
@@ -274,12 +288,29 @@ export async function POST(request: NextRequest) {
           payment_status,
           ip_address,
           referrer,
-        }
-      );
+        }),
+        handleGoogleCalendarIntegration(element.props, project.user_id, {
+          bookingRef,
+          customer_name,
+          customer_email,
+          customer_phone,
+          customer_remark,
+          booking_date,
+          time_slot,
+          service_name,
+          service_price,
+          duration,
+        }),
+      ]);
     }
 
     // Track analytics event
-    await trackAnalyticsEvent(supabase, project_id, actualElementId, booking?.id || bookingRef);
+    await trackAnalyticsEvent(
+      supabase,
+      project_id,
+      actualElementId,
+      booking?.id || bookingRef
+    );
 
     return NextResponse.json({
       success: true,
@@ -287,7 +318,6 @@ export async function POST(request: NextRequest) {
       booking_ref: bookingRef,
       booking_id: booking?.id,
     });
-
   } catch (error) {
     console.error('Booking submission error:', error);
     return NextResponse.json(
@@ -325,11 +355,15 @@ async function handleGoogleSheetsIntegration(
   }
 
   try {
-    const remarkPart = bookingData.customer_remark ? ` | Notes: ${bookingData.customer_remark}` : '';
+    const remarkPart = bookingData.customer_remark
+      ? ` | Notes: ${bookingData.customer_remark}`
+      : '';
     const result = await appendLeadToSheet(
       props.google_sheets_url,
       {
-        timestamp: new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }),
+        timestamp: new Date().toLocaleString('en-MY', {
+          timeZone: 'Asia/Kuala_Lumpur',
+        }),
         name: bookingData.customer_name,
         email: bookingData.customer_email,
         phone: bookingData.customer_phone || '',
@@ -345,6 +379,51 @@ async function handleGoogleSheetsIntegration(
     }
   } catch (error) {
     console.error('Google Sheets error:', error);
+  }
+}
+
+// Helper function for Google Calendar integration
+async function handleGoogleCalendarIntegration(
+  props: any,
+  userId: string,
+  bookingData: {
+    bookingRef: string;
+    customer_name: string;
+    customer_email: string;
+    customer_phone?: string;
+    customer_remark?: string;
+    booking_date: string;
+    time_slot: string;
+    service_name?: string;
+    service_price?: number;
+    currency?: string;
+    duration?: number;
+  }
+) {
+  if (!props.google_calendar_enabled) {
+    return;
+  }
+
+  try {
+    const result = await createCalendarEvent(userId, {
+      customerName: bookingData.customer_name,
+      customerEmail: bookingData.customer_email,
+      customerPhone: bookingData.customer_phone,
+      customerRemark: bookingData.customer_remark,
+      bookingDate: bookingData.booking_date,
+      timeSlot: bookingData.time_slot,
+      serviceName: bookingData.service_name || 'Appointment',
+      servicePrice: bookingData.service_price,
+      currency: bookingData.currency,
+      duration: bookingData.duration || 60,
+      bookingRef: bookingData.bookingRef,
+    });
+
+    if (!result.success) {
+      console.error('Google Calendar event creation failed:', result.error);
+    }
+  } catch (error) {
+    console.error('Google Calendar error:', error);
   }
 }
 

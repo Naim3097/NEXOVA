@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Phone, Mail, Shield, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
+  Shield,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+} from 'lucide-react';
 
 interface TimeSlot {
   id: string;
@@ -46,6 +56,8 @@ interface BookingFormElementProps {
     // Google Sheets integration
     google_sheets_enabled?: boolean;
     google_sheets_url?: string;
+    // Google Calendar integration
+    google_calendar_enabled?: boolean;
     // Payment settings
     requirePayment?: boolean;
     // Footer
@@ -84,7 +96,10 @@ const generateDefaultTimeSlots = (
   let currentMin = startMin;
   let id = 1;
 
-  while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+  while (
+    currentHour < endHour ||
+    (currentHour === endHour && currentMin < endMin)
+  ) {
     const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`;
     slots.push({
       id: `slot-${id++}`,
@@ -103,7 +118,13 @@ const generateDefaultTimeSlots = (
 };
 
 export const BookingFormElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover }: BookingFormElementProps) => {
+  ({
+    props,
+    isSelected,
+    isHovered,
+    onSelect,
+    onHover,
+  }: BookingFormElementProps) => {
     const {
       title = 'Book an Appointment',
       description = 'Select your preferred date and time slot',
@@ -134,6 +155,7 @@ export const BookingFormElement = React.memo(
       submitButtonColor = '#2563eb',
       bgColor = '#ffffff',
       google_sheets_enabled = false,
+      google_calendar_enabled = false,
       requirePayment = false,
       termsUrl = '#',
       policyUrl = '#',
@@ -144,10 +166,13 @@ export const BookingFormElement = React.memo(
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
-    const selectedCountry = countryCodes.find(c => c.code === defaultCountryCode) || countryCodes[0];
+    const selectedCountry =
+      countryCodes.find((c) => c.code === defaultCountryCode) ||
+      countryCodes[0];
 
     // Generate time slots if not provided
-    const displayTimeSlots = timeSlots || generateDefaultTimeSlots(startTime, endTime, slotDuration);
+    const displayTimeSlots =
+      timeSlots || generateDefaultTimeSlots(startTime, endTime, slotDuration);
 
     const baseClasses = `relative transition-all ${
       isSelected ? 'ring-4 ring-blue-500' : ''
@@ -208,20 +233,34 @@ export const BookingFormElement = React.memo(
     };
 
     const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const goToPrevMonth = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+      setCurrentMonth(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+      );
     };
 
     const goToNextMonth = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+      setCurrentMonth(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+      );
     };
 
     const handleDateSelect = (date: Date | null, e: React.MouseEvent) => {
@@ -251,7 +290,11 @@ export const BookingFormElement = React.memo(
           {/* Header */}
           {(title || description) && (
             <div className="text-center mb-8">
-              {title && <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>}
+              {title && (
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {title}
+                </h2>
+              )}
               {description && <p className="text-gray-600">{description}</p>}
             </div>
           )}
@@ -270,7 +313,9 @@ export const BookingFormElement = React.memo(
                 {servicePrice > 0 && (
                   <div className="text-right">
                     <p className="text-sm text-blue-100">Price</p>
-                    <p className="text-2xl font-bold">{formatCurrency(servicePrice)}</p>
+                    <p className="text-2xl font-bold">
+                      {formatCurrency(servicePrice)}
+                    </p>
                   </div>
                 )}
               </div>
@@ -290,7 +335,9 @@ export const BookingFormElement = React.memo(
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         {nameLabel}
-                        {nameRequired && <span className="text-red-500">*</span>}
+                        {nameRequired && (
+                          <span className="text-red-500">*</span>
+                        )}
                       </div>
                     </label>
                     <input
@@ -309,7 +356,9 @@ export const BookingFormElement = React.memo(
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4" />
                         {phoneLabel}
-                        {phoneRequired && <span className="text-red-500">*</span>}
+                        {phoneRequired && (
+                          <span className="text-red-500">*</span>
+                        )}
                       </div>
                     </label>
                     <div className="flex">
@@ -334,7 +383,9 @@ export const BookingFormElement = React.memo(
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4" />
                         {emailLabel}
-                        {emailRequired && <span className="text-red-500">*</span>}
+                        {emailRequired && (
+                          <span className="text-red-500">*</span>
+                        )}
                       </div>
                     </label>
                     <input
@@ -353,7 +404,9 @@ export const BookingFormElement = React.memo(
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         {remarkLabel}
-                        {remarkRequired && <span className="text-red-500">*</span>}
+                        {remarkRequired && (
+                          <span className="text-red-500">*</span>
+                        )}
                       </div>
                     </label>
                     <textarea
@@ -384,7 +437,8 @@ export const BookingFormElement = React.memo(
                       <ChevronLeft className="w-5 h-5 text-gray-600" />
                     </button>
                     <h5 className="text-lg font-semibold text-gray-900">
-                      {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                      {monthNames[currentMonth.getMonth()]}{' '}
+                      {currentMonth.getFullYear()}
                     </h5>
                     <button
                       type="button"
@@ -397,8 +451,11 @@ export const BookingFormElement = React.memo(
 
                   {/* Day Names */}
                   <div className="grid grid-cols-7 gap-1 mb-2">
-                    {dayNames.map(day => (
-                      <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                    {dayNames.map((day) => (
+                      <div
+                        key={day}
+                        className="text-center text-xs font-medium text-gray-500 py-2"
+                      >
                         {day}
                       </div>
                     ))}
@@ -412,7 +469,8 @@ export const BookingFormElement = React.memo(
                       }
 
                       const isAvailable = isDateAvailable(date);
-                      const isSelected = selectedDate?.toDateString() === date.toDateString();
+                      const isSelected =
+                        selectedDate?.toDateString() === date.toDateString();
 
                       return (
                         <button
@@ -424,8 +482,8 @@ export const BookingFormElement = React.memo(
                             isSelected
                               ? 'bg-blue-500 text-white font-semibold'
                               : isAvailable
-                              ? 'hover:bg-blue-50 text-gray-900'
-                              : 'text-gray-300 cursor-not-allowed'
+                                ? 'hover:bg-blue-50 text-gray-900'
+                                : 'text-gray-300 cursor-not-allowed'
                           }`}
                         >
                           {date.getDate()}
@@ -456,8 +514,8 @@ export const BookingFormElement = React.memo(
                           isSelected
                             ? 'bg-blue-500 text-white border-blue-500'
                             : slot.available
-                            ? 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700'
-                            : 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
+                              ? 'border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700'
+                              : 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
                         }`}
                       >
                         {slot.time}
@@ -470,16 +528,36 @@ export const BookingFormElement = React.memo(
               {/* Summary */}
               {(selectedDate || selectedSlot) && (
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-2">Booking Summary</h4>
+                  <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                    Booking Summary
+                  </h4>
                   <div className="space-y-1 text-sm text-blue-700">
                     {selectedDate && (
-                      <p>Date: {selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <p>
+                        Date:{' '}
+                        {selectedDate.toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </p>
                     )}
                     {selectedSlot && (
-                      <p>Time: {displayTimeSlots.find(s => s.id === selectedSlot)?.time}</p>
+                      <p>
+                        Time:{' '}
+                        {
+                          displayTimeSlots.find((s) => s.id === selectedSlot)
+                            ?.time
+                        }
+                      </p>
                     )}
                     <p>Service: {serviceName}</p>
-                    {servicePrice > 0 && <p className="font-semibold">Total: {formatCurrency(servicePrice)}</p>}
+                    {servicePrice > 0 && (
+                      <p className="font-semibold">
+                        Total: {formatCurrency(servicePrice)}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -500,27 +578,48 @@ export const BookingFormElement = React.memo(
               >
                 {requirePayment && servicePrice > 0
                   ? `${submitButtonText} - ${formatCurrency(servicePrice)}`
-                  : submitButtonText
-                }
+                  : submitButtonText}
               </button>
 
               {/* Google Sheets Badge */}
               {google_sheets_enabled && (
                 <div className="flex items-center justify-center gap-2 text-sm text-green-600 bg-green-50 rounded-lg py-2 px-4 border border-green-200">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
                   </svg>
-                  <span className="font-medium">Connected to Google Sheets</span>
+                  <span className="font-medium">
+                    Connected to Google Sheets
+                  </span>
+                </div>
+              )}
+
+              {/* Google Calendar Badge */}
+              {google_calendar_enabled && (
+                <div className="flex items-center justify-center gap-2 text-sm text-blue-600 bg-blue-50 rounded-lg py-2 px-4 border border-blue-200">
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-medium">Synced to Google Calendar</span>
                 </div>
               )}
 
               {/* Footer Links */}
               <div className="flex items-center justify-center gap-4 text-sm">
-                <a href={termsUrl} className="text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+                <a
+                  href={termsUrl}
+                  className="text-blue-600 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   Terms & Conditions
                 </a>
                 <span className="text-gray-300">|</span>
-                <a href={policyUrl} className="text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+                <a
+                  href={policyUrl}
+                  className="text-blue-600 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   Privacy Policy
                 </a>
               </div>

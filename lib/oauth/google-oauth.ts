@@ -70,7 +70,8 @@ export function decryptToken(encryptedData: string): string {
 export function getOAuth2Client() {
   const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_OAUTH_REDIRECT_URI ||
+  const redirectUri =
+    process.env.GOOGLE_OAUTH_REDIRECT_URI ||
     `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/google/callback`;
 
   if (!clientId || !clientSecret) {
@@ -91,6 +92,7 @@ export function getAuthorizationUrl(state: string): string {
     prompt: 'consent', // Force consent screen to get refresh token
     scope: [
       'https://www.googleapis.com/auth/spreadsheets',
+      'https://www.googleapis.com/auth/calendar.events.owned',
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
     ],
@@ -203,9 +205,8 @@ export async function storeUserTokens(
 
   const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
-  await supabase
-    .from('user_integrations')
-    .upsert({
+  await supabase.from('user_integrations').upsert(
+    {
       user_id: userId,
       integration_type: 'google_sheets',
       access_token: encryptedAccessToken,
@@ -220,9 +221,11 @@ export async function storeUserTokens(
       },
       is_active: true,
       last_used_at: new Date().toISOString(),
-    }, {
+    },
+    {
       onConflict: 'user_id,integration_type',
-    });
+    }
+  );
 }
 
 /**
@@ -262,7 +265,9 @@ export async function getUserTokens(userId: string): Promise<{
 /**
  * Get valid access token (refresh if needed)
  */
-export async function getValidAccessToken(userId: string): Promise<string | null> {
+export async function getValidAccessToken(
+  userId: string
+): Promise<string | null> {
   const tokens = await getUserTokens(userId);
 
   if (!tokens) {

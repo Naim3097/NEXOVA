@@ -3895,6 +3895,40 @@ export const PropertiesPanel = () => {
               </div>
 
               <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
+                Google Calendar Integration
+              </div>
+
+              <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#5FC7CD]/10">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="google_calendar_enabled"
+                    className="cursor-pointer"
+                  >
+                    Enable Google Calendar
+                  </Label>
+                  <input
+                    type="checkbox"
+                    id="google_calendar_enabled"
+                    checked={props.google_calendar_enabled ?? false}
+                    onChange={(e) =>
+                      handlePropChange(
+                        'google_calendar_enabled',
+                        e.target.checked
+                      )
+                    }
+                    className="w-4 h-4"
+                  />
+                </div>
+
+                {props.google_calendar_enabled && (
+                  <p className="text-xs text-[#969696]">
+                    Bookings will be automatically added to your Google
+                    Calendar. Connect your Google account in Integrations first.
+                  </p>
+                )}
+              </div>
+
+              <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Footer Links
               </div>
 
