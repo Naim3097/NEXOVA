@@ -62,21 +62,26 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Legacy: Check if this is a nested subdomain request (old format)
-  // e.g., subdomain.ide-page-builder.vercel.app
-  const isLegacySubdomain =
+  // Check if this is a subdomain request
+  // e.g., subdomain.nexova.my
+  const isSubdomain =
     hostnameWithoutPort !== mainDomainWithoutPort &&
     hostnameWithoutPort.endsWith(`.${mainDomainWithoutPort}`);
 
-  if (isLegacySubdomain) {
+  if (isSubdomain) {
     // Extract subdomain
     const subdomain = hostnameWithoutPort.replace(
       `.${mainDomainWithoutPort}`,
       ''
     );
 
+    // Skip www - it's the main domain, not a subdomain
+    if (subdomain === 'www') {
+      return response;
+    }
+
     // Rewrite to subdomain route
-    // e.g., johndoe.xide.app → /s/johndoe
+    // e.g., johndoe.nexova.my → /s/johndoe
     url.pathname = `/s/${subdomain}${url.pathname}`;
 
     response = NextResponse.rewrite(url);
