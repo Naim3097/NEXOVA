@@ -3,7 +3,11 @@
  */
 
 // Admin email whitelist - only these emails can access admin dashboard
-const ADMIN_EMAILS = ['ahm.zafran99@gmail.com', 'ahm.zafran@gmail.com'];
+const ADMIN_EMAILS = [
+  'ahm.zafran99@gmail.com',
+  'ahm.zafran@gmail.com',
+  'sales@nexovadigital.com',
+];
 
 /**
  * Check if an email is in the admin whitelist

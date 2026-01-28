@@ -93,7 +93,8 @@ export async function middleware(request: NextRequest) {
   const isCustomDomain =
     !hostnameWithoutPort.includes(mainDomainWithoutPort) &&
     !hostnameWithoutPort.includes('localhost') &&
-    !hostnameWithoutPort.includes('vercel.app');
+    !hostnameWithoutPort.includes('vercel.app') &&
+    !hostnameWithoutPort.includes('nexova.my');
 
   if (isCustomDomain) {
     // Normalize hostname: remove port and get the base hostname
