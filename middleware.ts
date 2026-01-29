@@ -75,8 +75,8 @@ export async function middleware(request: NextRequest) {
       ''
     );
 
-    // Skip www - it's the main domain, not a subdomain
-    if (subdomain === 'www') {
+    // Skip www and staging - they're not user subdomains
+    if (subdomain === 'www' || subdomain === 'staging') {
       return response;
     }
 
