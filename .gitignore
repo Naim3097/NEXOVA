@@ -44,3 +44,5 @@ next-env.d.ts
 .env.vercel.check
 *.csv
 *.xlsx
+WORKFLOW.md
+firebase-debug.log
