@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { isAdminEmail } from '@/lib/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 
 // Input validation constants
@@ -55,8 +56,11 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
+    // Use admin client to bypass RLS for admin queries
+    const adminClient = getSupabaseAdmin();
+
     // Build query
-    let query = supabase
+    let query = adminClient
       .from('help_requests')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -209,7 +213,10 @@ export async function PATCH(request: NextRequest) {
     // Update assigned_to with current admin
     updateData.assigned_to = user.id;
 
-    const { data: updatedRequest, error: updateError } = await supabase
+    // Use admin client to bypass RLS
+    const adminClient = getSupabaseAdmin();
+
+    const { data: updatedRequest, error: updateError } = await adminClient
       .from('help_requests')
       .update(updateData)
       .eq('id', id)

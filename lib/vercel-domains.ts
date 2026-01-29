@@ -12,9 +12,9 @@ const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
 const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID;
 
-// Base domain for single-level subdomain format
-// e.g., subdomain-ide-page-builder.vercel.app
-const VERCEL_APP_SUFFIX = 'ide-page-builder.vercel.app';
+// Base domain for subdomain format
+// e.g., subdomain.nexova.my
+const APP_DOMAIN = 'nexova.my';
 
 export interface VercelDomainVerification {
   type: string;
@@ -518,19 +518,19 @@ function buildDnsInstructions(
 }
 
 /**
- * Convert subdomain to single-level Vercel domain format
- * e.g., "kurtagorilla" → "kurtagorilla-ide-page-builder.vercel.app"
+ * Convert subdomain to domain format
+ * e.g., "kurtagorilla" → "kurtagorilla.nexova.my"
  */
 export function getSubdomainAlias(subdomain: string): string {
-  return `${subdomain}-${VERCEL_APP_SUFFIX}`;
+  return `${subdomain}.${APP_DOMAIN}`;
 }
 
 /**
- * Extract subdomain from single-level Vercel domain format
- * e.g., "kurtagorilla-ide-page-builder.vercel.app" → "kurtagorilla"
+ * Extract subdomain from domain format
+ * e.g., "kurtagorilla.nexova.my" → "kurtagorilla"
  */
 export function extractSubdomainFromAlias(domain: string): string | null {
-  const suffix = `-${VERCEL_APP_SUFFIX}`;
+  const suffix = `.${APP_DOMAIN}`;
   if (domain.endsWith(suffix)) {
     return domain.slice(0, -suffix.length);
   }
@@ -539,7 +539,7 @@ export function extractSubdomainFromAlias(domain: string): string | null {
 
 /**
  * Add a subdomain alias to the Vercel project
- * This creates a single-level subdomain like: subdomain-ide-page-builder.vercel.app
+ * This creates a subdomain like: subdomain.nexova.my
  */
 export async function addSubdomainAlias(subdomain: string): Promise<{
   success: boolean;

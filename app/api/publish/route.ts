@@ -49,13 +49,13 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Fetch project data
@@ -66,18 +66,12 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
     // Verify user owns the project
     if (project.user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Fetch project elements
@@ -110,10 +104,17 @@ export async function POST(request: NextRequest) {
 
     // Determine tracking pixels configuration
     // Use project-specific override if exists, otherwise use account defaults
-    const trackingPixels = (project as any).tracking_pixels_override || profile.tracking_pixels || null;
+    const trackingPixels =
+      (project as any).tracking_pixels_override ||
+      profile.tracking_pixels ||
+      null;
 
     // Generate HTML with tracking pixels
-    const html = generateHTML(project as Project, (elements || []) as Element[], trackingPixels);
+    const html = generateHTML(
+      project as Project,
+      (elements || []) as Element[],
+      trackingPixels
+    );
 
     // Generate unique slug if not exists
     let slug = project.slug;
@@ -136,14 +137,17 @@ export async function POST(request: NextRequest) {
     // Save to published_pages table
     const { error: upsertError } = await supabase
       .from('published_pages')
-      .upsert({
-        project_id: projectId,
-        html_content: html,
-        slug: slug,
-        published_at: new Date().toISOString(),
-      }, {
-        onConflict: 'project_id'
-      });
+      .upsert(
+        {
+          project_id: projectId,
+          html_content: html,
+          slug: slug,
+          published_at: new Date().toISOString(),
+        },
+        {
+          onConflict: 'project_id',
+        }
+      );
 
     if (upsertError) {
       console.warn('Error saving to published_pages:', upsertError);
@@ -157,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     if (profile.subdomain) {
       // Both Free and Pro users: Use subdomain if available
-      // New format: subdomain-ide-page-builder.vercel.app
+      // Format: subdomain.nexova.my
       const subdomainDomain = getSubdomainAlias(profile.subdomain);
       publishedUrl = `https://${subdomainDomain}`;
       urlType = 'subdomain';
@@ -207,9 +211,8 @@ export async function POST(request: NextRequest) {
       slug,
       urlType,
       subscriptionPlan: profile.subscription_plan,
-      message: 'Project published successfully'
+      message: 'Project published successfully',
     });
-
   } catch (error) {
     console.error('Publish error:', error);
     return NextResponse.json(
