@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminEmail } from '@/lib/admin';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,7 +60,6 @@ interface HelpRequest {
 }
 
 // Admin email whitelist check (client-side)
-const ADMIN_EMAILS = ['ahm.zafran99@gmail.com'];
 
 function AdminDashboardContent() {
   const { user, profile, signOut } = useAuth();
@@ -70,8 +70,7 @@ function AdminDashboardContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isAdmin =
-    user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase());
+  const isAdmin = isAdminEmail(user?.email);
 
   useEffect(() => {
     if (user && !isAdmin) {

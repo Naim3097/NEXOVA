@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { isAdminEmail } from '@/lib/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,14 +37,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use admin client to bypass RLS for admin queries
+    const adminClient = getSupabaseAdmin();
+
     // Get admin stats using RPC function
     const { data: stats, error: statsError } =
-      await supabase.rpc('get_admin_stats');
+      await adminClient.rpc('get_admin_stats');
 
     if (statsError) {
       console.error('Error fetching admin stats:', statsError);
 
-      // Fallback: fetch stats manually if RPC fails
+      // Fallback: fetch stats manually if RPC fails (using admin client to bypass RLS)
       const [
         { count: totalUsers },
         { count: freeUsers },
@@ -54,31 +58,33 @@ export async function GET(request: NextRequest) {
         { count: newSignupsToday },
         { count: newSignupsWeek },
       ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase
+        adminClient
+          .from('profiles')
+          .select('*', { count: 'exact', head: true }),
+        adminClient
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .or('subscription_plan.eq.free,subscription_plan.is.null'),
-        supabase
+        adminClient
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .eq('subscription_plan', 'premium'),
-        supabase
+        adminClient
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .eq('subscription_plan', 'enterprise'),
-        supabase
+        adminClient
           .from('help_requests')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'new'),
-        supabase
+        adminClient
           .from('help_requests')
           .select('*', { count: 'exact', head: true }),
-        supabase
+        adminClient
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', new Date().toISOString().split('T')[0]),
-        supabase
+        adminClient
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .gte(

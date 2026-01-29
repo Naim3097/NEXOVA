@@ -75,12 +75,12 @@ function SubdomainSettingsContent() {
   const [dnsRecords, setDnsRecords] = useState<DnsRecord[]>([]);
   const [verifyingDns, setVerifyingDns] = useState(false);
 
-  // Single-level subdomain format: subdomain-ide-page-builder.vercel.app
-  const vercelAppSuffix = 'ide-page-builder.vercel.app';
+  // Subdomain format: subdomain.nexova.my
+  const domainSuffix = 'nexova.my';
 
   // Helper to get full subdomain URL
   const getFullSubdomainUrl = (subdomain: string) =>
-    `${subdomain}-${vercelAppSuffix}`;
+    `${subdomain}.${domainSuffix}`;
 
   // Default DNS records to show before domain is added to Vercel
   const defaultDnsRecords: DnsRecord[] = [
@@ -457,7 +457,7 @@ function SubdomainSettingsContent() {
             With a subdomain, your published pages will be accessible at:
             <br />
             <code className="bg-[#5FC7CD]/10 px-1 rounded">
-              yourname-{vercelAppSuffix}
+              yourname.{domainSuffix}
             </code>
           </p>
           <p className="opacity-90 mt-2">
@@ -671,7 +671,7 @@ function SubdomainSettingsContent() {
                   className="flex-1"
                 />
                 <span className="text-sm text-[#969696] whitespace-nowrap">
-                  -{vercelAppSuffix}
+                  .{domainSuffix}
                 </span>
               </div>
               <p className="text-xs text-[#969696] mt-1">
@@ -939,7 +939,7 @@ function SubdomainSettingsContent() {
                     className="text-sm cursor-pointer text-[#455263]"
                   >
                     By choosing to use your own domain name, you can&apos;t
-                    revert back to our {vercelAppSuffix} subdomain.
+                    revert back to our {domainSuffix} subdomain.
                     <br />
                     <span className="font-medium">I understood and agree</span>
                   </Label>

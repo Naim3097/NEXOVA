@@ -189,6 +189,23 @@ function NewProjectForm() {
         return;
       }
 
+      // Generate slug with deduplication
+      let slug = projectName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 50);
+
+      const { data: existingProject } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('slug', slug)
+        .single();
+
+      if (existingProject) {
+        slug = `${slug}-${Math.random().toString(36).substring(2, 8)}`;
+      }
+
       // Create project
       const { data: project, error: projectError } = await supabase
         .from('projects')
@@ -196,10 +213,7 @@ function NewProjectForm() {
           user_id: user.id,
           name: projectName,
           description: projectDescription,
-          slug: projectName
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, ''),
+          slug,
           status: 'draft',
           element_count: template.data?.elements?.length || 0,
           seo_settings: template.data?.seo_settings || {},

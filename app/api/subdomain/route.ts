@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { addSubdomainAlias, removeSubdomainAlias, getSubdomainAlias } from '@/lib/vercel-domains';
+import {
+  addSubdomainAlias,
+  removeSubdomainAlias,
+  getSubdomainAlias,
+} from '@/lib/vercel-domains';
 
 // GET: Check current subdomain
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,7 +46,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -48,7 +58,10 @@ export async function POST(request: NextRequest) {
     const { subdomain } = await request.json();
 
     if (!subdomain) {
-      return NextResponse.json({ error: 'Subdomain is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Subdomain is required' },
+        { status: 400 }
+      );
     }
 
     // Validate subdomain format
@@ -56,12 +69,30 @@ export async function POST(request: NextRequest) {
     if (!subdomainRegex.test(subdomain)) {
       return NextResponse.json({
         available: false,
-        error: 'Invalid subdomain format. Use lowercase letters, numbers, and hyphens (3-63 characters).',
+        error:
+          'Invalid subdomain format. Use lowercase letters, numbers, and hyphens (3-63 characters).',
       });
     }
 
     // Reserved subdomains
-    const reserved = ['www', 'api', 'app', 'admin', 'dashboard', 'mail', 'ftp', 'blog', 'shop', 'store', 'help', 'support', 'docs', 'dev', 'staging', 'test'];
+    const reserved = [
+      'www',
+      'api',
+      'app',
+      'admin',
+      'dashboard',
+      'mail',
+      'ftp',
+      'blog',
+      'shop',
+      'store',
+      'help',
+      'support',
+      'docs',
+      'dev',
+      'staging',
+      'test',
+    ];
     if (reserved.includes(subdomain)) {
       return NextResponse.json({
         available: false,
@@ -99,7 +130,10 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -121,17 +155,41 @@ export async function PUT(request: NextRequest) {
       // Validate subdomain format
       const subdomainRegex = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
       if (!subdomainRegex.test(subdomain)) {
-        return NextResponse.json({
-          error: 'Invalid subdomain format. Use lowercase letters, numbers, and hyphens (3-63 characters).',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error:
+              'Invalid subdomain format. Use lowercase letters, numbers, and hyphens (3-63 characters).',
+          },
+          { status: 400 }
+        );
       }
 
       // Reserved subdomains
-      const reserved = ['www', 'api', 'app', 'admin', 'dashboard', 'mail', 'ftp', 'blog', 'shop', 'store', 'help', 'support', 'docs', 'dev', 'staging', 'test'];
+      const reserved = [
+        'www',
+        'api',
+        'app',
+        'admin',
+        'dashboard',
+        'mail',
+        'ftp',
+        'blog',
+        'shop',
+        'store',
+        'help',
+        'support',
+        'docs',
+        'dev',
+        'staging',
+        'test',
+      ];
       if (reserved.includes(subdomain)) {
-        return NextResponse.json({
-          error: 'This subdomain is reserved.',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: 'This subdomain is reserved.',
+          },
+          { status: 400 }
+        );
       }
 
       // Check if subdomain is already taken
@@ -143,17 +201,23 @@ export async function PUT(request: NextRequest) {
         .single();
 
       if (existing) {
-        return NextResponse.json({
-          error: 'This subdomain is already taken.',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: 'This subdomain is already taken.',
+          },
+          { status: 400 }
+        );
       }
 
-      // Add subdomain alias to Vercel (creates subdomain-ide-page-builder.vercel.app)
+      // Add subdomain alias to Vercel (creates subdomain.nexova.my)
       const aliasResult = await addSubdomainAlias(subdomain);
       if (!aliasResult.success) {
-        return NextResponse.json({
-          error: aliasResult.error || 'Failed to create subdomain alias.',
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: aliasResult.error || 'Failed to create subdomain alias.',
+          },
+          { status: 400 }
+        );
       }
     }
 

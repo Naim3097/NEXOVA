@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { ConditionalAuthProvider } from '@/components/auth/ConditionalAuthProvider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const satoshi = localFont({
   src: [
@@ -48,6 +49,7 @@ export default function RootLayout({
     <html lang="en" className="overflow-x-hidden">
       <body className={`${satoshi.variable} font-sans overflow-x-hidden`}>
         <ConditionalAuthProvider>{children}</ConditionalAuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
