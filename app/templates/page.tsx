@@ -60,10 +60,12 @@ export default function TemplatesPage() {
   const categories = [
     { value: 'all', label: 'All Templates' },
     { value: 'automotive', label: 'Automotive' },
-    { value: 'healthcare', label: 'Clinic' },
-    { value: 'services', label: 'Photography' },
-    { value: 'ecommerce', label: 'E-commerce' },
+    { value: 'barber', label: 'Barber' },
     { value: 'digital-products', label: 'Digital Products' },
+    { value: 'ecommerce', label: 'E-commerce' },
+    { value: 'healthcare', label: 'Clinic' },
+    { value: 'saloon', label: 'Saloon' },
+    { value: 'services', label: 'Photography' },
   ];
 
   // Filter by category

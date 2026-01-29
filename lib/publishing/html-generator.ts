@@ -300,10 +300,23 @@ function generateBodyContent(elements: Element[]): string {
           return generatePaymentButtonHTML(element);
         case 'booking_form':
           return generateBookingFormHTML(element);
+        case 'form_with_payment':
+          return generateFormWithPaymentHTML(element);
+        case 'product_carousel':
+          return generateProductCarouselHTML(element);
+        case 'lead_form':
+          return generateLeadFormHTML(element);
+        case 'whatsapp_button':
+          return generateWhatsAppButtonHTML(element);
+        case 'media':
+          return generateMediaHTML(element);
         case 'footer':
           return generateFooterHTML(element);
         default:
-          return '';
+          console.warn(
+            `[html-generator] Unknown element type: "${element.type}" — skipped. Add a case for this type in generateBodyContent().`
+          );
+          return `<!-- Unsupported element type: ${element.type} -->`;
       }
     })
     .join('\n');
@@ -1770,6 +1783,384 @@ ${
     : ''
 }`;
   }
+}
+
+/**
+ * Generate Form With Payment HTML
+ */
+function generateFormWithPaymentHTML(element: Element): string {
+  const {
+    title = 'Order Form',
+    description,
+    nameLabel = 'Name',
+    mobileLabel = 'Mobile Number',
+    emailLabel = 'Email',
+    showName = true,
+    showMobile = true,
+    showEmail = true,
+    nameRequired = true,
+    mobileRequired = true,
+    emailRequired = true,
+    products = [],
+    currency = 'MYR',
+    submitButtonText = 'Complete Payment',
+    submitButtonColor = '#ef4444',
+    bgColor = '#ffffff',
+    companyName = '',
+  } = element.props;
+
+  const formatCurrency = (value: number) => {
+    if (currency === 'MYR') return `RM ${value.toFixed(2)}`;
+    return `${currency} ${value.toFixed(2)}`;
+  };
+
+  const nameFieldHTML = showName
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${nameLabel}${nameRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <input type="text" placeholder="Enter your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+    </div>`
+    : '';
+
+  const mobileFieldHTML = showMobile
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${mobileLabel}${mobileRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <div style="display: flex;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid #d1d5db; border-right: none; border-radius: 0.5rem 0 0 0.5rem; background: #f9fafb;">
+          <span>🇲🇾</span>
+          <span style="color: #6b7280; font-size: 0.875rem;">▼</span>
+        </div>
+        <input type="tel" placeholder="012-345 6789" style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0 0.5rem 0.5rem 0; font-size: 1rem; box-sizing: border-box;" />
+      </div>
+    </div>`
+    : '';
+
+  const emailFieldHTML = showEmail
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${emailLabel}${emailRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <input type="email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+    </div>`
+    : '';
+
+  const productsHTML =
+    products.length > 0
+      ? `
+    <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
+      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Qty</div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Amount</div>
+      </div>
+      ${products
+        .map(
+          (product: any) => `
+      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: center; border-bottom: 1px solid #f3f4f6;">
+        <div>
+          <div style="font-weight: 500; color: #111827;">${product.name}</div>
+          <div style="color: #2563eb; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+          ${product.description ? `<div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">${product.description}</div>` : ''}
+        </div>
+        <div style="display: flex; justify-content: center;">
+          <div style="display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+            <button type="button" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">−</button>
+            <span style="width: 2rem; text-align: center; font-weight: 500;">0</span>
+            <button type="button" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">+</button>
+          </div>
+        </div>
+        <div style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
+      </div>`
+        )
+        .join('')}
+    </div>`
+      : '';
+
+  const totalHTML = `
+    <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 1.125rem; font-weight: 700; color: #111827;">Total Amount:</span>
+        <span style="font-size: 1.5rem; font-weight: 700; color: #111827;">${formatCurrency(0)}</span>
+      </div>
+      <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
+    </div>`;
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: 2rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container-sm" style="max-width: 42rem; margin: 0 auto;">
+    ${
+      title || description
+        ? `
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      ${title ? `<h2 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${title}</h2>` : ''}
+      ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
+    </div>`
+        : ''
+    }
+    ${nameFieldHTML}
+    ${mobileFieldHTML}
+    ${emailFieldHTML}
+    <div style="margin-top: 1.5rem;">
+      ${productsHTML}
+    </div>
+    ${totalHTML}
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; margin-bottom: 1.5rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+      <span>Your payment is secured &amp; encrypted</span>
+    </div>
+    <button type="button" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1.125rem; border: none; cursor: pointer; background-color: ${submitButtonColor};">
+      ${submitButtonText}
+    </button>
+    ${
+      companyName
+        ? `
+    <div style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 1rem;">
+      <p>&copy; ${new Date().getFullYear()} ${companyName}.</p>
+    </div>`
+        : ''
+    }
+  </div>
+</section>`;
+}
+
+/**
+ * Generate Product Carousel/Showcase HTML
+ */
+function generateProductCarouselHTML(element: Element): string {
+  const {
+    title = 'Our Products',
+    subtitle,
+    products = [],
+    bgColor = '#ffffff',
+  } = element.props;
+
+  const formatCurrency = (value: number, curr: string = 'MYR') => {
+    if (curr === 'MYR') return `RM ${value.toFixed(2)}`;
+    return `${curr} ${value.toFixed(2)}`;
+  };
+
+  const productsGridHTML = products
+    .map(
+      (product: any) => `
+    <div style="background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
+      ${
+        product.image_url
+          ? `<div style="width: 100%; height: 200px; overflow: hidden;">
+        <img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+      </div>`
+          : `<div style="width: 100%; height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>`
+      }
+      <div style="padding: 1.25rem;">
+        <h3 style="font-size: 1.125rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">${product.name}</h3>
+        ${product.description ? `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">${product.description}</p>` : ''}
+        <div style="font-size: 1.25rem; font-weight: 700; color: #2563eb;">
+          ${formatCurrency(product.base_price || product.price || 0, product.currency || 'MYR')}
+        </div>
+      </div>
+    </div>`
+    )
+    .join('');
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">${title}</h2>
+      ${subtitle ? `<p style="color: #6b7280; font-size: 1.125rem; max-width: 600px; margin: 0 auto;">${subtitle}</p>` : ''}
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto;">
+      ${productsGridHTML}
+    </div>
+  </div>
+</section>`;
+}
+
+/**
+ * Generate Lead Form HTML
+ */
+function generateLeadFormHTML(element: Element): string {
+  const {
+    title = 'Get In Touch',
+    description = "Fill out the form below and we'll get back to you soon.",
+    nameLabel = 'Your Name',
+    emailLabel = 'Email Address',
+    phoneLabel = 'Phone Number (optional)',
+    messageLabel = 'Message (optional)',
+    submitButtonText = 'Submit',
+    submitButtonColor = '#2563eb',
+    fields = { showPhone: true, showMessage: true },
+    bgColor = '#ffffff',
+  } = element.props;
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container-sm" style="max-width: 42rem; margin: 0 auto;">
+    <div style="background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 2.5rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.875rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${title}</h2>
+        ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
+      </div>
+      <form style="display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${nameLabel} <span style="color: #ef4444;">*</span></label>
+          <input type="text" placeholder="Your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${emailLabel} <span style="color: #ef4444;">*</span></label>
+          <input type="email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>
+        ${
+          fields.showPhone
+            ? `
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${phoneLabel}</label>
+          <input type="tel" placeholder="012-345 6789" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>`
+            : ''
+        }
+        ${
+          fields.showMessage
+            ? `
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${messageLabel}</label>
+          <textarea rows="4" placeholder="Your message..." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box; resize: vertical;"></textarea>
+        </div>`
+            : ''
+        }
+        <button type="button" style="width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1rem; border: none; cursor: pointer; background-color: ${submitButtonColor}; margin-top: 0.5rem;">
+          ${submitButtonText}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>`;
+}
+
+/**
+ * Generate WhatsApp Button HTML
+ */
+function generateWhatsAppButtonHTML(element: Element): string {
+  const {
+    phoneNumber = '',
+    message = '',
+    buttonText = 'WhatsApp Us',
+    buttonColor = '#25D366',
+    buttonSize = 'md',
+    position = 'fixed',
+    fixedPosition = 'bottom-right',
+    showIcon = true,
+  } = element.props;
+
+  const cleanPhone = phoneNumber.replace(/\D/g, '');
+  const encodedMessage = message ? encodeURIComponent(message) : '';
+  const waUrl = `https://wa.me/${cleanPhone}${encodedMessage ? `?text=${encodedMessage}` : ''}`;
+
+  const sizeStyles: Record<string, string> = {
+    sm: 'padding: 0.5rem 1rem; font-size: 0.875rem;',
+    md: 'padding: 0.75rem 1.5rem; font-size: 1rem;',
+    lg: 'padding: 1rem 2rem; font-size: 1.125rem;',
+  };
+
+  const positionStyles: Record<string, string> = {
+    'bottom-right': 'bottom: 1.5rem; right: 1.5rem;',
+    'bottom-left': 'bottom: 1.5rem; left: 1.5rem;',
+    'top-right': 'top: 1.5rem; right: 1.5rem;',
+    'top-left': 'top: 1.5rem; left: 1.5rem;',
+  };
+
+  const whatsappSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+  if (position === 'fixed') {
+    return `
+<a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="position: fixed; ${positionStyles[fixedPosition] || positionStyles['bottom-right']} z-index: 50; display: inline-flex; align-items: center; gap: 0.5rem; background-color: ${buttonColor}; color: white; border-radius: 9999px; ${sizeStyles[buttonSize] || sizeStyles['md']} font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  ${showIcon ? whatsappSVG : ''}
+  ${buttonText}
+</a>`;
+  }
+
+  return `
+<div style="text-align: center; padding: 1.5rem;">
+  <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: ${buttonColor}; color: white; border-radius: 9999px; ${sizeStyles[buttonSize] || sizeStyles['md']} font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    ${showIcon ? whatsappSVG : ''}
+    ${buttonText}
+  </a>
+</div>`;
+}
+
+/**
+ * Generate Media Element HTML
+ */
+function generateMediaHTML(element: Element): string {
+  const {
+    mediaType = 'image',
+    mediaUrl,
+    altText = 'Media content',
+    autoplay = false,
+    loop = true,
+    muted = true,
+    controls = true,
+    layout = 'contained',
+    maxWidth = '100%',
+    aspectRatio = 'auto',
+    borderRadius = '8px',
+    showCaption = false,
+    caption = '',
+    bgColor = '#ffffff',
+    paddingY = '2rem',
+    shadow = 'none',
+  } = element.props;
+
+  const shadowStyles: Record<string, string> = {
+    none: 'none',
+    sm: '0 1px 2px rgba(0,0,0,0.05)',
+    md: '0 4px 6px -1px rgba(0,0,0,0.1)',
+    lg: '0 10px 15px -3px rgba(0,0,0,0.1)',
+    xl: '0 20px 25px -5px rgba(0,0,0,0.1)',
+  };
+
+  const aspectRatioStyle =
+    aspectRatio !== 'auto'
+      ? `aspect-ratio: ${aspectRatio.replace(':', '/')};`
+      : '';
+  const containerMaxWidth = layout === 'full_width' ? '100%' : maxWidth;
+  const containerMargin =
+    layout === 'left'
+      ? '0 auto 0 0'
+      : layout === 'right'
+        ? '0 0 0 auto'
+        : '0 auto';
+
+  let mediaContent = '';
+  if (!mediaUrl) {
+    mediaContent = `
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius}; ${aspectRatioStyle}">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+    </div>`;
+  } else if (mediaType === 'video') {
+    mediaContent = `
+    <video style="width: 100%; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; ${aspectRatioStyle}" ${controls ? 'controls' : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''} ${muted ? 'muted' : ''} playsinline>
+      <source src="${mediaUrl}" />
+    </video>`;
+  } else {
+    mediaContent = `
+    <img src="${mediaUrl}" alt="${altText}" style="width: 100%; height: auto; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; object-fit: cover; ${aspectRatioStyle}" />`;
+  }
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: ${containerMaxWidth}; margin: ${containerMargin};">
+    ${mediaContent}
+    ${showCaption && caption ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem;">${caption}</p>` : ''}
+  </div>
+</section>`;
 }
 
 /**
