@@ -1944,10 +1944,13 @@ function generateProductCarouselHTML(element: Element): string {
     showPrice = true,
     showDescription = true,
     cardStyle = 'shadow',
+    showAddToCart = true,
+    addToCartButtonColor = '#111827',
+    addToCartButtonText = 'Add to Cart',
   } = element.props;
 
   const formatCurrency = (value: number, curr: string = 'MYR') => {
-    if (curr === 'MYR') return `RM ${value.toFixed(2)}`;
+    if (curr === 'MYR' || curr === 'RM') return `RM${value.toFixed(2)}`;
     return `${curr} ${value.toFixed(2)}`;
   };
 
@@ -1960,9 +1963,64 @@ function generateProductCarouselHTML(element: Element): string {
     cardStyle === 'shadow' ? 'box-shadow: 0 1px 3px rgba(0,0,0,0.1);' : '';
 
   const productsGridHTML = products
-    .map(
-      (product: any) => `
-    <div style="background: white; border-radius: 0.75rem; overflow: hidden; ${cardShadow} ${cardBorder}">
+    .map((product: any) => {
+      const hasVariations =
+        product.variations &&
+        product.variations.length > 0 &&
+        product.variations[0]?.options?.length > 0;
+      const variantOptions = hasVariations ? product.variations[0].options : [];
+      const basePrice = product.base_price || product.price || 0;
+      const currency = product.currency || 'MYR';
+
+      // Calculate price range for products with variations
+      let priceRangeHTML = '';
+      if (showPrice) {
+        if (hasVariations) {
+          const adjustments = variantOptions
+            .map((opt: any) => opt.priceAdjustment || 0)
+            .filter((adj: number) => adj > 0);
+          const maxAdjustment =
+            adjustments.length > 0 ? Math.max(...adjustments) : 0;
+          if (maxAdjustment > 0) {
+            priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)} - ${formatCurrency(basePrice + maxAdjustment, currency)}</div>`;
+          } else {
+            priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)}</div>`;
+          }
+        } else {
+          priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)}</div>`;
+        }
+      }
+
+      // Variant selector HTML
+      let variantHTML = '';
+      if (hasVariations && showAddToCart) {
+        const optionsHTML = variantOptions
+          .map(
+            (opt: any) =>
+              `<option value="${opt.value}" data-adjustment="${opt.priceAdjustment || 0}">${opt.label}</option>`
+          )
+          .join('');
+        variantHTML = `
+        <div class="${sectionId}-variant-wrap">
+          <select class="${sectionId}-variant-select" data-product-id="${product.id}" data-base-price="${basePrice}" data-currency="${currency}" onchange="handleVariantChange_${sectionId}(this)">
+            <option value="">Choose an option</option>
+            ${optionsHTML}
+          </select>
+          <svg class="${sectionId}-variant-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>`;
+      }
+
+      // Add to cart button HTML
+      let buttonHTML = '';
+      if (showAddToCart) {
+        const buttonText = hasVariations
+          ? 'Select Options'
+          : addToCartButtonText;
+        buttonHTML = `<button class="${sectionId}-cart-btn" style="background-color: ${addToCartButtonColor};" onclick="handleAddToCart_${sectionId}(this, '${product.id}')">${buttonText}</button>`;
+      }
+
+      return `
+    <div class="${sectionId}-card" style="background: white; border-radius: 0.75rem; overflow: hidden; ${cardShadow} ${cardBorder}">
       ${
         product.image_url
           ? `<div style="width: 100%; aspect-ratio: 1; overflow: hidden;">
@@ -1973,19 +2031,89 @@ function generateProductCarouselHTML(element: Element): string {
       </div>`
       }
       <div class="${sectionId}-card-body">
+        ${variantHTML}
         <h3 class="${sectionId}-card-title" style="color: ${textColor};">${product.name}</h3>
         ${showDescription && product.description ? `<p class="${sectionId}-card-desc">${product.description}</p>` : ''}
-        ${
-          showPrice
-            ? `<div class="${sectionId}-card-price" style="color: ${priceColor};">
-          ${formatCurrency(product.base_price || product.price || 0, product.currency || 'MYR')}
-        </div>`
-            : ''
-        }
+        ${priceRangeHTML}
+        ${buttonHTML}
       </div>
-    </div>`
-    )
+    </div>`;
+    })
     .join('');
+
+  // Check if any product has variations (to include JS)
+  const hasAnyVariations = products.some(
+    (p: any) =>
+      p.variations &&
+      p.variations.length > 0 &&
+      p.variations[0]?.options?.length > 0
+  );
+
+  const formatFn = `
+  function formatCurrency_${sectionId}(value, currency) {
+    if (currency === 'MYR' || currency === 'RM') return 'RM' + value.toFixed(2);
+    return currency + ' ' + value.toFixed(2);
+  }`;
+
+  const variantJS = hasAnyVariations
+    ? `
+  function handleVariantChange_${sectionId}(select) {
+    var card = select.closest('.${sectionId}-card');
+    var priceEl = card.querySelector('.${sectionId}-card-price');
+    if (!priceEl) return;
+    var basePrice = parseFloat(select.dataset.basePrice);
+    var currency = select.dataset.currency;
+    var selected = select.options[select.selectedIndex];
+    if (select.value === '') {
+      // Reset to price range
+      var opts = select.querySelectorAll('option[data-adjustment]');
+      var maxAdj = 0;
+      for (var i = 0; i < opts.length; i++) {
+        var adj = parseFloat(opts[i].dataset.adjustment) || 0;
+        if (adj > maxAdj) maxAdj = adj;
+      }
+      if (maxAdj > 0) {
+        priceEl.textContent = formatCurrency_${sectionId}(basePrice, currency) + ' - ' + formatCurrency_${sectionId}(basePrice + maxAdj, currency);
+      } else {
+        priceEl.textContent = formatCurrency_${sectionId}(basePrice, currency);
+      }
+      // Reset button text
+      var btn = card.querySelector('.${sectionId}-cart-btn');
+      if (btn) btn.textContent = 'Select Options';
+    } else {
+      var adjustment = parseFloat(selected.dataset.adjustment) || 0;
+      priceEl.textContent = formatCurrency_${sectionId}(basePrice + adjustment, currency);
+      // Update button text
+      var btn = card.querySelector('.${sectionId}-cart-btn');
+      if (btn) btn.textContent = '${addToCartButtonText}';
+    }
+  }`
+    : '';
+
+  const cartJS = showAddToCart
+    ? `
+  function handleAddToCart_${sectionId}(btn, productId) {
+    var card = btn.closest('.${sectionId}-card');
+    var select = card.querySelector('.${sectionId}-variant-select');
+    if (select && select.value === '') {
+      select.focus();
+      select.style.borderColor = '#ef4444';
+      setTimeout(function() { select.style.borderColor = '#d1d5db'; }, 2000);
+      return;
+    }
+    btn.style.backgroundColor = '#22c55e';
+    btn.textContent = 'Added!';
+    btn.disabled = true;
+    setTimeout(function() {
+      btn.style.backgroundColor = '${addToCartButtonColor}';
+      btn.textContent = select && select.value !== '' ? '${addToCartButtonText}' : 'Select Options';
+      btn.disabled = false;
+    }, 1500);
+    // Dispatch cart event for integration
+    var variant = select ? select.options[select.selectedIndex].text : '';
+    window.dispatchEvent(new CustomEvent('product-add-to-cart', { detail: { productId: productId, variant: variant } }));
+  }`
+    : '';
 
   return `
 <style>
@@ -2021,6 +2149,50 @@ function generateProductCarouselHTML(element: Element): string {
   #${sectionId} .${sectionId}-card-price {
     font-size: 0.875rem;
     font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  #${sectionId} .${sectionId}-variant-wrap {
+    position: relative;
+    margin-bottom: 0.75rem;
+  }
+  #${sectionId} .${sectionId}-variant-select {
+    width: 100%;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    color: #374151;
+    background: white;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #${sectionId} .${sectionId}-variant-select:focus {
+    outline: none;
+    border-color: #6b7280;
+  }
+  #${sectionId} .${sectionId}-variant-chevron {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #9ca3af;
+  }
+  #${sectionId} .${sectionId}-cart-btn {
+    width: 100%;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  #${sectionId} .${sectionId}-cart-btn:hover {
+    opacity: 0.9;
   }
   @media (min-width: 768px) {
     #${sectionId} .${sectionId}-grid {
@@ -2040,6 +2212,15 @@ function generateProductCarouselHTML(element: Element): string {
     }
     #${sectionId} .${sectionId}-card-price {
       font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    #${sectionId} .${sectionId}-variant-select {
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+    #${sectionId} .${sectionId}-cart-btn {
+      padding: 0.75rem;
+      font-size: 0.875rem;
     }
   }
 </style>
@@ -2053,7 +2234,12 @@ function generateProductCarouselHTML(element: Element): string {
       ${productsGridHTML}
     </div>
   </div>
-</section>`;
+</section>
+<script>
+${formatFn}
+${variantJS}
+${cartJS}
+</script>`;
 }
 
 /**
