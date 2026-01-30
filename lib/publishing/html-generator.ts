@@ -1937,7 +1937,13 @@ function generateProductCarouselHTML(element: Element): string {
     title = 'Our Products',
     subtitle,
     products = [],
+    columns = 3,
     bgColor = '#ffffff',
+    textColor = '#1f2937',
+    priceColor = '#2563eb',
+    showPrice = true,
+    showDescription = true,
+    cardStyle = 'shadow',
   } = element.props;
 
   const formatCurrency = (value: number, curr: string = 'MYR') => {
@@ -1945,38 +1951,105 @@ function generateProductCarouselHTML(element: Element): string {
     return `${curr} ${value.toFixed(2)}`;
   };
 
+  // Generate unique ID for scoped styles
+  const sectionId = `product-carousel-${element.order}`;
+
+  const cardBorder =
+    cardStyle === 'bordered' ? 'border: 1px solid #e5e7eb;' : '';
+  const cardShadow =
+    cardStyle === 'shadow' ? 'box-shadow: 0 1px 3px rgba(0,0,0,0.1);' : '';
+
   const productsGridHTML = products
     .map(
       (product: any) => `
-    <div style="background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
+    <div style="background: white; border-radius: 0.75rem; overflow: hidden; ${cardShadow} ${cardBorder}">
       ${
         product.image_url
-          ? `<div style="width: 100%; height: 200px; overflow: hidden;">
-        <img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+          ? `<div style="width: 100%; aspect-ratio: 1; overflow: hidden;">
+        <img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
       </div>`
-          : `<div style="width: 100%; height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+          : `<div style="width: 100%; aspect-ratio: 1; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
       </div>`
       }
-      <div style="padding: 1.25rem;">
-        <h3 style="font-size: 1.125rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem;">${product.name}</h3>
-        ${product.description ? `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">${product.description}</p>` : ''}
-        <div style="font-size: 1.25rem; font-weight: 700; color: #2563eb;">
+      <div class="${sectionId}-card-body">
+        <h3 class="${sectionId}-card-title" style="color: ${textColor};">${product.name}</h3>
+        ${showDescription && product.description ? `<p class="${sectionId}-card-desc">${product.description}</p>` : ''}
+        ${
+          showPrice
+            ? `<div class="${sectionId}-card-price" style="color: ${priceColor};">
           ${formatCurrency(product.base_price || product.price || 0, product.currency || 'MYR')}
-        </div>
+        </div>`
+            : ''
+        }
       </div>
     </div>`
     )
     .join('');
 
   return `
-<section id="${element.type}-${element.order}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+<style>
+  #${sectionId} .${sectionId}-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  #${sectionId} .${sectionId}-card-body {
+    padding: 0.75rem;
+  }
+  #${sectionId} .${sectionId}-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #${sectionId} .${sectionId}-card-desc {
+    color: #6b7280;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #${sectionId} .${sectionId}-card-price {
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  @media (min-width: 768px) {
+    #${sectionId} .${sectionId}-grid {
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: 1.5rem;
+    }
+    #${sectionId} .${sectionId}-card-body {
+      padding: 1.25rem;
+    }
+    #${sectionId} .${sectionId}-card-title {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+    #${sectionId} .${sectionId}-card-desc {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    #${sectionId} .${sectionId}-card-price {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+<section id="${sectionId}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
   <div class="container">
     <div style="text-align: center; margin-bottom: 3rem;">
-      <h2 style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">${title}</h2>
+      <h2 style="font-size: 2rem; font-weight: 700; color: ${textColor}; margin-bottom: 0.75rem;">${title}</h2>
       ${subtitle ? `<p style="color: #6b7280; font-size: 1.125rem; max-width: 600px; margin: 0 auto;">${subtitle}</p>` : ''}
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto;">
+    <div class="${sectionId}-grid">
       ${productsGridHTML}
     </div>
   </div>

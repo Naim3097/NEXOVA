@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUp } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -26,6 +27,15 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refCode, setRefCode] = useState<string | null>(null);
+
+  // Capture affiliate ref code from URL
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setRefCode(ref);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,11 +56,31 @@ export default function SignupPage() {
     }
 
     try {
-      const { error } = await signUp(email, password, displayName);
+      const { user: newUser, error } = await signUp(
+        email,
+        password,
+        displayName
+      );
 
       if (error) {
         setError(error.message);
         return;
+      }
+
+      // Track affiliate referral if ref code exists
+      if (refCode && newUser?.id) {
+        try {
+          await fetch('/api/affiliate/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referred_id: newUser.id,
+              affiliate_code: refCode,
+            }),
+          });
+        } catch {
+          // Silently fail - don't block signup for tracking errors
+        }
       }
 
       // Show success message
@@ -175,5 +205,21 @@ export default function SignupPage() {
         </CardFooter>
       </form>
     </Card>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <Card>
+          <CardContent className="p-8 text-center text-[#969696]">
+            Loading...
+          </CardContent>
+        </Card>
+      }
+    >
+      <SignupForm />
+    </Suspense>
   );
 }

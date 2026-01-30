@@ -17,6 +17,7 @@ import {
   Layers,
   Globe,
   ChevronUp,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -70,6 +71,12 @@ const navigation = [
     name: 'Subdomain',
     href: '/dashboard/settings/subdomain',
     icon: Globe,
+    isDynamic: false,
+  },
+  {
+    name: 'Affiliate',
+    href: '/dashboard/affiliate',
+    icon: Users,
     isDynamic: false,
   },
 ];
