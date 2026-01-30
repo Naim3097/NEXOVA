@@ -16,6 +16,7 @@ export interface Profile {
   leanx_merchant_id: string | null;
   leanx_enabled: boolean;
   leanx_environment: 'test' | 'live';
+  affiliate_code: string | null;
   created_at: string;
   updated_at: string;
 }
