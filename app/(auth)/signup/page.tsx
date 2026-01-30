@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUp } = useAuth();
@@ -205,5 +205,21 @@ export default function SignupPage() {
         </CardFooter>
       </form>
     </Card>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <Card>
+          <CardContent className="p-8 text-center text-[#969696]">
+            Loading...
+          </CardContent>
+        </Card>
+      }
+    >
+      <SignupForm />
+    </Suspense>
   );
 }

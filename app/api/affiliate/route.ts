@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 function generateAffiliateCode(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -13,7 +13,7 @@ function generateAffiliateCode(): string {
 // GET /api/affiliate - Get affiliate stats for current user
 export async function GET() {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,
@@ -90,7 +90,7 @@ export async function GET() {
 // POST /api/affiliate - Generate affiliate code for current user
 export async function POST() {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const {
       data: { user },
       error: authError,
