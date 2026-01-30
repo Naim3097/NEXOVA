@@ -1850,34 +1850,123 @@ function generateFormWithPaymentHTML(element: Element): string {
     </div>`
     : '';
 
+  const sectionId = `form-payment-${element.order}`;
+  const jsId = `form_payment_${element.order}`;
+
   const productsHTML =
     products.length > 0
       ? `
-    <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
+    <div id="${sectionId}-products" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
       <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
         <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
         <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Qty</div>
         <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Amount</div>
       </div>
       ${products
-        .map(
-          (product: any) => `
-      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: center; border-bottom: 1px solid #f3f4f6;">
+        .map((product: any, idx: number) => {
+          const hasVariations =
+            product.variations &&
+            product.variations.length > 0 &&
+            product.variations[0]?.options?.length > 0;
+          const productId = product.id || `prod-${idx}`;
+
+          // Bundle pricing info
+          const bundleInfoHTML =
+            product.bundlePricing && product.bundlePricing.length > 0
+              ? `<div style="margin-top: 0.25rem; font-size: 0.75rem; color: #16a34a;">${product.bundlePricing
+                  .slice(0, 3)
+                  .map(
+                    (b: any) =>
+                      `Buy ${b.quantity} = ${formatCurrency(b.totalPrice)}`
+                  )
+                  .join(' | ')}</div>`
+              : '';
+
+          // Variant grid (hidden by default, toggled via JS)
+          let variantGridHTML = '';
+          if (hasVariations) {
+            variantGridHTML = `
+              <div id="${sectionId}-variants-${idx}" style="display: none; padding: 0.75rem 1rem; border-bottom: 1px solid #f3f4f6;">
+                ${product.variations
+                  .map(
+                    (variation: any) => `
+                  <div style="margin-bottom: 0.75rem;">
+                    <div style="font-size: 0.75rem; font-weight: 500; color: #6b7280; margin-bottom: 0.5rem;">${variation.name}</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                      ${variation.options
+                        .map((option: any) => {
+                          const variantPrice =
+                            product.price + (option.priceAdjustment || 0);
+                          const variantKey = `${productId}-${option.value}`;
+                          return `
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border-radius: 0.375rem; padding: 0.375rem 0.5rem;">
+                          <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 0.875rem; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${option.label}</div>
+                            <div style="font-size: 0.75rem; color: #2563eb;">${formatCurrency(variantPrice)}</div>
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 0.125rem; border: 1px solid #d1d5db; border-radius: 0.25rem; background: white; margin-left: 0.5rem;">
+                            <button type="button" onclick="${jsId}_changeQty('${variantKey}', -1, ${option.stock || 0}, ${variantPrice})" style="padding: 0.25rem 0.5rem; color: #6b7280; background: none; border: none; cursor: pointer; font-size: 0.875rem;">−</button>
+                            <span id="${sectionId}-qty-${variantKey}" style="width: 1.5rem; text-align: center; font-size: 0.875rem; font-weight: 500;">0</span>
+                            <button type="button" onclick="${jsId}_changeQty('${variantKey}', 1, ${option.stock || 0}, ${variantPrice})" style="padding: 0.25rem 0.5rem; color: #6b7280; background: none; border: none; cursor: pointer; font-size: 0.875rem;">+</button>
+                          </div>
+                        </div>`;
+                        })
+                        .join('')}
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>`;
+          }
+
+          if (hasVariations) {
+            // Product with variations - clickable to expand, shows total qty badge
+            return `
+      <div data-product-idx="${idx}" data-product-id="${productId}" data-base-price="${product.price}">
+        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: start; border-bottom: 1px solid #f3f4f6; cursor: pointer;" onclick="${jsId}_toggleVariants(${idx})">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span id="${sectionId}-chevron-${idx}" style="color: #9ca3af; font-size: 0.75rem; transition: transform 0.2s;">▶</span>
+              <div>
+                <div style="font-weight: 500; color: #111827;">${product.name}</div>
+                <div style="color: #2563eb; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}
+                  <span style="color: #9ca3af; font-size: 0.75rem; margin-left: 0.25rem;">(tap to select)</span>
+                </div>
+                ${bundleInfoHTML}
+                ${product.description ? `<div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">${product.description}</div>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center;">
+            <span id="${sectionId}-total-qty-${idx}" style="display: none; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: #dbeafe; color: #1e40af;">0 selected</span>
+            <span id="${sectionId}-select-hint-${idx}" style="font-size: 0.875rem; color: #9ca3af;">Select below</span>
+          </div>
+          <div id="${sectionId}-amount-${idx}" style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
+        </div>
+        ${variantGridHTML}
+      </div>`;
+          } else {
+            // Simple product without variations
+            return `
+      <div data-product-idx="${idx}" data-product-id="${productId}" data-base-price="${product.price}" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: center; border-bottom: 1px solid #f3f4f6;">
         <div>
           <div style="font-weight: 500; color: #111827;">${product.name}</div>
           <div style="color: #2563eb; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+          ${bundleInfoHTML}
           ${product.description ? `<div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">${product.description}</div>` : ''}
         </div>
         <div style="display: flex; justify-content: center;">
           <div style="display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-            <button type="button" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">−</button>
-            <span style="width: 2rem; text-align: center; font-weight: 500;">0</span>
-            <button type="button" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">+</button>
+            <button type="button" onclick="${jsId}_changeQty('${productId}', -1, ${product.stock || 0}, ${product.price})" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">−</button>
+            <span id="${sectionId}-qty-${productId}" style="width: 2rem; text-align: center; font-weight: 500;">0</span>
+            <button type="button" onclick="${jsId}_changeQty('${productId}', 1, ${product.stock || 0}, ${product.price})" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">+</button>
           </div>
         </div>
-        <div style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
-      </div>`
-        )
+        <div id="${sectionId}-amount-${idx}" style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
+      </div>`;
+          }
+        })
         .join('')}
     </div>`
       : '';
@@ -1886,10 +1975,158 @@ function generateFormWithPaymentHTML(element: Element): string {
     <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span style="font-size: 1.125rem; font-weight: 700; color: #111827;">Total Amount:</span>
-        <span style="font-size: 1.5rem; font-weight: 700; color: #111827;">${formatCurrency(0)}</span>
+        <span id="${sectionId}-total" style="font-size: 1.5rem; font-weight: 700; color: #111827;">${formatCurrency(0)}</span>
       </div>
-      <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
+      <p id="${sectionId}-total-hint" style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
     </div>`;
+
+  // Build product data for JS
+  const productsJSData = JSON.stringify(
+    products.map((p: any, idx: number) => ({
+      idx,
+      id: p.id || `prod-${idx}`,
+      price: p.price,
+      bundlePricing: p.bundlePricing || [],
+      hasVariations: !!(
+        p.variations &&
+        p.variations.length > 0 &&
+        p.variations[0]?.options?.length > 0
+      ),
+      variations: (p.variations || []).map((v: any) => ({
+        options: (v.options || []).map((o: any) => ({
+          value: o.value,
+          priceAdjustment: o.priceAdjustment || 0,
+        })),
+      })),
+    }))
+  );
+
+  const interactiveJS = `
+<script>
+(function() {
+  var sid = '${sectionId}';
+  var quantities = {};
+  var products = ${productsJSData};
+  var currency = '${currency}';
+
+  function fmtCur(v) {
+    if (currency === 'MYR' || currency === 'RM') return 'RM ' + v.toFixed(2);
+    return currency + ' ' + v.toFixed(2);
+  }
+
+  function getBundlePrice(product, qty) {
+    if (!product.bundlePricing || product.bundlePricing.length === 0 || qty <= 0) return null;
+    var sorted = product.bundlePricing.slice().sort(function(a,b){ return b.quantity - a.quantity; });
+    for (var i = 0; i < sorted.length; i++) {
+      if (qty >= sorted[i].quantity) return sorted[i].totalPrice;
+    }
+    return null;
+  }
+
+  window.${jsId}_toggleVariants = function(idx) {
+    var el = document.getElementById(sid + '-variants-' + idx);
+    var chevron = document.getElementById(sid + '-chevron-' + idx);
+    if (!el) return;
+    if (el.style.display === 'none') {
+      el.style.display = 'block';
+      if (chevron) chevron.style.transform = 'rotate(90deg)';
+    } else {
+      el.style.display = 'none';
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  };
+
+  window.${jsId}_changeQty = function(key, delta, stock, price) {
+    var current = quantities[key] || 0;
+    var newQty = Math.max(0, current + delta);
+    if (stock > 0 && newQty > stock) newQty = stock;
+    quantities[key] = newQty;
+
+    // Update qty display
+    var qtyEl = document.getElementById(sid + '-qty-' + key);
+    if (qtyEl) qtyEl.textContent = newQty;
+
+    // Recalculate all amounts and total
+    recalculate();
+  };
+
+  function recalculate() {
+    var grandTotal = 0;
+
+    for (var i = 0; i < products.length; i++) {
+      var p = products[i];
+      var productAmount = 0;
+
+      if (p.hasVariations) {
+        var totalQty = 0;
+        var totalVariantPrice = 0;
+
+        for (var v = 0; v < p.variations.length; v++) {
+          var opts = p.variations[v].options;
+          for (var o = 0; o < opts.length; o++) {
+            var vKey = p.id + '-' + opts[o].value;
+            var qty = quantities[vKey] || 0;
+            totalQty += qty;
+            totalVariantPrice += (p.price + opts[o].priceAdjustment) * qty;
+          }
+        }
+
+        // Apply bundle pricing
+        var bundleTotal = getBundlePrice(p, totalQty);
+        if (bundleTotal !== null && totalQty > 0) {
+          var originalTotal = p.price * totalQty;
+          if (bundleTotal < originalTotal && originalTotal > 0) {
+            var ratio = bundleTotal / originalTotal;
+            productAmount = totalVariantPrice * ratio;
+          } else {
+            productAmount = totalVariantPrice;
+          }
+        } else {
+          productAmount = totalVariantPrice;
+        }
+
+        // Update total qty badge
+        var totalQtyEl = document.getElementById(sid + '-total-qty-' + i);
+        var hintEl = document.getElementById(sid + '-select-hint-' + i);
+        if (totalQtyEl && hintEl) {
+          if (totalQty > 0) {
+            totalQtyEl.style.display = 'inline';
+            totalQtyEl.textContent = totalQty + ' selected';
+            hintEl.style.display = 'none';
+          } else {
+            totalQtyEl.style.display = 'none';
+            hintEl.style.display = 'inline';
+          }
+        }
+      } else {
+        var simpleQty = quantities[p.id] || 0;
+        productAmount = p.price * simpleQty;
+
+        // Apply bundle pricing for simple products
+        var simpleBundleTotal = getBundlePrice(p, simpleQty);
+        if (simpleBundleTotal !== null && simpleQty > 0) {
+          productAmount = simpleBundleTotal;
+        }
+      }
+
+      // Update amount display
+      var amountEl = document.getElementById(sid + '-amount-' + i);
+      if (amountEl) amountEl.textContent = fmtCur(productAmount);
+
+      grandTotal += productAmount;
+    }
+
+    // Update grand total
+    var totalEl = document.getElementById(sid + '-total');
+    if (totalEl) totalEl.textContent = fmtCur(grandTotal);
+
+    var hintEl = document.getElementById(sid + '-total-hint');
+    if (hintEl) {
+      hintEl.textContent = grandTotal > 0 ? '' : 'Please select your items above.';
+    }
+  }
+})();
+</script>`;
 
   return `
 <section id="${element.type}-${element.order}" style="padding: 2rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
@@ -1926,6 +2163,7 @@ function generateFormWithPaymentHTML(element: Element): string {
         : ''
     }
   </div>
+${products.length > 0 ? interactiveJS : ''}
 </section>`;
 }
 
