@@ -6,6 +6,7 @@ import { Pipeline } from '@/components/landing/Pipeline';
 import { JugglingTools } from '@/components/landing/JugglingTools';
 import { GridFeatures } from '@/components/landing/GridFeatures';
 import { BusinessTypes } from '@/components/landing/BusinessTypes';
+import { Pricing } from '@/components/landing/Pricing';
 import { CTA } from '@/components/landing/CTA';
 import { Footer } from '@/components/landing/Footer';
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll';
@@ -35,6 +36,9 @@ export default function Home() {
         </RevealOnScroll>
         <RevealOnScroll delay={200}>
           <BusinessTypes />
+        </RevealOnScroll>
+        <RevealOnScroll delay={200}>
+          <Pricing />
         </RevealOnScroll>
         <RevealOnScroll delay={200}>
           <CTA />
