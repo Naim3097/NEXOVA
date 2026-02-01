@@ -116,21 +116,21 @@ export function Pricing() {
     {
       name: 'E-Invoice Integration',
       free: false,
-      premium: false,
+      premium: 'Coming Soon',
       enterprise: 'Coming Soon',
       locked: true,
     },
     {
       name: 'Affiliate Management',
       free: false,
-      premium: false,
+      premium: 'Coming Soon',
       enterprise: 'Coming Soon',
       locked: true,
     },
     {
       name: 'Dedicated Account Manager',
       free: false,
-      premium: false,
+      premium: true,
       enterprise: true,
       locked: true,
     },
@@ -317,10 +317,10 @@ export function Pricing() {
 
         {/* Feature Comparison Table */}
         <RevealOnScroll delay={300}>
-          <div className="overflow-x-auto max-w-6xl mx-auto rounded-3xl border border-gray-100 shadow-sm">
-            <div className="min-w-[800px] bg-white">
+          <div className="overflow-x-auto max-w-6xl mx-auto rounded-3xl border border-gray-100 shadow-sm relative">
+            <div className="min-w-[700px] md:min-w-[800px] bg-white">
               {/* Table Header */}
-              <div className="grid grid-cols-4 bg-[#69C5C5] text-white py-6 px-6 font-medium rounded-t-3xl items-center">
+              <div className="grid grid-cols-4 bg-[#69C5C5] text-white py-6 px-2 md:px-6 font-medium rounded-t-3xl items-center text-sm md:text-base">
                 <div className="pl-4"></div>
                 <div className="text-center">Free</div>
                 <div className="text-center">Premium</div>
@@ -332,10 +332,10 @@ export function Pricing() {
                 {features.map((feature, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-4 py-5 px-6 items-center hover:bg-gray-50 transition-colors"
+                    className="grid grid-cols-4 py-5 px-2 md:px-6 items-center hover:bg-gray-50 transition-colors"
                   >
                     {/* @ts-ignore */}
-                    <div className="text-sm text-gray-500 font-medium pl-4">
+                    <div className="text-xs md:text-sm text-gray-500 font-medium pl-2 md:pl-4">
                       {feature.name}
                     </div>
                     <div className="text-center">

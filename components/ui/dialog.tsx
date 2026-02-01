@@ -1,7 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 interface DialogProps {
   open?: boolean;
@@ -10,20 +12,41 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
-  return (
-    <>
-      {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => onOpenChange?.(false)}
-          />
-          {/* Content */}
-          <div className="relative z-[100]">{children}</div>
-        </div>
-      )}
-    </>
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
+
+  if (!mounted) return null;
+
+  if (!open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        onClick={() => onOpenChange?.(false)}
+        aria-hidden="true"
+      />
+      {/* Content */}
+      <div className="relative z-[100] w-full max-w-fit flex justify-center">
+        {children}
+      </div>
+    </div>,
+    document.body
   );
 }
 
@@ -39,7 +62,7 @@ export function DialogContent({
   return (
     <div
       className={cn(
-        'relative bg-white rounded-2xl shadow-lg border border-[#E2E8F0] max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6',
+        'relative bg-white rounded-2xl shadow-lg border border-[#E2E8F0] w-full max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95 duration-200',
         className
       )}
       {...props}
