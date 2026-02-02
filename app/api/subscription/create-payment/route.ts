@@ -172,11 +172,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create LeanX payment
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-    const callbackUrl = `${baseUrl}/api/subscription/webhook`;
+    // Use origin header so return URL matches the domain the user is on (staging vs production)
+    const origin =
+      request.headers.get('origin') ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'http://localhost:3001';
+    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || origin}/api/subscription/webhook`;
     // Return URL - user will be redirected here after payment (success or cancel)
-    // The subscription page will check the actual payment status
-    const returnUrl = `${baseUrl}/dashboard/subscription?order=${orderId}`;
+    const returnUrl = `${origin}/dashboard/subscription?order=${orderId}`;
 
     console.log('[Subscription Payment] Creating LeanX payment:', {
       orderId,
