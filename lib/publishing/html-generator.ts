@@ -2156,6 +2156,13 @@ function generateFormWithPaymentHTML(element: Element): string {
               var chevron = document.getElementById(sid + '-chevron-' + i);
               if (chevron) chevron.style.transform = 'rotate(90deg)';
               recalculate();
+              // Auto-scroll to the variant qty element
+              var scrollTarget = qtyEl || variantsEl;
+              if (scrollTarget) {
+                setTimeout(function() {
+                  scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+              }
               return;
             }
           }
@@ -2167,6 +2174,12 @@ function generateFormWithPaymentHTML(element: Element): string {
         var qtyEl = document.getElementById(sid + '-qty-' + p.id);
         if (qtyEl) qtyEl.textContent = quantities[p.id];
         recalculate();
+        // Auto-scroll to the product qty element
+        if (qtyEl) {
+          setTimeout(function() {
+            qtyEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
         return;
       }
     }
