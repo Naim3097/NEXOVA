@@ -100,20 +100,27 @@ export interface Bank {
  * return banks in different response structures.
  */
 export async function getLeanXBankList(
-  config: LeanXConfig
+  config: LeanXConfig,
+  options?: { modelFilter?: 1 | 2 }
 ): Promise<{ success: boolean; banks?: Bank[]; error?: string }> {
   try {
     console.log('Fetching LeanX bank list with Auto-Detection strategy:', {
       host: LEANX_API_HOST,
+      modelFilter: options?.modelFilter,
     });
 
-    // Define all 4 combinations to query in parallel
-    const combinations = [
+    // Define combinations to query in parallel
+    // model 1 = B2C (individual), model 2 = B2B (business)
+    const allCombinations = [
       { type: 'WEB_PAYMENT', model: 1, label: 'FPX B2C' },
       { type: 'WEB_PAYMENT', model: 2, label: 'FPX B2B' },
       { type: 'DIGITAL_PAYMENT', model: 1, label: 'E-Wallet B2C' },
       { type: 'DIGITAL_PAYMENT', model: 2, label: 'E-Wallet B2B' },
     ];
+
+    const combinations = options?.modelFilter
+      ? allCombinations.filter((c) => c.model === options.modelFilter)
+      : allCombinations;
 
     let allBanks: Bank[] = [];
     const errors: string[] = [];

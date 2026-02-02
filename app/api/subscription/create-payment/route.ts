@@ -114,10 +114,13 @@ export async function POST(request: NextRequest) {
 
     // If no bankId provided, return bank list for selection
     if (!bankId) {
-      const bankListResult = await getLeanXBankList({
-        authToken: systemAuthToken,
-        collectionUuid: systemCollectionUuid,
-      });
+      const bankListResult = await getLeanXBankList(
+        {
+          authToken: systemAuthToken,
+          collectionUuid: systemCollectionUuid,
+        },
+        { modelFilter: 1 } // B2C only for individual subscriptions
+      );
 
       if (!bankListResult.success) {
         return NextResponse.json(
