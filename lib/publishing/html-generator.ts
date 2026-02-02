@@ -2132,19 +2132,19 @@ function generateFormWithPaymentHTML(element: Element): string {
     if (!detail || !detail.productId) return;
 
     var productId = detail.productId;
-    var variantName = detail.variant || '';
+    var variantValue = (detail.variantValue || detail.variant || '').toLowerCase();
 
     // Find the matching product
     for (var i = 0; i < products.length; i++) {
       var p = products[i];
       if (p.id !== productId) continue;
 
-      if (p.hasVariations && variantName) {
+      if (p.hasVariations && variantValue) {
         // Find matching variant option and increment its qty
         for (var v = 0; v < p.variations.length; v++) {
           var opts = p.variations[v].options;
           for (var o = 0; o < opts.length; o++) {
-            if (opts[o].value === variantName || p.variations[v].name + ': ' + opts[o].value === variantName) {
+            if (opts[o].value.toLowerCase() === variantValue) {
               var vKey = p.id + '-' + opts[o].value;
               var current = quantities[vKey] || 0;
               quantities[vKey] = current + 1;
@@ -2396,7 +2396,8 @@ function generateProductCarouselHTML(element: Element): string {
     }, 1500);
     // Dispatch cart event for integration
     var variant = select ? select.options[select.selectedIndex].text : '';
-    window.dispatchEvent(new CustomEvent('product-add-to-cart', { detail: { productId: productId, variant: variant } }));
+    var variantValue = select ? select.value : '';
+    window.dispatchEvent(new CustomEvent('product-add-to-cart', { detail: { productId: productId, variant: variant, variantValue: variantValue } }));
   }`
     : '';
 
