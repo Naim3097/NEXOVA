@@ -56,10 +56,15 @@ function SignupForm() {
     }
 
     try {
+      const plan = searchParams.get('plan');
+      const redirectTo =
+        plan === 'premium' ? '/dashboard/subscription/checkout' : '/dashboard';
+
       const { user: newUser, error } = await signUp(
         email,
         password,
-        displayName
+        displayName,
+        redirectTo
       );
 
       if (error) {
@@ -86,9 +91,8 @@ function SignupForm() {
       // Show success message
       setSuccess(true);
 
-      // Redirect to dashboard after a short delay
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push(redirectTo);
       }, 2000);
     } catch (err) {
       setError('An unexpected error occurred');

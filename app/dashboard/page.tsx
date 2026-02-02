@@ -141,7 +141,7 @@ function DashboardContent() {
           <Card>
             <CardHeader>
               <CardTitle className="text-[#455263]">
-                Welcome back, Nexova!
+                Welcome back, {profile?.display_name || 'there'}!
               </CardTitle>
             </CardHeader>
             <CardContent>

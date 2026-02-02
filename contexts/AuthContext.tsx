@@ -10,11 +10,19 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, displayName?: string) => Promise<{
+  signUp: (
+    email: string,
+    password: string,
+    displayName?: string,
+    redirectTo?: string
+  ) => Promise<{
     user: User | null;
     error: AuthError | null;
   }>;
-  signIn: (email: string, password: string) => Promise<{
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{
     user: User | null;
     error: AuthError | null;
   }>;
@@ -76,8 +84,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName?: string,
+    redirectTo?: string
+  ) => {
     try {
+      const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+      if (redirectTo) {
+        callbackUrl.searchParams.set('redirect', redirectTo);
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -85,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             display_name: displayName,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: callbackUrl.toString(),
         },
       });
 

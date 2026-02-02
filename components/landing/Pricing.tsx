@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, X, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { RevealOnScroll } from '@/components/ui/RevealOnScroll';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function Pricing() {
+  const router = useRouter();
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
   const plans = [
@@ -305,6 +307,15 @@ export function Pricing() {
                           ? 'bg-white text-gray-900 hover:bg-gray-50 border-0'
                           : 'bg-[#5BC0BE] text-white hover:bg-[#4aaeb0]'
                       )}
+                      onClick={() => {
+                        if (plan.isCustom) {
+                          window.open('https://wa.me/60176069379', '_blank');
+                        } else {
+                          router.push(
+                            `/signup?plan=${plan.name.toLowerCase()}`
+                          );
+                        }
+                      }}
                     >
                       {plan.cta}
                     </Button>
