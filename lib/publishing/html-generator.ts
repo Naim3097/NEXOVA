@@ -2125,6 +2125,52 @@ function generateFormWithPaymentHTML(element: Element): string {
       hintEl.textContent = grandTotal > 0 ? '' : 'Please select your items above.';
     }
   }
+
+  // Listen for add-to-cart events from product carousel
+  window.addEventListener('product-add-to-cart', function(e) {
+    var detail = e.detail;
+    if (!detail || !detail.productId) return;
+
+    var productId = detail.productId;
+    var variantName = detail.variant || '';
+
+    // Find the matching product
+    for (var i = 0; i < products.length; i++) {
+      var p = products[i];
+      if (p.id !== productId) continue;
+
+      if (p.hasVariations && variantName) {
+        // Find matching variant option and increment its qty
+        for (var v = 0; v < p.variations.length; v++) {
+          var opts = p.variations[v].options;
+          for (var o = 0; o < opts.length; o++) {
+            if (opts[o].value === variantName || p.variations[v].name + ': ' + opts[o].value === variantName) {
+              var vKey = p.id + '-' + opts[o].value;
+              var current = quantities[vKey] || 0;
+              quantities[vKey] = current + 1;
+              var qtyEl = document.getElementById(sid + '-qty-' + vKey);
+              if (qtyEl) qtyEl.textContent = quantities[vKey];
+              // Expand variants section
+              var variantsEl = document.getElementById(sid + '-variants-' + i);
+              if (variantsEl) variantsEl.style.display = 'block';
+              var chevron = document.getElementById(sid + '-chevron-' + i);
+              if (chevron) chevron.style.transform = 'rotate(90deg)';
+              recalculate();
+              return;
+            }
+          }
+        }
+      } else {
+        // Simple product - increment qty
+        var current = quantities[p.id] || 0;
+        quantities[p.id] = current + 1;
+        var qtyEl = document.getElementById(sid + '-qty-' + p.id);
+        if (qtyEl) qtyEl.textContent = quantities[p.id];
+        recalculate();
+        return;
+      }
+    }
+  });
 })();
 </script>`;
 
