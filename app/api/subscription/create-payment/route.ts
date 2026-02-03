@@ -4,8 +4,95 @@ import { createServerClient } from '@supabase/ssr';
 import { createLeanXPayment, getLeanXBankList } from '@/lib/leanx';
 import { validateCsrf, CSRF_ERROR_RESPONSE } from '@/lib/csrf';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 const PREMIUM_PRICE = 79; // RM79 per month
+
+// Helper function to validate coupon server-side
+async function validateCouponForPayment(
+  couponCode: string,
+  userId: string,
+  plan: string
+): Promise<{
+  valid: boolean;
+  coupon?: any;
+  discountAmount?: number;
+  finalAmount?: number;
+  message?: string;
+}> {
+  const adminClient = getSupabaseAdmin();
+  const normalizedCode = couponCode.trim().toUpperCase();
+
+  // Find coupon by code
+  const { data: coupon, error } = await adminClient
+    .from('coupons')
+    .select('*')
+    .eq('code', normalizedCode)
+    .single();
+
+  if (error || !coupon) {
+    return { valid: false, message: 'Invalid coupon code' };
+  }
+
+  if (!coupon.is_active) {
+    return { valid: false, message: 'This coupon is no longer active' };
+  }
+
+  const now = new Date();
+  const validFrom = new Date(coupon.valid_from);
+  const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null;
+
+  if (now < validFrom) {
+    return { valid: false, message: 'This coupon is not yet active' };
+  }
+
+  if (validUntil && now > validUntil) {
+    return { valid: false, message: 'This coupon has expired' };
+  }
+
+  if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
+    return { valid: false, message: 'This coupon has reached its usage limit' };
+  }
+
+  if (!coupon.applicable_plans.includes(plan)) {
+    return {
+      valid: false,
+      message: 'This coupon cannot be used for the selected plan',
+    };
+  }
+
+  // Check if user has already used this coupon
+  const { data: existingUse } = await adminClient
+    .from('coupon_uses')
+    .select('id')
+    .eq('coupon_id', coupon.id)
+    .eq('user_id', userId)
+    .single();
+
+  if (existingUse) {
+    return { valid: false, message: 'You have already used this coupon' };
+  }
+
+  // Calculate discount
+  const originalAmount = PREMIUM_PRICE;
+  let discountAmount: number;
+
+  if (coupon.discount_type === 'percentage') {
+    discountAmount =
+      Math.round(((originalAmount * coupon.discount_value) / 100) * 100) / 100;
+  } else {
+    discountAmount = Math.min(coupon.discount_value, originalAmount);
+  }
+
+  const finalAmount = Math.max(0, originalAmount - discountAmount);
+
+  return {
+    valid: true,
+    coupon,
+    discountAmount,
+    finalAmount,
+  };
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +145,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, bankId } = body;
+    const { plan, bankId, couponCode } = body;
 
     // Validate plan
     if (plan !== 'premium') {
@@ -70,6 +157,33 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Validate coupon if provided
+    let validatedCoupon: {
+      valid: boolean;
+      coupon?: any;
+      discountAmount?: number;
+      finalAmount?: number;
+      message?: string;
+    } | null = null;
+
+    if (couponCode) {
+      validatedCoupon = await validateCouponForPayment(
+        couponCode,
+        user.id,
+        plan
+      );
+      if (!validatedCoupon.valid) {
+        return NextResponse.json(
+          { error: validatedCoupon.message || 'Invalid coupon' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate final amount
+    const finalAmount = validatedCoupon?.finalAmount ?? PREMIUM_PRICE;
+    const discountAmount = validatedCoupon?.discountAmount ?? 0;
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
@@ -112,6 +226,109 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle 100% discount - free upgrade (no payment needed)
+    if (finalAmount === 0 && validatedCoupon?.valid) {
+      const adminClient = getSupabaseAdmin();
+      const crypto = require('crypto');
+      const randomString = crypto.randomBytes(8).toString('hex').toUpperCase();
+      const orderId = `SUB-FREE-${Date.now()}-${randomString}`;
+
+      // Create dates
+      const currentDate = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1); // Monthly subscription
+
+      // Create subscription record directly as active
+      const { data: subscription, error: subscriptionError } = await adminClient
+        .from('subscriptions')
+        .insert({
+          user_id: user.id,
+          plan: 'premium',
+          status: 'active',
+          amount: 0,
+          original_amount: PREMIUM_PRICE,
+          discount_amount: discountAmount,
+          coupon_id: validatedCoupon.coupon.id,
+          currency: 'MYR',
+          billing_interval: 'monthly',
+          current_period_start: currentDate.toISOString(),
+          current_period_end: endDate.toISOString(),
+          metadata: {
+            order_id: orderId,
+            coupon_code: validatedCoupon.coupon.code,
+            free_upgrade: true,
+          },
+        })
+        .select()
+        .single();
+
+      if (subscriptionError) {
+        console.error('Error creating free subscription:', subscriptionError);
+        return NextResponse.json(
+          { error: 'Failed to create subscription' },
+          { status: 500 }
+        );
+      }
+
+      // Update user profile to premium
+      const { error: profileUpdateError } = await adminClient
+        .from('profiles')
+        .update({
+          subscription_plan: 'premium',
+          subscription_status: 'active',
+        })
+        .eq('id', user.id);
+
+      if (profileUpdateError) {
+        console.error('Error updating profile:', profileUpdateError);
+      }
+
+      // Record coupon usage
+      await adminClient.from('coupon_uses').insert({
+        coupon_id: validatedCoupon.coupon.id,
+        user_id: user.id,
+        subscription_id: subscription.id,
+        original_amount: PREMIUM_PRICE,
+        discount_amount: discountAmount,
+        final_amount: 0,
+      });
+
+      // Increment coupon used_count
+      await adminClient
+        .from('coupons')
+        .update({ used_count: validatedCoupon.coupon.used_count + 1 })
+        .eq('id', validatedCoupon.coupon.id);
+
+      // Create billing history record
+      await adminClient.from('billing_history').insert({
+        user_id: user.id,
+        subscription_id: subscription.id,
+        amount: 0,
+        currency: 'MYR',
+        description: `Premium Subscription (Free with ${validatedCoupon.coupon.code})`,
+        status: 'paid',
+        metadata: {
+          order_id: orderId,
+          coupon_code: validatedCoupon.coupon.code,
+          original_amount: PREMIUM_PRICE,
+          discount_amount: discountAmount,
+        },
+      });
+
+      console.log('[Subscription] Free upgrade completed:', {
+        userId: user.id,
+        subscriptionId: subscription.id,
+        couponCode: validatedCoupon.coupon.code,
+      });
+
+      return NextResponse.json({
+        success: true,
+        freeUpgrade: true,
+        orderId,
+        message: 'Your Premium subscription has been activated!',
+      });
+    }
+
     // If no bankId provided, return bank list for selection
     if (!bankId) {
       const bankListResult = await getLeanXBankList(
@@ -132,8 +349,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         requiresBankSelection: true,
         banks: bankListResult.banks,
-        amount: PREMIUM_PRICE,
+        amount: finalAmount,
+        originalAmount: PREMIUM_PRICE,
+        discountAmount: discountAmount,
         currency: 'MYR',
+        couponApplied: validatedCoupon?.valid
+          ? {
+              code: validatedCoupon.coupon.code,
+              discountType: validatedCoupon.coupon.discount_type,
+              discountValue: validatedCoupon.coupon.discount_value,
+            }
+          : null,
       });
     }
 
@@ -147,19 +373,35 @@ export async function POST(request: NextRequest) {
     const endDate = new Date();
     endDate.setMonth(endDate.getMonth() + 1); // Monthly subscription
 
+    const subscriptionData: Record<string, any> = {
+      user_id: user.id,
+      plan: 'premium',
+      status: 'pending',
+      amount: finalAmount,
+      currency: 'MYR',
+      billing_interval: 'monthly',
+      current_period_start: currentDate.toISOString(),
+      current_period_end: endDate.toISOString(),
+      metadata: {
+        order_id: orderId,
+        ...(validatedCoupon?.valid && {
+          coupon_code: validatedCoupon.coupon.code,
+          original_amount: PREMIUM_PRICE,
+          discount_amount: discountAmount,
+        }),
+      },
+    };
+
+    // Add coupon fields if coupon was applied
+    if (validatedCoupon?.valid) {
+      subscriptionData.coupon_id = validatedCoupon.coupon.id;
+      subscriptionData.original_amount = PREMIUM_PRICE;
+      subscriptionData.discount_amount = discountAmount;
+    }
+
     const { data: subscription, error: subscriptionError } = await supabase
       .from('subscriptions')
-      .insert({
-        user_id: user.id,
-        plan: 'premium',
-        status: 'pending',
-        amount: PREMIUM_PRICE,
-        currency: 'MYR',
-        billing_interval: 'monthly',
-        current_period_start: currentDate.toISOString(),
-        current_period_end: endDate.toISOString(),
-        metadata: { order_id: orderId },
-      })
+      .insert(subscriptionData)
       .select()
       .single();
 
@@ -181,9 +423,19 @@ export async function POST(request: NextRequest) {
     // Return URL - user will be redirected here after payment (success or cancel)
     const returnUrl = `${origin}/dashboard/subscription?order=${orderId}`;
 
+    // Build product description with discount info
+    let productDescription =
+      'Monthly Premium Plan - Unlimited projects, custom domains, analytics & more';
+    if (validatedCoupon?.valid) {
+      productDescription += ` (Discount: RM${discountAmount.toFixed(2)} with code ${validatedCoupon.coupon.code})`;
+    }
+
     console.log('[Subscription Payment] Creating LeanX payment:', {
       orderId,
-      amount: PREMIUM_PRICE,
+      amount: finalAmount,
+      originalAmount: PREMIUM_PRICE,
+      discountAmount,
+      couponCode: validatedCoupon?.coupon?.code || null,
       bankId,
       customerEmail: user.email,
       customerName:
@@ -202,11 +454,10 @@ export async function POST(request: NextRequest) {
       },
       {
         orderId,
-        amount: PREMIUM_PRICE,
+        amount: finalAmount,
         currency: 'MYR',
         productName: 'XIDE Premium Subscription',
-        productDescription:
-          'Monthly Premium Plan - Unlimited projects, custom domains, analytics & more',
+        productDescription,
         customerEmail: user.email,
         customerName:
           profile.display_name || user.email?.split('@')[0] || 'Customer',
@@ -252,8 +503,17 @@ export async function POST(request: NextRequest) {
       success: true,
       paymentUrl: leanxResult.paymentUrl,
       orderId,
-      amount: PREMIUM_PRICE,
+      amount: finalAmount,
+      originalAmount: PREMIUM_PRICE,
+      discountAmount: discountAmount,
       currency: 'MYR',
+      couponApplied: validatedCoupon?.valid
+        ? {
+            code: validatedCoupon.coupon.code,
+            discountType: validatedCoupon.coupon.discount_type,
+            discountValue: validatedCoupon.coupon.discount_value,
+          }
+        : null,
     });
   } catch (error) {
     console.error('Subscription payment error:', error);

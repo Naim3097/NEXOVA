@@ -112,18 +112,59 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', subscription.user_id);
 
+      // Handle coupon usage tracking if coupon was applied
+      if (subscription.coupon_id) {
+        // Get coupon details
+        const { data: coupon } = await supabase
+          .from('coupons')
+          .select('code, used_count')
+          .eq('id', subscription.coupon_id)
+          .single();
+
+        if (coupon) {
+          // Record coupon usage
+          await supabase.from('coupon_uses').insert({
+            coupon_id: subscription.coupon_id,
+            user_id: subscription.user_id,
+            subscription_id: subscription.id,
+            original_amount:
+              subscription.original_amount || subscription.amount,
+            discount_amount: subscription.discount_amount || 0,
+            final_amount: subscription.amount,
+          });
+
+          // Increment coupon used_count
+          await supabase
+            .from('coupons')
+            .update({ used_count: (coupon.used_count || 0) + 1 })
+            .eq('id', subscription.coupon_id);
+
+          console.log('Coupon usage recorded:', {
+            couponCode: coupon.code,
+            userId: subscription.user_id,
+          });
+        }
+      }
+
       // Generate invoice number
       const { data: invoiceNumberData } = await supabase.rpc(
         'generate_invoice_number'
       );
       const invoiceNumber = invoiceNumberData || `INV-${Date.now()}`;
 
+      // Build description with coupon info if applicable
+      let description = 'Premium Plan - Monthly Subscription';
+      const metadata = subscription.metadata || {};
+      if (metadata.coupon_code) {
+        description += ` (Discount: ${metadata.coupon_code})`;
+      }
+
       // Create billing history record
       await supabase.from('billing_history').insert({
         user_id: subscription.user_id,
         subscription_id: subscription.id,
         invoice_number: invoiceNumber,
-        description: 'Premium Plan - Monthly Subscription',
+        description,
         amount: amount || subscription.amount,
         currency: 'MYR',
         status: 'paid',
@@ -131,6 +172,13 @@ export async function POST(request: NextRequest) {
         leanx_transaction_id: bill_no,
         invoice_date: new Date().toISOString(),
         paid_at: new Date().toISOString(),
+        metadata: metadata.coupon_code
+          ? {
+              coupon_code: metadata.coupon_code,
+              original_amount: subscription.original_amount,
+              discount_amount: subscription.discount_amount,
+            }
+          : null,
       });
 
       console.log('Subscription activated for user:', subscription.user_id);

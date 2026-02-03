@@ -21,7 +21,11 @@ import {
   ArrowLeft,
   CreditCard,
   Lock,
+  Tag,
+  X,
+  Sparkles,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { getCsrfToken } from '@/lib/csrf';
 
@@ -90,6 +94,16 @@ const planFeatures: PlanFeature[] = [
   },
 ];
 
+interface CouponState {
+  code: string;
+  isValid: boolean;
+  discountType?: 'percentage' | 'fixed';
+  discountValue?: number;
+  discountAmount?: number;
+  finalAmount?: number;
+  message?: string;
+}
+
 export default function SubscriptionCheckoutPage() {
   const router = useRouter();
   const { profile } = useAuth();
@@ -98,7 +112,77 @@ export default function SubscriptionCheckoutPage() {
   const [banks, setBanks] = useState<Bank[]>([]);
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
 
+  // Coupon states
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponState | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   const currentPlan = profile?.subscription_plan || 'free';
+  const PREMIUM_PRICE = 79;
+
+  // Validate coupon code
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError(null);
+
+    try {
+      const response = await fetch('/api/subscription/validate-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          coupon_code: couponInput.trim(),
+          plan: 'premium',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        setAppliedCoupon({
+          code: data.coupon_code,
+          isValid: true,
+          discountType: data.discount_type,
+          discountValue: data.discount_value,
+          discountAmount: data.discount_amount,
+          finalAmount: data.final_amount,
+          message: data.message,
+        });
+        setCouponError(null);
+      } else {
+        setCouponError(data.message || 'Invalid coupon code');
+        setAppliedCoupon(null);
+      }
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      setCouponError('Error validating coupon. Please try again.');
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // Remove applied coupon
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError(null);
+  };
+
+  // Get final price (with or without coupon)
+  const getFinalPrice = () => {
+    if (appliedCoupon?.isValid && appliedCoupon.finalAmount !== undefined) {
+      return appliedCoupon.finalAmount;
+    }
+    return PREMIUM_PRICE;
+  };
 
   const handleUpgrade = async (plan: 'premium' | 'enterprise') => {
     if (plan === 'enterprise') {
@@ -135,6 +219,38 @@ export default function SubscriptionCheckoutPage() {
       return;
     }
 
+    // Check if 100% discount (free upgrade)
+    if (appliedCoupon?.isValid && appliedCoupon.finalAmount === 0) {
+      setLoading('premium');
+      try {
+        const response = await fetch('/api/subscription/create-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-csrf-token': getCsrfToken(),
+          },
+          body: JSON.stringify({
+            plan: 'premium',
+            couponCode: appliedCoupon.code,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.freeUpgrade) {
+          // Free upgrade successful - redirect to dashboard
+          router.push('/dashboard?subscription=success&free=true');
+        } else if (data.error) {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        console.error('Error processing free upgrade:', error);
+        alert('Failed to process upgrade. Please try again.');
+        setLoading(null);
+      }
+      return;
+    }
+
     // Fetch bank list for premium payment
     setLoading('premium');
     try {
@@ -144,7 +260,10 @@ export default function SubscriptionCheckoutPage() {
           'Content-Type': 'application/json',
           'x-csrf-token': getCsrfToken(),
         },
-        body: JSON.stringify({ plan: 'premium' }),
+        body: JSON.stringify({
+          plan: 'premium',
+          ...(appliedCoupon?.isValid && { couponCode: appliedCoupon.code }),
+        }),
       });
 
       const data = await response.json();
@@ -176,7 +295,11 @@ export default function SubscriptionCheckoutPage() {
           'Content-Type': 'application/json',
           'x-csrf-token': getCsrfToken(),
         },
-        body: JSON.stringify({ plan: 'premium', bankId }),
+        body: JSON.stringify({
+          plan: 'premium',
+          bankId,
+          ...(appliedCoupon?.isValid && { couponCode: appliedCoupon.code }),
+        }),
       });
 
       const data = await response.json();
@@ -318,21 +441,107 @@ export default function SubscriptionCheckoutPage() {
                       Most Popular
                     </Badge>
                   )}
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-4">
                     <h3 className="text-xl font-bold flex items-center justify-center gap-2 text-[#455263]">
                       <Crown className="h-5 w-5 text-[#5FC7CD]" />
                       Premium
                     </h3>
                     <div className="mt-2">
-                      <span className="text-3xl font-bold text-[#455263]">
-                        RM79
-                      </span>
-                      <span className="text-[#969696]">/month</span>
+                      {appliedCoupon?.isValid ? (
+                        <>
+                          <span className="text-lg line-through text-[#969696]">
+                            RM{PREMIUM_PRICE}
+                          </span>
+                          <span className="text-3xl font-bold text-[#5FC7CD] ml-2">
+                            RM{appliedCoupon.finalAmount}
+                          </span>
+                          <span className="text-[#969696]">/month</span>
+                          {appliedCoupon.finalAmount === 0 && (
+                            <div className="flex items-center justify-center gap-1 mt-1">
+                              <Sparkles className="h-4 w-4 text-[#5FC7CD]" />
+                              <span className="text-sm font-medium text-[#5FC7CD]">
+                                FREE!
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-3xl font-bold text-[#455263]">
+                            RM{PREMIUM_PRICE}
+                          </span>
+                          <span className="text-[#969696]">/month</span>
+                        </>
+                      )}
                     </div>
                     <p className="text-sm text-[#969696] mt-2">
                       Everything you need to scale
                     </p>
                   </div>
+
+                  {/* Coupon Input */}
+                  {currentPlan !== 'premium' && (
+                    <div className="mb-4">
+                      {appliedCoupon?.isValid ? (
+                        <div className="flex items-center justify-between bg-[#5FC7CD]/10 border border-[#5FC7CD]/30 rounded-lg px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <Tag className="h-4 w-4 text-[#5FC7CD]" />
+                            <span className="text-sm font-medium text-[#455263]">
+                              {appliedCoupon.code}
+                            </span>
+                            <span className="text-xs text-[#5FC7CD]">
+                              (-RM{appliedCoupon.discountAmount?.toFixed(2)})
+                            </span>
+                          </div>
+                          <button
+                            onClick={handleRemoveCoupon}
+                            className="text-[#969696] hover:text-[#455263]"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Coupon code"
+                              value={couponInput}
+                              onChange={(e) => {
+                                setCouponInput(e.target.value.toUpperCase());
+                                setCouponError(null);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleApplyCoupon();
+                                }
+                              }}
+                              className="flex-1 text-sm uppercase"
+                              disabled={couponLoading}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleApplyCoupon}
+                              disabled={couponLoading || !couponInput.trim()}
+                            >
+                              {couponLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Apply'
+                              )}
+                            </Button>
+                          </div>
+                          {couponError && (
+                            <p className="text-xs text-red-500">
+                              {couponError}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <Button
                     variant="teal"
                     className="w-full"
@@ -344,10 +553,17 @@ export default function SubscriptionCheckoutPage() {
                     {loading === 'premium' ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading...
+                        {appliedCoupon?.finalAmount === 0
+                          ? 'Activating...'
+                          : 'Loading...'}
                       </>
                     ) : currentPlan === 'premium' ? (
                       'Current Plan'
+                    ) : appliedCoupon?.finalAmount === 0 ? (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Upgrade for Free
+                      </>
                     ) : (
                       'Upgrade Now'
                     )}
@@ -489,10 +705,36 @@ export default function SubscriptionCheckoutPage() {
                     <p className="text-sm text-[#969696]">
                       Monthly subscription
                     </p>
+                    {appliedCoupon?.isValid && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <Tag className="h-3 w-3 text-[#5FC7CD]" />
+                        <span className="text-xs text-[#5FC7CD] font-medium">
+                          Coupon: {appliedCoupon.code}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-[#455263]">RM79</p>
-                    <p className="text-xs text-[#969696]">/month</p>
+                    {appliedCoupon?.isValid ? (
+                      <>
+                        <p className="text-sm line-through text-[#969696]">
+                          RM{PREMIUM_PRICE}
+                        </p>
+                        <p className="text-2xl font-bold text-[#5FC7CD]">
+                          RM{appliedCoupon.finalAmount}
+                        </p>
+                        <p className="text-xs text-[#5FC7CD]">
+                          Save RM{appliedCoupon.discountAmount?.toFixed(2)}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-bold text-[#455263]">
+                          RM{PREMIUM_PRICE}
+                        </p>
+                        <p className="text-xs text-[#969696]">/month</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

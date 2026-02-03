@@ -508,3 +508,44 @@ export interface MediaProps {
   paddingY?: string; // Vertical padding
   shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
 }
+
+// Coupon System Types
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string | null;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  max_uses: number | null;
+  used_count: number;
+  valid_from: string;
+  valid_until: string | null;
+  min_amount: number;
+  applicable_plans: string[];
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CouponUse {
+  id: string;
+  coupon_id: string;
+  user_id: string;
+  subscription_id: string | null;
+  original_amount: number;
+  discount_amount: number;
+  final_amount: number;
+  used_at: string;
+}
+
+export interface CouponValidationResult {
+  valid: boolean;
+  coupon_id?: string;
+  coupon_code?: string;
+  discount_type?: 'percentage' | 'fixed';
+  discount_value?: number;
+  discount_amount?: number;
+  final_amount?: number;
+  message: string;
+}

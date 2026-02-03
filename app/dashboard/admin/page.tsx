@@ -23,6 +23,7 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Tag,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -374,6 +375,51 @@ function AdminDashboardContent() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Link href="/dashboard/admin/coupons">
+            <Card className="rounded-2xl border-[#E2E8F0] hover:border-[#5FC7CD] hover:shadow-md transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-[#969696]">Coupon Management</p>
+                    <p className="text-lg font-semibold text-[#455263] mt-1">
+                      Create & manage discount coupons
+                    </p>
+                    <p className="text-sm text-[#5FC7CD] mt-2">
+                      View coupons →
+                    </p>
+                  </div>
+                  <div className="bg-[#5FC7CD]/10 p-3 rounded-xl">
+                    <Tag className="h-6 w-6 text-[#5FC7CD]" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/admin/help-requests">
+            <Card className="rounded-2xl border-[#E2E8F0] hover:border-[#5FC7CD] hover:shadow-md transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-[#969696]">Help Requests</p>
+                    <p className="text-lg font-semibold text-[#455263] mt-1">
+                      {stats?.new_help_requests || 0} new requests
+                    </p>
+                    <p className="text-sm text-[#5FC7CD] mt-2">
+                      View all requests →
+                    </p>
+                  </div>
+                  <div className="bg-[#5FC7CD]/10 p-3 rounded-xl">
+                    <HelpCircle className="h-6 w-6 text-[#5FC7CD]" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Help Requests Section */}
