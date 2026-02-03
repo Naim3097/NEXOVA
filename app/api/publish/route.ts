@@ -154,7 +154,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate published URL based on subdomain availability
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002';
+    // Use request origin for production, with fallback to env var or hardcoded production URL
+    const requestOrigin =
+      request.headers.get('origin') || request.headers.get('host');
+    const baseUrl = requestOrigin?.includes('localhost')
+      ? process.env.NEXT_PUBLIC_APP_URL || 'https://www.nexova.my'
+      : `https://${requestOrigin?.replace(/^https?:\/\//, '')}` ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        'https://www.nexova.my';
 
     let publishedUrl: string;
     let urlType: 'path' | 'subdomain' | 'custom';
