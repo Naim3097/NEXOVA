@@ -37,15 +37,16 @@ interface AffiliateData {
 }
 
 export default function AffiliatePage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState<AffiliateData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   const fetchData = useCallback(async () => {
+    setDataLoading(true);
     try {
       const res = await fetch('/api/affiliate');
       if (res.ok) {
@@ -55,13 +56,19 @@ export default function AffiliatePage() {
     } catch (err) {
       console.error('Failed to fetch affiliate data:', err);
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (user) fetchData();
-  }, [user, fetchData]);
+    // Only fetch data when auth is ready and user exists
+    if (!authLoading && user) {
+      fetchData();
+    }
+  }, [user, authLoading, fetchData]);
+
+  // Show loading while auth is loading OR data is being fetched
+  const isLoading = authLoading || dataLoading;
 
   const generateCode = async () => {
     setGenerating(true);
@@ -94,7 +101,7 @@ export default function AffiliatePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="p-6 md:p-8">
         <div className="animate-pulse space-y-6">

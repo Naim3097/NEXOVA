@@ -2658,8 +2658,10 @@ function generateWhatsAppButtonHTML(element: Element): string {
  */
 function generateMediaHTML(element: Element): string {
   const {
+    variant = 'single',
     mediaType = 'image',
     mediaUrl,
+    mediaItems = [],
     altText = 'Media content',
     autoplay = false,
     loop = true,
@@ -2674,6 +2676,14 @@ function generateMediaHTML(element: Element): string {
     bgColor = '#ffffff',
     paddingY = '2rem',
     shadow = 'none',
+    // Carousel specific
+    showArrows = true,
+    showDots = true,
+    autoSlide = false,
+    slideInterval = 5,
+    // Gallery/Masonry specific
+    columns = 3,
+    gap = 'md',
   } = element.props;
 
   const shadowStyles: Record<string, string> = {
@@ -2682,6 +2692,12 @@ function generateMediaHTML(element: Element): string {
     md: '0 4px 6px -1px rgba(0,0,0,0.1)',
     lg: '0 10px 15px -3px rgba(0,0,0,0.1)',
     xl: '0 20px 25px -5px rgba(0,0,0,0.1)',
+  };
+
+  const gapSizes: Record<string, string> = {
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
   };
 
   const aspectRatioStyle =
@@ -2696,27 +2712,218 @@ function generateMediaHTML(element: Element): string {
         ? '0 0 0 auto'
         : '0 auto';
 
-  let mediaContent = '';
-  if (!mediaUrl) {
-    mediaContent = `
-    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius}; ${aspectRatioStyle}">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
-    </div>`;
-  } else if (mediaType === 'video') {
-    mediaContent = `
-    <video style="width: 100%; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; ${aspectRatioStyle}" ${controls ? 'controls' : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''} ${muted ? 'muted' : ''} playsinline>
-      <source src="${mediaUrl}" />
-    </video>`;
-  } else {
-    mediaContent = `
-    <img src="${mediaUrl}" alt="${altText}" style="width: 100%; height: auto; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; object-fit: cover; ${aspectRatioStyle}" />`;
-  }
+  const uniqueId = `media_${element.order}_${element.id.slice(-8)}`;
+  const gapSize = gapSizes[gap] || '1rem';
 
-  return `
+  // Get items for multi-image variants
+  const items =
+    mediaItems.length > 0
+      ? mediaItems
+      : mediaUrl
+        ? [{ id: '1', url: mediaUrl, altText, caption }]
+        : [];
+
+  // SINGLE VARIANT
+  if (variant === 'single' || !variant) {
+    let mediaContent = '';
+    if (!mediaUrl) {
+      mediaContent = `
+      <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius}; ${aspectRatioStyle}">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>`;
+    } else if (mediaType === 'video') {
+      mediaContent = `
+      <video style="width: 100%; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; ${aspectRatioStyle}" ${controls ? 'controls' : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''} ${muted ? 'muted' : ''} playsinline>
+        <source src="${mediaUrl}" />
+      </video>`;
+    } else {
+      mediaContent = `
+      <img src="${mediaUrl}" alt="${altText}" style="width: 100%; height: auto; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; object-fit: cover; ${aspectRatioStyle}" />`;
+    }
+
+    return `
 <section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
   <div style="max-width: ${containerMaxWidth}; margin: ${containerMargin};">
     ${mediaContent}
     ${showCaption && caption ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem;">${caption}</p>` : ''}
+  </div>
+</section>`;
+  }
+
+  // CAROUSEL VARIANT
+  if (variant === 'carousel') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for carousel</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    const defaultAspectRatio =
+      aspectRatio === 'auto' ? '16/9' : aspectRatio.replace(':', '/');
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto; position: relative;">
+    <div id="${uniqueId}" style="overflow: hidden; border-radius: ${borderRadius};">
+      <div id="${uniqueId}-track" style="display: flex; transition: transform 0.5s ease-in-out;">
+        ${items
+          .map(
+            (item: any, index: number) => `
+          <div style="min-width: 100%; flex-shrink: 0;">
+            <img src="${item.url}" alt="${item.altText || `Slide ${index + 1}`}" style="width: 100%; object-fit: cover; aspect-ratio: ${defaultAspectRatio}; box-shadow: ${shadowStyles[shadow] || 'none'};" />
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+    </div>
+    ${
+      showArrows && items.length > 1
+        ? `
+    <button onclick="${uniqueId}Prev()" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 1.25rem; color: #1f2937; font-weight: bold;">&#10094;</button>
+    <button onclick="${uniqueId}Next()" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 1.25rem; color: #1f2937; font-weight: bold;">&#10095;</button>
+    `
+        : ''
+    }
+    ${
+      showDots && items.length > 1
+        ? `
+    <div id="${uniqueId}-dots" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+      ${items
+        .map(
+          (_: any, index: number) => `
+        <button onclick="${uniqueId}GoTo(${index})" style="width: ${index === 0 ? '1.5rem' : '0.625rem'}; height: 0.625rem; border-radius: 9999px; border: none; background: ${index === 0 ? '#1f2937' : '#d1d5db'}; cursor: pointer; transition: all 0.3s;"></button>
+      `
+        )
+        .join('')}
+    </div>
+    `
+        : ''
+    }
+    ${showCaption && items[0]?.caption ? `<p id="${uniqueId}-caption" style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem;">${items[0].caption}</p>` : ''}
+  </div>
+  <script>
+    (function() {
+      var current = 0;
+      var total = ${items.length};
+      var track = document.getElementById('${uniqueId}-track');
+      var dots = document.querySelectorAll('#${uniqueId}-dots button');
+      var caption = document.getElementById('${uniqueId}-caption');
+      var captions = ${JSON.stringify(items.map((item: any) => item.caption || ''))};
+
+      function updateSlide() {
+        if (track) track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach(function(dot, i) {
+          dot.style.width = i === current ? '1.5rem' : '0.625rem';
+          dot.style.background = i === current ? '#1f2937' : '#d1d5db';
+        });
+        if (caption && captions[current]) caption.textContent = captions[current];
+      }
+
+      window['${uniqueId}Next'] = function() { current = (current + 1) % total; updateSlide(); };
+      window['${uniqueId}Prev'] = function() { current = (current - 1 + total) % total; updateSlide(); };
+      window['${uniqueId}GoTo'] = function(i) { current = i; updateSlide(); };
+
+      ${autoSlide ? `setInterval(function() { current = (current + 1) % total; updateSlide(); }, ${slideInterval * 1000});` : ''}
+    })();
+  </script>
+</section>`;
+  }
+
+  // GALLERY VARIANT
+  if (variant === 'gallery') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for gallery</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    const defaultAspectRatio =
+      aspectRatio === 'auto' ? '1/1' : aspectRatio.replace(':', '/');
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: repeat(${columns}, 1fr); gap: ${gapSize};">
+      ${items
+        .map(
+          (item: any, index: number) => `
+        <div style="overflow: hidden; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'};">
+          <img src="${item.url}" alt="${item.altText || `Gallery image ${index + 1}`}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: ${defaultAspectRatio}; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  // MASONRY VARIANT
+  if (variant === 'masonry') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for masonry</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    // Distribute items into columns
+    const columnItems: any[][] = Array.from({ length: columns }, () => []);
+    items.forEach((item: any, index: number) => {
+      columnItems[index % columns].push(item);
+    });
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="display: flex; gap: ${gapSize};">
+      ${columnItems
+        .map(
+          (colItems: any[]) => `
+        <div style="flex: 1; display: flex; flex-direction: column; gap: ${gapSize};">
+          ${colItems
+            .map(
+              (item: any, index: number) => `
+            <div style="overflow: hidden; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'};">
+              <img src="${item.url}" alt="${item.altText || `Image ${index + 1}`}" style="width: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  // Fallback to single
+  return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: ${containerMaxWidth}; margin: ${containerMargin};">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+    </div>
   </div>
 </section>`;
 }

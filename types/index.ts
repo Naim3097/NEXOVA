@@ -482,11 +482,23 @@ export interface ProductCarouselProps {
   backgroundOpacity?: number;
 }
 
+// Media Item for carousel/gallery
+export interface MediaItem {
+  id: string;
+  url: string;
+  altText?: string;
+  caption?: string;
+}
+
 // Media Element Props
 export interface MediaProps {
+  // Variant
+  variant: 'single' | 'carousel' | 'gallery' | 'masonry';
   mediaType: 'image' | 'video';
   sourceType: 'upload' | 'url';
   mediaUrl?: string;
+  // Multiple items for carousel/gallery
+  mediaItems?: MediaItem[];
   // Image specific
   altText?: string;
   // Video specific
@@ -507,6 +519,14 @@ export interface MediaProps {
   bgColor?: string;
   paddingY?: string; // Vertical padding
   shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  // Carousel specific
+  autoSlide?: boolean;
+  slideInterval?: number; // in seconds
+  showDots?: boolean;
+  showArrows?: boolean;
+  // Gallery specific
+  columns?: 2 | 3 | 4;
+  gap?: 'sm' | 'md' | 'lg';
 }
 
 // Coupon System Types

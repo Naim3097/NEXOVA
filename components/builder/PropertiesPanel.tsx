@@ -5104,231 +5104,261 @@ export const PropertiesPanel = () => {
           <>
             {commonSection}
             <div className="space-y-4 pt-6">
-              <div className="font-semibold text-sm text-[#455263] mb-2">
-                Media Type
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => handlePropChange('mediaType', 'image')}
-                  className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
-                    props.mediaType === 'image'
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
-                  }`}
-                >
-                  Image
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePropChange('mediaType', 'video')}
-                  className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
-                    props.mediaType === 'video'
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
-                  }`}
-                >
-                  Video
-                </button>
-              </div>
-
-              <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
-                Media Source
-              </div>
-
-              {/* URL Input */}
+              {/* Variant Selector */}
               <div>
-                <Label htmlFor="mediaUrl">
-                  {props.mediaType === 'image' ? 'Image URL' : 'Video URL'}
-                </Label>
-                <Input
-                  id="mediaUrl"
-                  value={props.mediaUrl || ''}
-                  onChange={(e) => handlePropChange('mediaUrl', e.target.value)}
-                  placeholder={
-                    props.mediaType === 'image'
-                      ? 'https://example.com/image.jpg'
-                      : 'https://youtube.com/watch?v=... or video URL'
-                  }
-                />
-                <p className="text-xs text-[#969696] mt-1">
-                  {props.mediaType === 'video'
-                    ? 'Supports YouTube, Vimeo, or direct video file URLs'
-                    : 'Paste image URL or upload below'}
-                </p>
+                <Label htmlFor="media-variant">Variant</Label>
+                <select
+                  id="media-variant"
+                  value={props.variant || 'single'}
+                  onChange={(e) => handlePropChange('variant', e.target.value)}
+                  className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl focus:ring-[#5FC7CD]"
+                >
+                  <option value="single">Single Image/Video</option>
+                  <option value="carousel">Carousel / Slideshow</option>
+                  <option value="gallery">Gallery Grid</option>
+                  <option value="masonry">Masonry Grid</option>
+                </select>
               </div>
 
-              {/* Upload Button for Images */}
-              {props.mediaType === 'image' && currentProject && (
-                <div className="border-2 border-dashed border-[#E2E8F0] rounded-xl p-4 text-center hover:border-[#5FC7CD] transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    id="media-upload"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
+              {/* Media Type - only show for single variant */}
+              {(!props.variant || props.variant === 'single') && (
+                <>
+                  <div className="font-semibold text-sm text-[#455263] mb-2">
+                    Media Type
+                  </div>
 
-                      // Validate file type
-                      if (!file.type.startsWith('image/')) {
-                        alert('Please select an image file');
-                        return;
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handlePropChange('mediaType', 'image')}
+                      className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
+                        props.mediaType === 'image'
+                          ? 'bg-blue-50 border-blue-500 text-blue-700'
+                          : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
+                      }`}
+                    >
+                      Image
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePropChange('mediaType', 'video')}
+                      className={`flex-1 py-2 px-3 rounded-md border text-sm font-medium transition-colors ${
+                        props.mediaType === 'video'
+                          ? 'bg-blue-50 border-blue-500 text-blue-700'
+                          : 'bg-white border-[#E2E8F0] text-[#455263] hover:bg-[#F8FAFC]'
+                      }`}
+                    >
+                      Video
+                    </button>
+                  </div>
+
+                  <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
+                    Media Source
+                  </div>
+
+                  {/* URL Input */}
+                  <div>
+                    <Label htmlFor="mediaUrl">
+                      {props.mediaType === 'image' ? 'Image URL' : 'Video URL'}
+                    </Label>
+                    <Input
+                      id="mediaUrl"
+                      value={props.mediaUrl || ''}
+                      onChange={(e) =>
+                        handlePropChange('mediaUrl', e.target.value)
                       }
-
-                      // Validate file size (max 5MB)
-                      if (file.size > 5 * 1024 * 1024) {
-                        alert('Image must be less than 5MB');
-                        return;
+                      placeholder={
+                        props.mediaType === 'image'
+                          ? 'https://example.com/image.jpg'
+                          : 'https://youtube.com/watch?v=... or video URL'
                       }
+                    />
+                    <p className="text-xs text-[#969696] mt-1">
+                      {props.mediaType === 'video'
+                        ? 'Supports YouTube, Vimeo, or direct video file URLs'
+                        : 'Paste image URL or upload below'}
+                    </p>
+                  </div>
+                </>
+              )}
 
-                      // Show uploading state
-                      const uploadLabel =
-                        document.getElementById('media-upload-label');
-                      if (uploadLabel) {
-                        uploadLabel.innerHTML =
-                          '<p class="text-sm font-medium text-[#5FC7CD]">Uploading...</p>';
-                      }
+              {/* Upload Button for Images - only for single variant */}
+              {(!props.variant || props.variant === 'single') &&
+                props.mediaType === 'image' &&
+                currentProject && (
+                  <div className="border-2 border-dashed border-[#E2E8F0] rounded-xl p-4 text-center hover:border-[#5FC7CD] transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="media-upload"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
 
-                      try {
-                        // Create file name
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `media/${currentProject.user_id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-                        console.log('[Media Upload] Uploading to:', fileName);
-
-                        // Upload to Supabase storage
-                        const { supabase } =
-                          await import('@/lib/supabase/auth-client');
-                        const { data, error } = await supabase.storage
-                          .from('project-images')
-                          .upload(fileName, file, {
-                            cacheControl: '3600',
-                            upsert: false,
-                          });
-
-                        if (error) {
-                          console.error('[Media Upload] Upload error:', error);
-                          throw error;
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                          alert('Please select an image file');
+                          return;
                         }
 
-                        console.log('[Media Upload] Upload success:', data);
-
-                        // Get public URL
-                        const {
-                          data: { publicUrl },
-                        } = supabase.storage
-                          .from('project-images')
-                          .getPublicUrl(data.path);
-
-                        console.log('[Media Upload] Public URL:', publicUrl);
-
-                        handlePropChange('mediaUrl', publicUrl);
-
-                        // Reset upload label
-                        if (uploadLabel) {
-                          uploadLabel.innerHTML =
-                            '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('Image must be less than 5MB');
+                          return;
                         }
-                      } catch (err) {
-                        console.error('[Media Upload] Error:', err);
-                        alert(
-                          'Failed to upload image: ' +
-                            (err instanceof Error
-                              ? err.message
-                              : 'Unknown error')
-                        );
-                        // Reset upload label
+
+                        // Show uploading state
                         const uploadLabel =
                           document.getElementById('media-upload-label');
                         if (uploadLabel) {
                           uploadLabel.innerHTML =
-                            '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                            '<p class="text-sm font-medium text-[#5FC7CD]">Uploading...</p>';
                         }
-                      }
 
-                      // Reset file input
-                      e.target.value = '';
-                    }}
-                  />
-                  <label htmlFor="media-upload" className="cursor-pointer">
-                    <div
-                      id="media-upload-label"
-                      className="text-[#969696] hover:text-[#455263]"
-                    >
-                      <p className="text-sm font-medium">
-                        Click to upload image
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">Max 5MB</p>
-                    </div>
-                  </label>
-                </div>
-              )}
+                        try {
+                          // Create file name
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `media/${currentProject.user_id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-              {/* Preview */}
-              {props.mediaUrl && props.mediaType === 'image' && (
-                <div className="relative">
-                  <img
-                    src={props.mediaUrl}
-                    alt="Preview"
-                    className="w-full h-32 object-cover rounded-xl border border-[#E2E8F0]"
-                    onError={(e) => {
-                      // Show placeholder on error
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      const placeholder = document.getElementById(
-                        'media-preview-error'
-                      );
-                      if (placeholder) placeholder.style.display = 'flex';
-                    }}
-                    onLoad={(e) => {
-                      // Hide error placeholder on successful load
-                      (e.target as HTMLImageElement).style.display = 'block';
-                      const placeholder = document.getElementById(
-                        'media-preview-error'
-                      );
-                      if (placeholder) placeholder.style.display = 'none';
-                    }}
-                  />
-                  <div
-                    id="media-preview-error"
-                    className="w-full h-32 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] items-center justify-center text-[#969696] text-xs text-center p-2"
-                    style={{ display: 'none' }}
-                  >
-                    <div>
-                      <p>Preview unavailable</p>
-                      <p className="mt-1 text-[#5FC7CD] break-all">
-                        {props.mediaUrl.substring(0, 50)}...
-                      </p>
-                    </div>
+                          console.log('[Media Upload] Uploading to:', fileName);
+
+                          // Upload to Supabase storage
+                          const { supabase } =
+                            await import('@/lib/supabase/auth-client');
+                          const { data, error } = await supabase.storage
+                            .from('project-images')
+                            .upload(fileName, file, {
+                              cacheControl: '3600',
+                              upsert: false,
+                            });
+
+                          if (error) {
+                            console.error(
+                              '[Media Upload] Upload error:',
+                              error
+                            );
+                            throw error;
+                          }
+
+                          console.log('[Media Upload] Upload success:', data);
+
+                          // Get public URL
+                          const {
+                            data: { publicUrl },
+                          } = supabase.storage
+                            .from('project-images')
+                            .getPublicUrl(data.path);
+
+                          console.log('[Media Upload] Public URL:', publicUrl);
+
+                          handlePropChange('mediaUrl', publicUrl);
+
+                          // Reset upload label
+                          if (uploadLabel) {
+                            uploadLabel.innerHTML =
+                              '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                          }
+                        } catch (err) {
+                          console.error('[Media Upload] Error:', err);
+                          alert(
+                            'Failed to upload image: ' +
+                              (err instanceof Error
+                                ? err.message
+                                : 'Unknown error')
+                          );
+                          // Reset upload label
+                          const uploadLabel =
+                            document.getElementById('media-upload-label');
+                          if (uploadLabel) {
+                            uploadLabel.innerHTML =
+                              '<p class="text-sm font-medium">Click to upload image</p><p class="text-xs text-gray-400 mt-1">Max 5MB</p>';
+                          }
+                        }
+
+                        // Reset file input
+                        e.target.value = '';
+                      }}
+                    />
+                    <label htmlFor="media-upload" className="cursor-pointer">
+                      <div
+                        id="media-upload-label"
+                        className="text-[#969696] hover:text-[#455263]"
+                      >
+                        <p className="text-sm font-medium">
+                          Click to upload image
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">Max 5MB</p>
+                      </div>
+                    </label>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handlePropChange('mediaUrl', '')}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                  >
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                  <p className="text-xs text-green-600 mt-1">
-                    Image uploaded successfully
-                  </p>
-                </div>
-              )}
+                )}
 
-              {/* Alt Text for Images */}
-              {props.mediaType === 'image' && (
+              {/* Preview - only for single variant */}
+              {(!props.variant || props.variant === 'single') &&
+                props.mediaUrl &&
+                props.mediaType === 'image' && (
+                  <div className="relative">
+                    <img
+                      src={props.mediaUrl}
+                      alt="Preview"
+                      className="w-full h-32 object-cover rounded-xl border border-[#E2E8F0]"
+                      onError={(e) => {
+                        // Show placeholder on error
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const placeholder = document.getElementById(
+                          'media-preview-error'
+                        );
+                        if (placeholder) placeholder.style.display = 'flex';
+                      }}
+                      onLoad={(e) => {
+                        // Hide error placeholder on successful load
+                        (e.target as HTMLImageElement).style.display = 'block';
+                        const placeholder = document.getElementById(
+                          'media-preview-error'
+                        );
+                        if (placeholder) placeholder.style.display = 'none';
+                      }}
+                    />
+                    <div
+                      id="media-preview-error"
+                      className="w-full h-32 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] items-center justify-center text-[#969696] text-xs text-center p-2"
+                      style={{ display: 'none' }}
+                    >
+                      <div>
+                        <p>Preview unavailable</p>
+                        <p className="mt-1 text-[#5FC7CD] break-all">
+                          {props.mediaUrl.substring(0, 50)}...
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handlePropChange('mediaUrl', '')}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                    <p className="text-xs text-green-600 mt-1">
+                      Image uploaded successfully
+                    </p>
+                  </div>
+                )}
+
+              {/* Alt Text for Images - only for single variant */}
+              {props.mediaType === 'image' && props.variant === 'single' && (
                 <div>
                   <Label htmlFor="altText">Alt Text (for accessibility)</Label>
                   <Input
@@ -5342,72 +5372,385 @@ export const PropertiesPanel = () => {
                 </div>
               )}
 
-              {/* Video Options */}
-              {props.mediaType === 'video' && (
+              {/* Media Items for Carousel/Gallery/Masonry */}
+              {props.variant && props.variant !== 'single' && (
                 <>
                   <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
-                    Video Options
+                    Media Items ({(props.mediaItems || []).length} images)
+                  </div>
+
+                  {/* List of media items */}
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {(props.mediaItems || []).map(
+                      (
+                        item: {
+                          id: string;
+                          url: string;
+                          altText?: string;
+                          caption?: string;
+                        },
+                        index: number
+                      ) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 p-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]"
+                        >
+                          <img
+                            src={item.url}
+                            alt={item.altText || `Image ${index + 1}`}
+                            className="w-12 h-12 object-cover rounded"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+                            }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-[#455263] truncate">
+                              {item.url.split('/').pop() ||
+                                `Image ${index + 1}`}
+                            </p>
+                            <Input
+                              value={item.caption || ''}
+                              onChange={(e) => {
+                                const items = [...(props.mediaItems || [])];
+                                items[index] = {
+                                  ...items[index],
+                                  caption: e.target.value,
+                                };
+                                handlePropChange('mediaItems', items);
+                              }}
+                              placeholder="Caption (optional)"
+                              className="h-6 text-xs mt-1"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const items = (props.mediaItems || []).filter(
+                                (_: unknown, i: number) => i !== index
+                              );
+                              handlePropChange('mediaItems', items);
+                            }}
+                            className="p-1 text-red-500 hover:bg-red-50 rounded"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* Add image input */}
+                  <div className="mt-2">
+                    <Input
+                      placeholder="Paste image URL and press Enter"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const input = e.target as HTMLInputElement;
+                          const url = input.value.trim();
+                          if (url) {
+                            const items = [...(props.mediaItems || [])];
+                            items.push({
+                              id: `media-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                              url,
+                              altText: '',
+                              caption: '',
+                            });
+                            handlePropChange('mediaItems', items);
+                            input.value = '';
+                          }
+                        }
+                      }}
+                    />
+                    <p className="text-xs text-[#969696] mt-1">
+                      Press Enter to add image URL
+                    </p>
+                  </div>
+
+                  {/* Upload button */}
+                  {currentProject && (
+                    <div className="border-2 border-dashed border-[#E2E8F0] rounded-xl p-3 text-center hover:border-[#5FC7CD] transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        id="media-items-upload"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const files = e.target.files;
+                          if (!files || files.length === 0) return;
+
+                          const uploadLabel = document.getElementById(
+                            'media-items-upload-label'
+                          );
+                          if (uploadLabel) {
+                            uploadLabel.innerHTML =
+                              '<p class="text-sm font-medium text-[#5FC7CD]">Uploading...</p>';
+                          }
+
+                          try {
+                            const { supabase } =
+                              await import('@/lib/supabase/auth-client');
+                            const newItems = [...(props.mediaItems || [])];
+
+                            for (let i = 0; i < files.length; i++) {
+                              const file = files[i];
+                              if (!file.type.startsWith('image/')) continue;
+                              if (file.size > 5 * 1024 * 1024) continue;
+
+                              const fileExt = file.name.split('.').pop();
+                              const fileName = `media/${currentProject.user_id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                              const { data, error } = await supabase.storage
+                                .from('project-images')
+                                .upload(fileName, file, {
+                                  cacheControl: '3600',
+                                  upsert: false,
+                                });
+
+                              if (error) continue;
+
+                              const {
+                                data: { publicUrl },
+                              } = supabase.storage
+                                .from('project-images')
+                                .getPublicUrl(data.path);
+
+                              newItems.push({
+                                id: `media-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                                url: publicUrl,
+                                altText: file.name,
+                                caption: '',
+                              });
+                            }
+
+                            handlePropChange('mediaItems', newItems);
+
+                            if (uploadLabel) {
+                              uploadLabel.innerHTML =
+                                '<p class="text-sm font-medium">Click to upload images</p><p class="text-xs text-gray-400 mt-1">Max 5MB each</p>';
+                            }
+                          } catch (err) {
+                            console.error('[Media Items Upload] Error:', err);
+                            if (uploadLabel) {
+                              uploadLabel.innerHTML =
+                                '<p class="text-sm font-medium">Click to upload images</p><p class="text-xs text-gray-400 mt-1">Max 5MB each</p>';
+                            }
+                          }
+
+                          e.target.value = '';
+                        }}
+                      />
+                      <label
+                        htmlFor="media-items-upload"
+                        className="cursor-pointer"
+                      >
+                        <div
+                          id="media-items-upload-label"
+                          className="text-[#969696] hover:text-[#455263]"
+                        >
+                          <p className="text-sm font-medium">
+                            Click to upload images
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Max 5MB each
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Carousel Options */}
+              {props.variant === 'carousel' && (
+                <>
+                  <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
+                    Carousel Options
                   </div>
                   <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="autoplay" className="cursor-pointer">
-                        Autoplay
+                      <Label htmlFor="showArrows" className="cursor-pointer">
+                        Show Arrows
                       </Label>
                       <input
                         type="checkbox"
-                        id="autoplay"
-                        checked={props.autoplay ?? false}
+                        id="showArrows"
+                        checked={props.showArrows !== false}
                         onChange={(e) =>
-                          handlePropChange('autoplay', e.target.checked)
+                          handlePropChange('showArrows', e.target.checked)
                         }
                         className="w-4 h-4"
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="loop" className="cursor-pointer">
-                        Loop
+                      <Label htmlFor="showDots" className="cursor-pointer">
+                        Show Dots
                       </Label>
                       <input
                         type="checkbox"
-                        id="loop"
-                        checked={props.loop ?? true}
+                        id="showDots"
+                        checked={props.showDots !== false}
                         onChange={(e) =>
-                          handlePropChange('loop', e.target.checked)
+                          handlePropChange('showDots', e.target.checked)
                         }
                         className="w-4 h-4"
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="muted" className="cursor-pointer">
-                        Muted
+                      <Label htmlFor="autoSlide" className="cursor-pointer">
+                        Auto Slide
                       </Label>
                       <input
                         type="checkbox"
-                        id="muted"
-                        checked={props.muted ?? true}
+                        id="autoSlide"
+                        checked={props.autoSlide ?? false}
                         onChange={(e) =>
-                          handlePropChange('muted', e.target.checked)
+                          handlePropChange('autoSlide', e.target.checked)
                         }
                         className="w-4 h-4"
                       />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="controls" className="cursor-pointer">
-                        Show Controls
-                      </Label>
-                      <input
-                        type="checkbox"
-                        id="controls"
-                        checked={props.controls ?? true}
-                        onChange={(e) =>
-                          handlePropChange('controls', e.target.checked)
-                        }
-                        className="w-4 h-4"
-                      />
-                    </div>
+                    {props.autoSlide && (
+                      <div>
+                        <Label htmlFor="slideInterval">
+                          Slide Interval (seconds)
+                        </Label>
+                        <Input
+                          id="slideInterval"
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={props.slideInterval || 5}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'slideInterval',
+                              parseInt(e.target.value) || 5
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
                 </>
               )}
+
+              {/* Gallery/Masonry Options */}
+              {(props.variant === 'gallery' || props.variant === 'masonry') && (
+                <>
+                  <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
+                    Grid Options
+                  </div>
+                  <div>
+                    <Label htmlFor="columns">Columns</Label>
+                    <select
+                      id="columns"
+                      value={props.columns || 3}
+                      onChange={(e) =>
+                        handlePropChange('columns', parseInt(e.target.value))
+                      }
+                      className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
+                    >
+                      <option value={2}>2 Columns</option>
+                      <option value={3}>3 Columns</option>
+                      <option value={4}>4 Columns</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="gap">Gap</Label>
+                    <select
+                      id="gap"
+                      value={props.gap || 'md'}
+                      onChange={(e) => handlePropChange('gap', e.target.value)}
+                      className="w-full p-2 border border-[#E2E8F0] rounded-xl text-sm focus:ring-[#5FC7CD]"
+                    >
+                      <option value="sm">Small</option>
+                      <option value="md">Medium</option>
+                      <option value="lg">Large</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* Video Options - only for single variant */}
+              {(!props.variant || props.variant === 'single') &&
+                props.mediaType === 'video' && (
+                  <>
+                    <div className="font-semibold text-sm text-[#455263] mb-2 mt-4">
+                      Video Options
+                    </div>
+                    <div className="space-y-3 border border-[#E2E8F0] rounded-xl p-3 bg-[#F8FAFC]">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="autoplay" className="cursor-pointer">
+                          Autoplay
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="autoplay"
+                          checked={props.autoplay ?? false}
+                          onChange={(e) =>
+                            handlePropChange('autoplay', e.target.checked)
+                          }
+                          className="w-4 h-4"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="loop" className="cursor-pointer">
+                          Loop
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="loop"
+                          checked={props.loop ?? true}
+                          onChange={(e) =>
+                            handlePropChange('loop', e.target.checked)
+                          }
+                          className="w-4 h-4"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="muted" className="cursor-pointer">
+                          Muted
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="muted"
+                          checked={props.muted ?? true}
+                          onChange={(e) =>
+                            handlePropChange('muted', e.target.checked)
+                          }
+                          className="w-4 h-4"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="controls" className="cursor-pointer">
+                          Show Controls
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="controls"
+                          checked={props.controls ?? true}
+                          onChange={(e) =>
+                            handlePropChange('controls', e.target.checked)
+                          }
+                          className="w-4 h-4"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
               <div className="font-semibold text-sm text-[#455263] mb-2 mt-6">
                 Layout
