@@ -14,7 +14,6 @@ import { Users, Copy, Check, Link, UserPlus, UserCheck } from 'lucide-react';
 
 interface ReferralUser {
   display_name: string | null;
-  email: string | null;
   subscription_plan: string;
   created_at: string;
 }
@@ -250,9 +249,6 @@ export default function AffiliatePage() {
                       Name
                     </th>
                     <th className="text-left py-3 px-2 text-[#969696] font-medium">
-                      Email
-                    </th>
-                    <th className="text-left py-3 px-2 text-[#969696] font-medium">
                       Plan
                     </th>
                     <th className="text-left py-3 px-2 text-[#969696] font-medium">
@@ -271,9 +267,6 @@ export default function AffiliatePage() {
                     >
                       <td className="py-3 px-2 text-[#455263]">
                         {referral.referred?.display_name || 'Unknown'}
-                      </td>
-                      <td className="py-3 px-2 text-[#455263]">
-                        {referral.referred?.email || '-'}
                       </td>
                       <td className="py-3 px-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#F8FAFC] text-[#455263] capitalize">

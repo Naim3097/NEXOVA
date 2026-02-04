@@ -47,7 +47,6 @@ export async function GET() {
         created_at,
         referred:referred_id (
           display_name,
-          email,
           subscription_plan,
           created_at
         )
