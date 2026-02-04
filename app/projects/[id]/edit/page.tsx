@@ -15,6 +15,7 @@ import { Toolbar } from '@/components/builder/Toolbar';
 import { ElementLibrary } from '@/components/builder/ElementLibrary';
 import { Canvas } from '@/components/builder/Canvas';
 import { PropertiesPanel } from '@/components/builder/PropertiesPanel';
+import { BuilderWalkthrough } from '@/components/walkthrough';
 import type { Project, Element } from '@/types';
 
 export default function ProjectEditorPage() {
@@ -150,6 +151,9 @@ export default function ProjectEditorPage() {
   return (
     <ProtectedRoute>
       <div className="flex h-screen overflow-hidden">
+        {/* Builder Walkthrough for first-time users */}
+        <BuilderWalkthrough projectId={params.id as string} />
+
         {/* Sidebar */}
         <BuilderSidebar
           isCollapsed={isSidebarCollapsed}
@@ -164,15 +168,22 @@ export default function ProjectEditorPage() {
           {/* Main builder interface */}
           <div className="flex-1 flex overflow-hidden">
             {/* Element Library */}
-            <ElementLibrary />
+            <div data-tour="elements-panel">
+              <ElementLibrary />
+            </div>
 
             {/* Canvas */}
-            <div className="flex-1 overflow-auto bg-[#F8FAFC]">
+            <div
+              data-tour="canvas"
+              className="flex-1 overflow-auto bg-[#F8FAFC]"
+            >
               <Canvas />
             </div>
 
             {/* Properties Panel */}
-            <PropertiesPanel />
+            <div data-tour="properties-panel">
+              <PropertiesPanel />
+            </div>
           </div>
         </div>
       </div>

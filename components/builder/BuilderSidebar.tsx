@@ -30,54 +30,63 @@ const navigation = [
     href: '/dashboard',
     icon: Home,
     isDynamic: false,
+    tourId: 'sidebar-dashboard',
   },
   {
     name: 'Builder',
     href: '/builder',
     icon: Layers,
     isDynamic: true,
+    tourId: 'sidebar-builder',
   },
   {
     name: 'Templates',
     href: '/templates',
     icon: FileText,
     isDynamic: false,
+    tourId: 'templates',
   },
   {
     name: 'Analytics',
     href: '/dashboard/analytics',
     icon: TrendingUp,
     isDynamic: false,
+    tourId: 'sidebar-analytics',
   },
   {
     name: 'Payments',
     href: '/dashboard/settings/payments',
     icon: CreditCard,
     isDynamic: false,
+    tourId: 'sidebar-transactions',
   },
   {
     name: 'Products',
     href: '/dashboard/products',
     icon: Package,
     isDynamic: false,
+    tourId: 'sidebar-products',
   },
   {
     name: 'Integrations',
     href: '/dashboard/integrations',
     icon: Zap,
     isDynamic: false,
+    tourId: 'sidebar-integrations',
   },
   {
     name: 'Subdomain',
     href: '/dashboard/settings/subdomain',
     icon: Globe,
     isDynamic: false,
+    tourId: 'sidebar-settings',
   },
   {
     name: 'Affiliate',
     href: '/dashboard/affiliate',
     icon: Users,
     isDynamic: false,
+    tourId: 'sidebar-affiliate',
   },
 ];
 
@@ -185,6 +194,7 @@ export function BuilderSidebar({
             <Link
               key={item.name}
               href={href}
+              data-tour={item.tourId}
               className={cn(
                 'flex items-center rounded-xl transition-all group relative',
                 isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5',

@@ -602,7 +602,10 @@ export const Toolbar = ({
         </div>
 
         {/* Viewport switcher */}
-        <div className="flex items-center gap-1 bg-[#F8FAFC] rounded-xl p-1">
+        <div
+          data-tour="device-preview"
+          className="flex items-center gap-1 bg-[#F8FAFC] rounded-xl p-1"
+        >
           <Button
             variant={viewportMode === 'desktop' ? 'default' : 'ghost'}
             size="sm"
@@ -635,7 +638,12 @@ export const Toolbar = ({
 
       {/* Right section - Action buttons */}
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={handlePreview}>
+        <Button
+          data-tour="preview-button"
+          variant="ghost"
+          size="sm"
+          onClick={handlePreview}
+        >
           <Eye className="w-4 h-4 mr-2" />
           <span className="hidden md:inline">Preview</span>
         </Button>
@@ -660,7 +668,7 @@ export const Toolbar = ({
           )}
 
         {/* More menu - Analytics, Forms, Settings */}
-        <div className="relative">
+        <div data-tour="more-options" className="relative">
           <Button
             variant="ghost"
             size="sm"
@@ -730,6 +738,7 @@ export const Toolbar = ({
           </Button>
         )}
         <Button
+          data-tour="publish-button"
           size="sm"
           className="bg-green-600 hover:bg-green-700"
           onClick={handlePublish}

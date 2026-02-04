@@ -201,7 +201,10 @@ function DashboardContent() {
           {/* CTA + Quick Actions Row */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Create New Project CTA */}
-            <div className="lg:col-span-3 rounded-2xl bg-gradient-to-r from-[#8273B5] to-[#5FC7CD] p-8 text-white">
+            <div
+              data-tour="create-project"
+              className="lg:col-span-3 rounded-2xl bg-gradient-to-r from-[#8273B5] to-[#5FC7CD] p-8 text-white"
+            >
               <h2 className="text-xl font-bold mb-2">Create New Project</h2>
               <p className="text-sm text-white/80 mb-6">
                 Start from scratch or choose a professionally designed template.
@@ -258,7 +261,7 @@ function DashboardContent() {
           </div>
 
           {/* Recent Projects */}
-          <Card>
+          <Card data-tour="projects-list">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-[#455263]">Recent Projects</CardTitle>
               {projects.length > 0 && (
