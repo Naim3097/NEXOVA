@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSetAtom } from 'jotai';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -17,6 +17,41 @@ import { Canvas } from '@/components/builder/Canvas';
 import { PropertiesPanel } from '@/components/builder/PropertiesPanel';
 // import { BuilderWalkthrough } from '@/components/walkthrough';
 import type { Project, Element } from '@/types';
+
+// Error Boundary to catch and display errors
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; name: string },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode; name: string }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error(
+      `ErrorBoundary [${this.props.name}] caught error:`,
+      error,
+      errorInfo
+    );
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 bg-red-100 border border-red-500 rounded m-2">
+          <p className="text-red-700 font-bold">Error in {this.props.name}:</p>
+          <p className="text-red-600 text-sm">{this.state.error?.message}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function ProjectEditorPage() {
   const params = useParams();
@@ -156,44 +191,48 @@ export default function ProjectEditorPage() {
         {/* Builder Walkthrough temporarily disabled for debugging */}
         {/* <BuilderWalkthrough projectId={params.id as string} /> */}
 
-        {console.log('ProjectEditorPage: Before BuilderSidebar')}
         {/* Sidebar */}
-        <BuilderSidebar
-          isCollapsed={isSidebarCollapsed}
-          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        />
+        <ErrorBoundary name="BuilderSidebar">
+          <BuilderSidebar
+            isCollapsed={isSidebarCollapsed}
+            onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          />
+        </ErrorBoundary>
 
         {/* Main Builder Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {console.log('ProjectEditorPage: Before Toolbar')}
           {/* Toolbar */}
-          <Toolbar />
+          <ErrorBoundary name="Toolbar">
+            <Toolbar />
+          </ErrorBoundary>
 
           {/* Main builder interface */}
           <div className="flex-1 flex overflow-hidden">
-            {console.log('ProjectEditorPage: Before ElementLibrary')}
             {/* Element Library */}
-            <div data-tour="elements-panel">
-              <ElementLibrary />
-            </div>
+            <ErrorBoundary name="ElementLibrary">
+              <div data-tour="elements-panel">
+                <ElementLibrary />
+              </div>
+            </ErrorBoundary>
 
-            {console.log('ProjectEditorPage: Before Canvas')}
             {/* Canvas */}
-            <div
-              data-tour="canvas"
-              className="flex-1 overflow-auto bg-[#F8FAFC]"
-            >
-              <Canvas />
-            </div>
+            <ErrorBoundary name="Canvas">
+              <div
+                data-tour="canvas"
+                className="flex-1 overflow-auto bg-[#F8FAFC]"
+              >
+                <Canvas />
+              </div>
+            </ErrorBoundary>
 
-            {console.log('ProjectEditorPage: Before PropertiesPanel')}
             {/* Properties Panel */}
-            <div data-tour="properties-panel">
-              <PropertiesPanel />
-            </div>
+            <ErrorBoundary name="PropertiesPanel">
+              <div data-tour="properties-panel">
+                <PropertiesPanel />
+              </div>
+            </ErrorBoundary>
           </div>
         </div>
-        {console.log('ProjectEditorPage: Render complete')}
       </div>
     </ProtectedRoute>
   );
