@@ -3,7 +3,7 @@ import localFont from 'next/font/local';
 // import Script from 'next/script';
 import './globals.css';
 import { ConditionalAuthProvider } from '@/components/auth/ConditionalAuthProvider';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+// import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Temporarily disabled for debugging
 // const GTM_ID = 'GTM-5GQQ6L8N';
@@ -54,7 +54,7 @@ export default function RootLayout({
       <head>{/* GTM temporarily disabled for debugging */}</head>
       <body className={`${satoshi.variable} font-sans overflow-x-hidden`}>
         <ConditionalAuthProvider>{children}</ConditionalAuthProvider>
-        <SpeedInsights />
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );
