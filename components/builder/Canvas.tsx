@@ -48,28 +48,59 @@ import { GripVertical } from 'lucide-react';
 import type { Element, ElementType } from '@/types';
 
 // Debug: Log all imports to verify they're not undefined
-console.log('Canvas imports check:', {
-  AnnouncementBarElement: typeof AnnouncementBarElement,
-  NavigationElement: typeof NavigationElement,
-  HeroElement: typeof HeroElement,
-  FeaturesElement: typeof FeaturesElement,
-  TestimonialsElement: typeof TestimonialsElement,
-  FAQElement: typeof FAQElement,
-  CTAElement: typeof CTAElement,
-  PaymentButtonElement: typeof PaymentButtonElement,
-  FooterElement: typeof FooterElement,
-  PricingElement: typeof PricingElement,
-  LeadFormElement: typeof LeadFormElement,
-  WhatsAppButtonElement: typeof WhatsAppButtonElement,
-  FormWithPaymentElement: typeof FormWithPaymentElement,
-  BookingFormElement: typeof BookingFormElement,
-  ProductCarouselElement: typeof ProductCarouselElement,
-  MediaElement: typeof MediaElement,
-  DndContext: typeof DndContext,
-  SortableContext: typeof SortableContext,
-  useSortable: typeof useSortable,
-  GripVertical: typeof GripVertical,
-});
+const importCheck = {
+  AnnouncementBarElement,
+  NavigationElement,
+  HeroElement,
+  FeaturesElement,
+  TestimonialsElement,
+  FAQElement,
+  CTAElement,
+  PaymentButtonElement,
+  FooterElement,
+  PricingElement,
+  LeadFormElement,
+  WhatsAppButtonElement,
+  FormWithPaymentElement,
+  BookingFormElement,
+  ProductCarouselElement,
+  MediaElement,
+};
+
+// Find any undefined imports
+const undefinedImports = Object.entries(importCheck)
+  .filter(([_, value]) => value === undefined)
+  .map(([name]) => name);
+
+if (undefinedImports.length > 0) {
+  console.error(
+    'CRITICAL: These element components are UNDEFINED:',
+    undefinedImports
+  );
+} else {
+  console.log('All element imports OK');
+}
+
+// Create a safe component map that handles undefined
+const ELEMENT_COMPONENTS: Record<string, React.ComponentType<any> | undefined> =
+  {
+    announcement_bar: AnnouncementBarElement,
+    navigation: NavigationElement,
+    hero: HeroElement,
+    features: FeaturesElement,
+    testimonials: TestimonialsElement,
+    faq: FAQElement,
+    cta: CTAElement,
+    pricing: PricingElement,
+    payment_button: PaymentButtonElement,
+    lead_form: LeadFormElement,
+    whatsapp_button: WhatsAppButtonElement,
+    form_with_payment: FormWithPaymentElement,
+    booking_form: BookingFormElement,
+    product_carousel: ProductCarouselElement,
+    media: MediaElement,
+    footer: FooterElement,
+  };
 
 // Sortable Element Wrapper
 interface SortableElementProps {
@@ -224,134 +255,40 @@ export const Canvas = () => {
       viewportMode,
     };
 
-    console.log('renderElementContent: Rendering', element.type, element.id);
+    console.log(
+      'renderElementContent: Looking up component for type:',
+      element.type
+    );
 
-    let elementContent: React.ReactNode;
+    // Use the component map to get the component
+    const Component = ELEMENT_COMPONENTS[element.type];
 
-    switch (element.type as ElementType) {
-      case 'announcement_bar':
-        elementContent = (
-          <AnnouncementBarElement
-            props={element.props as any}
-            {...commonProps}
-          />
-        );
-        break;
-      case 'navigation':
-        elementContent = (
-          <NavigationElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'hero':
-        elementContent = (
-          <HeroElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'features':
-        elementContent = (
-          <FeaturesElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'testimonials':
-        elementContent = (
-          <TestimonialsElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'faq':
-        elementContent = (
-          <FAQElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'cta':
-        elementContent = (
-          <CTAElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'pricing':
-        elementContent = (
-          <PricingElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'payment_button':
-        elementContent = (
-          <PaymentButtonElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'lead_form':
-        elementContent = (
-          <LeadFormElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'whatsapp_button':
-        elementContent = (
-          <WhatsAppButtonElement
-            props={element.props as any}
-            {...commonProps}
-          />
-        );
-        break;
-      case 'form_with_payment':
-        elementContent = (
-          <FormWithPaymentElement
-            props={element.props as any}
-            {...commonProps}
-          />
-        );
-        break;
-      case 'booking_form':
-        elementContent = (
-          <BookingFormElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'product_carousel':
-        elementContent = (
-          <ProductCarouselElement
-            props={element.props as any}
-            {...commonProps}
-          />
-        );
-        break;
-      case 'media':
-        elementContent = (
-          <MediaElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      case 'footer':
-        elementContent = (
-          <FooterElement props={element.props as any} {...commonProps} />
-        );
-        break;
-      default:
-        console.error('Unknown element type:', element.type);
-        elementContent = (
-          <div className="p-8 bg-[#F8FAFC] border-2 border-dashed border-[#E2E8F0] rounded-xl text-center">
-            <p className="text-[#969696]">
-              Unknown element type: {element.type}
-            </p>
-          </div>
-        );
-    }
-
-    if (elementContent === undefined) {
+    if (!Component) {
       console.error(
-        'Element content is undefined for:',
+        'COMPONENT IS UNDEFINED for type:',
         element.type,
-        element.id
+        '- Available types:',
+        Object.keys(ELEMENT_COMPONENTS)
       );
       return (
         <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
-          <p className="text-red-600">
-            Error rendering element: {element.type}
+          <p className="text-red-600 font-bold">
+            Component undefined for: {element.type}
           </p>
+          <p className="text-red-500 text-sm mt-2">ID: {element.id}</p>
         </div>
       );
     }
 
     console.log(
-      'renderElementContent: Successfully created content for',
-      element.type
+      'renderElementContent: Found component for',
+      element.type,
+      '- Component type:',
+      typeof Component
     );
-    return elementContent;
+
+    // Render the component
+    return <Component props={element.props as any} {...commonProps} />;
   };
 
   const renderElement = (element: Element) => {
