@@ -15,7 +15,7 @@ import { Toolbar } from '@/components/builder/Toolbar';
 import { ElementLibrary } from '@/components/builder/ElementLibrary';
 import { Canvas } from '@/components/builder/Canvas';
 import { PropertiesPanel } from '@/components/builder/PropertiesPanel';
-import { BuilderWalkthrough } from '@/components/walkthrough';
+// import { BuilderWalkthrough } from '@/components/walkthrough';
 import type { Project, Element } from '@/types';
 
 export default function ProjectEditorPage() {
@@ -151,8 +151,8 @@ export default function ProjectEditorPage() {
   return (
     <ProtectedRoute>
       <div className="flex h-screen overflow-hidden">
-        {/* Builder Walkthrough for first-time users */}
-        <BuilderWalkthrough projectId={params.id as string} />
+        {/* Builder Walkthrough temporarily disabled for debugging */}
+        {/* <BuilderWalkthrough projectId={params.id as string} /> */}
 
         {/* Sidebar */}
         <BuilderSidebar
