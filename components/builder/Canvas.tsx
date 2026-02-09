@@ -47,6 +47,30 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import type { Element, ElementType } from '@/types';
 
+// Debug: Log all imports to verify they're not undefined
+console.log('Canvas imports check:', {
+  AnnouncementBarElement: typeof AnnouncementBarElement,
+  NavigationElement: typeof NavigationElement,
+  HeroElement: typeof HeroElement,
+  FeaturesElement: typeof FeaturesElement,
+  TestimonialsElement: typeof TestimonialsElement,
+  FAQElement: typeof FAQElement,
+  CTAElement: typeof CTAElement,
+  PaymentButtonElement: typeof PaymentButtonElement,
+  FooterElement: typeof FooterElement,
+  PricingElement: typeof PricingElement,
+  LeadFormElement: typeof LeadFormElement,
+  WhatsAppButtonElement: typeof WhatsAppButtonElement,
+  FormWithPaymentElement: typeof FormWithPaymentElement,
+  BookingFormElement: typeof BookingFormElement,
+  ProductCarouselElement: typeof ProductCarouselElement,
+  MediaElement: typeof MediaElement,
+  DndContext: typeof DndContext,
+  SortableContext: typeof SortableContext,
+  useSortable: typeof useSortable,
+  GripVertical: typeof GripVertical,
+});
+
 // Sortable Element Wrapper
 interface SortableElementProps {
   element: Element;
@@ -65,6 +89,21 @@ const SortableElement = ({
   onSelect,
   onHover,
 }: SortableElementProps) => {
+  console.log('SortableElement rendering for:', element.id, element.type);
+
+  let sortableResult;
+  try {
+    sortableResult = useSortable({ id: element.id });
+    console.log('useSortable result:', {
+      hasAttributes: !!sortableResult.attributes,
+      hasListeners: !!sortableResult.listeners,
+      hasSetNodeRef: !!sortableResult.setNodeRef,
+    });
+  } catch (err) {
+    console.error('useSortable error:', err);
+    throw err;
+  }
+
   const {
     attributes,
     listeners,
@@ -72,13 +111,15 @@ const SortableElement = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: element.id });
+  } = sortableResult;
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  console.log('SortableElement about to render JSX for:', element.id);
 
   return (
     <div
@@ -121,11 +162,17 @@ const SortableElement = ({
 };
 
 export const Canvas = () => {
+  console.log('Canvas: Component starting to render');
+
   const elements = useAtomValue(sortedElementsAtom);
+  console.log('Canvas: Got elements from atom:', elements?.length);
+
   const [selectedId, setSelectedId] = useAtom(selectedElementIdAtom);
   const [hoveredId, setHoveredId] = useAtom(hoveredElementIdAtom);
   const viewportMode = useAtomValue(viewportModeAtom);
   const reorderElements = useSetAtom(reorderElementsAtom);
+
+  console.log('Canvas: State hooks completed');
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -161,6 +208,150 @@ export const Canvas = () => {
         newOrder: newIndex,
       });
     }
+  };
+
+  // New function: Render just the element content without wrapper
+  const renderElementContent = (element: Element) => {
+    const isSelected = selectedId === element.id;
+    const isHovered = hoveredId === element.id;
+
+    const commonProps = {
+      isSelected,
+      isHovered,
+      onSelect: () => setSelectedId(element.id),
+      onHover: (hovering: boolean) =>
+        setHoveredId(hovering ? element.id : null),
+      viewportMode,
+    };
+
+    console.log('renderElementContent: Rendering', element.type, element.id);
+
+    let elementContent: React.ReactNode;
+
+    switch (element.type as ElementType) {
+      case 'announcement_bar':
+        elementContent = (
+          <AnnouncementBarElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
+        break;
+      case 'navigation':
+        elementContent = (
+          <NavigationElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'hero':
+        elementContent = (
+          <HeroElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'features':
+        elementContent = (
+          <FeaturesElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'testimonials':
+        elementContent = (
+          <TestimonialsElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'faq':
+        elementContent = (
+          <FAQElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'cta':
+        elementContent = (
+          <CTAElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'pricing':
+        elementContent = (
+          <PricingElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'payment_button':
+        elementContent = (
+          <PaymentButtonElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'lead_form':
+        elementContent = (
+          <LeadFormElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'whatsapp_button':
+        elementContent = (
+          <WhatsAppButtonElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
+        break;
+      case 'form_with_payment':
+        elementContent = (
+          <FormWithPaymentElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
+        break;
+      case 'booking_form':
+        elementContent = (
+          <BookingFormElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'product_carousel':
+        elementContent = (
+          <ProductCarouselElement
+            props={element.props as any}
+            {...commonProps}
+          />
+        );
+        break;
+      case 'media':
+        elementContent = (
+          <MediaElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      case 'footer':
+        elementContent = (
+          <FooterElement props={element.props as any} {...commonProps} />
+        );
+        break;
+      default:
+        console.error('Unknown element type:', element.type);
+        elementContent = (
+          <div className="p-8 bg-[#F8FAFC] border-2 border-dashed border-[#E2E8F0] rounded-xl text-center">
+            <p className="text-[#969696]">
+              Unknown element type: {element.type}
+            </p>
+          </div>
+        );
+    }
+
+    if (elementContent === undefined) {
+      console.error(
+        'Element content is undefined for:',
+        element.type,
+        element.id
+      );
+      return (
+        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
+          <p className="text-red-600">
+            Error rendering element: {element.type}
+          </p>
+        </div>
+      );
+    }
+
+    console.log(
+      'renderElementContent: Successfully created content for',
+      element.type
+    );
+    return elementContent;
   };
 
   const renderElement = (element: Element) => {
@@ -365,19 +556,44 @@ export const Canvas = () => {
               </div>
             </div>
           ) : (
-            /* Render elements with drag-and-drop */
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={elements.map((el) => el.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="relative">{elements.map(renderElement)}</div>
-              </SortableContext>
-            </DndContext>
+            /* Render elements - DndContext temporarily disabled for debugging */
+            (() => {
+              console.log(
+                'Canvas: Rendering elements without DndContext (debug mode)'
+              );
+              console.log('Canvas: Elements to render:', elements.length);
+              // Temporarily render without DndContext to isolate the issue
+              return (
+                <div className="relative">
+                  {elements.map((element) => {
+                    console.log(
+                      'Canvas: Direct rendering element:',
+                      element.type,
+                      element.id
+                    );
+                    const isSelected = selectedId === element.id;
+                    const isHovered = hoveredId === element.id;
+                    return (
+                      <div
+                        key={element.id}
+                        className={`relative ${
+                          isSelected
+                            ? 'ring-2 ring-[#5FC7CD] ring-offset-2'
+                            : isHovered
+                              ? 'ring-2 ring-[#E2E8F0] ring-offset-2'
+                              : ''
+                        }`}
+                        onClick={() => setSelectedId(element.id)}
+                        onMouseEnter={() => setHoveredId(element.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                      >
+                        {renderElementContent(element)}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()
           )}
         </div>
       </div>
