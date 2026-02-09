@@ -176,6 +176,9 @@ export const Canvas = () => {
       viewportMode,
     };
 
+    // Debug: Log element being rendered
+    console.log('Rendering element:', element.type, element.id);
+
     let elementContent: React.ReactNode;
 
     switch (element.type as ElementType) {
@@ -272,6 +275,7 @@ export const Canvas = () => {
         );
         break;
       default:
+        console.error('Unknown element type:', element.type);
         elementContent = (
           <div className="p-8 bg-[#F8FAFC] border-2 border-dashed border-[#E2E8F0] rounded-xl text-center">
             <p className="text-[#969696]">
@@ -279,6 +283,22 @@ export const Canvas = () => {
             </p>
           </div>
         );
+    }
+
+    // Debug: Verify elementContent is not undefined
+    if (elementContent === undefined) {
+      console.error(
+        'Element content is undefined for:',
+        element.type,
+        element.id
+      );
+      elementContent = (
+        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
+          <p className="text-red-600">
+            Error rendering element: {element.type}
+          </p>
+        </div>
+      );
     }
 
     return (

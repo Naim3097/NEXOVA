@@ -2,7 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
-import { useAuth } from '@/contexts/AuthContext';
+import {
+  Sparkles,
+  FilePlus,
+  Palette,
+  FolderOpen,
+  Package,
+  TrendingUp,
+  CreditCard,
+  Link,
+  Globe,
+  Rocket,
+} from 'lucide-react';
 
 const WALKTHROUGH_KEY = 'nexova_dashboard_walkthrough_completed';
 
@@ -11,12 +22,15 @@ const steps: Step[] = [
     target: 'body',
     content: (
       <div className="text-center">
+        <div className="flex justify-center mb-3">
+          <Sparkles className="w-8 h-8 text-[#5FC7CD]" />
+        </div>
         <h3 className="text-xl font-bold text-[#455263] mb-2">
-          Selamat Datang ke Nexova! 🎉
+          Welcome to Nexova!
         </h3>
         <p className="text-[#969696]">
-          Jom kita tunjukkan cara guna platform ini untuk bina sales page yang
-          convert tinggi.
+          Let us show you how to use this platform to build high-converting
+          sales pages.
         </p>
       </div>
     ),
@@ -27,12 +41,13 @@ const steps: Step[] = [
     target: '[data-tour="create-project"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">
-          Buat Projek Baru 📝
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <FilePlus className="w-5 h-5 text-[#5FC7CD]" />
+          Create New Project
         </h4>
         <p className="text-sm text-[#969696]">
-          Klik di sini untuk mula bina sales page baru. Anda boleh pilih dari
-          template atau mulakan dari kosong.
+          Click here to start building a new sales page. You can choose from
+          templates or start from scratch.
         </p>
       </div>
     ),
@@ -42,10 +57,13 @@ const steps: Step[] = [
     target: '[data-tour="templates"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Pilih Template 🎨</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Palette className="w-5 h-5 text-[#5FC7CD]" />
+          Browse Templates
+        </h4>
         <p className="text-sm text-[#969696]">
-          Kami ada banyak template profesional untuk pelbagai industri - kuih
-          raya, photography, automotive dan banyak lagi!
+          We have many professional templates for various industries -
+          photography, automotive, food business and more!
         </p>
       </div>
     ),
@@ -55,10 +73,13 @@ const steps: Step[] = [
     target: '[data-tour="projects-list"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Senarai Projek 📁</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <FolderOpen className="w-5 h-5 text-[#5FC7CD]" />
+          Your Projects
+        </h4>
         <p className="text-sm text-[#969696]">
-          Semua sales page anda akan dipaparkan di sini. Klik untuk edit, atau
-          klik ikon untuk preview dan publish.
+          All your sales pages will be displayed here. Click to edit, or use the
+          icons to preview and publish.
         </p>
       </div>
     ),
@@ -68,10 +89,13 @@ const steps: Step[] = [
     target: '[data-tour="sidebar-products"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Urus Produk 🛍️</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Package className="w-5 h-5 text-[#5FC7CD]" />
+          Manage Products
+        </h4>
         <p className="text-sm text-[#969696]">
-          Tambah produk anda di sini. Set harga, variasi (saiz/warna), dan
-          bundle pricing.
+          Add your products here. Set prices, variations (size/color), and
+          bundle pricing options.
         </p>
       </div>
     ),
@@ -81,12 +105,13 @@ const steps: Step[] = [
     target: '[data-tour="sidebar-analytics"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">
-          Analitik & Prestasi 📊
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-[#5FC7CD]" />
+          Analytics & Performance
         </h4>
         <p className="text-sm text-[#969696]">
-          Pantau page views, clicks, dan conversion rate untuk setiap sales page
-          anda.
+          Monitor page views, clicks, and conversion rates for each of your
+          sales pages.
         </p>
       </div>
     ),
@@ -96,9 +121,13 @@ const steps: Step[] = [
     target: '[data-tour="sidebar-transactions"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Transaksi 💰</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-[#5FC7CD]" />
+          Payment Integration
+        </h4>
         <p className="text-sm text-[#969696]">
-          Lihat semua pembayaran yang diterima dari pelanggan anda di sini.
+          Connect your LeanX account here to receive payments from customers
+          directly on your sales pages.
         </p>
       </div>
     ),
@@ -108,10 +137,13 @@ const steps: Step[] = [
     target: '[data-tour="sidebar-integrations"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Integrasi 🔗</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Link className="w-5 h-5 text-[#5FC7CD]" />
+          Integrations
+        </h4>
         <p className="text-sm text-[#969696]">
-          Sambungkan LeanX untuk terima pembayaran, dan tambah Facebook Pixel
-          atau Google Analytics untuk tracking.
+          Connect Google Analytics, Google Sheets, Google Calendar, and Facebook
+          Pixel for tracking and automation.
         </p>
       </div>
     ),
@@ -121,9 +153,13 @@ const steps: Step[] = [
     target: '[data-tour="sidebar-settings"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Tetapan ⚙️</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Globe className="w-5 h-5 text-[#5FC7CD]" />
+          Subdomain & Domain
+        </h4>
         <p className="text-sm text-[#969696]">
-          Update profil, sambung custom domain, dan urus akaun anda di sini.
+          Claim your unique subdomain (yourname.nexova.my) or connect your own
+          custom domain here.
         </p>
       </div>
     ),
@@ -133,15 +169,18 @@ const steps: Step[] = [
     target: 'body',
     content: (
       <div className="text-center">
+        <div className="flex justify-center mb-3">
+          <Rocket className="w-8 h-8 text-[#5FC7CD]" />
+        </div>
         <h3 className="text-xl font-bold text-[#455263] mb-2">
-          Anda Sudah Bersedia! 🚀
+          You&apos;re All Set!
         </h3>
         <p className="text-[#969696] mb-3">
-          Sekarang, jom buat sales page pertama anda. Klik &quot;Create
-          Project&quot; atau pilih template untuk bermula.
+          Now, let&apos;s create your first sales page. Click &quot;Create New
+          Site&quot; or browse templates to get started.
         </p>
         <p className="text-xs text-[#969696]">
-          💡 Tip: Anda boleh replay tutorial ini dari Settings bila-bila masa.
+          Tip: You can replay this tutorial anytime from Settings.
         </p>
       </div>
     ),
@@ -150,7 +189,6 @@ const steps: Step[] = [
 ];
 
 export default function DashboardWalkthrough() {
-  const { user } = useAuth();
   const [run, setRun] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -159,14 +197,17 @@ export default function DashboardWalkthrough() {
 
     // Check if user has completed walkthrough
     const completed = localStorage.getItem(WALKTHROUGH_KEY);
-    if (!completed && user) {
-      // Small delay to ensure DOM elements are rendered
+    console.log('[Walkthrough] Dashboard check:', { completed });
+
+    if (!completed) {
+      // Delay to ensure DOM elements are rendered
       const timer = setTimeout(() => {
+        console.log('[Walkthrough] Starting dashboard tour...');
         setRun(true);
-      }, 1000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, []);
 
   const handleCallback = (data: CallBackProps) => {
     const { status } = data;
@@ -192,11 +233,11 @@ export default function DashboardWalkthrough() {
       disableOverlayClose
       spotlightClicks
       locale={{
-        back: 'Kembali',
-        close: 'Tutup',
-        last: 'Selesai',
-        next: 'Seterusnya',
-        skip: 'Langkau',
+        back: 'Back',
+        close: 'Close',
+        last: 'Finish',
+        next: 'Next',
+        skip: 'Skip',
       }}
       styles={{
         options: {

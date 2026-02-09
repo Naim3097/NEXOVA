@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import {
+  Wrench,
+  Puzzle,
+  Palette,
+  Settings,
+  Smartphone,
+  Eye,
+  Rocket,
+  Zap,
+} from 'lucide-react';
 
 const WALKTHROUGH_KEY = 'nexova_builder_walkthrough_completed';
 
@@ -10,12 +20,15 @@ const steps: Step[] = [
     target: 'body',
     content: (
       <div className="text-center">
+        <div className="flex justify-center mb-3">
+          <Wrench className="w-8 h-8 text-[#5FC7CD]" />
+        </div>
         <h3 className="text-xl font-bold text-[#455263] mb-2">
-          Selamat Datang ke Page Builder! 🛠️
+          Welcome to the Page Builder!
         </h3>
         <p className="text-[#969696]">
-          Di sini anda boleh bina dan customize sales page mengikut kreativiti
-          anda.
+          Here you can build and customize your sales page with your own
+          creativity.
         </p>
       </div>
     ),
@@ -26,26 +39,29 @@ const steps: Step[] = [
     target: '[data-tour="elements-panel"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Panel Elemen 🧩</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Puzzle className="w-5 h-5 text-[#5FC7CD]" />
+          Elements Panel
+        </h4>
         <p className="text-sm text-[#969696]">
-          Pilih elemen dari sini untuk ditambah ke page anda. Cuma klik pada
-          elemen yang anda mahu.
+          Choose elements from here to add to your page. Just click on the
+          element you want.
         </p>
         <ul className="text-xs text-[#969696] mt-2 space-y-1">
           <li>
-            • <b>Hero</b> - Header utama dengan headline
+            • <b>Hero</b> - Main header with headline
           </li>
           <li>
-            • <b>Features</b> - Senarai ciri produk
+            • <b>Features</b> - Product feature list
           </li>
           <li>
-            • <b>Testimonials</b> - Review pelanggan
+            • <b>Testimonials</b> - Customer reviews
           </li>
           <li>
-            • <b>Pricing</b> - Jadual harga
+            • <b>Pricing</b> - Price table
           </li>
           <li>
-            • <b>Form</b> - Borang order/lead
+            • <b>Form</b> - Order/lead form
           </li>
         </ul>
       </div>
@@ -56,15 +72,16 @@ const steps: Step[] = [
     target: '[data-tour="canvas"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">
-          Canvas (Kawasan Kerja) 🎨
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Palette className="w-5 h-5 text-[#5FC7CD]" />
+          Canvas (Work Area)
         </h4>
         <p className="text-sm text-[#969696]">
-          Ini adalah paparan live sales page anda. Klik pada mana-mana elemen
-          untuk select dan edit.
+          This is the live preview of your sales page. Click on any element to
+          select and edit it.
         </p>
         <p className="text-xs text-[#969696] mt-2">
-          💡 Drag elemen untuk susun semula urutan.
+          Tip: Drag elements to rearrange their order.
         </p>
       </div>
     ),
@@ -74,16 +91,17 @@ const steps: Step[] = [
     target: '[data-tour="properties-panel"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">
-          Panel Properties ⚙️
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-[#5FC7CD]" />
+          Properties Panel
         </h4>
         <p className="text-sm text-[#969696]">
-          Apabila elemen dipilih, panel ini akan muncul. Di sini anda boleh:
+          When an element is selected, this panel will appear. Here you can:
         </p>
         <ul className="text-xs text-[#969696] mt-2 space-y-1">
-          <li>• Edit teks dan kandungan</li>
-          <li>• Tukar warna dan font</li>
-          <li>• Upload gambar</li>
+          <li>• Edit text and content</li>
+          <li>• Change colors and fonts</li>
+          <li>• Upload images</li>
           <li>• Set button links</li>
         </ul>
       </div>
@@ -94,10 +112,13 @@ const steps: Step[] = [
     target: '[data-tour="device-preview"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Device Preview 📱</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Smartphone className="w-5 h-5 text-[#5FC7CD]" />
+          Device Preview
+        </h4>
         <p className="text-sm text-[#969696]">
-          Tukar antara Desktop, Tablet, dan Mobile untuk pastikan page anda
-          cantik di semua device.
+          Switch between Desktop, Tablet, and Mobile to make sure your page
+          looks great on all devices.
         </p>
       </div>
     ),
@@ -107,10 +128,13 @@ const steps: Step[] = [
     target: '[data-tour="preview-button"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Preview 👁️</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Eye className="w-5 h-5 text-[#5FC7CD]" />
+          Preview
+        </h4>
         <p className="text-sm text-[#969696]">
-          Klik untuk preview page anda dalam tab baru. Test semua button dan
-          form sebelum publish.
+          Click to preview your page in a new tab. Test all buttons and forms
+          before publishing.
         </p>
       </div>
     ),
@@ -120,10 +144,13 @@ const steps: Step[] = [
     target: '[data-tour="publish-button"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">Publish 🚀</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Rocket className="w-5 h-5 text-[#5FC7CD]" />
+          Publish
+        </h4>
         <p className="text-sm text-[#969696]">
-          Bila dah ready, klik Publish untuk go live! Page anda akan dapat URL
-          yang boleh di-share kepada pelanggan.
+          When ready, click Publish to go live! Your page will get a URL that
+          you can share with customers.
         </p>
       </div>
     ),
@@ -133,19 +160,22 @@ const steps: Step[] = [
     target: '[data-tour="more-options"]',
     content: (
       <div>
-        <h4 className="font-semibold text-[#455263] mb-2">More Options ⚡</h4>
+        <h4 className="font-semibold text-[#455263] mb-2 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-[#5FC7CD]" />
+          More Options
+        </h4>
         <p className="text-sm text-[#969696]">
-          Akses tetapan tambahan di sini:
+          Access additional settings here:
         </p>
         <ul className="text-xs text-[#969696] mt-2 space-y-1">
           <li>
-            • <b>SEO Settings</b> - Title, description untuk Google
+            • <b>SEO Settings</b> - Title, description for Google
           </li>
           <li>
-            • <b>Tracking</b> - Facebook Pixel, GA4
+            • <b>Tracking Pixels</b> - Facebook Pixel, GA4
           </li>
           <li>
-            • <b>Custom Code</b> - Tambah script sendiri
+            • <b>Project Settings</b> - Import/export templates
           </li>
         </ul>
       </div>
@@ -156,15 +186,18 @@ const steps: Step[] = [
     target: 'body',
     content: (
       <div className="text-center">
+        <div className="flex justify-center mb-3">
+          <Wrench className="w-8 h-8 text-[#5FC7CD]" />
+        </div>
         <h3 className="text-xl font-bold text-[#455263] mb-2">
-          Jom Mula Bina! 💪
+          Let&apos;s Start Building!
         </h3>
         <p className="text-[#969696] mb-3">
-          Pilih elemen dari panel kiri untuk mula membina sales page anda.
-          Perubahan akan auto-save setiap beberapa saat.
+          Choose an element from the left panel to start building your sales
+          page. Click Save to save your changes.
         </p>
         <p className="text-xs text-[#969696]">
-          💡 Tip: Guna Ctrl/Cmd + Z untuk undo jika ada silap.
+          Tip: Use Ctrl/Cmd + Z to undo if you make a mistake.
         </p>
       </div>
     ),
@@ -220,11 +253,11 @@ export default function BuilderWalkthrough({
       disableOverlayClose
       spotlightClicks
       locale={{
-        back: 'Kembali',
-        close: 'Tutup',
-        last: 'Selesai',
-        next: 'Seterusnya',
-        skip: 'Langkau',
+        back: 'Back',
+        close: 'Close',
+        last: 'Finish',
+        next: 'Next',
+        skip: 'Skip',
       }}
       styles={{
         options: {
