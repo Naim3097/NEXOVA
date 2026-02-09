@@ -1,6 +1,14 @@
 import React from 'react';
 import { FooterProps } from '@/types';
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+  Music2,
+  Globe,
+} from 'lucide-react';
 
 interface FooterElementProps {
   props: FooterProps;
@@ -10,12 +18,13 @@ interface FooterElementProps {
   onHover?: (hovering: boolean) => void;
 }
 
-const socialIcons = {
+const socialIcons: Record<string, React.ComponentType<any>> = {
   facebook: Facebook,
   twitter: Twitter,
   instagram: Instagram,
   linkedin: Linkedin,
   youtube: Youtube,
+  tiktok: Music2, // TikTok icon (using Music2 as closest match)
 };
 
 export const FooterElement = React.memo(
@@ -48,7 +57,10 @@ export const FooterElement = React.memo(
     return (
       <footer
         className={`${baseClasses} py-12 px-4 cursor-pointer overflow-hidden`}
-        style={{ backgroundColor: backgroundImage ? 'transparent' : bgColor, color: textColor }}
+        style={{
+          backgroundColor: backgroundImage ? 'transparent' : bgColor,
+          color: textColor,
+        }}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -94,7 +106,7 @@ export const FooterElement = React.memo(
               {socialLinks && socialLinks.length > 0 && (
                 <div className="flex gap-3">
                   {socialLinks.map((social, index) => {
-                    const Icon = socialIcons[social.platform];
+                    const Icon = socialIcons[social.platform] || Globe; // Fallback to Globe icon
                     return (
                       <a
                         key={index}
@@ -133,7 +145,10 @@ export const FooterElement = React.memo(
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 border-t" style={{ borderColor: `${textColor}20` }}>
+          <div
+            className="pt-8 border-t"
+            style={{ borderColor: `${textColor}20` }}
+          >
             <p className="text-sm text-center opacity-70">{copyright}</p>
           </div>
         </div>

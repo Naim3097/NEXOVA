@@ -37,7 +37,6 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -46,107 +45,6 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import type { Element, ElementType } from '@/types';
-
-// Debug: Log all imports to verify they're not undefined
-const importCheck = {
-  AnnouncementBarElement,
-  NavigationElement,
-  HeroElement,
-  FeaturesElement,
-  TestimonialsElement,
-  FAQElement,
-  CTAElement,
-  PaymentButtonElement,
-  FooterElement,
-  PricingElement,
-  LeadFormElement,
-  WhatsAppButtonElement,
-  FormWithPaymentElement,
-  BookingFormElement,
-  ProductCarouselElement,
-  MediaElement,
-};
-
-// Find any undefined imports
-const undefinedImports = Object.entries(importCheck)
-  .filter(([_, value]) => value === undefined)
-  .map(([name]) => name);
-
-if (undefinedImports.length > 0) {
-  console.error(
-    'CRITICAL: These element components are UNDEFINED:',
-    undefinedImports
-  );
-} else {
-  console.log('All element imports OK');
-}
-
-// Create a safe component map that handles undefined
-const ELEMENT_COMPONENTS: Record<string, React.ComponentType<any> | undefined> =
-  {
-    announcement_bar: AnnouncementBarElement,
-    navigation: NavigationElement,
-    hero: HeroElement,
-    features: FeaturesElement,
-    testimonials: TestimonialsElement,
-    faq: FAQElement,
-    cta: CTAElement,
-    pricing: PricingElement,
-    payment_button: PaymentButtonElement,
-    lead_form: LeadFormElement,
-    whatsapp_button: WhatsAppButtonElement,
-    form_with_payment: FormWithPaymentElement,
-    booking_form: BookingFormElement,
-    product_carousel: ProductCarouselElement,
-    media: MediaElement,
-    footer: FooterElement,
-  };
-
-// Element-level Error Boundary to catch errors from individual elements
-class ElementErrorBoundary extends React.Component<
-  { elementType: string; elementId: string; children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
-> {
-  constructor(props: {
-    elementType: string;
-    elementId: string;
-    children: React.ReactNode;
-  }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(
-      `ElementErrorBoundary caught error in ${this.props.elementType} (${this.props.elementId}):`,
-      error,
-      errorInfo
-    );
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
-          <p className="text-red-600 font-bold">
-            Error in element: {this.props.elementType}
-          </p>
-          <p className="text-red-500 text-sm mt-2">
-            ID: {this.props.elementId}
-          </p>
-          <p className="text-red-400 text-xs mt-1">
-            {this.state.error?.message}
-          </p>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
 
 // Sortable Element Wrapper
 interface SortableElementProps {
@@ -166,21 +64,6 @@ const SortableElement = ({
   onSelect,
   onHover,
 }: SortableElementProps) => {
-  console.log('SortableElement rendering for:', element.id, element.type);
-
-  let sortableResult;
-  try {
-    sortableResult = useSortable({ id: element.id });
-    console.log('useSortable result:', {
-      hasAttributes: !!sortableResult.attributes,
-      hasListeners: !!sortableResult.listeners,
-      hasSetNodeRef: !!sortableResult.setNodeRef,
-    });
-  } catch (err) {
-    console.error('useSortable error:', err);
-    throw err;
-  }
-
   const {
     attributes,
     listeners,
@@ -188,15 +71,13 @@ const SortableElement = ({
     transform,
     transition,
     isDragging,
-  } = sortableResult;
+  } = useSortable({ id: element.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-
-  console.log('SortableElement about to render JSX for:', element.id);
 
   return (
     <div
@@ -239,17 +120,11 @@ const SortableElement = ({
 };
 
 export const Canvas = () => {
-  console.log('Canvas: Component starting to render');
-
   const elements = useAtomValue(sortedElementsAtom);
-  console.log('Canvas: Got elements from atom:', elements?.length);
-
   const [selectedId, setSelectedId] = useAtom(selectedElementIdAtom);
   const [hoveredId, setHoveredId] = useAtom(hoveredElementIdAtom);
   const viewportMode = useAtomValue(viewportModeAtom);
   const reorderElements = useSetAtom(reorderElementsAtom);
-
-  console.log('Canvas: State hooks completed');
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -287,60 +162,6 @@ export const Canvas = () => {
     }
   };
 
-  // New function: Render just the element content without wrapper
-  const renderElementContent = (element: Element) => {
-    const isSelected = selectedId === element.id;
-    const isHovered = hoveredId === element.id;
-
-    const commonProps = {
-      isSelected,
-      isHovered,
-      onSelect: () => setSelectedId(element.id),
-      onHover: (hovering: boolean) =>
-        setHoveredId(hovering ? element.id : null),
-      viewportMode,
-    };
-
-    console.log(
-      'renderElementContent: Looking up component for type:',
-      element.type
-    );
-
-    // Use the component map to get the component
-    const Component = ELEMENT_COMPONENTS[element.type];
-
-    if (!Component) {
-      console.error(
-        'COMPONENT IS UNDEFINED for type:',
-        element.type,
-        '- Available types:',
-        Object.keys(ELEMENT_COMPONENTS)
-      );
-      return (
-        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
-          <p className="text-red-600 font-bold">
-            Component undefined for: {element.type}
-          </p>
-          <p className="text-red-500 text-sm mt-2">ID: {element.id}</p>
-        </div>
-      );
-    }
-
-    console.log(
-      'renderElementContent: Found component for',
-      element.type,
-      '- Component type:',
-      typeof Component
-    );
-
-    // Wrap in error boundary to catch errors from inside the component
-    return (
-      <ElementErrorBoundary elementType={element.type} elementId={element.id}>
-        <Component props={element.props as any} {...commonProps} />
-      </ElementErrorBoundary>
-    );
-  };
-
   const renderElement = (element: Element) => {
     const isSelected = selectedId === element.id;
     const isHovered = hoveredId === element.id;
@@ -353,9 +174,6 @@ export const Canvas = () => {
         setHoveredId(hovering ? element.id : null),
       viewportMode,
     };
-
-    // Debug: Log element being rendered
-    console.log('Rendering element:', element.type, element.id);
 
     let elementContent: React.ReactNode;
 
@@ -453,7 +271,6 @@ export const Canvas = () => {
         );
         break;
       default:
-        console.error('Unknown element type:', element.type);
         elementContent = (
           <div className="p-8 bg-[#F8FAFC] border-2 border-dashed border-[#E2E8F0] rounded-xl text-center">
             <p className="text-[#969696]">
@@ -461,22 +278,6 @@ export const Canvas = () => {
             </p>
           </div>
         );
-    }
-
-    // Debug: Verify elementContent is not undefined
-    if (elementContent === undefined) {
-      console.error(
-        'Element content is undefined for:',
-        element.type,
-        element.id
-      );
-      elementContent = (
-        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
-          <p className="text-red-600">
-            Error rendering element: {element.type}
-          </p>
-        </div>
-      );
     }
 
     return (
@@ -543,44 +344,19 @@ export const Canvas = () => {
               </div>
             </div>
           ) : (
-            /* Render elements - DndContext temporarily disabled for debugging */
-            (() => {
-              console.log(
-                'Canvas: Rendering elements without DndContext (debug mode)'
-              );
-              console.log('Canvas: Elements to render:', elements.length);
-              // Temporarily render without DndContext to isolate the issue
-              return (
-                <div className="relative">
-                  {elements.map((element) => {
-                    console.log(
-                      'Canvas: Direct rendering element:',
-                      element.type,
-                      element.id
-                    );
-                    const isSelected = selectedId === element.id;
-                    const isHovered = hoveredId === element.id;
-                    return (
-                      <div
-                        key={element.id}
-                        className={`relative ${
-                          isSelected
-                            ? 'ring-2 ring-[#5FC7CD] ring-offset-2'
-                            : isHovered
-                              ? 'ring-2 ring-[#E2E8F0] ring-offset-2'
-                              : ''
-                        }`}
-                        onClick={() => setSelectedId(element.id)}
-                        onMouseEnter={() => setHoveredId(element.id)}
-                        onMouseLeave={() => setHoveredId(null)}
-                      >
-                        {renderElementContent(element)}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()
+            /* Render elements with drag-and-drop */
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={elements.map((el) => el.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="relative">{elements.map(renderElement)}</div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BuilderSidebar } from '@/components/builder/BuilderSidebar';
-// import { DashboardWalkthrough } from '@/components/walkthrough';
+import { DashboardWalkthrough } from '@/components/walkthrough';
 
 export default function DashboardLayout({
   children,
@@ -13,8 +13,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* DashboardWalkthrough temporarily disabled for debugging */}
-      {/* <DashboardWalkthrough /> */}
+      <DashboardWalkthrough />
       <BuilderSidebar
         isCollapsed={isCollapsed}
         onToggle={() => setIsCollapsed(!isCollapsed)}
