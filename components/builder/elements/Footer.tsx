@@ -8,6 +8,7 @@ import {
   Youtube,
   Music2,
   Globe,
+  Pin,
 } from 'lucide-react';
 
 interface FooterElementProps {
@@ -25,6 +26,7 @@ const socialIcons: Record<string, React.ComponentType<any>> = {
   linkedin: Linkedin,
   youtube: Youtube,
   tiktok: Music2, // TikTok icon (using Music2 as closest match)
+  pinterest: Pin, // Pinterest icon (using Pin as closest match)
 };
 
 export const FooterElement = React.memo(
