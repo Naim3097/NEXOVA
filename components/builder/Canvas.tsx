@@ -102,6 +102,52 @@ const ELEMENT_COMPONENTS: Record<string, React.ComponentType<any> | undefined> =
     footer: FooterElement,
   };
 
+// Element-level Error Boundary to catch errors from individual elements
+class ElementErrorBoundary extends React.Component<
+  { elementType: string; elementId: string; children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: {
+    elementType: string;
+    elementId: string;
+    children: React.ReactNode;
+  }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error(
+      `ElementErrorBoundary caught error in ${this.props.elementType} (${this.props.elementId}):`,
+      error,
+      errorInfo
+    );
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 bg-red-100 border-2 border-dashed border-red-300 rounded-xl text-center">
+          <p className="text-red-600 font-bold">
+            Error in element: {this.props.elementType}
+          </p>
+          <p className="text-red-500 text-sm mt-2">
+            ID: {this.props.elementId}
+          </p>
+          <p className="text-red-400 text-xs mt-1">
+            {this.state.error?.message}
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Sortable Element Wrapper
 interface SortableElementProps {
   element: Element;
@@ -287,8 +333,12 @@ export const Canvas = () => {
       typeof Component
     );
 
-    // Render the component
-    return <Component props={element.props as any} {...commonProps} />;
+    // Wrap in error boundary to catch errors from inside the component
+    return (
+      <ElementErrorBoundary elementType={element.type} elementId={element.id}>
+        <Component props={element.props as any} {...commonProps} />
+      </ElementErrorBoundary>
+    );
   };
 
   const renderElement = (element: Element) => {
