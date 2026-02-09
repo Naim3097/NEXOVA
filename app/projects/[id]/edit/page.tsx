@@ -148,12 +148,15 @@ export default function ProjectEditorPage() {
     );
   }
 
+  console.log('ProjectEditorPage: Rendering main layout');
+
   return (
     <ProtectedRoute>
       <div className="flex h-screen overflow-hidden">
         {/* Builder Walkthrough temporarily disabled for debugging */}
         {/* <BuilderWalkthrough projectId={params.id as string} /> */}
 
+        {console.log('ProjectEditorPage: Before BuilderSidebar')}
         {/* Sidebar */}
         <BuilderSidebar
           isCollapsed={isSidebarCollapsed}
@@ -162,16 +165,19 @@ export default function ProjectEditorPage() {
 
         {/* Main Builder Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
+          {console.log('ProjectEditorPage: Before Toolbar')}
           {/* Toolbar */}
           <Toolbar />
 
           {/* Main builder interface */}
           <div className="flex-1 flex overflow-hidden">
+            {console.log('ProjectEditorPage: Before ElementLibrary')}
             {/* Element Library */}
             <div data-tour="elements-panel">
               <ElementLibrary />
             </div>
 
+            {console.log('ProjectEditorPage: Before Canvas')}
             {/* Canvas */}
             <div
               data-tour="canvas"
@@ -180,12 +186,14 @@ export default function ProjectEditorPage() {
               <Canvas />
             </div>
 
+            {console.log('ProjectEditorPage: Before PropertiesPanel')}
             {/* Properties Panel */}
             <div data-tour="properties-panel">
               <PropertiesPanel />
             </div>
           </div>
         </div>
+        {console.log('ProjectEditorPage: Render complete')}
       </div>
     </ProtectedRoute>
   );

@@ -69,6 +69,7 @@ export const Toolbar = ({
   projectStatus,
   isGuestMode = false,
 }: ToolbarProps = {}) => {
+  console.log('Toolbar: Component rendering');
   const currentProject = useAtomValue(currentProjectAtom);
   const profile = useAtomValue(profileAtom);
   const elements = useAtomValue(elementsAtom);

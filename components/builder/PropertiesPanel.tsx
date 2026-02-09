@@ -224,6 +224,7 @@ const iconOptions = [
 ];
 
 export const PropertiesPanel = () => {
+  console.log('PropertiesPanel: Component rendering');
   const selectedElement = useAtomValue(selectedElementAtom);
   const currentProject = useAtomValue(currentProjectAtom);
   const [isOpen, setIsOpen] = useAtom(rightSidebarOpenAtom);
@@ -231,6 +232,12 @@ export const PropertiesPanel = () => {
   const deleteElement = useSetAtom(deleteElementAtom);
   const duplicateElement = useSetAtom(duplicateElementAtom);
   const allElements = useAtomValue(elementsAtom);
+
+  console.log(
+    'PropertiesPanel: selectedElement=',
+    selectedElement?.type,
+    selectedElement?.id
+  );
 
   if (!isOpen && !selectedElement) {
     return null;
