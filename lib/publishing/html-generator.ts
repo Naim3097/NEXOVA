@@ -1419,9 +1419,9 @@ function generateNavigationHTML(element: Element): string {
           )
           .join('')}
         ${
-          ctaButton
+          ctaButton && ctaButton.text
             ? `
-          <a href="${ctaButton.url}" class="button button-primary" style="padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
+          <a href="${ctaButton.url || '#'}" class="button button-primary" style="padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
         `
             : ''
         }
@@ -1449,9 +1449,9 @@ function generateNavigationHTML(element: Element): string {
         )
         .join('')}
       ${
-        ctaButton
+        ctaButton && ctaButton.text
           ? `
-        <a href="${ctaButton.url}" class="button button-primary" style="display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
+        <a href="${ctaButton.url || '#'}" class="button button-primary" style="display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
       `
           : ''
       }
@@ -2558,6 +2558,10 @@ function generateLeadFormHTML(element: Element): string {
     bgColor = '#ffffff',
   } = element.props;
 
+  const formId = `lead-form-${element.id}`;
+  const statusId = `lead-form-status-${element.id}`;
+  const btnId = `lead-form-btn-${element.id}`;
+
   return `
 <section id="${element.type}-${element.order}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
   <div class="container-sm" style="max-width: 42rem; margin: 0 auto;">
@@ -2566,21 +2570,21 @@ function generateLeadFormHTML(element: Element): string {
         <h2 style="font-size: 1.875rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${title}</h2>
         ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
       </div>
-      <form style="display: flex; flex-direction: column; gap: 1rem;">
+      <form id="${formId}" style="display: flex; flex-direction: column; gap: 1rem;">
         <div>
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${nameLabel} <span style="color: #ef4444;">*</span></label>
-          <input type="text" placeholder="Your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+          <input type="text" name="customer_name" required placeholder="Your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
         </div>
         <div>
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${emailLabel} <span style="color: #ef4444;">*</span></label>
-          <input type="email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+          <input type="email" name="customer_email" required placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
         </div>
         ${
           fields.showPhone
             ? `
         <div>
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${phoneLabel}</label>
-          <input type="tel" placeholder="012-345 6789" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+          <input type="tel" name="customer_phone" placeholder="012-345 6789" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
         </div>`
             : ''
         }
@@ -2589,17 +2593,91 @@ function generateLeadFormHTML(element: Element): string {
             ? `
         <div>
           <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${messageLabel}</label>
-          <textarea rows="4" placeholder="Your message..." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box; resize: vertical;"></textarea>
+          <textarea name="message" rows="4" placeholder="Your message..." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box; resize: vertical;"></textarea>
         </div>`
             : ''
         }
-        <button type="button" style="width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1rem; border: none; cursor: pointer; background-color: ${submitButtonColor}; margin-top: 0.5rem;">
+        <div id="${statusId}" style="display: none; padding: 0.75rem 1rem; border-radius: 0.5rem; text-align: center; font-size: 0.875rem;"></div>
+        <button id="${btnId}" type="submit" style="width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1rem; border: none; cursor: pointer; background-color: ${submitButtonColor}; margin-top: 0.5rem;">
           ${submitButtonText}
         </button>
       </form>
     </div>
   </div>
-</section>`;
+</section>
+<script>
+(function() {
+  var form = document.getElementById('${formId}');
+  var btn = document.getElementById('${btnId}');
+  var statusEl = document.getElementById('${statusId}');
+  var originalBtnText = btn.textContent;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(form);
+    var name = (formData.get('customer_name') || '').toString().trim();
+    var email = (formData.get('customer_email') || '').toString().trim();
+    var phone = (formData.get('customer_phone') || '').toString().trim();
+    var message = (formData.get('message') || '').toString().trim();
+
+    if (!name || !email) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = 'Please fill in your name and email address.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    btn.style.opacity = '0.7';
+    statusEl.style.display = 'none';
+
+    var data = {
+      project_id: window.__PROJECT_ID__,
+      element_id: '${element.id}',
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone || null,
+      message: message || null
+    };
+
+    fetch('/api/leads/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        statusEl.style.display = 'block';
+        statusEl.style.background = '#f0fdf4';
+        statusEl.style.color = '#16a34a';
+        statusEl.textContent = result.message || 'Thank you! Your information has been submitted.';
+        form.reset();
+      } else {
+        statusEl.style.display = 'block';
+        statusEl.style.background = '#fef2f2';
+        statusEl.style.color = '#dc2626';
+        statusEl.textContent = result.error || 'Something went wrong. Please try again.';
+      }
+    })
+    .catch(function(err) {
+      console.error('Lead form error:', err);
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = 'Failed to submit. Please try again.';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = originalBtnText;
+      btn.style.opacity = '1';
+    });
+  });
+})();
+</script>`;
 }
 
 /**
