@@ -432,33 +432,110 @@ function generateFeaturesHTML(element: Element): string {
     bgColor = '#000000',
   } = element.props;
 
-  if (variant === 'grid') {
-    return `
-<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
-  ${
-    backgroundImage
-      ? `
+  const backgroundHTML = backgroundImage
+    ? `
   <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
   <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
   `
-      : ''
-  }
+    : '';
+
+  const renderFeatureIcon = (feature: any) => `
+    <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+      <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ${getIconSVG(feature.icon || 'check-circle')}
+      </svg>
+    </div>`;
+
+  const hasImage = (feature: any) => feature.image && feature.image.trim() !== '';
+
+  if (variant === 'grid') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
   <div class="container" style="position: relative; z-index: 10;">
     <h2 class="text-center mb-12">${title}</h2>
     <div class="grid grid-cols-3 gap-8">
       ${features
         .map(
-          (feature: any) => `
-        <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
-          <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-            <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              ${getIconSVG(feature.icon || 'check-circle')}
-            </svg>
+          (feature: any) => hasImage(feature)
+            ? `
+        <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background: white;">
+          <div style="aspect-ratio: 4/3; overflow: hidden;">
+            <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />
           </div>
+          <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">${feature.title}</h3>
+            <p style="color: #666; text-align: center;">${feature.description}</p>
+          </div>
+        </div>`
+            : `
+        <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+          ${renderFeatureIcon(feature)}
           <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${feature.title}</h3>
           <p style="color: #666;">${feature.description}</p>
-        </div>
-      `
+        </div>`
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'list') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: #f9fafb; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="position: relative; z-index: 10; max-width: 56rem; margin: 0 auto;">
+    <h2 class="text-center mb-12">${title}</h2>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      ${features
+        .map(
+          (feature: any) => `
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+          ${hasImage(feature)
+            ? `<div style="flex-shrink: 0; width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden;">
+                <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>`
+            : `<div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  ${getIconSVG(feature.icon || 'check-circle')}
+                </svg>
+              </div>`
+          }
+          <div style="flex: 1; min-width: 0;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">${feature.title}</h3>
+            <p style="color: #666;">${feature.description}</p>
+          </div>
+        </div>`
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'alternating') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="position: relative; z-index: 10; max-width: 72rem; margin: 0 auto;">
+    <h2 class="text-center mb-16">${title}</h2>
+    <div style="display: flex; flex-direction: column; gap: 5rem;">
+      ${features
+        .map(
+          (feature: any, index: number) => `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+          <div style="${index % 2 === 1 ? 'order: 2;' : ''}">
+            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">${feature.title}</h3>
+            <p style="font-size: 1.125rem; color: #666;">${feature.description}</p>
+          </div>
+          <div style="height: 16rem; border-radius: 0.5rem; overflow: hidden; ${index % 2 === 1 ? 'order: 1;' : ''} ${!hasImage(feature) ? 'background: #e5e7eb; display: flex; align-items: center; justify-content: center;' : ''}">
+            ${hasImage(feature)
+              ? `<img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />`
+              : `<span style="color: #9ca3af;">Feature illustration</span>`
+            }
+          </div>
+        </div>`
         )
         .join('')}
     </div>
