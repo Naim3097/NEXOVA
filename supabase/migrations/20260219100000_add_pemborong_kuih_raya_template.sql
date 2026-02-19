@@ -88,32 +88,32 @@ INSERT INTO templates (
           "bgColor": "#fdf6f0",
           "features": [
             {
-              "image": "https://images.unsplash.com/photo-1486427944544-d2c246c4df14?w=300&h=300&fit=crop",
+              "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300&h=300&fit=crop",
               "title": "100% Buatan Tangan",
               "description": "Setiap kuih dihasilkan secara handmade menggunakan resipi turun-temurun. Rasa autentik yang tidak dapat ditandingi oleh produk kilang."
             },
             {
-              "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300&h=300&fit=crop",
+              "image": "https://bazaramadhanbangi.com/wp-content/uploads/2020/04/MAKMUR-300x300.jpeg",
               "title": "Bahan Premium Berkualiti",
               "description": "Hanya menggunakan mentega tulen, tepung terbaik, dan bahan-bahan import berkualiti tinggi. Tanpa pengawet dan pewarna tiruan."
             },
             {
-              "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=300&h=300&fit=crop",
+              "image": "https://bazaramadhanbangi.com/wp-content/uploads/2020/04/TART-NENAS-2020-300x300.jpeg",
               "title": "Pembungkusan Eksklusif",
               "description": "Balang premium dengan label cantik dan pembungkusan kemas. Sesuai untuk dijadikan hadiah, doorgift, dan buah tangan Hari Raya."
             },
             {
-              "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&h=300&fit=crop",
+              "image": "https://bazaramadhanbangi.com/wp-content/uploads/2020/04/CHOCOLATE-CHIP-1-300x300.jpeg",
               "title": "Harga Borong Terbaik",
               "description": "Harga terendah di pasaran dengan kualiti premium. Diskaun istimewa untuk pesanan pukal dan tempahan korporat."
             },
             {
-              "image": "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=300&h=300&fit=crop",
+              "image": "https://bazaramadhanbangi.com/wp-content/uploads/2020/04/MAMA-CARIE-300x300.jpeg",
               "title": "Penghantaran Selamat & Pantas",
               "description": "Dibungkus dengan teliti dan dihantar ke seluruh Malaysia. Penghantaran express tersedia. Percuma untuk pesanan RM200 ke atas."
             },
             {
-              "image": "https://images.unsplash.com/photo-1548848221-0c2e497ed557?w=300&h=300&fit=crop",
+              "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&h=300&fit=crop",
               "title": "Jaminan Puas Hati 100%",
               "description": "Kami yakin dengan kualiti produk kami. Jika tidak berpuas hati, wang anda akan dikembalikan sepenuhnya tanpa soalan."
             }
