@@ -10,8 +10,8 @@ INSERT INTO templates (
   'ecommerce',
   'Food & Beverage',
   'Template e-dagang premium untuk pemborong kuih raya. Tema maroon dan krim yang elegan dengan reka bentuk moden. Termasuk pameran produk, borang tempahan dengan pembayaran, testimoni, dan FAQ.',
-  'https://bazaramadhanbangi.com/wp-content/uploads/2020/04/TART-NENAS-2020-300x300.jpeg',
-  'https://bazaramadhanbangi.com/wp-content/uploads/2020/04/TART-NENAS-2020-300x300.jpeg',
+  'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1200&h=800&fit=crop',
   true,
   ARRAY['pemborong kuih raya', 'kuih raya', 'cookies', 'tart nenas', 'makmur', 'chocolate chip', 'borong', 'raya', 'ecommerce', 'malaysia', 'wholesale'],
   '{
