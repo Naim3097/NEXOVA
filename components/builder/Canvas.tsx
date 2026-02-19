@@ -45,6 +45,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import type { Element, ElementType } from '@/types';
+import { CartProvider } from '@/lib/cart-context';
 
 // Sortable Element Wrapper
 interface SortableElementProps {
@@ -345,18 +346,20 @@ export const Canvas = () => {
             </div>
           ) : (
             /* Render elements with drag-and-drop */
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={elements.map((el) => el.id)}
-                strategy={verticalListSortingStrategy}
+            <CartProvider>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
               >
-                <div className="relative">{elements.map(renderElement)}</div>
-              </SortableContext>
-            </DndContext>
+                <SortableContext
+                  items={elements.map((el) => el.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="relative">{elements.map(renderElement)}</div>
+                </SortableContext>
+              </DndContext>
+            </CartProvider>
           )}
         </div>
       </div>
