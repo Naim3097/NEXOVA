@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { Trash2, Copy, Plus, ChevronDown, ChevronRight, X } from 'lucide-react';
 import ProductSelector from '@/components/builder/ProductSelector';
+import { FontSelector } from '@/components/builder/FontSelector';
 
 // Array Item Editor Component
 interface ArrayItemEditorProps {
@@ -432,6 +433,135 @@ export const PropertiesPanel = () => {
                 </div>
               </div>
 
+              {/* Gradient Background */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="bgGradient">Gradient Background</Label>
+                  <input
+                    id="bgGradient"
+                    type="checkbox"
+                    checked={props.bgGradient || false}
+                    onChange={(e) =>
+                      handlePropChange('bgGradient', e.target.checked)
+                    }
+                    className="w-4 h-4 accent-[#5FC7CD]"
+                  />
+                </div>
+                {props.bgGradient && (
+                  <div className="space-y-3 mt-3 p-3 border border-[#E2E8F0] rounded-xl">
+                    <div>
+                      <Label htmlFor="bgGradientFrom">From Color</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          id="bgGradientFrom"
+                          type="color"
+                          value={props.bgGradientFrom || '#000000'}
+                          onChange={(e) =>
+                            handlePropChange('bgGradientFrom', e.target.value)
+                          }
+                          className="w-14 h-10 p-1"
+                        />
+                        <Input
+                          value={props.bgGradientFrom || '#000000'}
+                          onChange={(e) =>
+                            handlePropChange('bgGradientFrom', e.target.value)
+                          }
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="bgGradientTo">To Color</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          id="bgGradientTo"
+                          type="color"
+                          value={props.bgGradientTo || '#333333'}
+                          onChange={(e) =>
+                            handlePropChange('bgGradientTo', e.target.value)
+                          }
+                          className="w-14 h-10 p-1"
+                        />
+                        <Input
+                          value={props.bgGradientTo || '#333333'}
+                          onChange={(e) =>
+                            handlePropChange('bgGradientTo', e.target.value)
+                          }
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="bgGradientDirection">Direction</Label>
+                      <select
+                        id="bgGradientDirection"
+                        value={props.bgGradientDirection || 'to right'}
+                        onChange={(e) =>
+                          handlePropChange(
+                            'bgGradientDirection',
+                            e.target.value
+                          )
+                        }
+                        className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm"
+                      >
+                        <option value="to right">Left → Right</option>
+                        <option value="to left">Right → Left</option>
+                        <option value="to bottom">Top → Bottom</option>
+                        <option value="to top">Bottom → Top</option>
+                        <option value="to bottom right">Diagonal ↘</option>
+                        <option value="to bottom left">Diagonal ↙</option>
+                        <option value="to top right">Diagonal ↗</option>
+                        <option value="to top left">Diagonal ↖</option>
+                      </select>
+                    </div>
+                    {/* Gradient preview */}
+                    <div
+                      className="h-8 rounded-lg border border-[#E2E8F0]"
+                      style={{
+                        background: `linear-gradient(${props.bgGradientDirection || 'to right'}, ${props.bgGradientFrom || '#000000'}, ${props.bgGradientTo || '#333333'})`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Background Image - for image_left variant */}
+              {props.variant === 'image_left' && currentProject && (
+                <div>
+                  <Label>Background Image (optional)</Label>
+                  <ImageUpload
+                    value={props.bgImage || ''}
+                    onChange={(url) => handlePropChange('bgImage', url)}
+                    userId={currentProject.user_id}
+                    maxSizeMB={5}
+                  />
+                  <p className="text-xs text-[#969696] mt-1">
+                    Adds a background image behind the hero content
+                  </p>
+                  {props.bgImage && (
+                    <div className="mt-2">
+                      <Label htmlFor="bgImageOpacity">
+                        Overlay Opacity ({props.bgImageOpacity ?? 30}%)
+                      </Label>
+                      <input
+                        id="bgImageOpacity"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={props.bgImageOpacity ?? 30}
+                        onChange={(e) =>
+                          handlePropChange(
+                            'bgImageOpacity',
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="w-full mt-1"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
               {currentProject && (
                 <div>
                   <Label>
@@ -457,6 +587,75 @@ export const PropertiesPanel = () => {
                       Full-width background image with overlay
                     </p>
                   )}
+                  {props.variant !== 'image_bg' && (
+                    <p className="text-xs text-[#969696] mt-1">
+                      Recommended: 1200 × 800px for best quality
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Image Scale & Position Controls - Not for image_bg variant */}
+              {props.variant !== 'image_bg' && props.image && (
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="imageScale">
+                      Image Zoom ({props.imageScale || 100}%)
+                    </Label>
+                    <input
+                      id="imageScale"
+                      type="range"
+                      min="100"
+                      max="250"
+                      value={props.imageScale || 100}
+                      onChange={(e) =>
+                        handlePropChange('imageScale', parseInt(e.target.value))
+                      }
+                      className="w-full mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="imagePositionX">Horizontal Position</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-[#969696]">L</span>
+                      <input
+                        id="imagePositionX"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={props.imagePositionX ?? 50}
+                        onChange={(e) =>
+                          handlePropChange(
+                            'imagePositionX',
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                      <span className="text-xs text-[#969696]">R</span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="imagePositionY">Vertical Position</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-[#969696]">T</span>
+                      <input
+                        id="imagePositionY"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={props.imagePositionY ?? 50}
+                        onChange={(e) =>
+                          handlePropChange(
+                            'imagePositionY',
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="w-full"
+                      />
+                      <span className="text-xs text-[#969696]">B</span>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -574,6 +773,24 @@ export const PropertiesPanel = () => {
                     <option value="3xl">Huge (3xl)</option>
                   </select>
                 </div>
+
+                {/* Headline Font */}
+                <div className="mb-4 mt-4">
+                  <FontSelector
+                    label="Headline Font"
+                    value={props.headlineFont}
+                    onChange={(v) => handlePropChange('headlineFont', v)}
+                  />
+                </div>
+
+                {/* Subheadline Font */}
+                <div>
+                  <FontSelector
+                    label="Subheadline Font"
+                    value={props.subheadlineFont}
+                    onChange={(v) => handlePropChange('subheadlineFont', v)}
+                  />
+                </div>
               </div>
 
               {/* Button Styling Section */}
@@ -662,6 +879,22 @@ export const PropertiesPanel = () => {
                   placeholder="Enter title"
                 />
               </div>
+
+              <div>
+                <Label htmlFor="subtitle">Subtitle</Label>
+                <Input
+                  id="subtitle"
+                  value={props.subtitle || ''}
+                  onChange={(e) => handlePropChange('subtitle', e.target.value)}
+                  placeholder="Enter subtitle (optional)"
+                />
+              </div>
+
+              <FontSelector
+                label="Title Font"
+                value={props.fontFamily}
+                onChange={(v) => handlePropChange('fontFamily', v)}
+              />
 
               <ArrayEditor
                 title="Features"
@@ -788,6 +1021,165 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
+              <FontSelector
+                label="Title Font"
+                value={props.fontFamily}
+                onChange={(v) => handlePropChange('fontFamily', v)}
+              />
+
+              <FontSelector
+                label="Quote Font"
+                value={props.quoteFont}
+                onChange={(v) => handlePropChange('quoteFont', v)}
+              />
+
+              {/* Section Styling */}
+              <div className="border-t border-[#E2E8F0] pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-[#455263] mb-3">
+                  Section Styling
+                </h4>
+
+                {/* Gradient Background */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="bgGradient">Gradient Background</Label>
+                    <input
+                      id="bgGradient"
+                      type="checkbox"
+                      checked={props.bgGradient || false}
+                      onChange={(e) =>
+                        handlePropChange('bgGradient', e.target.checked)
+                      }
+                      className="w-4 h-4 accent-[#5FC7CD]"
+                    />
+                  </div>
+                  {props.bgGradient && (
+                    <div className="space-y-3 mt-3 p-3 border border-[#E2E8F0] rounded-xl">
+                      <div>
+                        <Label htmlFor="bgGradientFrom">From Color</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input
+                            id="bgGradientFrom"
+                            type="color"
+                            value={props.bgGradientFrom || '#667eea'}
+                            onChange={(e) =>
+                              handlePropChange('bgGradientFrom', e.target.value)
+                            }
+                            className="w-14 h-10 p-1"
+                          />
+                          <Input
+                            value={props.bgGradientFrom || '#667eea'}
+                            onChange={(e) =>
+                              handlePropChange('bgGradientFrom', e.target.value)
+                            }
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="bgGradientTo">To Color</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input
+                            id="bgGradientTo"
+                            type="color"
+                            value={props.bgGradientTo || '#764ba2'}
+                            onChange={(e) =>
+                              handlePropChange('bgGradientTo', e.target.value)
+                            }
+                            className="w-14 h-10 p-1"
+                          />
+                          <Input
+                            value={props.bgGradientTo || '#764ba2'}
+                            onChange={(e) =>
+                              handlePropChange('bgGradientTo', e.target.value)
+                            }
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="bgGradientDirection">Direction</Label>
+                        <select
+                          id="bgGradientDirection"
+                          value={props.bgGradientDirection || 'to right'}
+                          onChange={(e) =>
+                            handlePropChange(
+                              'bgGradientDirection',
+                              e.target.value
+                            )
+                          }
+                          className="w-full mt-1 p-2 border border-[#E2E8F0] rounded-xl text-sm"
+                        >
+                          <option value="to right">Left → Right</option>
+                          <option value="to left">Right → Left</option>
+                          <option value="to bottom">Top → Bottom</option>
+                          <option value="to top">Bottom → Top</option>
+                          <option value="to bottom right">Diagonal ↘</option>
+                          <option value="to bottom left">Diagonal ↙</option>
+                          <option value="to top right">Diagonal ↗</option>
+                          <option value="to top left">Diagonal ↖</option>
+                        </select>
+                      </div>
+                      {/* Gradient preview */}
+                      <div
+                        className="h-8 rounded-lg border border-[#E2E8F0]"
+                        style={{
+                          background: `linear-gradient(${props.bgGradientDirection || 'to right'}, ${props.bgGradientFrom || '#667eea'}, ${props.bgGradientTo || '#764ba2'})`,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {!props.bgGradient && (
+                  <div className="mb-4">
+                    <Label htmlFor="sectionBgColor">Background Color</Label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        id="sectionBgColor"
+                        type="color"
+                        value={props.sectionBgColor || '#f9fafb'}
+                        onChange={(e) =>
+                          handlePropChange('sectionBgColor', e.target.value)
+                        }
+                        className="w-20 h-10 p-1"
+                      />
+                      <Input
+                        value={props.sectionBgColor || '#f9fafb'}
+                        onChange={(e) =>
+                          handlePropChange('sectionBgColor', e.target.value)
+                        }
+                        placeholder="#f9fafb"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <Label htmlFor="textColor">Text Color</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      id="textColor"
+                      type="color"
+                      value={props.textColor || '#111827'}
+                      onChange={(e) =>
+                        handlePropChange('textColor', e.target.value)
+                      }
+                      className="w-20 h-10 p-1"
+                    />
+                    <Input
+                      value={props.textColor || '#111827'}
+                      onChange={(e) =>
+                        handlePropChange('textColor', e.target.value)
+                      }
+                      placeholder="#111827"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <ArrayEditor
                 title="Testimonials"
                 items={props.testimonials || []}
@@ -900,6 +1292,12 @@ export const PropertiesPanel = () => {
                   placeholder="Enter title"
                 />
               </div>
+
+              <FontSelector
+                label="Title Font"
+                value={props.fontFamily}
+                onChange={(v) => handlePropChange('fontFamily', v)}
+              />
 
               <ArrayEditor
                 title="FAQ Questions"
@@ -1021,6 +1419,12 @@ export const PropertiesPanel = () => {
                   placeholder="Enter description"
                 />
               </div>
+
+              <FontSelector
+                label="Headline Font"
+                value={props.fontFamily}
+                onChange={(v) => handlePropChange('fontFamily', v)}
+              />
 
               <div>
                 <Label htmlFor="buttonText">Button Text</Label>
@@ -1681,6 +2085,22 @@ export const PropertiesPanel = () => {
                 />
               </div>
 
+              {currentProject && (
+                <div>
+                  <Label>Brand Logo (optional)</Label>
+                  <ImageUpload
+                    value={props.logo || ''}
+                    onChange={(url) => handlePropChange('logo', url)}
+                    userId={currentProject.user_id}
+                    maxSizeMB={2}
+                  />
+                  <p className="text-xs text-[#969696] mt-1">
+                    Recommended: 200 × 50px transparent PNG. Replaces brand name
+                    text when uploaded.
+                  </p>
+                </div>
+              )}
+
               <div>
                 <Label htmlFor="layout">Layout</Label>
                 <select
@@ -1955,6 +2375,12 @@ export const PropertiesPanel = () => {
                   placeholder="Select the perfect plan for your needs"
                 />
               </div>
+
+              <FontSelector
+                label="Title Font"
+                value={props.fontFamily}
+                onChange={(v) => handlePropChange('fontFamily', v)}
+              />
 
               <div>
                 <Label htmlFor="layout">Layout</Label>

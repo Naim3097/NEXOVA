@@ -163,11 +163,28 @@ export interface HeroProps {
   buttonTextColor?: string;
   // CTA button visibility
   showCtaButton?: boolean;
+  // Image scale (percentage, 50-200)
+  imageScale?: number;
+  // Image position offsets (percentage, -50 to 50)
+  imagePositionX?: number;
+  imagePositionY?: number;
+  // Background image for image_left variant
+  bgImage?: string;
+  bgImageOpacity?: number;
+  // Gradient background
+  bgGradient?: boolean;
+  bgGradientFrom?: string;
+  bgGradientTo?: string;
+  bgGradientDirection?: string;
+  // Font selection
+  headlineFont?: string;
+  subheadlineFont?: string;
 }
 
 export interface FeaturesProps {
   variant: 'grid' | 'list' | 'alternating';
   title: string;
+  subtitle?: string;
   features: Array<{
     icon: string;
     title: string;
@@ -178,6 +195,7 @@ export interface FeaturesProps {
   backgroundImage?: string;
   backgroundOpacity?: number; // 0-100
   bgColor?: string;
+  fontFamily?: string;
 }
 
 export interface TestimonialsProps {
@@ -194,6 +212,16 @@ export interface TestimonialsProps {
   backgroundImage?: string;
   backgroundOpacity?: number; // 0-100
   bgColor?: string;
+  fontFamily?: string;
+  // Section styling
+  sectionBgColor?: string;
+  textColor?: string;
+  quoteFont?: string;
+  // Gradient background
+  bgGradient?: boolean;
+  bgGradientFrom?: string;
+  bgGradientTo?: string;
+  bgGradientDirection?: string;
 }
 
 export interface FAQProps {
@@ -207,6 +235,7 @@ export interface FAQProps {
   backgroundImage?: string;
   backgroundOpacity?: number; // 0-100
   bgColor?: string;
+  fontFamily?: string;
 }
 
 export interface CTAProps {
@@ -224,6 +253,7 @@ export interface CTAProps {
   buttonTextColor?: string;
   buttonSize?: 'sm' | 'md' | 'lg';
   buttonFontSize?: string; // e.g., '1rem', '1.125rem', '1.25rem'
+  fontFamily?: string;
 }
 
 export interface AnnouncementBarProps {
@@ -305,6 +335,7 @@ export interface PricingProps {
   bgColor?: string;
   // Global payment settings
   enablePaymentIntegration?: boolean; // Enable payment for all plans
+  fontFamily?: string;
 }
 
 // LeanX Payment Integration Types

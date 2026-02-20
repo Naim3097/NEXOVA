@@ -1,5 +1,6 @@
 import React from 'react';
 import { FeaturesProps } from '@/types';
+import { getFontFamilyCSS } from '@/lib/fonts';
 import {
   CheckCircle,
   Star,
@@ -74,11 +75,15 @@ export const FeaturesElement = React.memo(
     const {
       variant,
       title,
+      subtitle,
       features,
       backgroundImage,
       backgroundOpacity = 70,
       bgColor = '#000000',
+      fontFamily,
     } = props;
+
+    const titleFontFamily = getFontFamilyCSS(fontFamily);
 
     // Determine grid columns based on viewport mode
     const getGridCols = () => {
@@ -126,9 +131,19 @@ export const FeaturesElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-7xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12 text-gray-900 px-2">
+            <h2
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center ${subtitle ? 'mb-3 sm:mb-4' : 'mb-8 sm:mb-10 lg:mb-12'} text-gray-900 px-2`}
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
               {title}
             </h2>
+            {subtitle && (
+              <p className="text-base sm:text-lg text-gray-600 text-center mb-8 sm:mb-10 lg:mb-12 max-w-2xl mx-auto px-2">
+                {subtitle}
+              </p>
+            )}
             <div className={`grid ${getGridCols()} gap-4 sm:gap-6 lg:gap-8`}>
               {features.map((feature, index) => {
                 const IconComponent = getIconComponent(
@@ -207,9 +222,19 @@ export const FeaturesElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12 text-gray-900 px-2">
+            <h2
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center ${subtitle ? 'mb-3 sm:mb-4' : 'mb-8 sm:mb-10 lg:mb-12'} text-gray-900 px-2`}
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
               {title}
             </h2>
+            {subtitle && (
+              <p className="text-base sm:text-lg text-gray-600 text-center mb-8 sm:mb-10 lg:mb-12 max-w-2xl mx-auto px-2">
+                {subtitle}
+              </p>
+            )}
             <div className="space-y-4 sm:space-y-6">
               {features.map((feature, index) => {
                 const IconComponent = getIconComponent(
@@ -278,9 +303,19 @@ export const FeaturesElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-6xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-10 sm:mb-12 lg:mb-16 text-gray-900 px-2">
+            <h2
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center ${subtitle ? 'mb-3 sm:mb-4' : 'mb-10 sm:mb-12 lg:mb-16'} text-gray-900 px-2`}
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
               {title}
             </h2>
+            {subtitle && (
+              <p className="text-base sm:text-lg text-gray-600 text-center mb-10 sm:mb-12 lg:mb-16 max-w-2xl mx-auto px-2">
+                {subtitle}
+              </p>
+            )}
             <div className="space-y-12 sm:space-y-16 lg:space-y-20">
               {features.map((feature, index) => {
                 const IconComponent = getIconComponent(

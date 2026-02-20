@@ -1,5 +1,6 @@
 import React from 'react';
 import { TestimonialsProps } from '@/types';
+import { getFontFamilyCSS } from '@/lib/fonts';
 import { Star } from 'lucide-react';
 
 interface TestimonialsElementProps {
@@ -26,8 +27,33 @@ export const TestimonialsElement = React.memo(
       testimonials,
       backgroundImage,
       backgroundOpacity = 70,
-      bgColor = '#000000'
+      bgColor = '#000000',
+      fontFamily,
+      sectionBgColor,
+      textColor,
+      quoteFont,
+      bgGradient = false,
+      bgGradientFrom = '#667eea',
+      bgGradientTo = '#764ba2',
+      bgGradientDirection = 'to right',
     } = props;
+
+    const titleFontFamily = getFontFamilyCSS(fontFamily);
+    const quoteFontFamily = getFontFamilyCSS(quoteFont);
+
+    // Compute section background style: gradient > sectionBgColor > variant default
+    const getSectionBgStyle = (defaultBg: string): React.CSSProperties => {
+      if (bgGradient) {
+        return {
+          background: `linear-gradient(${bgGradientDirection}, ${bgGradientFrom}, ${bgGradientTo})`,
+        };
+      }
+      return { backgroundColor: sectionBgColor || defaultBg };
+    };
+    const titleColor = textColor || undefined;
+    const quoteColor = textColor || undefined;
+    const nameColor = textColor || undefined;
+    const roleColor = textColor ? `${textColor}cc` : undefined; // slightly transparent
 
     // Determine grid columns based on viewport mode
     const getGridCols = () => {
@@ -61,9 +87,7 @@ export const TestimonialsElement = React.memo(
             <Star
               key={i}
               className={`w-4 h-4 ${
-                i < rating
-                  ? 'fill-yellow-400 text-yellow-400'
-                  : 'text-gray-300'
+                i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
               }`}
             />
           ))}
@@ -75,7 +99,8 @@ export const TestimonialsElement = React.memo(
     if (variant === 'grid') {
       return (
         <section
-          className={`${baseClasses} py-20 px-4 bg-gray-50 cursor-pointer overflow-hidden`}
+          className={`${baseClasses} py-20 px-4 cursor-pointer overflow-hidden`}
+          style={getSectionBgStyle('#f9fafb')}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -98,21 +123,35 @@ export const TestimonialsElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
+            <h2
+              className="text-4xl font-bold text-center mb-12 text-gray-900"
+              style={{ fontFamily: titleFontFamily, color: titleColor }}
+            >
               {title}
             </h2>
             <div className={`grid ${getGridCols()} gap-8`}>
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
                   {renderStars(testimonial.rating)}
-                  <p className="text-gray-700 my-4 italic">
+                  <p
+                    className="text-gray-700 my-4 italic"
+                    style={{ color: quoteColor, fontFamily: quoteFontFamily }}
+                  >
                     &quot;{testimonial.quote}&quot;
                   </p>
                   <div className="mt-4">
-                    <p className="font-semibold text-gray-900">
+                    <p
+                      className="font-semibold text-gray-900"
+                      style={{ color: nameColor }}
+                    >
                       {testimonial.name}
                     </p>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <p
+                      className="text-sm text-gray-600"
+                      style={{ color: roleColor }}
+                    >
+                      {testimonial.role}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -126,7 +165,8 @@ export const TestimonialsElement = React.memo(
     if (variant === 'slider') {
       return (
         <section
-          className={`${baseClasses} py-20 px-4 bg-blue-600 cursor-pointer overflow-hidden`}
+          className={`${baseClasses} py-20 px-4 cursor-pointer overflow-hidden`}
+          style={getSectionBgStyle('#2563eb')}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -148,19 +188,38 @@ export const TestimonialsElement = React.memo(
             </>
           )}
 
-          <div className="relative z-10 max-w-4xl mx-auto text-center text-white">
-            <h2 className="text-4xl font-bold mb-12">{title}</h2>
+          <div
+            className="relative z-10 max-w-4xl mx-auto text-center"
+            style={{ color: textColor || '#ffffff' }}
+          >
+            <h2
+              className="text-4xl font-bold mb-12"
+              style={{
+                fontFamily: titleFontFamily,
+                color: titleColor || '#ffffff',
+              }}
+            >
+              {title}
+            </h2>
             {testimonials.length > 0 && (
               <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg">
                 {renderStars(testimonials[0].rating)}
-                <p className="text-2xl my-6 italic">
+                <p
+                  className="text-2xl my-6 italic"
+                  style={{ color: quoteColor, fontFamily: quoteFontFamily }}
+                >
                   &quot;{testimonials[0].quote}&quot;
                 </p>
                 <div className="mt-6">
-                  <p className="font-semibold text-lg">
+                  <p
+                    className="font-semibold text-lg"
+                    style={{ color: nameColor }}
+                  >
                     {testimonials[0].name}
                   </p>
-                  <p className="text-blue-100">{testimonials[0].role}</p>
+                  <p style={{ color: roleColor || 'rgba(191, 219, 254, 1)' }}>
+                    {testimonials[0].role}
+                  </p>
                 </div>
                 {/* Slider dots */}
                 <div className="flex gap-2 justify-center mt-8">
@@ -184,7 +243,8 @@ export const TestimonialsElement = React.memo(
     if (variant === 'masonry') {
       return (
         <section
-          className={`${baseClasses} py-20 px-4 bg-white cursor-pointer overflow-hidden`}
+          className={`${baseClasses} py-20 px-4 cursor-pointer overflow-hidden`}
+          style={getSectionBgStyle('#ffffff')}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -207,7 +267,10 @@ export const TestimonialsElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
+            <h2
+              className="text-4xl font-bold text-center mb-12 text-gray-900"
+              style={{ fontFamily: titleFontFamily, color: titleColor }}
+            >
               {title}
             </h2>
             <div className={`${getMasonryCols()} gap-8 space-y-8`}>
@@ -217,14 +280,23 @@ export const TestimonialsElement = React.memo(
                   className="break-inside-avoid bg-gray-50 p-6 rounded-lg border border-gray-200"
                 >
                   {renderStars(testimonial.rating)}
-                  <p className="text-gray-700 my-4">
+                  <p
+                    className="text-gray-700 my-4"
+                    style={{ color: quoteColor, fontFamily: quoteFontFamily }}
+                  >
                     &quot;{testimonial.quote}&quot;
                   </p>
                   <div className="mt-4">
-                    <p className="font-semibold text-sm text-gray-900">
+                    <p
+                      className="font-semibold text-sm text-gray-900"
+                      style={{ color: nameColor }}
+                    >
                       {testimonial.name}
                     </p>
-                    <p className="text-xs text-gray-600">
+                    <p
+                      className="text-xs text-gray-600"
+                      style={{ color: roleColor }}
+                    >
                       {testimonial.role}
                     </p>
                   </div>

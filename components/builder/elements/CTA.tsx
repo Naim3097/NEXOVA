@@ -1,5 +1,6 @@
 import React from 'react';
 import { CTAProps } from '@/types';
+import { getFontFamilyCSS } from '@/lib/fonts';
 import { ArrowRight } from 'lucide-react';
 
 interface CTAElementProps {
@@ -28,11 +29,16 @@ export const CTAElement = React.memo(
       buttonTextColor = '#111827',
       buttonSize = 'lg',
       buttonFontSize = '1.125rem',
+      fontFamily,
     } = props;
 
+    const headlineFontFamily = getFontFamilyCSS(fontFamily);
+
     // Determine if link is external
-    const isExternalLink = buttonLinkType === 'external' ||
-      (buttonUrl && (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
+    const isExternalLink =
+      buttonLinkType === 'external' ||
+      (buttonUrl &&
+        (buttonUrl.startsWith('http://') || buttonUrl.startsWith('https://')));
 
     // Get background style based on type
     const getBackgroundStyle = () => {
@@ -114,7 +120,16 @@ export const CTAElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-4xl mx-auto text-center text-white">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">{headline}</h2>
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-6"
+              style={
+                headlineFontFamily
+                  ? { fontFamily: headlineFontFamily }
+                  : undefined
+              }
+            >
+              {headline}
+            </h2>
             <p className="text-xl md:text-2xl mb-8 text-white/90">
               {description}
             </p>
@@ -168,7 +183,16 @@ export const CTAElement = React.memo(
 
           <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div className="text-white">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">{headline}</h2>
+              <h2
+                className="text-4xl md:text-5xl font-bold mb-6"
+                style={
+                  headlineFontFamily
+                    ? { fontFamily: headlineFontFamily }
+                    : undefined
+                }
+              >
+                {headline}
+              </h2>
               <p className="text-xl text-white/90">{description}</p>
             </div>
             <div className="flex justify-center md:justify-end">
@@ -223,7 +247,16 @@ export const CTAElement = React.memo(
 
           <div className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-white text-center md:text-left">
-              <h3 className="text-2xl md:text-3xl font-bold mb-2">{headline}</h3>
+              <h3
+                className="text-2xl md:text-3xl font-bold mb-2"
+                style={
+                  headlineFontFamily
+                    ? { fontFamily: headlineFontFamily }
+                    : undefined
+                }
+              >
+                {headline}
+              </h3>
               <p className="text-lg text-white/90">{description}</p>
             </div>
             <a

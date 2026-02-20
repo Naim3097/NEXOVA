@@ -1,5 +1,6 @@
 import React from 'react';
 import { PricingProps } from '@/types';
+import { getFontFamilyCSS } from '@/lib/fonts';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -30,7 +31,10 @@ export const PricingElement = React.memo(
       backgroundOpacity = 70,
       bgColor = '#000000',
       enablePaymentIntegration = false,
+      fontFamily,
     } = props;
+
+    const titleFontFamily = getFontFamilyCSS(fontFamily);
 
     // Determine grid columns based on viewport mode
     const getGridCols = () => {
@@ -78,7 +82,14 @@ export const PricingElement = React.memo(
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">{title}</h2>
+            <h2
+              className="text-4xl font-bold text-gray-900 mb-4"
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
+              {title}
+            </h2>
             {subtitle && (
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                 {subtitle}

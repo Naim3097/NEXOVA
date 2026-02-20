@@ -1,6 +1,11 @@
 import type { Project, Element, SEOSettings } from '@/types';
 import { generateTrackingScript } from '@/lib/analytics/tracking-script';
 import { generateBookingFormHTML } from '@/lib/publishing/booking-form-generator';
+import {
+  collectUsedFonts,
+  buildGoogleFontsLinkTag,
+  getFontFamilyCSS,
+} from '@/lib/fonts';
 
 /**
  * Map icon names to SVG paths
@@ -55,10 +60,14 @@ export function generateHTML(project: Project, elements: Element[]): string {
   // Provide default empty object if seo_settings is null/undefined
   const seo_settings = project.seo_settings || {};
 
+  // Collect all Google Fonts used across elements
+  const usedFonts = collectUsedFonts(elements);
+  const fontsLinkTag = buildGoogleFontsLinkTag(usedFonts);
+
   return `<!DOCTYPE html>
 <html lang="${seo_settings.language || 'en'}">
 <head>
-  ${generateHeadContent(project, seo_settings)}
+  ${generateHeadContent(project, seo_settings, fontsLinkTag)}
 </head>
 <body>
   <!-- Global project configuration -->
@@ -93,7 +102,11 @@ export function generateHTML(project: Project, elements: Element[]): string {
 /**
  * Generate <head> section with SEO meta tags
  */
-function generateHeadContent(project: Project, seo: SEOSettings): string {
+function generateHeadContent(
+  project: Project,
+  seo: SEOSettings,
+  fontsLinkTag: string = ''
+): string {
   return `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -121,6 +134,9 @@ function generateHeadContent(project: Project, seo: SEOSettings): string {
 
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Google Fonts -->
+  ${fontsLinkTag}
 
   <!-- Styles -->
   ${generateStyles()}
@@ -341,7 +357,18 @@ function generateHeroHTML(element: Element): string {
     imageOpacity = 70,
     buttonBgColor = '#2563eb',
     buttonTextColor = '#ffffff',
+    headlineFont,
+    subheadlineFont,
   } = element.props;
+
+  const headlineFontCSS = getFontFamilyCSS(headlineFont);
+  const subheadlineFontCSS = getFontFamilyCSS(subheadlineFont);
+  const headlineFontStyle = headlineFontCSS
+    ? ` font-family: ${headlineFontCSS};`
+    : '';
+  const subheadlineFontStyle = subheadlineFontCSS
+    ? ` font-family: ${subheadlineFontCSS};`
+    : '';
 
   // Convert Tailwind sizes to actual CSS values
   const headlineSizeMap: Record<string, string> = {
@@ -368,8 +395,8 @@ function generateHeroHTML(element: Element): string {
 <section id="${element.type}-${element.order}" style="background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   <div class="container-sm text-center">
     ${image ? `<img src="${image}" alt="Hero" style="width: 8rem; height: 8rem; margin: 0 auto 2rem; border-radius: 0.5rem; object-fit: cover;">` : ''}
-    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;">${headline}</h1>
-    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;">${subheadline}</p>
+    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;${headlineFontStyle}">${headline}</h1>
+    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;${subheadlineFontStyle}">${subheadline}</p>
     <a href="${ctaUrl}" class="button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}; border: none;">${ctaText}</a>
   </div>
 </section>`;
@@ -409,8 +436,8 @@ function generateHeroHTML(element: Element): string {
   `
   }
   <div class="container-sm text-center" style="position: relative; z-index: 10;">
-    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;">${headline}</h1>
-    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;">${subheadline}</p>
+    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;${headlineFontStyle}">${headline}</h1>
+    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;${subheadlineFontStyle}">${subheadline}</p>
     <a href="${ctaUrl}" class="button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}; border: 2px solid ${buttonTextColor};">${ctaText}</a>
   </div>
 </section>`;
@@ -426,11 +453,21 @@ function generateFeaturesHTML(element: Element): string {
   const {
     variant,
     title,
+    subtitle,
     features,
     backgroundImage,
     backgroundOpacity = 70,
     bgColor = '#000000',
+    fontFamily: featuresFontFamily,
   } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(featuresFontFamily);
+  const titleFontStyle = titleFontCSS
+    ? ` style="font-family: ${titleFontCSS};"`
+    : '';
+  const subtitleHTML = subtitle
+    ? `\n    <p style="font-size: 1.125rem; color: #666; text-align: center; max-width: 42rem; margin: 0 auto 3rem;">${subtitle}</p>`
+    : '';
 
   const backgroundHTML = backgroundImage
     ? `
@@ -446,18 +483,19 @@ function generateFeaturesHTML(element: Element): string {
       </svg>
     </div>`;
 
-  const hasImage = (feature: any) => feature.image && feature.image.trim() !== '';
+  const hasImage = (feature: any) =>
+    feature.image && feature.image.trim() !== '';
 
   if (variant === 'grid') {
     return `
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   ${backgroundHTML}
   <div class="container" style="position: relative; z-index: 10;">
-    <h2 class="text-center mb-12">${title}</h2>
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>${subtitleHTML}
     <div class="grid grid-cols-3 gap-8">
       ${features
-        .map(
-          (feature: any) => hasImage(feature)
+        .map((feature: any) =>
+          hasImage(feature)
             ? `
         <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background: white;">
           <div style="aspect-ratio: 4/3; overflow: hidden;">
@@ -486,17 +524,18 @@ function generateFeaturesHTML(element: Element): string {
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: #f9fafb; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   ${backgroundHTML}
   <div style="position: relative; z-index: 10; max-width: 56rem; margin: 0 auto;">
-    <h2 class="text-center mb-12">${title}</h2>
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>${subtitleHTML}
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       ${features
         .map(
           (feature: any) => `
         <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-          ${hasImage(feature)
-            ? `<div style="flex-shrink: 0; width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden;">
+          ${
+            hasImage(feature)
+              ? `<div style="flex-shrink: 0; width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden;">
                 <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>`
-            : `<div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
+              : `<div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
                 <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   ${getIconSVG(feature.icon || 'check-circle')}
                 </svg>
@@ -519,7 +558,7 @@ function generateFeaturesHTML(element: Element): string {
 <section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   ${backgroundHTML}
   <div style="position: relative; z-index: 10; max-width: 72rem; margin: 0 auto;">
-    <h2 class="text-center mb-16">${title}</h2>
+    <h2 class="text-center mb-16"${titleFontStyle}>${title}</h2>${subtitleHTML}
     <div style="display: flex; flex-direction: column; gap: 5rem;">
       ${features
         .map(
@@ -530,9 +569,10 @@ function generateFeaturesHTML(element: Element): string {
             <p style="font-size: 1.125rem; color: #666;">${feature.description}</p>
           </div>
           <div style="height: 16rem; border-radius: 0.5rem; overflow: hidden; ${index % 2 === 1 ? 'order: 1;' : ''} ${!hasImage(feature) ? 'background: #e5e7eb; display: flex; align-items: center; justify-content: center;' : ''}">
-            ${hasImage(feature)
-              ? `<img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />`
-              : `<span style="color: #9ca3af;">Feature illustration</span>`
+            ${
+              hasImage(feature)
+                ? `<img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />`
+                : `<span style="color: #9ca3af;">Feature illustration</span>`
             }
           </div>
         </div>`
@@ -557,7 +597,32 @@ function generateTestimonialsHTML(element: Element): string {
     backgroundImage,
     backgroundOpacity = 70,
     bgColor = '#000000',
+    fontFamily: testimonialsFontFamily,
+    sectionBgColor,
+    textColor,
+    quoteFont,
+    bgGradient: testimonialsGradient,
+    bgGradientFrom: testimonialsGradientFrom = '#667eea',
+    bgGradientTo: testimonialsGradientTo = '#764ba2',
+    bgGradientDirection: testimonialsGradientDir = 'to right',
   } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(testimonialsFontFamily);
+  const quoteFontCSS = getFontFamilyCSS(quoteFont);
+  const quoteFontInline = quoteFontCSS ? ` font-family: ${quoteFontCSS};` : '';
+  const titleStyleParts = [
+    titleFontCSS ? `font-family: ${titleFontCSS}` : '',
+    textColor ? `color: ${textColor}` : '',
+  ]
+    .filter(Boolean)
+    .join('; ');
+  const titleFontStyle = titleStyleParts ? ` style="${titleStyleParts};"` : '';
+  const sectionBg = testimonialsGradient
+    ? `linear-gradient(${testimonialsGradientDir}, ${testimonialsGradientFrom}, ${testimonialsGradientTo})`
+    : sectionBgColor || '#f9fafb';
+  const quoteTextColor = textColor || '#374151';
+  const nameTextColor = textColor || '#111827';
+  const roleTextColor = textColor ? `${textColor}cc` : '#6b7280';
 
   const renderStars = (rating: number) => {
     return Array(5)
@@ -571,7 +636,7 @@ function generateTestimonialsHTML(element: Element): string {
 
   if (variant === 'grid') {
     return `
-<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: #f9fafb; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${sectionBg}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
   ${
     backgroundImage
       ? `
@@ -581,17 +646,17 @@ function generateTestimonialsHTML(element: Element): string {
       : ''
   }
   <div class="container" style="position: relative; z-index: 10;">
-    <h2 class="text-center mb-12">${title}</h2>
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>
     <div class="grid grid-cols-3 gap-8">
       ${testimonials
         .map(
           (testimonial: any) => `
         <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
           <div style="margin-bottom: 1rem;">${renderStars(testimonial.rating)}</div>
-          <p style="color: #374151; margin-bottom: 1rem; font-style: italic;">"${testimonial.quote}"</p>
+          <p style="color: ${quoteTextColor}; margin-bottom: 1rem; font-style: italic;${quoteFontInline}">"${testimonial.quote}"</p>
           <div style="margin-top: 1rem;">
-            <p style="font-weight: 600; color: #111827; margin: 0;">${testimonial.name}</p>
-            <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">${testimonial.role}</p>
+            <p style="font-weight: 600; color: ${nameTextColor}; margin: 0;">${testimonial.name}</p>
+            <p style="font-size: 0.875rem; color: ${roleTextColor}; margin: 0;">${testimonial.role}</p>
           </div>
         </div>
       `
@@ -616,7 +681,13 @@ function generateFAQHTML(element: Element): string {
     backgroundImage,
     backgroundOpacity = 70,
     bgColor = '#000000',
+    fontFamily: faqFontFamily,
   } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(faqFontFamily);
+  const titleFontStyle = titleFontCSS
+    ? ` style="font-family: ${titleFontCSS};"`
+    : '';
 
   if (variant === 'single_column') {
     return `
@@ -630,7 +701,7 @@ function generateFAQHTML(element: Element): string {
       : ''
   }
   <div class="container-sm" style="position: relative; z-index: 10;">
-    <h2 class="text-center mb-12">${title}</h2>
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>
     <div style="display: flex; flex-direction: column; gap: 1rem;">
       ${questions
         .map(
@@ -672,7 +743,13 @@ function generateCTAHTML(element: Element): string {
     buttonTextColor = '#111827',
     buttonSize = 'lg',
     buttonFontSize = '1.125rem',
+    fontFamily: ctaFontFamily,
   } = element.props;
+
+  const headlineFontCSS = getFontFamilyCSS(ctaFontFamily);
+  const headlineFontInline = headlineFontCSS
+    ? ` font-family: ${headlineFontCSS};`
+    : '';
 
   // Button padding based on size
   const getButtonPadding = () => {
@@ -715,7 +792,7 @@ function generateCTAHTML(element: Element): string {
       : ''
   }
   <div class="container-sm text-center" style="position: relative; z-index: 10; color: white;">
-    <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;">${headline}</h2>
+    <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;${headlineFontInline}">${headline}</h2>
     <p style="font-size: 1.5rem; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.9);">${description}</p>
     <a href="${buttonUrl || '#'}" style="${buttonStyles}" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
   </div>
@@ -1482,8 +1559,7 @@ function generateNavigationHTML(element: Element): string {
     <div style="display: flex; align-items: center; justify-content: ${justifyContent}; height: 4rem;">
       <!-- Logo -->
       <div style="display: flex; align-items: center; gap: 0.5rem;">
-        ${logo ? `<img src="${logo}" alt="${logoText}" style="height: 2rem;">` : ''}
-        <span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>
+        ${logo ? `<img src="${logo}" alt="${logoText || 'Logo'}" style="height: 2rem;">` : `<span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>`}
       </div>
 
       <!-- Desktop Menu -->
@@ -1566,7 +1642,11 @@ function generatePricingHTML(element: Element): string {
     backgroundOpacity = 70,
     bgColor = '#000000',
     enablePaymentIntegration = false,
+    fontFamily: pricingFontFamily,
   } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(pricingFontFamily);
+  const titleFontInline = titleFontCSS ? ` font-family: ${titleFontCSS};` : '';
 
   const checkoutModalId = `pricing-checkout-modal-${element.id}`;
 
@@ -1584,7 +1664,7 @@ function generatePricingHTML(element: Element): string {
   <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 3rem;">
-      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;">${title}</h2>
+      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;${titleFontInline}">${title}</h2>
       ${subtitle ? `<p style="font-size: 1.25rem; color: #666; max-width: 42rem; margin: 0 auto;">${subtitle}</p>` : ''}
     </div>
 
@@ -1728,7 +1808,7 @@ ${
   }
   <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
     <div style="text-align: center; margin-bottom: 3rem;">
-      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;">${title}</h2>
+      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;${titleFontInline}">${title}</h2>
       ${subtitle ? `<p style="font-size: 1.25rem; color: #666; max-width: 42rem; margin: 0 auto;">${subtitle}</p>` : ''}
     </div>
     <div style="overflow-x: auto;">
@@ -3135,8 +3215,7 @@ function generateFooterHTML(element: Element): string {
       <!-- Logo & Description -->
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-          ${logo ? `<img src="${logo}" alt="${logoText}" style="height: 2rem;">` : ''}
-          <span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>
+          ${logo ? `<img src="${logo}" alt="${logoText || 'Logo'}" style="height: 2rem;">` : `<span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>`}
         </div>
         ${description ? `<p style="color: ${textColor || '#d1d5db'}; font-size: 0.875rem; line-height: 1.6;">${description}</p>` : ''}
 

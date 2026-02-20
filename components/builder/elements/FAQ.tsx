@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FAQProps } from '@/types';
+import { getFontFamilyCSS } from '@/lib/fonts';
 import { ChevronDown } from 'lucide-react';
 
 interface FAQElementProps {
@@ -18,8 +19,11 @@ export const FAQElement = React.memo(
       questions,
       backgroundImage,
       backgroundOpacity = 70,
-      bgColor = '#000000'
+      bgColor = '#000000',
+      fontFamily,
     } = props;
+
+    const titleFontFamily = getFontFamilyCSS(fontFamily);
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     const baseClasses = `relative transition-all ${
@@ -66,7 +70,12 @@ export const FAQElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
+            <h2
+              className="text-4xl font-bold text-center mb-12 text-gray-900"
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
               {title}
             </h2>
             <div className="space-y-4">
@@ -132,7 +141,12 @@ export const FAQElement = React.memo(
           )}
 
           <div className="relative z-10 max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
+            <h2
+              className="text-4xl font-bold text-center mb-12 text-gray-900"
+              style={
+                titleFontFamily ? { fontFamily: titleFontFamily } : undefined
+              }
+            >
               {title}
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
