@@ -209,6 +209,15 @@ export default function ProductModal({
 
       if (!response.ok) {
         const data = await response.json();
+        if (data.details) {
+          const messages = Object.entries(data.details)
+            .map(
+              ([field, errors]) =>
+                `${field}: ${(errors as string[]).join(', ')}`
+            )
+            .join('; ');
+          throw new Error(messages || data.error || 'Failed to save product');
+        }
         throw new Error(data.error || 'Failed to save product');
       }
 

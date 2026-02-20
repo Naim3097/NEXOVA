@@ -27,15 +27,18 @@ export const ProductCreateSchema = z.object({
   code: z.string().min(1).max(50),
   name: z.string().min(1).max(255),
   description: z.string().max(5000).optional().nullable(),
-  image_url: z.string().url().optional().nullable(),
+  image_url: z
+    .union([z.string().url(), z.literal('')])
+    .optional()
+    .nullable(),
   stock: z.number().int().min(0).default(0),
   base_price: z.number().positive(),
-  currency: z.enum(['MYR', 'USD', 'SGD', 'EUR', 'GBP']).default('MYR'),
+  currency: z.enum(['RM', 'MYR', 'USD', 'SGD', 'EUR', 'GBP']).default('RM'),
   quantity_pricing: z
     .array(
       z.object({
-        min_quantity: z.number().int().positive(),
-        price: z.number().positive(),
+        min_qty: z.number().int().min(0),
+        price: z.number().min(0),
       })
     )
     .default([]),
