@@ -13,7 +13,14 @@ interface NavigationElementProps {
 }
 
 export const NavigationElement = React.memo(
-  ({ props, isSelected, isHovered, onSelect, onHover, viewportMode = 'desktop' }: NavigationElementProps) => {
+  ({
+    props,
+    isSelected,
+    isHovered,
+    onSelect,
+    onHover,
+    viewportMode = 'desktop',
+  }: NavigationElementProps) => {
     const {
       logo,
       logoText,
@@ -58,22 +65,25 @@ export const NavigationElement = React.memo(
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {logo && (
+              {logo ? (
                 <img
                   src={logo}
-                  alt={logoText}
-                  className="h-8 w-auto"
+                  alt={logoText || 'Logo'}
+                  className="h-8 w-auto max-w-[160px] object-contain"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
+              ) : (
+                <span className="text-xl font-bold">{logoText}</span>
               )}
-              <span className="text-xl font-bold">{logoText}</span>
             </div>
 
             {/* Desktop Menu - hidden on mobile viewport mode */}
             {!isMobileView && (
-              <div className={`hidden md:flex items-center ${layout === 'center' ? 'gap-6' : 'gap-8'}`}>
+              <div
+                className={`hidden md:flex items-center ${layout === 'center' ? 'gap-6' : 'gap-8'}`}
+              >
                 {menuItems.map((item, index) => (
                   <a
                     key={index}
@@ -120,7 +130,10 @@ export const NavigationElement = React.memo(
 
           {/* Mobile Menu - show when menu is open AND (mobile viewport mode OR browser is mobile-sized) */}
           {isMobileMenuOpen && (
-            <div className={`${isMobileView ? 'block' : 'md:hidden'} pb-4 border-t`} style={{ borderColor: `${textColor}20` }}>
+            <div
+              className={`${isMobileView ? 'block' : 'md:hidden'} pb-4 border-t`}
+              style={{ borderColor: `${textColor}20` }}
+            >
               <div className="flex flex-col gap-3 pt-4">
                 {menuItems.map((item, index) => (
                   <a
