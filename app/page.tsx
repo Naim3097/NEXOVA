@@ -2,6 +2,7 @@ import { Navbar } from '@/components/landing/Navbar';
 import { Hero } from '@/components/landing/Hero';
 import { Problem } from '@/components/landing/Problem';
 import { Features } from '@/components/landing/Features';
+import { Testimonials } from '@/components/landing/Testimonials';
 import { Pipeline } from '@/components/landing/Pipeline';
 import { JugglingTools } from '@/components/landing/JugglingTools';
 import { GridFeatures } from '@/components/landing/GridFeatures';
@@ -24,6 +25,9 @@ export default function Home() {
         </RevealOnScroll>
         <RevealOnScroll delay={200}>
           <Features />
+        </RevealOnScroll>
+        <RevealOnScroll delay={200}>
+          <Testimonials />
         </RevealOnScroll>
         <RevealOnScroll delay={200}>
           <Pipeline />
