@@ -372,6 +372,29 @@ export function Pricing() {
           </div>
         </RevealOnScroll>
 
+        {/* Lean.x cross-link */}
+        <RevealOnScroll delay={200}>
+          <div className="mt-10 max-w-3xl mx-auto text-center">
+            <p className="text-sm text-gray-400">
+              Payments on all plans are powered by{' '}
+              <a
+                href="/leanx"
+                className="text-[#5BC0BE] font-semibold hover:underline"
+              >
+                Lean.x
+              </a>{' '}
+              — accept FPX, GrabPay, Touch&apos;n Go, Boost, ShopeePay, and
+              cards natively.{' '}
+              <a
+                href="/leanx"
+                className="text-[#5BC0BE] font-medium hover:underline"
+              >
+                Learn how Lean.x works →
+              </a>
+            </p>
+          </div>
+        </RevealOnScroll>
+
         {/* Services Dialog */}
         <Dialog open={isServicesOpen} onOpenChange={setIsServicesOpen}>
           <DialogContent className="sm:max-w-md">

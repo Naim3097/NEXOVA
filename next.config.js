@@ -30,8 +30,56 @@ const nextConfig = {
     }
     return config;
   },
+  async redirects() {
+    return [
+      // www → non-www (canonical domain)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.nexova.co' }],
+        destination: 'https://nexova.co/:path*',
+        permanent: true,
+      },
+      // Trailing slash normalisation (strip trailing slashes)
+      {
+        source: '/:path+/',
+        destination: '/:path+',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
+      // Immutable cache for fonts (content-hashed filenames)
+      {
+        source: '/fonts/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Long cache for static images / icons
+      {
+        source: '/assets/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      // Immutable cache for Next.js static chunks (content-hashed filenames)
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         // Apply security headers to all routes
         source: '/(.*)',

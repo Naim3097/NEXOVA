@@ -7,17 +7,27 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yourdomain.com';
 
-  const robotsTxt = `# Allow all crawlers
+  const robotsTxt = `# Nexova — robots.txt
 User-agent: *
 Allow: /
 
-# Disallow private pages
+# Private / authenticated pages — do not index
 Disallow: /dashboard
-Disallow: /projects/*/edit
+Disallow: /dashboard/
+Disallow: /builder
+Disallow: /builder/
+Disallow: /projects/
+Disallow: /account/
+Disallow: /auth/
 Disallow: /api/
+Disallow: /payment/
+Disallow: /s/
+Disallow: /d/
+Disallow: /p/
 
 # Sitemap
 Sitemap: ${appUrl}/sitemap.xml
+Sitemap: ${appUrl}/sitemap-marketing.xml
 `;
 
   return new NextResponse(robotsTxt, {

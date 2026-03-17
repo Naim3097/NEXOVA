@@ -273,6 +273,24 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+
+        {/* Lean.x cross-link */}
+        <div className="mt-12 max-w-3xl mx-auto bg-gradient-to-r from-[#5BC0BE]/10 to-[#7C74EA]/10 border border-[#5BC0BE]/20 rounded-2xl p-6 text-center">
+          <p className="text-sm font-semibold text-[#455263] mb-1">
+            Selling online in Malaysia?
+          </p>
+          <p className="text-sm text-[#969696] mb-3">
+            All plans include native Malaysian payment processing — FPX, cards,
+            GrabPay, Touch&apos;n Go, and more via{' '}
+            <span className="font-medium text-[#5FC7CD]">Lean.x</span>.
+          </p>
+          <Link
+            href="/leanx"
+            className="text-sm font-semibold text-[#5FC7CD] hover:underline"
+          >
+            Learn more about Lean.x payments →
+          </Link>
+        </div>
       </div>
 
       {/* Footer */}
