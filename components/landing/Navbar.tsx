@@ -4,13 +4,20 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { X, Menu } from 'lucide-react';
+import { X, Menu, ChevronDown } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Templates', href: '/marketplace' },
   { label: 'Elements', href: '/elements' },
   { label: 'Lean.x', href: '/leanx' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Pricing', href: '/pricing' },
+];
+
+const MORE_LINKS = [
+  { label: 'About', href: '/about' },
+  { label: 'Changelog', href: '/changelog' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export function Navbar() {
@@ -18,7 +25,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100/60">
+      <nav className="sticky top-0 z-[200] w-full bg-white/80 backdrop-blur-md border-b border-gray-100/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-20 items-center justify-between max-w-7xl">
           {/* Logo */}
           <Link
@@ -37,7 +44,7 @@ export function Navbar() {
           </Link>
 
           {/* Centered pill nav — desktop */}
-          <div className="hidden md:flex items-center justify-center flex-1">
+          <div className="hidden md:flex items-center justify-center gap-6 flex-1">
             <nav
               aria-label="Main navigation"
               className="flex gap-8 bg-gray-100/80 rounded-full px-8 py-3 backdrop-blur-sm"
@@ -52,6 +59,31 @@ export function Navbar() {
                 </Link>
               ))}
             </nav>
+
+            {/* More dropdown — outside the pill so backdrop-filter doesn't clip it */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                More{' '}
+                <ChevronDown
+                  size={14}
+                  className="transition-transform duration-200 group-hover:rotate-180"
+                />
+              </button>
+              {/* pt-3 bridges the gap between button and card without breaking hover */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 hidden group-hover:block z-[300]">
+                <div className="w-40 bg-white rounded-2xl shadow-lg border border-gray-100 py-2">
+                  {MORE_LINKS.map(({ label, href }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="block px-4 py-2.5 text-sm text-gray-600 hover:text-[#5BC0BE] hover:bg-gray-50 transition-colors"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right — desktop */}
@@ -88,7 +120,7 @@ export function Navbar() {
             aria-label="Mobile navigation"
             className="flex flex-col gap-6 mt-8"
           >
-            {NAV_LINKS.map(({ label, href }) => (
+            {[...NAV_LINKS, ...MORE_LINKS].map(({ label, href }) => (
               <Link
                 key={href}
                 href={href}

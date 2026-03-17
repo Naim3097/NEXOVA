@@ -69,7 +69,7 @@ export default function Home() {
       <div className="flex min-h-screen flex-col font-sans">
         <Navbar />
         <main>
-          <RevealOnScroll className="relative z-50">
+          <RevealOnScroll className="relative">
             <Hero />
           </RevealOnScroll>
           <RevealOnScroll delay={200} className="relative z-0">
