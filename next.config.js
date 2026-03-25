@@ -9,16 +9,16 @@ const nextConfig = {
   experimental: {
     // Turbopack-specific config (used when running `next dev --turbo`)
     turbo: {},
+    // Treat these server-only packages as Node.js externals — never bundled into
+    // any webpack output. They use Node.js built-ins (crypto, fs, net) internally
+    // and must only ever run on the server.
+    serverComponentsExternalPackages: [
+      'googleapis',
+      '@google-analytics/data',
+      'google-auth-library',
+      'nodemailer',
+    ],
   },
-  // Treat these server-only packages as Node.js externals — never bundled into
-  // any webpack output. They use Node.js built-ins (crypto, fs, net) internally
-  // and must only ever run on the server.
-  serverExternalPackages: [
-    'googleapis',
-    '@google-analytics/data',
-    'google-auth-library',
-    'nodemailer',
-  ],
   eslint: {
     // Disable ESLint during production builds (already ran in pre-commit)
     ignoreDuringBuilds: true,
