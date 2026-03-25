@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { verifyLeanXWebhook } from '@/lib/leanx';
 
 // Disable body parsing to access raw body for signature verification
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -196,8 +196,9 @@ async function handlePaymentSucceeded(supabase: any, data: any) {
   }
 
   // Generate invoice number
-  const { data: invoiceNumberData } = await supabase
-    .rpc('generate_invoice_number');
+  const { data: invoiceNumberData } = await supabase.rpc(
+    'generate_invoice_number'
+  );
 
   const invoiceNumber = invoiceNumberData || `INV-${Date.now()}`;
 

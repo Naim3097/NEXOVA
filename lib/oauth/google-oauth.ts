@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 /**
  * Google OAuth Integration

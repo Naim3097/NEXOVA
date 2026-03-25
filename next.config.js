@@ -35,14 +35,49 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, nextRuntime }) => {
+    // Only add Node.js built-in externals for the Node.js server runtime.
+    // Edge runtime (nextRuntime === 'edge') has no CommonJS/require — skip it.
+    if (isServer && nextRuntime === 'nodejs') {
+      const builtins = [
+        'crypto',
+        'node:crypto',
+        'fs',
+        'net',
+        'tls',
+        'child_process',
+        'stream',
+        'os',
+        'path',
+        'http',
+        'https',
+        'url',
+        'util',
+        'events',
+        'buffer',
+        'querystring',
+        'zlib',
+      ];
+      const prev = Array.isArray(config.externals)
+        ? config.externals
+        : config.externals
+          ? [config.externals]
+          : [];
+      config.externals = [
+        ...prev,
+        ({ request }, callback) => {
+          if (builtins.includes(request))
+            return callback(null, 'commonjs ' + request.replace('node:', ''));
+          callback();
+        },
+      ];
+    }
     if (!isServer) {
-      // resolve.fallback with `false` in webpack 5 means "error loudly if needed".
-      // resolve.alias with `false` means "empty stub — no error". Use alias for
-      // Node.js built-ins that must never appear in the client bundle.
+      // On the client, stub out any accidental imports of Node.js built-ins.
       config.resolve.alias = {
         ...config.resolve.alias,
         crypto: false,
+        'node:crypto': false,
         fs: false,
         net: false,
         tls: false,

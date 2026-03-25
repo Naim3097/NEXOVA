@@ -504,7 +504,7 @@ export function validateLeanXWebhook(
   secretKey: string
 ): boolean {
   try {
-    const crypto = require('crypto');
+    const crypto = require('node:crypto');
 
     // Generate expected signature using HMAC SHA256
     const expectedSignature = crypto
@@ -612,9 +612,13 @@ export async function processLeanXSubscription(
     }
 
     // MOCK SUCCESS RESPONSE
-    const crypto = require('crypto');
-    const randomString1 = crypto.randomBytes(8).toString('hex').toUpperCase();
-    const randomString2 = crypto.randomBytes(8).toString('hex').toUpperCase();
+    const randomHex = (n: number) =>
+      Array.from(globalThis.crypto.getRandomValues(new Uint8Array(n)))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+        .toUpperCase();
+    const randomString1 = randomHex(8);
+    const randomString2 = randomHex(8);
     const mockSubscriptionId = `SUB-${Date.now()}-${randomString1}`;
     const mockCustomerId = `CUST-${request.user_id.substring(0, 8).toUpperCase()}`;
     const mockTransactionId = `TXN-${Date.now()}-${randomString2}`;

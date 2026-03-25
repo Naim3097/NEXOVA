@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
-// Create a Supabase client for edge runtime (no auth needed for public tracking)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Create a Supabase client (lazy-init to avoid build-time env var errors)
+const getSupabase = () =>
+  createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 /**
  * POST /api/analytics/track
@@ -21,10 +22,7 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = rateLimit(clientId, RATE_LIMITS.LENIENT);
 
     if (!rateLimitResult.success) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      );
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
     const body = await request.json();
@@ -33,21 +31,32 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!project_id || !event_type || !session_id) {
       return NextResponse.json(
-        { error: 'Missing required fields: project_id, event_type, session_id' },
+        {
+          error: 'Missing required fields: project_id, event_type, session_id',
+        },
         { status: 400 }
       );
     }
 
     // Validate event type
-    const validEventTypes = ['page_view', 'button_click', 'form_view', 'form_submit', 'page_exit'];
+    const validEventTypes = [
+      'page_view',
+      'button_click',
+      'form_view',
+      'form_submit',
+      'page_exit',
+    ];
     if (!validEventTypes.includes(event_type)) {
       return NextResponse.json(
-        { error: `Invalid event_type. Must be one of: ${validEventTypes.join(', ')}` },
+        {
+          error: `Invalid event_type. Must be one of: ${validEventTypes.join(', ')}`,
+        },
         { status: 400 }
       );
     }
 
     // Verify project exists
+    const supabase = getSupabase();
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('id')
@@ -55,10 +64,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (projectError || !project) {
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
     // Insert analytics event
