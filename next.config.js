@@ -10,6 +10,15 @@ const nextConfig = {
     // Turbopack-specific config (used when running `next dev --turbo`)
     turbo: {},
   },
+  // Treat these server-only packages as Node.js externals — never bundled into
+  // any webpack output. They use Node.js built-ins (crypto, fs, net) internally
+  // and must only ever run on the server.
+  serverExternalPackages: [
+    'googleapis',
+    '@google-analytics/data',
+    'google-auth-library',
+    'nodemailer',
+  ],
   eslint: {
     // Disable ESLint during production builds (already ran in pre-commit)
     ignoreDuringBuilds: true,
@@ -28,8 +37,11 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
+      // resolve.fallback with `false` in webpack 5 means "error loudly if needed".
+      // resolve.alias with `false` means "empty stub — no error". Use alias for
+      // Node.js built-ins that must never appear in the client bundle.
+      config.resolve.alias = {
+        ...config.resolve.alias,
         crypto: false,
         fs: false,
         net: false,
