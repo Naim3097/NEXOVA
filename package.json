@@ -4,7 +4,7 @@
   "description": "Template-first landing page builder built with Next.js and Supabase",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev --turbo -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",

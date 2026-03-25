@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false, // Disable strict mode to prevent development double-renders
+  reactStrictMode: false,
+  // Keep compiled pages/layouts in memory longer to reduce on-demand recompilation
+  onDemandEntries: {
+    maxInactiveAge: 120 * 1000,
+    pagesBufferLength: 8,
+  },
+  experimental: {
+    // Turbopack-specific config (used when running `next dev --turbo`)
+    turbo: {},
+  },
   eslint: {
     // Disable ESLint during production builds (already ran in pre-commit)
     ignoreDuringBuilds: true,
