@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { POSTS } from '@/lib/blog-posts';
 
 /**
  * GET /sitemap-marketing.xml
@@ -34,43 +35,13 @@ export async function GET() {
     { url: '/pricing', changefreq: 'monthly', priority: '0.8', lastmod: now },
     { url: '/about', changefreq: 'monthly', priority: '0.6', lastmod: now },
     { url: '/blog', changefreq: 'daily', priority: '0.7', lastmod: now },
-    // Blog posts
-    {
-      url: '/blog/how-to-launch-a-landing-page-in-a-day',
+    // Blog posts — auto-generated from lib/blog-posts.ts
+    ...POSTS.map((post) => ({
+      url: `/blog/${post.slug}`,
       changefreq: 'yearly',
       priority: '0.65',
-      lastmod: '2025-12-10',
-    },
-    {
-      url: '/blog/top-7-design-trends-2026',
-      changefreq: 'yearly',
-      priority: '0.65',
-      lastmod: '2025-12-03',
-    },
-    {
-      url: '/blog/fpx-vs-card-payments-malaysia',
-      changefreq: 'yearly',
-      priority: '0.65',
-      lastmod: '2025-11-22',
-    },
-    {
-      url: '/blog/css-animations-that-dont-hurt-performance',
-      changefreq: 'yearly',
-      priority: '0.65',
-      lastmod: '2025-11-15',
-    },
-    {
-      url: '/blog/nexova-elements-launch',
-      changefreq: 'yearly',
-      priority: '0.65',
-      lastmod: '2025-11-01',
-    },
-    {
-      url: '/blog/seo-checklist-small-business-website',
-      changefreq: 'yearly',
-      priority: '0.65',
-      lastmod: '2025-10-28',
-    },
+      lastmod: post.date,
+    })),
     { url: '/changelog', changefreq: 'weekly', priority: '0.5', lastmod: now },
     { url: '/contact', changefreq: 'yearly', priority: '0.5', lastmod: now },
     { url: '/privacy', changefreq: 'yearly', priority: '0.3', lastmod: now },

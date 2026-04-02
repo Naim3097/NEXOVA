@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll';
+import { POSTS, CATEGORY_COLORS } from '@/lib/blog-posts';
 
 // Re-generate this page at most once per hour on Vercel (ISR)
 export const revalidate = 3600;
@@ -17,72 +18,6 @@ export const metadata: Metadata = {
     url: 'https://nexova.co/blog',
     type: 'website',
   },
-};
-
-const POSTS = [
-  {
-    slug: 'how-to-launch-a-landing-page-in-a-day',
-    title: 'How to launch a landing page in a day',
-    category: 'Tutorial',
-    date: '2025-12-10',
-    readTime: '5 min',
-    excerpt:
-      'Walk through the entire process — choosing a template, customising it in X.IDE, connecting a domain, and hitting publish.',
-  },
-  {
-    slug: 'top-7-design-trends-2026',
-    title: 'Top 7 web design trends for 2026',
-    category: 'Design',
-    date: '2025-12-03',
-    readTime: '7 min',
-    excerpt:
-      'From glassmorphism evolving to spatial UI and AI-assisted layouts — the trends shaping the web next year.',
-  },
-  {
-    slug: 'fpx-vs-card-payments-malaysia',
-    title: 'FPX vs card payments — what every Malaysian merchant should know',
-    category: 'Payments',
-    date: '2025-11-22',
-    readTime: '6 min',
-    excerpt:
-      'A no-jargon breakdown of FPX online banking, debit/credit card processing, and which works best for your e-commerce checkout.',
-  },
-  {
-    slug: 'css-animations-that-dont-hurt-performance',
-    title: "CSS animations that don't hurt performance",
-    category: 'Development',
-    date: '2025-11-15',
-    readTime: '8 min',
-    excerpt:
-      'Using transform and opacity correctly, will-change gotchas, and when to prefer the Web Animations API over CSS keyframes.',
-  },
-  {
-    slug: 'nexova-elements-launch',
-    title: 'Introducing Nexova Elements — 100+ UI animations',
-    category: 'Product',
-    date: '2025-11-01',
-    readTime: '3 min',
-    excerpt:
-      "Today we're launching our UI element library: 100+ production-ready animations and 29 layout sections, free to preview.",
-  },
-  {
-    slug: 'seo-checklist-small-business-website',
-    title: 'The SEO checklist for a new small business website',
-    category: 'Growth',
-    date: '2025-10-28',
-    readTime: '10 min',
-    excerpt:
-      'Titles, meta descriptions, structured data, Core Web Vitals — the must-haves before you start thinking about backlinks.',
-  },
-];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Tutorial: 'bg-teal-50 text-teal-700',
-  Design: 'bg-purple-50 text-purple-700',
-  Payments: 'bg-emerald-50 text-emerald-700',
-  Development: 'bg-blue-50 text-blue-700',
-  Product: 'bg-orange-50 text-orange-700',
-  Growth: 'bg-rose-50 text-rose-700',
 };
 
 function formatDate(iso: string) {
