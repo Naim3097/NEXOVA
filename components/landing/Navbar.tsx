@@ -10,11 +10,13 @@ const NAV_LINKS = [
   { label: 'Templates', href: '/marketplace' },
   { label: 'Elements', href: '/elements' },
   { label: 'Lean.x', href: '/leanx' },
-  { label: 'Blog', href: '/blog' },
+  { label: 'Services', href: '/services' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
 const MORE_LINKS = [
+  { label: 'Academy', href: '/academy' },
+  { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
   { label: 'Changelog', href: '/changelog' },
   { label: 'Contact', href: '/contact' },
