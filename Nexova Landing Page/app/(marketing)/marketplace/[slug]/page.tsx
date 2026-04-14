@@ -19,6 +19,7 @@ type Template = {
   sections: string[];
   features: string[];
   pages: string[];
+  demoUrl?: string;
 };
 
 const TEMPLATES: Template[] = [
@@ -47,6 +48,7 @@ const TEMPLATES: Template[] = [
       'Dark mode ready',
     ],
     pages: ['Home / Landing', 'Pricing (standalone)'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/saas_bold_0453596c/index.html',
   },
   {
     slug: 'agency-pro',
@@ -73,6 +75,7 @@ const TEMPLATES: Template[] = [
       'WCAG 2.1 AA accessible',
     ],
     pages: ['Home', 'Services', 'Work / Case Studies', 'Team', 'Contact'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/agency_creative_f9a2b3c4/index.html',
   },
   {
     slug: 'store-minimal',
@@ -99,6 +102,7 @@ const TEMPLATES: Template[] = [
       'Cart persistence',
     ],
     pages: ['Home', 'Shop / Product Grid', 'Product Detail', 'Checkout'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_22d74bb8/index.html',
   },
   {
     slug: 'portfolio-grid',
@@ -125,6 +129,7 @@ const TEMPLATES: Template[] = [
       'Social links',
     ],
     pages: ['Home / Grid', 'Project Detail', 'About'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_minimal_22d83524/index.html',
   },
   {
     slug: 'restaurant-bistro',
@@ -151,6 +156,7 @@ const TEMPLATES: Template[] = [
       'Halal badge support',
     ],
     pages: ['Home', 'Menu', 'Gallery', 'Reservations'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/restaurant_creative_418334b4/index.html',
   },
   {
     slug: 'event-summit',
@@ -177,6 +183,7 @@ const TEMPLATES: Template[] = [
       'PDF schedule download',
     ],
     pages: ['Home', 'Speakers', 'Schedule', 'Tickets'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/blog_tech_7d8e9f0a/index.html',
   },
   {
     slug: 'education-academy',
@@ -203,6 +210,7 @@ const TEMPLATES: Template[] = [
       'Whatsapp support link',
     ],
     pages: ['Home', 'Courses', 'Course Detail', 'Instructors', 'Pricing'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_creative_1c8e5434/index.html',
   },
   {
     slug: 'health-clinic',
@@ -229,6 +237,7 @@ const TEMPLATES: Template[] = [
       'MOH compliance note',
     ],
     pages: ['Home', 'Services', 'Doctors', 'Book Appointment', 'Blog'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html',
   },
   {
     slug: 'finance-advisor',
@@ -255,6 +264,7 @@ const TEMPLATES: Template[] = [
       'FIMM/SC badge support',
     ],
     pages: ['Home', 'Services', 'About', 'Contact'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/legal_professional_c7c6d8a0/index.html',
   },
   {
     slug: 'travel-explore',
@@ -281,6 +291,7 @@ const TEMPLATES: Template[] = [
       'Google Reviews embed',
     ],
     pages: ['Home', 'Destinations', 'Packages', 'Contact'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/realestate_professional_138d1185/index.html',
   },
   {
     slug: 'fashion-brand',
@@ -307,6 +318,7 @@ const TEMPLATES: Template[] = [
       'Limited edition badge',
     ],
     pages: ['Home', 'Collections', 'Shop', 'Product Detail', 'About'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_3b6e76e1/index.html',
   },
   {
     slug: 'startup-mvp',
@@ -333,6 +345,7 @@ const TEMPLATES: Template[] = [
       'Typeform embed hook',
     ],
     pages: ['Single page (scrollable)'],
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_bold_1e9e671a/index.html',
   },
 ];
 
@@ -517,9 +530,25 @@ export default function TemplateDetailPage({
 
               {/* Preview */}
               <RevealOnScroll delay={200}>
-                <div className="aspect-video bg-gradient-to-br from-[#5BC0BE]/10 to-[#7C74EA]/10 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center text-gray-300 mb-10">
-                  Template preview
-                </div>
+                {template.demoUrl ? (
+                  <div className="rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-10">
+                    <iframe
+                      src={template.demoUrl}
+                      title={`${template.title} live preview`}
+                      className="w-full aspect-video"
+                      loading="lazy"
+                    />
+                    <div className="bg-white border-t border-gray-100 px-4 py-3 flex justify-end">
+                      <a href={template.demoUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#5BC0BE] hover:underline">
+                        Open in new tab →
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-gradient-to-br from-[#5BC0BE]/10 to-[#7C74EA]/10 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center text-gray-300 mb-10">
+                    Template preview
+                  </div>
+                )}
               </RevealOnScroll>
 
               {/* Stats bar */}
@@ -635,14 +664,25 @@ export default function TemplateDetailPage({
                       Open in X.IDE Builder
                     </Button>
                   </Link>
-                  <Link href={`/marketplace`} className="block mb-6">
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-full py-3 text-[#455263] border-gray-200 hover:border-[#5BC0BE] hover:text-[#5BC0BE] transition-all duration-300"
-                    >
-                      Live Preview
-                    </Button>
-                  </Link>
+                  {template.demoUrl ? (
+                    <a href={template.demoUrl} target="_blank" rel="noopener noreferrer" className="block mb-6">
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-full py-3 text-[#455263] border-gray-200 hover:border-[#5BC0BE] hover:text-[#5BC0BE] transition-all duration-300"
+                      >
+                        Live Preview
+                      </Button>
+                    </a>
+                  ) : (
+                    <Link href={`/marketplace`} className="block mb-6">
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-full py-3 text-[#455263] border-gray-200 hover:border-[#5BC0BE] hover:text-[#5BC0BE] transition-all duration-300"
+                      >
+                        Browse Templates
+                      </Button>
+                    </Link>
+                  )}
 
                   {/* Benefits */}
                   <ul className="space-y-3 mb-6">

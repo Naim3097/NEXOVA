@@ -21,8 +21,6 @@ export const CATEGORIES = [
   'Finance',
   'Travel',
   'Fashion',
-  'Barber',
-  'Real Estate',
 ];
 
 export type Template = {
@@ -32,45 +30,10 @@ export type Template = {
   price: number;
   tags: string[];
   description: string;
+  demoUrl?: string;
 };
 
 export const TEMPLATES: Template[] = [
-  {
-    slug: 'apexcare-dental',
-    title: 'ApexCare Dental',
-    category: 'Healthcare',
-    price: 49,
-    tags: ['Services', 'Appointment', 'Team', 'Blog'],
-    description:
-      'Modern dental clinic landing page with appointment booking, services list, team showcase, testimonials, and blog.',
-  },
-  {
-    slug: 'timeshop-smartwatch',
-    title: 'Timeshop Smartwatch',
-    category: 'E-commerce',
-    price: 49,
-    tags: ['Products', 'Specs', 'Video', 'Testimonials'],
-    description:
-      'Sleek e-commerce landing page for digital smartwatches. Includes product grid, feature showcase, limited-time offers, and video demo.',
-  },
-  {
-    slug: 'ai-real-estate',
-    title: 'AI Real Estate',
-    category: 'Real Estate',
-    price: 59,
-    tags: ['Property Listings', 'Analytics', 'Team', 'Blog'],
-    description:
-      'Premium AI-driven real estate platform with property listings, analytics, team showcase, blog insights, and contact form.',
-  },
-  {
-    slug: 'classic-barber',
-    title: 'Classic Barber',
-    category: 'Barber',
-    price: 49,
-    tags: ['Services', 'Gallery', 'Booking', 'Team'],
-    description:
-      'Premium barbershop template with dark luxurious aesthetic. Features services, team showcase, gallery, reviews, and booking form.',
-  },
   {
     slug: 'saas-launch',
     title: 'SaaS Launch',
@@ -79,6 +42,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Hero', 'Pricing', 'FAQ'],
     description:
       'Clean, conversion-focused SaaS landing page with pricing table and feature grid.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/saas_bold_0453596c/index.html',
   },
   {
     slug: 'agency-pro',
@@ -88,6 +52,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Portfolio', 'Case Studies', 'Contact'],
     description:
       'Full-service agency site with work showcase and team section.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/agency_creative_f9a2b3c4/index.html',
   },
   {
     slug: 'store-minimal',
@@ -96,6 +61,7 @@ export const TEMPLATES: Template[] = [
     price: 49,
     tags: ['Products', 'Cart', 'Checkout'],
     description: 'Minimal, modern e-commerce storefront built for conversion.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_22d74bb8/index.html',
   },
   {
     slug: 'portfolio-grid',
@@ -104,6 +70,7 @@ export const TEMPLATES: Template[] = [
     price: 29,
     tags: ['Grid', 'About', 'Contact'],
     description: 'Elegant masonry grid portfolio for creators and designers.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_minimal_22d83524/index.html',
   },
   {
     slug: 'restaurant-bistro',
@@ -112,6 +79,7 @@ export const TEMPLATES: Template[] = [
     price: 39,
     tags: ['Menu', 'Reservations', 'Gallery'],
     description: 'Warm, appetising restaurant site with menu and booking form.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/restaurant_creative_418334b4/index.html',
   },
   {
     slug: 'event-summit',
@@ -120,6 +88,7 @@ export const TEMPLATES: Template[] = [
     price: 39,
     tags: ['Schedule', 'Speakers', 'Tickets'],
     description: 'Professional event / conference page with speaker lineup.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/blog_tech_7d8e9f0a/index.html',
   },
   {
     slug: 'education-academy',
@@ -128,6 +97,7 @@ export const TEMPLATES: Template[] = [
     price: 49,
     tags: ['Courses', 'Instructors', 'Pricing'],
     description: 'Online learning platform landing page with course cards.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_creative_1c8e5434/index.html',
   },
   {
     slug: 'health-clinic',
@@ -137,6 +107,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Services', 'Appointment', 'Team'],
     description:
       'Trustworthy healthcare / clinic site with booking integration.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html',
   },
   {
     slug: 'finance-advisor',
@@ -146,6 +117,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Services', 'Trust', 'Contact'],
     description:
       'Premium financial advisor page radiating trust and authority.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/legal_professional_c7c6d8a0/index.html',
   },
   {
     slug: 'travel-explore',
@@ -154,6 +126,7 @@ export const TEMPLATES: Template[] = [
     price: 39,
     tags: ['Destinations', 'Gallery', 'Booking'],
     description: 'Cinematic travel agency site with full-bleed imagery.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/realestate_professional_138d1185/index.html',
   },
   {
     slug: 'fashion-brand',
@@ -163,6 +136,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Lookbook', 'Shop', 'Minimal'],
     description:
       'Editorial fashion brand with high-impact visuals and shop grid.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_3b6e76e1/index.html',
   },
   {
     slug: 'startup-mvp',
@@ -171,6 +145,7 @@ export const TEMPLATES: Template[] = [
     price: 29,
     tags: ['Hero', 'Features', 'CTA'],
     description: 'Rapid-launch startup landing page — zero fluff, all signal.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_bold_1e9e671a/index.html',
   },
 ];
 
@@ -312,6 +287,17 @@ export function MarketplaceGrid() {
                           Use Template
                         </Button>
                       </Link>
+                      {tpl.demoUrl && (
+                        <a href={tpl.demoUrl} target="_blank" rel="noopener noreferrer">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full border-gray-200 text-gray-600 hover:border-[#5BC0BE] hover:text-[#5BC0BE] text-xs transition-colors"
+                          >
+                            Live Preview
+                          </Button>
+                        </a>
+                      )}
                       <Link href={`/marketplace/${tpl.slug}`}>
                         <Button
                           size="sm"
