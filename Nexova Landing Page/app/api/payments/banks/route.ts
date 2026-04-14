@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getLeanXBankList } from '@/lib/leanx';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/payments/banks?projectId=xxx
  * Fetch available banks for LeanX Silent Bill payment method
