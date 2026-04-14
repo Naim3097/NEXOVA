@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export function Problem() {
   return (
-    <section className="relative pt-[24vw] md:pt-[16vw] lg:pt-[10vw] pb-[24vw] md:pb-[16vw] lg:pb-[10vw] overflow-hidden z-10 flex flex-col justify-center">
+    <section className="relative pt-[24vw] md:pt-[16vw] lg:pt-[10vw] pb-[24vw] md:pb-[16vw] lg:pb-[10vw] overflow-hidden z-0 flex flex-col justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 z-0 bg-[#2D2B4A]"> {/* Fallback color */}
         <Image
