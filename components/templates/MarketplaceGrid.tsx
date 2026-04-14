@@ -21,6 +21,8 @@ export const CATEGORIES = [
   'Finance',
   'Travel',
   'Fashion',
+  'Real Estate',
+  'Barber',
 ];
 
 export type Template = {
@@ -34,6 +36,46 @@ export type Template = {
 };
 
 export const TEMPLATES: Template[] = [
+  {
+    slug: 'apexcare-dental',
+    title: 'ApexCare Dental',
+    category: 'Healthcare',
+    price: 49,
+    tags: ['Services', 'Appointment', 'Team', 'Blog'],
+    description:
+      'Modern dental clinic landing page with appointment booking, services list, team showcase, testimonials, and blog.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html',
+  },
+  {
+    slug: 'timeshop-smartwatch',
+    title: 'Timeshop Smartwatch',
+    category: 'E-commerce',
+    price: 49,
+    tags: ['Products', 'Specs', 'Video', 'Testimonials'],
+    description:
+      'Sleek e-commerce landing page for digital smartwatches. Includes product grid, feature showcase, limited-time offers, and video demo.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_3c3ea951/index.html',
+  },
+  {
+    slug: 'ai-real-estate',
+    title: 'AI Real Estate',
+    category: 'Real Estate',
+    price: 59,
+    tags: ['Property Listings', 'Analytics', 'Team', 'Blog'],
+    description:
+      'Premium AI-driven real estate platform with property listings, analytics, team showcase, blog insights, and contact form.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/realestate_professional_138d1185/index.html',
+  },
+  {
+    slug: 'classic-barber',
+    title: 'Classic Barber',
+    category: 'Barber',
+    price: 49,
+    tags: ['Services', 'Gallery', 'Booking', 'Team'],
+    description:
+      'Premium barbershop template with dark luxurious aesthetic. Features services, team showcase, gallery, reviews, and booking form.',
+    demoUrl: 'https://axtratemplates.vercel.app/built_templates/fitness_bold_fcbe0d96/index.html',
+  },
   {
     slug: 'saas-launch',
     title: 'SaaS Launch',
