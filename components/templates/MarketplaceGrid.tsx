@@ -21,6 +21,8 @@ export const CATEGORIES = [
   'Finance',
   'Travel',
   'Fashion',
+  'Barber',
+  'Real Estate',
 ];
 
 export type Template = {
@@ -33,6 +35,42 @@ export type Template = {
 };
 
 export const TEMPLATES: Template[] = [
+  {
+    slug: 'apexcare-dental',
+    title: 'ApexCare Dental',
+    category: 'Healthcare',
+    price: 49,
+    tags: ['Services', 'Appointment', 'Team', 'Blog'],
+    description:
+      'Modern dental clinic landing page with appointment booking, services list, team showcase, testimonials, and blog.',
+  },
+  {
+    slug: 'timeshop-smartwatch',
+    title: 'Timeshop Smartwatch',
+    category: 'E-commerce',
+    price: 49,
+    tags: ['Products', 'Specs', 'Video', 'Testimonials'],
+    description:
+      'Sleek e-commerce landing page for digital smartwatches. Includes product grid, feature showcase, limited-time offers, and video demo.',
+  },
+  {
+    slug: 'ai-real-estate',
+    title: 'AI Real Estate',
+    category: 'Real Estate',
+    price: 59,
+    tags: ['Property Listings', 'Analytics', 'Team', 'Blog'],
+    description:
+      'Premium AI-driven real estate platform with property listings, analytics, team showcase, blog insights, and contact form.',
+  },
+  {
+    slug: 'classic-barber',
+    title: 'Classic Barber',
+    category: 'Barber',
+    price: 49,
+    tags: ['Services', 'Gallery', 'Booking', 'Team'],
+    description:
+      'Premium barbershop template with dark luxurious aesthetic. Features services, team showcase, gallery, reviews, and booking form.',
+  },
   {
     slug: 'saas-launch',
     title: 'SaaS Launch',

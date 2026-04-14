@@ -23,6 +23,119 @@ type Template = {
 
 const TEMPLATES: Template[] = [
   {
+    slug: 'apexcare-dental',
+    title: 'ApexCare Dental',
+    category: 'Healthcare',
+    price: 49,
+    tags: ['Services', 'Appointment', 'Team', 'Blog'],
+    description:
+      'Modern dental clinic landing page with appointment booking, services list, team showcase, testimonials, and blog. Radiates trust and professionalism.',
+    sections: [
+      'Hero with patient stats and trust signals',
+      'About section with doctor image',
+      'Why Choose Us — reasons grid',
+      'Comprehensive dental services list',
+      'Appointment booking form',
+      'Patient testimonial spotlight',
+      'Team / dental professionals showcase',
+      'Blog tips & insights',
+    ],
+    features: [
+      'Online appointment booking form',
+      'Doctor team profiles',
+      'Patient testimonial section',
+      'Blog preview section',
+      'Newsletter subscription',
+      'Mobile-responsive design',
+    ],
+    pages: ['Home', 'About', 'Services', 'Book Appointment', 'Blog'],
+  },
+  {
+    slug: 'timeshop-smartwatch',
+    title: 'Timeshop Smartwatch',
+    category: 'E-commerce',
+    price: 49,
+    tags: ['Products', 'Specs', 'Video', 'Testimonials'],
+    description:
+      'Sleek e-commerce landing page for digital smartwatches. Includes product grid, feature showcase, limited-time offers, and video demo.',
+    sections: [
+      'Hero with discount badge',
+      'Feature strip (shipping, support, payment)',
+      'Product grid (6 products)',
+      'Smartwatch specs showcase',
+      'Best products selection',
+      'Limited time offer section',
+      'Product demo video',
+      'Customer testimonials',
+    ],
+    features: [
+      'Product grid with ratings and reviews',
+      'Specs comparison table',
+      'Limited-time offer countdown',
+      'Video demo embed',
+      'Customer testimonials',
+      'Mobile-responsive design',
+    ],
+    pages: ['Home', 'Products', 'Product Detail', 'Contact'],
+  },
+  {
+    slug: 'ai-real-estate',
+    title: 'AI Real Estate',
+    category: 'Real Estate',
+    price: 59,
+    tags: ['Property Listings', 'Analytics', 'Team', 'Blog'],
+    description:
+      'Premium AI-driven real estate investment platform with property listings, analytics, team showcase, blog insights, and contact form.',
+    sections: [
+      'Hero with search bar and filters',
+      'Intro / description section',
+      'Featured projects grid (4 properties)',
+      'Property detail showcase',
+      'Property gallery grid',
+      'Leadership team profiles',
+      'Partner logos',
+      'Latest insights / blog',
+      'Client testimonials carousel',
+      'Contact form with property preferences',
+    ],
+    features: [
+      'Property search with filters (Buy/Rent/Invest)',
+      'Featured property cards with details',
+      'Property detail with specs and gallery',
+      'Leadership team with bios',
+      'Blog / insights section',
+      'Contact form with budget range selector',
+    ],
+    pages: ['Home', 'Properties', 'Property Detail', 'Insights', 'Contact'],
+  },
+  {
+    slug: 'classic-barber',
+    title: 'Classic Barber',
+    category: 'Barber',
+    price: 49,
+    tags: ['Services', 'Gallery', 'Booking', 'Team'],
+    description:
+      'Premium barbershop template with dark luxurious aesthetic. Features services, team showcase, gallery, reviews, and booking form.',
+    sections: [
+      'Hero slider (3 slides)',
+      'Services with pricing',
+      'About Us with stats',
+      'Meet the Team',
+      'Gallery / Our Work (6 images)',
+      'Client reviews',
+      'Contact + booking form',
+    ],
+    features: [
+      'Multi-slide hero with animations',
+      'Service pricing cards',
+      'Team member profiles',
+      'Work gallery grid',
+      'Client review cards with ratings',
+      'Booking form with service selection',
+    ],
+    pages: ['Single page (scrollable)'],
+  },
+  {
     slug: 'saas-launch',
     title: 'SaaS Launch',
     category: 'SaaS',
@@ -517,8 +630,13 @@ export default function TemplateDetailPage({
 
               {/* Preview */}
               <RevealOnScroll delay={200}>
-                <div className="aspect-video bg-gradient-to-br from-[#5BC0BE]/10 to-[#7C74EA]/10 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center text-gray-300 mb-10">
-                  Template preview
+                <div className="aspect-video rounded-2xl border border-gray-200 shadow-sm overflow-hidden bg-gray-100 mb-10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/assets/templates/${template.slug}.jpg`}
+                    alt={`${template.title} template preview`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </RevealOnScroll>
 
@@ -635,14 +753,19 @@ export default function TemplateDetailPage({
                       Open in X.IDE Builder
                     </Button>
                   </Link>
-                  <Link href={`/marketplace`} className="block mb-6">
+                  <a
+                    href={`/api/preview-template/${template.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mb-6"
+                  >
                     <Button
                       variant="outline"
                       className="w-full rounded-full py-3 text-[#455263] border-gray-200 hover:border-[#5BC0BE] hover:text-[#5BC0BE] transition-all duration-300"
                     >
                       Live Preview
                     </Button>
-                  </Link>
+                  </a>
 
                   {/* Benefits */}
                   <ul className="space-y-3 mb-6">

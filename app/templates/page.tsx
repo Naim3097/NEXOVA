@@ -63,7 +63,8 @@ export default function TemplatesPage() {
     { value: 'barber', label: 'Barber' },
     { value: 'digital-products', label: 'Digital Products' },
     { value: 'ecommerce', label: 'E-commerce' },
-    { value: 'healthcare', label: 'Clinic' },
+    { value: 'healthcare', label: 'Healthcare' },
+    { value: 'realestate', label: 'Real Estate' },
     { value: 'saloon', label: 'Saloon' },
     { value: 'services', label: 'Photography' },
   ];
