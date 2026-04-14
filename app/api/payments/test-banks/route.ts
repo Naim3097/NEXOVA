@@ -3,6 +3,8 @@ import { getLeanXBankList } from '@/lib/leanx';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/payments/test-banks
  * Fetch available banks for test checkout using current user's credentials

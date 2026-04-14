@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll';
 import { POSTS, CATEGORY_COLORS } from '@/lib/blog-posts';
+import { BlogFilteredGrid } from '@/components/landing/BlogFilteredGrid';
 
 // Re-generate this page at most once per hour on Vercel (ISR)
 export const revalidate = 3600;
@@ -97,8 +98,15 @@ export default function BlogPage() {
           <RevealOnScroll>
             <Link href={`/blog/${featured.slug}`}>
               <article className="group bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col lg:flex-row">
-                <div className="lg:w-1/2 aspect-video lg:aspect-auto bg-gradient-to-br from-[#5BC0BE]/10 to-[#7C74EA]/10 flex items-center justify-center text-sm text-gray-300">
-                  Featured image
+                <div className="lg:w-1/2 aspect-video lg:aspect-auto relative bg-gradient-to-br from-[#5BC0BE]/10 to-[#7C74EA]/10 overflow-hidden">
+                  {featured.image && (
+                    <img
+                      src={featured.image}
+                      alt={featured.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="eager"
+                    />
+                  )}
                 </div>
                 <div className="p-8 lg:w-1/2 flex flex-col justify-center">
                   <div className="flex items-center gap-3 mb-4">
@@ -130,48 +138,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Post grid */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {rest.map((post) => (
-              <RevealOnScroll key={post.slug} delay={80}>
-                <Link href={`/blog/${post.slug}`}>
-                  <article className="group bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
-                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-[#5BC0BE]/10 group-hover:to-[#7C74EA]/10 transition-all flex items-center justify-center text-xs text-gray-300">
-                      Preview
-                    </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span
-                          className={`text-xs font-semibold rounded-full px-2.5 py-0.5 ${
-                            CATEGORY_COLORS[post.category] ||
-                            'bg-gray-100 text-gray-600'
-                          }`}
-                        >
-                          {post.category}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {post.readTime}
-                        </span>
-                      </div>
-                      <h2 className="text-sm font-semibold text-gray-900 mb-2 group-hover:text-[#5BC0BE] transition-colors leading-snug flex-1">
-                        {post.title}
-                      </h2>
-                      <p className="text-xs text-gray-500 leading-relaxed mb-4">
-                        {post.excerpt}
-                      </p>
-                      <time className="text-xs text-gray-400 mt-auto">
-                        {formatDate(post.date)}
-                      </time>
-                    </div>
-                  </article>
-                </Link>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
+      <BlogFilteredGrid posts={rest} />
 
       {/* Newsletter CTA */}
       <section className="bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] py-20 text-white text-center">

@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { label: 'Elements', href: '/elements' },
   { label: 'Lean.x', href: '/leanx' },
   { label: 'Services', href: '/services' },
-  { label: 'Pricing', href: '/pricing' },
 ];
 
 const MORE_LINKS = [

@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { servicesList } from '@/lib/services-data';
 import { ContactForm } from '@/components/landing/ContactForm';
+import { Navbar } from '@/components/landing/Navbar';
+import { Footer } from '@/components/landing/Footer';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Share2,
@@ -71,33 +73,7 @@ export default function ServicesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between max-w-7xl">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/assets/landing/logo-nexova.png"
-              alt="Nexova"
-              width={120}
-              height={40}
-              className="h-8 w-auto"
-            />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hidden sm:block"
-            >
-              Home
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] hover:opacity-90 text-white rounded-full px-6 border-0">
-                Get Started
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero */}
       <section className="pt-16 pb-20">
@@ -168,25 +144,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>&copy; 2026 Nexova. All rights reserved.</p>
-            <div className="flex gap-6">
-              <Link href="/" className="hover:text-gray-900">
-                Home
-              </Link>
-              <Link href="/pricing" className="hover:text-gray-900">
-                Pricing
-              </Link>
-              <Link href="/templates" className="hover:text-gray-900">
-                Templates
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

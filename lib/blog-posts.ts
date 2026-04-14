@@ -29,6 +29,7 @@ export type BlogPost = {
   date: string;
   readTime: string;
   excerpt: string;
+  image?: string;
   sections: PostSection[];
 };
 
@@ -49,6 +50,387 @@ export const CATEGORY_COLORS: Record<string, string> = {
 /*  (newest first = correct index order)   */
 /* ─────────────────────────────────────── */
 export const POSTS: BlogPost[] = [
+  /* ── Batch 2 — Expanded Niches & Categories ──────── */
+  {
+    slug: 'how-to-start-online-f-and-b-business-malaysia',
+    title:
+      'How to start an online F&B business in Malaysia: from menu to first sale',
+    category: 'E-Commerce',
+    date: '2026-04-14',
+    readTime: '10 min',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80',
+    excerpt:
+      'A step-by-step guide for Malaysian F&B entrepreneurs — from building your online menu to processing your first FPX payment.',
+    sections: [
+      {
+        body: 'Malaysia\'s food industry is worth over RM 65 billion, yet a huge number of F&B operators still rely on walk-ins and WhatsApp orders. The pandemic proved that an online ordering presence is not optional — it is a survival requirement. Whether you run a home-based bakery, a nasi lemak stall, or a café chain, getting online properly means more than just posting on Instagram. It means having a structured menu, accepting payments digitally, and tracking which products actually sell.',
+      },
+      {
+        heading: 'Step 1 — Build your digital menu page',
+        body: 'Forget PDFs and image-based menus. A proper digital menu is a landing page with product cards, clear pricing in RM, high-quality food photography, and a direct order flow. With a no-code builder like X.IDE, you can drag-and-drop a product grid, add variant options (size, spice level, add-ons), and publish in under two hours. Use niche-specific templates designed for F&B — they already include sections for bestsellers, combo deals, and operating hours.',
+      },
+      {
+        heading: 'Step 2 — Set up Malaysian payment processing',
+        body: 'Your customers want to pay with FPX, Touch \'n Go eWallet, or GrabPay — not dig out a credit card. Integrating these methods used to require a developer and weeks of work. With LeanX (https://leanx.io/) integrated natively into your page builder, you activate Malaysian payment methods in minutes. Settlement is fast, and you get a dashboard to track every transaction. This is the single biggest friction remover for F&B businesses going online.',
+      },
+      {
+        heading: 'Step 3 — Drive orders with social media + SEO',
+        body: 'Once your page is live, share the link everywhere — Instagram bio, WhatsApp status, Google Business Profile. Set up Meta Pixel tracking so you can retarget people who viewed your menu but did not order. Write a blog post about your signature dish and optimise it for local search terms like "best nasi lemak delivery KL". The combination of a conversion-optimised page and targeted traffic is what separates hobby sellers from real F&B businesses.',
+      },
+      {
+        heading: 'Step 4 — Optimise based on data',
+        body: 'Track which items get the most views versus actual purchases. If your ayam goreng page gets traffic but low conversion, the problem might be pricing, photography, or a confusing checkout. Use your analytics dashboard to identify drop-off points. A/B test different hero images. Over time, your data tells you exactly what to promote and what to retire.',
+      },
+      {
+        heading: 'The bottom line',
+        body: 'Starting an online F&B business in Malaysia is no longer expensive or complicated. The tools exist. The payment infrastructure — specifically Malaysian-focused gateways like LeanX (https://leanx.io/) — is ready. The only question is whether you start today or let your competitors get there first.',
+      },
+    ],
+  },
+  {
+    slug: 'google-ads-landing-page-tips-malaysia',
+    title:
+      '7 landing page rules that make your Google Ads actually convert in Malaysia',
+    category: 'Marketing',
+    date: '2026-04-13',
+    readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+    excerpt:
+      'Spending on Google Ads but getting poor ROAS? Your landing page is probably the problem — here are 7 fixes.',
+    sections: [
+      {
+        body: 'Malaysian businesses collectively spend millions on Google Ads every month, yet the average conversion rate hovers around 2-3%. The gap between a 2% and a 6% conversion rate is not better keywords — it is a better landing page. Your ad gets the click; your landing page gets the sale. If you are sending paid traffic to your homepage or a generic page, you are burning money.',
+      },
+      {
+        heading: '1. Match your headline to the search intent',
+        body: 'If someone searches "beli tilam murah online", your landing page headline must immediately confirm they are in the right place. A headline like "Premium Mattresses — Free Delivery KL/Selangor" matches intent perfectly. A generic "Welcome to Our Store" does not. This single change can improve conversion by 30-50%.',
+      },
+      {
+        heading: '2. Show pricing in RM — immediately',
+        body: 'Malaysian buyers want to see prices upfront. Do not hide pricing behind a "Contact Us" form unless you are selling enterprise B2B services. For consumer products, show the price with any available instalment options (BNPL via Atome, FPX monthly). Transparency builds trust and reduces bounce.',
+      },
+      {
+        heading: '3. Add Malaysian payment trust signals',
+        body: 'Display the payment methods you accept — FPX, GrabPay, Touch \'n Go, credit cards. Malaysian shoppers look for these logos before they commit. When your checkout is powered by a trusted Malaysian payment gateway like LeanX (https://leanx.io/), conversion friction drops dramatically because buyers see familiar, local payment options.',
+      },
+      {
+        heading: '4. One page, one goal',
+        body: 'Your Google Ads landing page should have one CTA — buy, book, or enquire. Remove navigation menus, footer links, and anything that distracts from the conversion goal. Every element on the page should push toward that single action. This is why dedicated landing pages built in tools like X.IDE outperform generic website pages.',
+      },
+      {
+        heading: '5. Load fast on mobile',
+        body: 'Over 85% of Malaysian internet users browse on mobile. If your page takes more than 3 seconds to load, you lose half your visitors. Use optimised images (WebP format), minimal JavaScript, and a builder that outputs lightweight code. Test with Google PageSpeed Insights — aim for 90+ on mobile.',
+      },
+      {
+        heading: '6. Add social proof in Bahasa and English',
+        body: 'Testimonials, review screenshots, and "X customers served" counters work powerfully in Malaysia. Use bilingual social proof — BM for mass market, English for urban/professional segments. Video testimonials from real customers are the highest-converting format.',
+      },
+      {
+        heading: '7. Set up conversion tracking properly',
+        body: 'Without proper tracking, you cannot optimise. Install Google Ads conversion tracking, Google Analytics 4, and Meta Pixel on every landing page. Track add-to-cart, form submissions, and completed purchases separately. This data feeds Google\'s algorithm and improves your ad targeting over time. Platforms like X.IDE let you set up all pixels in one settings panel — no code required.',
+      },
+    ],
+  },
+  {
+    slug: 'instagram-shop-to-real-website-malaysia',
+    title:
+      'Why your Instagram shop needs a real website (and how to build one in a day)',
+    category: 'E-Commerce',
+    date: '2026-04-12',
+    readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&q=80',
+    excerpt:
+      'Instagram is great for discovery, but terrible for closing sales — here is how to bridge the gap.',
+    sections: [
+      {
+        body: 'Thousands of Malaysian businesses run entirely on Instagram — posting product photos, taking orders via DM, and collecting payments through manual bank transfer. It works, until it does not. You lose track of orders, customers ghost after requesting your bank details, and you have zero analytics on what products people actually want. Instagram is a discovery platform, not a sales platform.',
+      },
+      {
+        heading: 'The DM-to-sale conversion problem',
+        body: 'Studies show that for every 10 DM enquiries, only 2-3 convert to actual purchases. The friction is enormous: customers ask for price, you reply, they ask for size/colour, you reply, they ask for postage, you reply, they say "I\'ll think about it" — and disappear. A product page with clear pricing, variants, shipping info, and a one-click checkout eliminates 80% of this back-and-forth.',
+      },
+      {
+        heading: 'What your website needs to do',
+        body: 'You do not need a complex e-commerce store. You need a simple, beautiful product page with: high-quality product images, clear pricing in RM, variant selection (size, colour), a checkout that accepts FPX and e-wallets via LeanX (https://leanx.io/), and a WhatsApp button for support. That is it. One page per product or collection, linked from your Instagram bio.',
+      },
+      {
+        heading: 'Build it in one day — seriously',
+        body: 'With X.IDE, you pick a template, replace the images and text with your own products, connect your LeanX (https://leanx.io/) payment account, and publish. Your page gets a free subdomain immediately, or you can connect your own .com.my domain. The entire process takes 2-4 hours for someone who has never built a website before.',
+      },
+      {
+        heading: 'Link your Instagram to your new page',
+        body: 'Update your Instagram bio link to your product page (or use a link-in-bio tool pointing to multiple pages). In your Stories and Reels, add swipe-up links or "link in bio" CTAs. Now every piece of content you post drives to a conversion-optimised page instead of a DM conversation. Your conversion rate jumps, your order tracking improves, and you look professional.',
+      },
+      {
+        heading: 'Track what works',
+        body: 'Install Meta Pixel on your website to create Custom Audiences from your page visitors. Now you can run retargeting ads to people who viewed your product but did not buy — the highest-ROI ad format available. This is impossible when you are selling through DMs alone. A real website turns your Instagram from a hustle into a scalable business.',
+      },
+    ],
+  },
+  {
+    slug: 'beauty-salon-website-guide-malaysia',
+    title:
+      'The complete website guide for Malaysian beauty salons and clinics',
+    category: 'Tutorial',
+    date: '2026-04-11',
+    readTime: '9 min',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80',
+    excerpt:
+      'How beauty salons, spas, and aesthetic clinics in Malaysia can build a website that actually books appointments.',
+    sections: [
+      {
+        body: 'The beauty and wellness industry in Malaysia is booming — from nail salons in SS15 to aesthetic clinics in Mont Kiara. Yet most operators still rely on WhatsApp bookings and Instagram DMs to manage appointments. The result: double bookings, no-shows, and zero data on which services drive the most revenue. A simple website changes everything.',
+      },
+      {
+        heading: 'What your salon website must include',
+        body: 'Your website needs five core sections: (1) Hero with your best interior/service photos and a "Book Now" CTA, (2) Services menu with pricing in RM, (3) Before & after gallery for treatments, (4) Booking form with date/time selection, and (5) Location map + operating hours. That is the minimum viable salon website. Anything else is a bonus.',
+      },
+      {
+        heading: 'Accept deposits to reduce no-shows',
+        body: 'No-shows cost Malaysian salons an estimated RM 500-2,000 per month. The solution: require a 50% deposit at booking. With LeanX (https://leanx.io/) payment integration, you can add a deposit payment step to your booking form. Customers pay via FPX or e-wallet when they book. No-shows drop by 60-70% overnight.',
+      },
+      {
+        heading: 'Build once, update easily',
+        body: 'Salon menus change — new treatments, seasonal promotions, price adjustments. A website built on a no-code platform like X.IDE lets you update pricing, swap photos, and add new service cards without calling a developer. You manage your own site the same way you manage your Instagram — but with the permanence and professionalism of a real web presence.',
+      },
+      {
+        heading: 'Get found on Google',
+        body: 'When someone in Bangsar searches "facial treatment near me", Google shows local results. To appear in these results, you need: a Google Business Profile (free), a website linked to that profile, and consistent NAP (Name, Address, Phone) information. Your website is the anchor that makes all your other digital marketing work harder.',
+      },
+      {
+        heading: 'Upsell and package deals',
+        body: 'Your website can do what Instagram cannot: structured upselling. Create package pages — "Bridal Glow Package", "Monthly Facial Subscription" — with clear pricing and a checkout flow. Add bump offers at checkout (add a hair mask for RM 29). These strategies increase average order value by 20-40% and are built directly into platforms like X.IDE with LeanX (https://leanx.io/) payment support.',
+      },
+    ],
+  },
+  {
+    slug: 'facebook-ads-for-local-businesses-malaysia',
+    title:
+      'Facebook Ads for Malaysian local businesses: the only guide you need in 2026',
+    category: 'Marketing',
+    date: '2026-04-10',
+    readTime: '11 min',
+    image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=1200&q=80',
+    excerpt:
+      'A practical, no-fluff Facebook Ads guide specifically for Malaysian local businesses — from budget to targeting to landing pages.',
+    sections: [
+      {
+        body: 'Facebook and Instagram remain the dominant advertising platforms for Malaysian local businesses. With over 28 million Malaysian users on META platforms, the reach is unmatched. But reach without strategy is just noise. This guide covers everything you need to run profitable META ads as a local business in Malaysia — from RM 10/day budgets to advanced retargeting.',
+      },
+      {
+        heading: 'Start with the right campaign objective',
+        body: 'For local businesses, there are really only three objectives that matter: Traffic (drive people to your website/landing page), Leads (collect contact information directly on Facebook), and Conversions (optimise for purchases or bookings). If you are just starting, use Traffic to your landing page. Once you have 50+ conversions tracked, switch to Conversion optimisation — Facebook\'s algorithm gets smarter with data.',
+      },
+      {
+        heading: 'Targeting: go hyper-local',
+        body: 'Target by radius around your business location (5-15km for urban, 25km for suburban). Layer with interests relevant to your industry — "Skincare" for beauty salons, "Home renovation" for contractors, "Fitness" for gyms. Exclude ages outside your customer profile. For Malaysia specifically, test separate ad sets for BM and English audiences — the messaging style differs significantly.',
+      },
+      {
+        heading: 'Creative that works in Malaysia',
+        body: 'Video outperforms static images by 2-3x in the Malaysian market. Shoot short, authentic videos (15-30 seconds) showing your product or service in action. Use text overlays in both BM and English. Include the price — Malaysians respond to price transparency. Before-and-after content works exceptionally well for beauty, renovation, and automotive businesses.',
+      },
+      {
+        heading: 'The landing page is where money is made or lost',
+        body: 'Your ad gets the click. Your landing page gets the sale. Sending traffic to your Instagram page or a generic homepage is the most common (and expensive) mistake. Build a dedicated landing page for each ad campaign with a headline that matches your ad copy, the same offer/price shown in the ad, Malaysian payment options via LeanX (https://leanx.io/), and a single clear CTA. Tools like X.IDE let you build and publish these pages in hours, not weeks.',
+      },
+      {
+        heading: 'Budget: start small, scale what works',
+        body: 'Start with RM 20-30/day per ad set. Run for 3-5 days before judging performance. If cost per click is under RM 1 and cost per lead is under RM 15, you have a winner — increase budget by 20% every 3 days. If not, change the creative first, then the audience, then the offer. Never scale a losing ad.',
+      },
+      {
+        heading: 'Retargeting: the profit multiplier',
+        body: 'Install Meta Pixel on your website. After 7 days, create a Custom Audience of people who visited but did not convert. Run a retargeting campaign to this audience with a stronger offer — a discount, free delivery, or limited-time bonus. Retargeting typically converts at 3-5x the rate of cold traffic. This is why having a proper website with pixel tracking is non-negotiable.',
+      },
+      {
+        heading: 'Measure what matters',
+        body: 'The metrics that matter for local businesses: Cost Per Lead (CPL), Cost Per Acquisition (CPA), and Return on Ad Spend (ROAS). Ignore vanity metrics like reach and impressions. Set up proper conversion tracking from day one — this is the foundation of profitable advertising. Your analytics dashboard should show you exactly which ad, which audience, and which landing page drives the most revenue.',
+      },
+    ],
+  },
+  {
+    slug: 'ecommerce-shipping-guide-malaysia',
+    title:
+      'E-commerce shipping in Malaysia: costs, providers, and how to not lose money on delivery',
+    category: 'Operations',
+    date: '2026-04-09',
+    readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80',
+    excerpt:
+      'A practical breakdown of Malaysian shipping options, pricing strategies, and how to turn delivery from a cost centre into a competitive advantage.',
+    sections: [
+      {
+        body: 'Shipping is often the make-or-break factor for Malaysian e-commerce businesses. Charge too much and customers abandon cart. Offer free shipping and your margins disappear. The key is understanding the actual costs, choosing the right courier partners, and building shipping into your pricing strategy — not treating it as an afterthought.',
+      },
+      {
+        heading: 'Malaysian courier landscape in 2026',
+        body: 'The major players: J&T Express (fastest growing, strong Shopee integration), Pos Laju (widest coverage including East Malaysia), DHL eCommerce (reliable for West Malaysia), Ninja Van (competitive rates for SMEs), and GDex (budget option for lightweight items). Each has different strengths — J&T for speed, Pos Laju for rural reach, Ninja Van for volume discounts. Most SMEs should work with 2-3 couriers to optimise for cost and coverage.',
+      },
+      {
+        heading: 'Pricing strategies that work',
+        body: 'Three approaches: (1) Flat rate — e.g., RM 8 West Malaysia, RM 15 East Malaysia. Simple and predictable. (2) Free shipping above a threshold — "Free shipping for orders above RM 100." This increases average order value by 15-30%. (3) Built-in shipping — add RM 5-8 to your product price and advertise "free shipping." Psychologically, customers prefer paying RM 58 with free shipping over RM 50 + RM 8 delivery.',
+      },
+      {
+        heading: 'Integrate shipping into your checkout flow',
+        body: 'Your checkout page should calculate shipping automatically based on the customer\'s postcode. Show the delivery estimate ("3-5 business days to Johor") next to the shipping fee. When your payment processing is handled by a reliable gateway like LeanX (https://leanx.io/), the total — including shipping — is charged in one seamless transaction. No manual calculations, no awkward "I\'ll DM you the total" messages.',
+      },
+      {
+        heading: 'Packaging tips that save money',
+        body: 'Courier pricing is based on actual weight or volumetric weight — whichever is higher. Use the smallest box possible. Invest in polymailer bags for clothing and soft goods (half the volumetric cost of boxes). Buy packaging in bulk — a box that costs RM 2.50 each drops to RM 1.20 at quantities of 200+. These savings compound at scale.',
+      },
+      {
+        heading: 'Handle returns before they happen',
+        body: 'State your return policy clearly on your product page. For fashion and beauty, expect 5-10% returns. Build this into your pricing. Offer exchanges as the default option instead of refunds — this retains revenue while keeping customers happy. The best return policy is a product page so good that customers know exactly what they are buying before they click "Pay".',
+      },
+    ],
+  },
+  {
+    slug: 'tiktok-shop-vs-own-website-malaysia',
+    title:
+      'TikTok Shop vs your own website: where should Malaysian sellers focus in 2026?',
+    category: 'E-Commerce',
+    date: '2026-04-08',
+    readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=1200&q=80',
+    excerpt:
+      'TikTok Shop is booming in Malaysia, but smart sellers are building their own websites too — here is why.',
+    sections: [
+      {
+        body: 'TikTok Shop has taken Malaysia by storm. In 2025-2026 alone, thousands of businesses started selling directly through TikTok\'s in-app checkout. The attraction is obvious: massive reach, algorithm-driven discovery, and a young, engaged audience. But there is a growing tension — businesses that rely solely on TikTok Shop are building on rented land.',
+      },
+      {
+        heading: 'The case for TikTok Shop',
+        body: 'TikTok Shop is unmatched for discovery. A single viral video can generate thousands of sales overnight. The algorithm favours authentic, engaging content over polished ads. Commission rates (1-5%) are reasonable. For new brands with zero audience, TikTok Shop provides instant access to millions of Malaysian users without any upfront investment in a website or paid ads.',
+      },
+      {
+        heading: 'The risks of platform dependency',
+        body: 'TikTok controls the algorithm, the customer data, and the rules. A policy change can tank your sales overnight. You do not own your customer list — TikTok does. You cannot retarget buyers on other platforms. Your pricing is visible to every competitor. And TikTok\'s commission structure can change at any time. Remember when Shopee raised fees? Sellers with no alternative got squeezed.',
+      },
+      {
+        heading: 'The smart play: both',
+        body: 'The most successful Malaysian e-commerce operators in 2026 use TikTok Shop for discovery and their own website for retention and margin. Here is the playbook: sell trending and entry-level products on TikTok Shop (volume play), then direct repeat customers to your own website where margins are higher and you own the data. Your website runs on your terms — your pricing, your branding, your customer relationships.',
+      },
+      {
+        heading: 'Building your website alongside TikTok',
+        body: 'Your website does not need to replicate TikTok Shop. It needs to do three things: (1) showcase your full product range with proper descriptions, (2) accept Malaysian payments seamlessly via FPX, e-wallets, and BNPL through LeanX (https://leanx.io/), and (3) capture customer emails and phone numbers for direct marketing. Build it with a no-code tool, publish it in a day, and start linking from your TikTok bio and content.',
+      },
+      {
+        heading: 'The data advantage',
+        body: 'On your own website, you see everything: which products people view, where they drop off, which traffic source converts best, and who your repeat buyers are. Install Meta Pixel and Google Analytics. Build email lists. Run retargeting ads. This data is worth more than any single TikTok sale. The businesses that win long-term are the ones that own their customer data.',
+      },
+    ],
+  },
+  {
+    slug: 'home-service-business-website-malaysia',
+    title:
+      'How Malaysian home service businesses can get more leads with a simple website',
+    category: 'Tutorial',
+    date: '2026-04-07',
+    readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80',
+    excerpt:
+      'Plumbers, electricians, contractors, and cleaners — here is how a basic website can triple your monthly leads.',
+    sections: [
+      {
+        body: 'If you run a home service business in Malaysia — plumbing, electrical, air-cond servicing, renovation, cleaning, pest control — you know that word-of-mouth and WhatsApp referrals are your bread and butter. But there is a massive untapped channel: people searching Google for "plumber near me" or "aircon service Petaling Jaya". These are people ready to hire right now, and they are going to whoever shows up first with a professional-looking website.',
+      },
+      {
+        heading: 'Why home service businesses need a website',
+        body: 'Three reasons: (1) Google Search — "plumber taman tun" gets hundreds of searches monthly. Without a website, you are invisible. (2) Credibility — a customer choosing between a business with only a WhatsApp number and one with a proper website will pick the website every time. (3) Lead capture — instead of fielding 50 WhatsApp messages asking the same questions, your website answers them and collects only serious enquiries.',
+      },
+      {
+        heading: 'The perfect home service landing page',
+        body: 'Keep it simple: Hero section with your service area ("Professional Plumbing Services — Klang Valley"), a list of services with pricing ranges, 4-5 photos of completed work, customer testimonials, and a lead form asking for name, phone, location, and problem description. That is your entire website. One page. Build it in X.IDE in 2-3 hours.',
+      },
+      {
+        heading: 'Accept deposits for bookings',
+        body: 'For larger jobs (renovation, full air-cond servicing), require a deposit to confirm the booking. This filters out time-wasters and secures your schedule. With LeanX (https://leanx.io/) payment integration, customers can pay a deposit via FPX immediately after submitting their booking request. You get the deposit in your bank account within one business day.',
+      },
+      {
+        heading: 'Get found on Google for free',
+        body: 'Set up Google Business Profile (GBP) — it is free. Add your website URL, service area, business hours, and photos. Ask happy customers to leave Google reviews. The combination of GBP + a website with relevant content (e.g., a page titled "Air-Cond Service Petaling Jaya") is how you show up in local search results without spending a sen on ads.',
+      },
+      {
+        heading: 'Scale with paid ads when ready',
+        body: 'Once your website is converting organically, amplify with Google Ads targeting "near me" searches in your service area. Start with RM 15-20/day. Each lead might cost RM 10-25, but if your average job is RM 200-500, the ROI is massive. Track every lead from click to closed job. The data will tell you exactly which services and areas are most profitable to advertise.',
+      },
+    ],
+  },
+  {
+    slug: 'automotive-business-digital-marketing-malaysia',
+    title:
+      'Digital marketing for Malaysian automotive businesses: workshops, dealers, and detailers',
+    category: 'Marketing',
+    date: '2026-04-06',
+    readTime: '9 min',
+    image: 'https://images.unsplash.com/photo-1487754180451-c456f7ff24f2?w=1200&q=80',
+    excerpt:
+      'How car workshops, used car dealers, and auto detailers in Malaysia can use digital marketing to fill their bays.',
+    sections: [
+      {
+        body: 'The Malaysian automotive aftermarket is massive — over 33 million registered vehicles on the road, each needing regular servicing, repairs, and upgrades. Yet most workshops, dealers, and detailers still rely on signboard visibility and word-of-mouth. The businesses that embrace digital marketing are pulling ahead fast, and the barrier to entry has never been lower.',
+      },
+      {
+        heading: 'The automotive customer journey online',
+        body: 'When a car owner needs a service, they search Google ("car workshop near Subang Jaya"), ask in Facebook Groups ("recommend good spray paint shop PJ"), or search Instagram for detailing results. Your business needs to show up in at least one of these channels. The ideal setup: a Google Business Profile for search visibility, active social media for trust building, and a website for conversion.',
+      },
+      {
+        heading: 'Building your automotive business website',
+        body: 'For workshops: list your services (engine overhaul, brake service, battery replacement) with transparent pricing ranges. Show your workshop interior and equipment — cleanliness builds trust. For detailers: before-and-after galleries are your best conversion tool. For used car dealers: individual vehicle pages with specs, photos, and a "Book Test Drive" form. All of these can be built with no-code templates in X.IDE.',
+      },
+      {
+        heading: 'Accept bookings and deposits online',
+        body: 'Let customers book service appointments online with a date/time selector and optional deposit payment. Workshops that accept online bookings report 40% fewer no-shows compared to phone-only booking. Process deposits through LeanX (https://leanx.io/) — your customer pays RM 50-100 via FPX to confirm their slot, and you have guaranteed revenue before they even arrive.',
+      },
+      {
+        heading: 'Facebook and Instagram strategy for automotive',
+        body: 'Content that works: transformation videos (before/after detailing), time-lapse repair videos, customer testimonial clips, and educational content ("5 signs your brake pads need replacing"). Post 3-4 times per week. Use location tags and automotive hashtags (#workshopKL, #cardetailingMalaysia). Run targeted ads to car owners within a 10-15km radius of your location.',
+      },
+      {
+        heading: 'Google Ads for immediate results',
+        body: 'Google Ads for automotive services has high intent. Someone searching "timing belt replacement Klang" is ready to spend RM 500-1,500 today. Target specific service keywords + location. Send traffic to a dedicated landing page (not your homepage) with the service, pricing, and a booking form. At RM 2-5 per click and 5-10% conversion rate, each lead costs RM 20-100 — a fraction of the job value.',
+      },
+      {
+        heading: 'Tracking and optimisation',
+        body: 'Set up conversion tracking on your website — every form submission, every deposit payment, every phone call click. After 30 days, you will know exactly which channels drive the most valuable customers. Double down on what works, cut what does not. Digital marketing for automotive is not complicated — it just needs to be measured.',
+      },
+    ],
+  },
+  {
+    slug: 'education-tuition-centre-website-malaysia',
+    title:
+      'How Malaysian tuition centres and educators can build a website that enrols students',
+    category: 'Tutorial',
+    date: '2026-04-05',
+    readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80',
+    excerpt:
+      'A practical guide for tuition centres, online tutors, and education businesses in Malaysia to get more student sign-ups through a simple website.',
+    sections: [
+      {
+        body: 'Malaysia has one of the highest tuition rates in Southeast Asia — over 70% of students attend some form of tuition or enrichment class. That is a massive market. Yet most tuition centres still advertise through banners on fences and flyers in letterboxes. The parents who are actually making decisions for their children are searching online, reading reviews, and comparing options on their phones.',
+      },
+      {
+        heading: 'What parents look for in a tuition centre website',
+        body: 'Parents evaluating tuition centres want: (1) subjects and levels offered (SPM, IGCSE, PT3, UPSR), (2) teacher qualifications and experience, (3) class schedules and fees, (4) results and testimonials (number of students scoring A), and (5) location and contact details. A website that answers all five questions clearly will convert visitors into enrolments.',
+      },
+      {
+        heading: 'Build your education landing page',
+        body: 'Use a no-code builder like X.IDE to create a structured page: hero section with your centre\'s name and tagline ("Helping SPM Students Score A+ Since 2018"), subject cards with pricing per month, teacher profiles with credentials, a results section ("85% of our students improved by 2 grades"), and a registration form. Publish in an afternoon.',
+      },
+      {
+        heading: 'Accept registration fees and monthly payments online',
+        body: 'Replace manual bank transfers with online payment links. Send parents a payment link for registration fees, monthly tuition, or material costs. Process everything through LeanX (https://leanx.io/) — parents pay via FPX or e-wallet, you get an instant notification, and the payment is reconciled automatically. No more chasing parents for late payments with awkward WhatsApp messages.',
+      },
+      {
+        heading: 'Sell courses and workshops online',
+        body: 'Beyond regular tuition, create landing pages for intensive workshops (SPM Crash Course, IGCSE Revision Camp), holiday programmes, and online courses. Each page has its own pricing, schedule, and payment checkout. This diversifies your revenue beyond monthly tuition fees and reaches students outside your physical location.',
+      },
+      {
+        heading: 'Get found by parents searching online',
+        body: 'Optimise your website for local search terms: "tuition centre Kota Damansara", "SPM Maths tutor Ampang", "IGCSE science tuition Subang". Set up Google Business Profile, encourage parent reviews, and write a few blog posts about study tips (these rank well for education keywords). Your website becomes a 24/7 enrolment machine — working while you are in class teaching.',
+      },
+    ],
+  },
   /* ── Batch 1 — Landing Pages, Payments & Checkout ──────── */
   {
     slug: 'why-malaysian-smes-ditching-developers-for-no-code-builders',
@@ -57,6 +439,7 @@ export const POSTS: BlogPost[] = [
     category: 'Growth',
     date: '2026-04-02',
     readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
     excerpt:
       'A cost-vs-time analysis of hiring a developer versus launching with a no-code builder — with real Malaysian pricing.',
     sections: [
@@ -92,6 +475,7 @@ export const POSTS: BlogPost[] = [
     category: 'Growth',
     date: '2026-03-28',
     readTime: '9 min',
+    image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&q=80',
     excerpt:
       'A section-by-section teardown of what Malaysian buyers respond to — from hero headlines to payment trust signals.',
     sections: [
@@ -131,6 +515,7 @@ export const POSTS: BlogPost[] = [
     category: 'Tutorial',
     date: '2026-03-21',
     readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80',
     excerpt:
       'A timed, step-by-step walkthrough for solo founders, Shopee sellers, and course creators launching their own product page.',
     sections: [
@@ -165,6 +550,7 @@ export const POSTS: BlogPost[] = [
     category: 'Growth',
     date: '2026-03-14',
     readTime: '6 min',
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80',
     excerpt:
       'Slow load times, missing FPX support, no inventory sync — if your builder has these problems, you are losing revenue.',
     sections: [
@@ -208,6 +594,7 @@ export const POSTS: BlogPost[] = [
     category: 'Tutorial',
     date: '2026-03-07',
     readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=1200&q=80',
     excerpt:
       'When each approach makes sense — budget benchmarks, timeline comparison, and maintenance cost for Malaysian SMEs.',
     sections: [
@@ -247,6 +634,7 @@ export const POSTS: BlogPost[] = [
     category: 'Payments',
     date: '2026-02-28',
     readTime: '12 min',
+    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
     excerpt:
       'FPX, e-wallets, cards, BNPL — everything Malaysian merchants need to know about accepting payments online.',
     sections: [
@@ -286,6 +674,7 @@ export const POSTS: BlogPost[] = [
     category: 'Payments',
     date: '2026-02-21',
     readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80',
     excerpt:
       'A data-driven analysis of Buy Now Pay Later adoption in Malaysia — basket size lift, conversion changes, and the RM 150 threshold.',
     sections: [
@@ -321,6 +710,7 @@ export const POSTS: BlogPost[] = [
     category: 'Growth',
     date: '2026-02-14',
     readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1200&q=80',
     excerpt:
       'CRO-focused deep dive into checkout optimisation — method breadth, loading speed, trust signals, and mobile UX.',
     sections: [
@@ -359,6 +749,7 @@ export const POSTS: BlogPost[] = [
     category: 'Payments',
     date: '2026-02-07',
     readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?w=1200&q=80',
     excerpt:
       'Segmented analysis by buyer type, AOV, device, and business category — with a recommendation matrix for Malaysian merchants.',
     sections: [
@@ -394,6 +785,7 @@ export const POSTS: BlogPost[] = [
     category: 'Payments',
     date: '2026-01-31',
     readTime: '6 min',
+    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80',
     excerpt:
       'The practical cashflow impact of T+1 versus T+5 settlement — with real scenarios for Malaysian merchants.',
     sections: [
@@ -428,6 +820,7 @@ export const POSTS: BlogPost[] = [
     category: 'Tutorial',
     date: '2025-12-10',
     readTime: '5 min',
+    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80',
     excerpt:
       'Walk through the entire process — choosing a template, customising it in X.IDE, connecting a domain, and hitting publish.',
     sections: [
@@ -466,6 +859,7 @@ export const POSTS: BlogPost[] = [
     category: 'Design',
     date: '2025-12-03',
     readTime: '7 min',
+    image: 'https://images.unsplash.com/photo-1545235617-9465d2a55698?w=1200&q=80',
     excerpt:
       'From glassmorphism evolving to spatial UI and AI-assisted layouts — the trends shaping the web next year.',
     sections: [
@@ -508,6 +902,7 @@ export const POSTS: BlogPost[] = [
     category: 'Payments',
     date: '2025-11-22',
     readTime: '6 min',
+    image: 'https://images.unsplash.com/photo-1556742208-999815fca738?w=1200&q=80',
     excerpt:
       'A no-jargon breakdown of FPX online banking, debit/credit card processing, and which works best for your e-commerce checkout.',
     sections: [
@@ -546,6 +941,7 @@ export const POSTS: BlogPost[] = [
     category: 'Development',
     date: '2025-11-15',
     readTime: '8 min',
+    image: 'https://images.unsplash.com/photo-1550439062-609e1531270e?w=1200&q=80',
     excerpt:
       'Using transform and opacity correctly, will-change gotchas, and when to prefer the Web Animations API over CSS keyframes.',
     sections: [
@@ -584,6 +980,7 @@ export const POSTS: BlogPost[] = [
     category: 'Product',
     date: '2025-11-01',
     readTime: '3 min',
+    image: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80',
     excerpt:
       "Today we're launching our UI element library: 100+ production-ready animations and 29 layout sections, free to preview.",
     sections: [
@@ -618,6 +1015,7 @@ export const POSTS: BlogPost[] = [
     category: 'Growth',
     date: '2025-10-28',
     readTime: '10 min',
+    image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=1200&q=80',
     excerpt:
       'Titles, meta descriptions, structured data, Core Web Vitals — the must-haves before you start thinking about backlinks.',
     sections: [
