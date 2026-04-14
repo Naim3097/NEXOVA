@@ -78,13 +78,13 @@ export default function ServicesPage() {
       {/* Hero */}
       <section className="pt-16 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             Digital services to{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA]">
               grow your business
             </span>
           </h1>
-          <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             From ads to apps — our team handles the digital heavy lifting so you
             can focus on what you do best.
           </p>
@@ -109,7 +109,7 @@ export default function ServicesPage() {
                   >
                     <Icon className="w-7 h-7 text-white" />
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">
                     {service.title}
                   </h2>
                   <p className="text-gray-500 leading-relaxed mb-4">
@@ -131,10 +131,10 @@ export default function ServicesPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 Not sure where to start?
               </h2>
-              <p className="text-xl text-gray-500">
+              <p className="text-lg text-gray-500">
                 Tell us about your business and we&apos;ll recommend the right
                 services. No commitment, just honest advice.
               </p>

@@ -16,6 +16,8 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { ContactForm } from '@/components/landing/ContactForm';
+import { Navbar } from '@/components/landing/Navbar';
+import { Footer } from '@/components/landing/Footer';
 import type { ServiceData } from '@/lib/services-data';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -39,33 +41,7 @@ export default function ServicePageClient({
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between max-w-7xl">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/assets/landing/logo-nexova.png"
-              alt="Nexova"
-              width={120}
-              height={40}
-              className="h-8 w-auto"
-            />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/services"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hidden sm:block"
-            >
-              All Services
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-gradient-to-r from-[#5BC0BE] to-[#7C74EA] hover:opacity-90 text-white rounded-full px-6 border-0">
-                Get Started
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-4">
@@ -95,10 +71,10 @@ export default function ServicePageClient({
             >
               <Icon className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               {service.headline}
             </h1>
-            <p className="text-xl text-gray-500 leading-relaxed mb-8">
+            <p className="text-lg text-gray-500 leading-relaxed mb-8">
               {service.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -129,7 +105,7 @@ export default function ServicePageClient({
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-10">
               {service.problem.heading}
             </h2>
             <div className="space-y-4">
@@ -153,10 +129,10 @@ export default function ServicePageClient({
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
               {service.solution.heading}
             </h2>
-            <p className="text-xl text-gray-500 leading-relaxed">
+            <p className="text-lg text-gray-500 leading-relaxed">
               {service.solution.description}
             </p>
           </div>
@@ -167,10 +143,10 @@ export default function ServicePageClient({
       <section id="process" className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
               How it works
             </h2>
-            <p className="text-xl text-gray-500">
+            <p className="text-lg text-gray-500">
               A clear process from start to results.
             </p>
           </div>
@@ -200,7 +176,7 @@ export default function ServicePageClient({
       {/* FAQ */}
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
@@ -240,10 +216,10 @@ export default function ServicePageClient({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 Ready to get started?
               </h2>
-              <p className="text-xl text-gray-500 mb-6">
+              <p className="text-lg text-gray-500 mb-6">
                 No commitment, no hard sell. Just honest advice on what your
                 business needs.
               </p>
