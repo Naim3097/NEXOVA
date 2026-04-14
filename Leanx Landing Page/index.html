@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Templates - Lean.x</title>
+    <link rel="stylesheet" href="brand-variables.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            color: #455263;
+            background-color: #F8FAFC;
+        }
+
+        /* Nexova Navbar */
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0;
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #455263;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .nav-menu a:hover {
+            background: #F8FAFC;
+            color: #5BC0BE;
+        }
+
+        .btn-nav-signup {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white !important;
+            padding: 0.5rem 1.4rem !important;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 12px rgba(91,192,190,0.3);
+        }
+
+        .btn-nav-signup:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(91,192,190,0.4) !important;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA) !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(91, 192, 190, 0.12), rgba(124, 116, 234, 0.10));
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #455263;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: #6B7280;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #455263;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #5BC0BE;
+            box-shadow: 0 4px 12px rgba(91, 192, 190, 0.15);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(91,192,190,0.3);
+        }
+
+        .btn-search:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #5BC0BE;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Filter Bar (Framer Style) */
+        .filter-bar {
+            display: flex;
+            gap: 0.8rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 3rem;
+            scrollbar-width: none; /* Firefox */
+            justify-content: center;
+        }
+        .filter-bar::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        
+        .filter-pill {
+            padding: 0.6rem 1.5rem;
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 9999px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #6B7280;
+            font-weight: 500;
+        }
+        
+        .filter-pill:hover {
+            border-color: #5BC0BE;
+            color: #5BC0BE;
+        }
+        
+        .filter-pill.active {
+            background: #455263;
+            color: white;
+            border-color: #455263;
+        }
+
+        /* Templates Grid (Optimized) */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 3rem 2rem;
+        }
+
+        .template-card {
+            background: transparent;
+            border-radius: 0;
+            overflow: visible;
+            transition: transform 0.3s;
+            box-shadow: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .template-image-container {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+            background: #F8FAFC;
+            position: relative;
+            aspect-ratio: 4/3;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .template-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .template-card:hover .template-image {
+            transform: scale(1.05);
+        }
+
+        .template-info {
+            padding: 0;
+        }
+
+        .template-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.3rem;
+        }
+
+        .template-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #455263;
+            margin: 0;
+        }
+
+        .template-category {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+        
+        .template-price {
+            font-weight: 700;
+            color: #455263;
+        }
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--lean-text-dark);
+        }
+
+        .template-description {
+            font-size: 0.9rem;
+            color: var(--lean-text-body);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .template-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .template-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--lean-text-body);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(91,192,190,0.25);
+        }
+
+        .btn-view:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* CTA Banner */
+        .cta-banner {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            margin: 4rem 0 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(91,192,190,0.25);
+        }
+
+        .cta-banner h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-banner p {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .btn-cta {
+            background-color: white;
+            color: #455263;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #455263;
+            color: white;
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: #5BC0BE;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                flex: none;
+                width: 100%;
+            }
+
+            .templates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .stats {
+                gap: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-banner h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #455263;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo">
+            <button class="mobile-menu-toggle">☰</button>
+            <ul class="nav-menu">
+                <li><a href="#services">Services</a></li>
+                <li><a href="index.html">Browse</a></li>
+                <li><a href="#tools">Tools</a></li>
+                <li><a href="#library">Library</a></li>
+                                                    <li><a href="signup.html">Sign Up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Explore Website Templates</h1>
+            <p>Professional website templates for digital products. Customise, launch, and monetise your online business today.</p>
+            
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search templates by name...">
+                <button class="btn-search">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-pill active">All Templates</button>
+            <button class="filter-pill">Blog</button>
+            <button class="filter-pill">E-Commerce</button>
+            <button class="filter-pill">Fitness</button>
+            <button class="filter-pill">Medical</button>
+            <button class="filter-pill">Portfolio</button>
+            <button class="filter-pill">Restaurant</button>
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="templates-grid">
+            <!-- Template 1 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=blog-style'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Blog Style Template.jpeg" alt="Blog Style Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Blog Style Template</h3>
+                        <span class="template-price">$49</span>
+                    </div>
+                    <div class="template-category">Blog</div>
+                </div>
+            </div>
+
+            <!-- Template 2 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=ecommerce-bold'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/E Commerce Bold Template.jpeg" alt="E Commerce Bold Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">E Commerce Bold Template</h3>
+                        <span class="template-price">$59</span>
+                    </div>
+                    <div class="template-category">E-Commerce</div>
+                </div>
+            </div>
+
+            <!-- Template 3 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=fitness-minimal'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Fitness Minimal Template.jpeg" alt="Fitness Minimal Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Fitness Minimal Template</h3>
+                        <span class="template-price">$39</span>
+                    </div>
+                    <div class="template-category">Fitness</div>
+                </div>
+            </div>
+
+            <!-- Template 4 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=medical-elegant'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Medical Elegant Template.jpeg" alt="Medical Elegant Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Medical Elegant Template</h3>
+                        <span class="template-price">$45</span>
+                    </div>
+                    <div class="template-category">Medical</div>
+                </div>
+            </div>
+
+            <!-- Template 5 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=portfolio-minimal'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Portfolio Minimal Template.jpeg" alt="Portfolio Minimal Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Portfolio Minimal Template</h3>
+                        <span class="template-price">$29</span>
+                    </div>
+                    <div class="template-category">Portfolio</div>
+                </div>
+            </div>
+
+            <!-- Template 6 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=restaurant-creative'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Restaurant Creative Template.jpeg" alt="Restaurant Creative Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Restaurant Creative Template</h3>
+                        <span class="template-price">$35</span>
+                    </div>
+                    <div class="template-category">Restaurant</div>
+                </div>
+            </div>
+
+            <!-- Template 7 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=saas-bold'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/SAAS Bold Template.jpeg" alt="SAAS Bold Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">SAAS Bold Template</h3>
+                        <span class="template-price">$69</span>
+                    </div>
+                    <div class="template-category">SAAS</div>
+                </div>
+            </div>
+
+            <!-- Template 8 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=professional-portfolio'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Professional Portfolio Template.jpeg" alt="Professional Portfolio Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Professional Portfolio Template</h3>
+                        <span class="template-price">$49</span>
+                    </div>
+                    <div class="template-category">Portfolio</div>
+                </div>
+            </div>
+
+            <!-- Template 9 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=legal-professional'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Legal Professional Template.jpeg" alt="Legal Professional Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Legal Professional Template</h3>
+                        <span class="template-price">$59</span>
+                    </div>
+                    <div class="template-category">Legal</div>
+                </div>
+            </div>
+
+            <!-- Template 10 -->
+            <div class="template-card" onclick="window.location.href='template-detail.html?template=fitness-bold'">
+                <div class="template-image-container">
+                    <img src="assets/Website Templates/Fitness Bold Template.jpeg" alt="Fitness Bold Template" class="template-image">
+                </div>
+                <div class="template-info">
+                    <div class="template-header-row">
+                        <h3 class="template-title">Fitness Bold Template</h3>
+                        <span class="template-price">$45</span>
+                    </div>
+                    <div class="template-category">Fitness</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Banner -->
+        <div class="cta-banner">
+            <h2>Want unlimited access to all templates?</h2>
+            <p>Subscribe to unlock premium templates and features. Get unlimited assets for just $12.38/month.</p>
+            <a href="signup.html" class="btn-cta">Get Started For Free!</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+                <p style="color: #ddd;">Professional website templates for digital products. Launch your online business today.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="index.html">Browse Templates</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#library">My Library</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="signup.html">Sign Up</a></li>
+                    <li><a href="#">Create Account</a></li>
+                    <li><a href="#">My Favorites</a></li>
+                    <li><a href="#">Profile</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Lean.x. Professional website templates for digital creators.
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const menu = document.querySelector('.nav-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html>

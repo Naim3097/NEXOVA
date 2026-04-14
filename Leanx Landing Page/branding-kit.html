@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean.x Brand Kit</title>
+    <link rel="stylesheet" href="brand-variables.css">
+    <style>
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--bs-body-font-family);
+            color: var(--lean-text-body);
+            background-color: var(--lean-bg-light);
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--lean-text-dark);
+            margin-bottom: 0.5rem;
+        }
+        .logo-accent { color: var(--lean-orange); }
+        .logo-x { color: var(--lean-teal); }
+
+        header p { color: var(--lean-text-body); font-size: 1.1rem; }
+
+        /* Sections */
+        .section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--lean-text-dark);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--lean-bg-light);
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .swatch-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .swatch-card:hover { transform: translateY(-5px); }
+
+        .swatch-color { height: 140px; width: 100%; }
+        .swatch-info { padding: 1.2rem; background: white; }
+        .swatch-name { font-weight: 700; color: var(--lean-text-dark); margin-bottom: 0.25rem; }
+        .swatch-hex { font-family: monospace; color: var(--lean-text-body); }
+        .swatch-usage { font-size: 0.85rem; margin-top: 0.5rem; color: #999; }
+
+        /* Typography */
+        .type-sample { margin-bottom: 1.5rem; }
+        .type-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 0.5rem; }
+        .h1-sample { font-size: 2.5rem; font-weight: 600; color: var(--lean-text-dark); }
+        .h2-sample { font-size: 2rem; font-weight: 600; color: var(--lean-text-dark); }
+        .p-sample { font-size: 1rem; color: var(--lean-text-body); max-width: 600px; }
+
+        /* Buttons */
+        .btn-grid {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: var(--lean-purple);
+            color: white;
+        }
+        .btn-primary:hover { background-color: #7368a3; }
+
+        .btn-secondary {
+            background-color: var(--lean-teal);
+            color: white;
+        }
+        .btn-secondary:hover { background-color: #4ab1b5; }
+
+        .btn-accent {
+            background-color: var(--lean-yellow);
+            color: var(--lean-text-dark);
+        }
+        .btn-accent:hover { background-color: #eec245; }
+
+        /* Footer Preview */
+        .footer-preview {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .footer-top {
+            background-color: var(--lean-purple);
+            padding: 3rem;
+            text-align: center;
+            color: white;
+        }
+        .footer-bottom {
+            background-color: var(--lean-teal);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        /* Copy Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--lean-text-dark);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <div class="container">
+        <header>
+            <img src="assets/Logos/LeanX Logo.png" alt="Lean.x Logo" style="height: 80px; margin-bottom: 1rem;">
+            <p>Official Brand Identity Kit</p>
+        </header>
+
+        <!-- Colors -->
+        <div class="section">
+            <h2 class="section-title">Brand Colors</h2>
+            <div class="color-grid">
+                <!-- Purple -->
+                <div class="swatch-card" onclick="copy('#8479b2')">
+                    <div class="swatch-color" style="background-color: var(--lean-purple)"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Lean Purple</div>
+                        <div class="swatch-hex">#8479b2</div>
+                        <div class="swatch-usage">Primary CTA, Footer Top</div>
+                    </div>
+                </div>
+                <!-- Teal -->
+                <div class="swatch-card" onclick="copy('#5bc2c6')">
+                    <div class="swatch-color" style="background-color: var(--lean-teal)"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Lean Teal</div>
+                        <div class="swatch-hex">#5bc2c6</div>
+                        <div class="swatch-usage">Secondary CTA, Footer Bottom</div>
+                    </div>
+                </div>
+                <!-- Yellow -->
+                <div class="swatch-card" onclick="copy('#fdd056')">
+                    <div class="swatch-color" style="background-color: var(--lean-yellow)"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Lean Yellow</div>
+                        <div class="swatch-hex">#fdd056</div>
+                        <div class="swatch-usage">Action Buttons</div>
+                    </div>
+                </div>
+                <!-- Dark Text -->
+                <div class="swatch-card" onclick="copy('#3d3d3d')">
+                    <div class="swatch-color" style="background-color: var(--lean-text-dark)"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Heading Dark</div>
+                        <div class="swatch-hex">#3d3d3d</div>
+                        <div class="swatch-usage">Headings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="section">
+            <h2 class="section-title">Typography</h2>
+            <div class="type-sample">
+                <div class="type-label">Heading 1</div>
+                <div class="h1-sample">Next-Generation Payment Platform</div>
+            </div>
+            <div class="type-sample">
+                <div class="type-label">Heading 2</div>
+                <div class="h2-sample">Powerful and easy-to-use APIs</div>
+            </div>
+            <div class="type-sample">
+                <div class="type-label">Body Text</div>
+                <div class="p-sample">
+                    We bring together everything that's necessary to build a good online business, from accepting payment, sending money nationwide or selling products in the internet.
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="section">
+            <h2 class="section-title">Buttons (Pill Shape)</h2>
+            <div class="btn-grid">
+                <a href="#" class="btn btn-primary">Get Started For Free!</a>
+                <a href="#" class="btn btn-secondary">Register Now</a>
+                <a href="#" class="btn btn-accent">Developer Portal</a>
+                <a href="#" class="btn btn-accent">Contact Sales</a>
+            </div>
+        </div>
+
+        <!-- Visual Elements -->
+        <div class="section">
+            <h2 class="section-title">Visual Elements</h2>
+            
+            <h3 style="margin-bottom: 1rem; color: var(--lean-text-dark);">Icons</h3>
+            <div class="icon-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 1.png" alt="Icon 1" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 2.png" alt="Icon 2" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 3.png" alt="Icon 3" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 4.png" alt="Icon 4" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 5.png" alt="Icon 5" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 6.png" alt="Icon 6" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 7.png" alt="Icon 7" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 8.png" alt="Icon 8" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 9.png" alt="Icon 9" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="icon-card" style="background: var(--lean-bg-light); padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/Elements/icon lean x 10.png" alt="Icon 10" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 1rem; color: var(--lean-text-dark);">Backgrounds</h3>
+            <div class="bg-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div class="bg-card" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <img src="assets/Elements/(DESKTOP) 1920X1080 LEANX BG.png" alt="Desktop Background" style="width: 100%; height: auto; display: block;">
+                    <div style="padding: 1rem; background: white;">
+                        <div style="font-weight: 600; color: var(--lean-text-dark);">Desktop Background</div>
+                        <div style="font-size: 0.85rem; color: var(--lean-text-body);">1920 x 1080</div>
+                    </div>
+                </div>
+                <div class="bg-card" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <img src="assets/Elements/(MOBILE) 1080X1920 LEANX BG.png" alt="Mobile Background" style="width: 100%; height: auto; display: block;">
+                    <div style="padding: 1rem; background: white;">
+                        <div style="font-weight: 600; color: var(--lean-text-dark);">Mobile Background</div>
+                        <div style="font-size: 0.85rem; color: var(--lean-text-body);">1080 x 1920</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Structure -->
+        <div class="section">
+            <h2 class="section-title">Footer Structure</h2>
+            <p style="margin-bottom: 1rem; color: var(--lean-text-body);">The footer uses a distinctive split-color design.</p>
+            <div class="footer-preview">
+                <div class="footer-top">
+                    <h3>Ready to get started?</h3>
+                    <p style="margin-bottom: 1.5rem; opacity: 0.9;">Explore Lean products, or create an account instantly.</p>
+                    <a href="#" class="btn btn-accent">Contact Sales</a>
+                    <a href="#" class="btn btn-secondary" style="margin-left: 10px;">Register Now</a>
+                </div>
+                <div class="footer-bottom">
+                    <img src="assets/Logos/LeanX Logo.png" alt="Lean.x Logo" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+                    <p style="color: white; opacity: 0.8; font-size: 0.9rem;">© 2025 Lean.x Payment Solutions</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function copy(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>

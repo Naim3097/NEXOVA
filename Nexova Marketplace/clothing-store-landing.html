@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean X - Modern Payment Solutions | Fast Settlements for Malaysian Businesses</title>
+    <meta name="description" content="All-in-one payment platform for Malaysian businesses. Same-day settlement, multiple payment methods, and 24/7 support. Setup in 65 minutes!">
+    <style>
+        /* ── Satoshi Font (local) ── */
+        @font-face { font-family: 'Satoshi'; src: url('assets/fonts/satoshi/Satoshi-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+        @font-face { font-family: 'Satoshi'; src: url('assets/fonts/satoshi/Satoshi-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+        @font-face { font-family: 'Satoshi'; src: url('assets/fonts/satoshi/Satoshi-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+        @font-face { font-family: 'Satoshi'; src: url('assets/fonts/satoshi/Satoshi-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+        @font-face { font-family: 'Satoshi'; src: url('assets/fonts/satoshi/Satoshi-Black.otf') format('opentype'); font-weight: 900; font-style: normal; }
+        :root {
+            /* Brand Primary Color */
+            --primary-color: #5FC7CD;
+            
+            /* Brand Secondary Colors */
+            --secondary-purple: #8273B5;
+            --secondary-yellow: #FFCE33;
+            --secondary-gray: #969696;
+            
+            /* Brand Accent Colors */
+            --accent-teal: #5BC5CD;
+            --accent-blue: #37B2DA;
+            --accent-dark: #455263;
+            --accent-white: #FCFDFF;
+            --accent-yellow-light: #FFD549;
+            --accent-yellow-dark: #FCC048;
+            
+            /* Base Colors */
+            --text-black: #455263;
+            --white: #FFFFFF;
+            --light-gray: #F8FAFC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            color: #455263;
+            overflow-x: hidden;
+        }
+
+        /* Typography Hierarchy */
+        h1, h2 {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 500;
+        }
+
+        h3 {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 400;
+        }
+
+        p {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 300;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            background-image: url('assets/(DESKTOP) 1920X1080 LEANX BG.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Mobile background for hero */
+        @media (max-width: 768px) {
+            .hero {
+                background-image: url('assets/(MOBILE) 1080X1920 LEANX BG.png');
+            }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50%) translateY(-50%); }
+            100% { transform: translateX(-50%) translateY(-60%); }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .highlight-stat {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px 40px;
+            border-radius: 15px;
+            display: inline-block;
+            margin: 20px 0 40px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .highlight-stat .big-number {
+            font-size: 4rem;
+            font-weight: 700;
+            display: block;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .highlight-stat .stat-text {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-top: 10px;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(91,192,190,0.35);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(91,192,190,0.45);
+            opacity: 0.92;
+        }
+
+        /* Problem Section */
+        .problem-section {
+            padding: 80px 20px;
+            background: #F8FAFC;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #455263;
+            margin-bottom: 60px;
+        }
+
+        .problems-grid {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .problem-item {
+            position: relative;
+            padding: 35px 0 35px 40px;
+            border-left: 3px solid #5FC7CD;
+            margin-bottom: 40px;
+            transition: all 0.3s;
+        }
+
+        .problem-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 35px;
+            width: 13px;
+            height: 13px;
+            background: #5FC7CD;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--white), 0 0 0 6px #5FC7CD;
+        }
+
+        .problem-item:hover {
+            padding-left: 50px;
+        }
+
+        .problem-item:hover::before {
+            background: #7C74EA;
+            box-shadow: 0 0 0 4px var(--white), 0 0 0 6px #7C74EA;
+        }
+
+        .problem-item h3 {
+            color: #455263;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .problem-item p {
+            font-weight: 400;
+            font-size: 1.05rem;
+            color: #969696;
+            line-height: 1.7;
+        }
+
+        /* Solution Section */
+        .solution-section {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-top: 50px;
+        }
+
+        @media (min-width: 1200px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 40px 30px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            transition: all 0.3s;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(95, 199, 205, 0.5);
+            box-shadow: 0 8px 24px rgba(91, 192, 190, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: var(--white);
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .feature-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .feature-card h3 {
+            color: #455263;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            font-weight: 400;
+            color: #969696;
+        }
+
+        /* Malaysian Behavior Section */
+        .behavior-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #455263, #5BC0BE);
+            background-image: url('assets/(DESKTOP) 1920X1080 LEANX BG.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--white);
+            position: relative;
+        }
+
+        .behavior-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(69, 82, 99, 0.80), rgba(91, 192, 190, 0.65));
+            z-index: 1;
+        }
+
+        .behavior-section .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .behavior-section .section-title {
+            color: var(--white);
+        }
+
+        .behavior-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .behavior-stat {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .behavior-stat .number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .behavior-stat p {
+            font-weight: 400;
+        }
+
+        /* Testimonial Section */
+        .testimonial-section {
+            padding: 80px 20px;
+            background: var(--white);
+        }
+
+        .testimonial-card {
+            background: #FFFFFF;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 800px;
+            margin: 50px auto;
+            position: relative;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 6rem;
+            color: #5FC7CD;
+            position: absolute;
+            top: -10px;
+            left: 30px;
+            opacity: 0.3;
+            font-weight: 700;
+        }
+
+        .testimonial-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            font-weight: 400;
+            margin-bottom: 25px;
+            color: #455263;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #5FC7CD;
+            font-size: 1rem;
+        }
+
+        /* CTA Section */
+        .final-cta {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            background-image: url('assets/(DESKTOP) 1920X1080 LEANX BG.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--white);
+            text-align: center;
+            position: relative;
+        }
+
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(91, 192, 190, 0.80), rgba(124, 116, 234, 0.80));
+            z-index: 1;
+        }
+
+        .final-cta .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .cta-content p {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-primary {
+            background: var(--white);
+            color: #455263;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--white);
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid var(--white);
+            border-radius: 9999px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .cta-secondary:hover {
+            background: var(--white);
+            color: #455263;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .highlight-stat .big-number {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .problems-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Mobile backgrounds */
+            .behavior-section,
+            .final-cta {
+                background-image: url('assets/(MOBILE) 1080X1920 LEANX BG.png');
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* About Lean X Section */
+        .about-leanx {
+            padding: 80px 20px;
+            background: var(--white);
+        }
+
+        .about-intro {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 60px;
+        }
+
+        .about-intro h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #455263;
+            margin-bottom: 20px;
+        }
+
+        .about-intro p {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--accent-dark);
+            line-height: 1.8;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .capability-card {
+            background: #FFFFFF;
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .capability-card:hover {
+            border-color: rgba(95, 199, 205, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(91, 192, 190, 0.15);
+        }
+
+        .capability-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 20px;
+        }
+
+        .capability-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .capability-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #455263;
+            margin-bottom: 15px;
+        }
+
+        .capability-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .capability-card li {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #969696;
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .capability-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #5FC7CD;
+            font-weight: 700;
+        }
+
+        /* Security Badge Section */
+        .security-section {
+            background: linear-gradient(135deg, #FFFFFF, #F8FAFC);
+            padding: 60px 20px;
+            margin: 60px 0;
+            border-radius: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .security-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .security-content h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #455263;
+            margin-bottom: 30px;
+        }
+
+        .security-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .security-badge {
+            background: #FFFFFF;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #5FC7CD;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--accent-dark);
+            color: var(--white);
+            padding: 40px 20px 120px 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .powered-by {
+            font-size: 0.9rem;
+            font-weight: 300;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .footer-logo {
+            max-width: 150px;
+            margin: 10px auto;
+            opacity: 0.9;
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            font-weight: 300;
+            margin-top: 20px;
+            opacity: 0.7;
+        }
+
+        /* Sticky Contact Footer */
+        .sticky-contact {
+            position: fixed;
+            bottom: -100px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            padding: 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            z-index: 999;
+            transition: bottom 0.4s ease;
+        }
+
+        .sticky-contact.visible {
+            bottom: 0;
+        }
+
+        .sticky-contact-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .sticky-contact-text {
+            color: var(--white);
+        }
+
+        .sticky-contact-text h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .sticky-contact-text p {
+            font-size: 0.95rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .sticky-contact-btn {
+            background: var(--white);
+            color: #455263;
+            padding: 15px 35px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .sticky-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        @media (max-width: 768px) {
+            .sticky-contact-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .sticky-contact-text h4 {
+                font-size: 1rem;
+            }
+
+            .sticky-contact-text p {
+                font-size: 0.85rem;
+            }
+
+            .sticky-contact-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .footer {
+                padding: 40px 20px 140px 20px;
+            }
+
+            .footer-text {
+                font-size: 0.75rem;
+                line-height: 1.6;
+                max-width: 100%;
+                word-wrap: break-word;
+            }
+        }
+
+        /* ── Nexova Marketplace Navbar ── */
+        .nexova-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .nexova-nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nexova-logo-link { display: flex; align-items: center; text-decoration: none; }
+        .nexova-logo { height: 32px; width: auto; }
+        .nexova-nav-pills {
+            display: flex;
+            gap: 4px;
+            background: rgba(241, 245, 249, 0.9);
+            border-radius: 9999px;
+            padding: 6px 8px;
+        }
+        .nexova-pill {
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: #6B7280;
+            transition: all 0.2s;
+            font-family: 'Satoshi', sans-serif;
+        }
+        .nexova-pill:hover { color: #111827; background: rgba(255, 255, 255, 0.7); }
+        .nexova-pill-active { background: rgba(95, 199, 205, 0.15); color: #5FC7CD; font-weight: 600; }
+        .nexova-cta-btn {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: 'Satoshi', sans-serif;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 8px rgba(91, 192, 190, 0.35);
+        }
+        .nexova-cta-btn:hover { opacity: 0.88; }
+        @media (max-width: 640px) { .nexova-nav-pills { display: none; } }
+    </style>
+</head>
+<body>
+    <!-- Nexova Marketplace Navbar -->
+    <nav class="nexova-nav">
+        <div class="nexova-nav-inner">
+            <a href="index.html" class="nexova-logo-link">
+                <img src="assets/Nexova Logo (for powered by).png" alt="Nexova" class="nexova-logo">
+            </a>
+            <div class="nexova-nav-pills">
+                <a href="index.html" class="nexova-pill">Payment Landing</a>
+                <a href="clothing-store-landing.html" class="nexova-pill nexova-pill-active">Clothing Store</a>
+            </div>
+            <a href="http://localhost:3001" class="nexova-cta-btn">Go to Nexova</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <img src="assets/Lean X Logo.png" alt="Lean X" style="max-width: 200px; margin-bottom: 30px; filter: brightness(0) invert(1);">
+            <h1>BERAPA BANYAK SALES DAH HILANG SEBAB PAYMENT LAMBAT?</h1>
+            <p class="subtitle">Jangan biarkan customer lari sebab payment system anda slow! Duit masuk akaun hari yang sama.</p>
+            
+            <div class="highlight-stat">
+                <span class="big-number">65 MINIT</span>
+                <span class="stat-text">Setup & mula terima payment!</span>
+            </div>
+
+            <a href="#get-started" class="cta-button">SAYA NAK SETUP SEKARANG!</a>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section">
+        <div class="container">
+            <h2 class="section-title">MASALAH YANG PEMILIK BISNES RETAIL HADAPI</h2>
+            
+            <div class="problems-grid">
+                <div class="problem-item fade-in">
+                    <h3>Duit Masuk Lambat Gila!</h3>
+                    <p>Hari ni jual RM5,000. Duit masuk akaun 3-7 hari kemudian. Masa tu trend dah berubah, customer dah beli kat tempat lain. Rugi besar!</p>
+                </div>
+
+                <div class="problem-item fade-in">
+                    <h3>Payment App Banyak Sampai Pening!</h3>
+                    <p>Customer ada yang nak GrabPay, Touch n Go, Boost, bank transfer, card... Kena install 8 app berbeza. Nak manage semua memang stress!</p>
+                </div>
+
+                <div class="problem-item fade-in">
+                    <h3>Tak Boleh Restock Sebab Takde Cash Flow</h3>
+                    <p>Musim peak jual RM15,000 sehari. Tapi duit masuk lambat. Nak restock produk trending tak boleh. Customer datang, barang habis. Melepas je!</p>
+                </div>
+
+                <div class="problem-item fade-in">
+                    <h3>Apply Bank 3 Bulan, Still Pending!</h3>
+                    <p>January apply merchant account. Sekarang dah April, still dalam proses. Nak launch online store tapi tak boleh terima payment. Geram betul!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="solution-section">
+        <div class="container">
+            <h2 class="section-title">LEAN X: SYSTEM PAYMENT YANG BETUL-BETUL FAHAM BISNES RETAIL MALAYSIA</h2>
+            
+            <div class="about-intro fade-in" style="max-width: 900px; margin: 0 auto 50px; text-align: center;">
+                <p style="font-size: 1.2rem; font-weight: 400; color: var(--accent-dark); line-height: 1.8;">
+                    Lean X bukan sekadar payment gateway biasa. Kami adalah platform payment moden yang complete, dibina khas untuk bisnes Malaysia yang nak terima payment dari international market dengan settlement yang laju dan murah. API-first design, satu interface modern je untuk handle semua protocol dari berbagai bank!
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 1.png" alt="Real-time Settlement">
+                    </div>
+                    <h3>Duit Masuk Hari Yang Sama!</h3>
+                    <p>Pagi jual RM5,000. Petang duit dah masuk akaun. Esok terus boleh pergi restock produk trending. Takde tunggu-tunggu dah!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 2.png" alt="All Payment Methods">
+                    </div>
+                    <h3>Satu QR Je Untuk Semua Payment</h3>
+                    <p>GrabPay, TNG, Boost, ShopeePay, bank transfer, card - SEMUA boleh! Customer bayar macam mana pun, anda terima. Senang gila!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 3.png" alt="Fashion Business">
+                    </div>
+                    <h3>Semua Payment Method Ada!</h3>
+                    <p>QR Code, Debit/Credit Cards (Visa, Mastercard), E-wallet, Buy Now Pay Later (Atome), Merchant of Record untuk international sales - complete!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 4.png" alt="Real-time Reports">
+                    </div>
+                    <h3>Tengok Sales Report Real-Time</h3>
+                    <p>Produk apa laku? Category apa fast moving? Jam berapa ramai customer? Semua data ada. Buat keputusan berdasarkan fakta, bukan agak-agak!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 5.png" alt="Security & Compliance">
+                    </div>
+                    <h3>Security Level Enterprise</h3>
+                    <p>PCI-DSS Certified, Trusted CA cert, Sanction filtration, Digital KYB/KYC. Infrastructure dalam MY1 Data Center Cyberjaya - bukan cloud entah mana!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 6.png" alt="Fast Setup">
+                    </div>
+                    <h3>Setup 65 Minit Je!</h3>
+                    <p>Pagi apply, tengahari dah boleh terima payment. Takde nak tunggu 3 bulan macam bank lain. Paperwork sikit je!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 7.png" alt="Real-time Payout">
+                    </div>
+                    <h3>Payout Ke Mana-Mana Pun Boleh</h3>
+                    <p>Bank account Malaysia (semua bank!), E-wallet accounts (TNG, GrabPay, Boost). Kos rendah, settlement pantas. Duit sampai terus!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 8.png" alt="Cross-border Settlement">
+                    </div>
+                    <h3>Settlement Cross-Border Yang Power</h3>
+                    <p>Digital remittance cepat & murah, Cryptocurrency transfer, International telegraphic transfer. Expand business ke overseas senang je!</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <img src="assets/icon lean x 10.png" alt="API Integration">
+                    </div>
+                    <h3>API Yang Senang Guna</h3>
+                    <p>Satu API modern untuk semua bank. Dashboard merchant yang user-friendly. Integration senang & cepat dengan documentation lengkap!</p>
+                </div>
+            </div>
+
+            <div class="security-section fade-in" style="background: linear-gradient(135deg, #FFFFFF, #F8FAFC); padding: 60px 40px; margin: 60px 0; border-radius: 20px; border: 1px solid #E2E8F0;">
+                <div class="security-content" style="max-width: 1000px; margin: 0 auto; text-align: center;">
+                    <h3 style="font-size: 2rem; font-weight: 600; color: #455263; margin-bottom: 20px;">24/7 OPERATIONAL & TECHNICAL SUPPORT</h3>
+                    <p style="font-weight: 400; color: var(--accent-dark); margin-bottom: 40px; font-size: 1.1rem; line-height: 1.8;">
+                        Team kami always ready nak tolong! Tak kira pukul berapa, kami ada untuk anda. Technical issue? Support team respond cepat!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto;">
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid var(--primary-color);">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Security</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">PCI-DSS Certified</div>
+                        </div>
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid var(--primary-color);">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Certificate</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">Trusted CA</div>
+                        </div>
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid var(--primary-color);">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Compliance</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">Sanction Filtration</div>
+                        </div>
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid var(--primary-color);">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Verification</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">Digital KYB/KYC</div>
+                        </div>
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid #5FC7CD;">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Support</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">24/7 Available</div>
+                        </div>
+                        <div style="background: var(--white); padding: 25px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid #5FC7CD;">
+                            <div style="font-size: 0.85rem; font-weight: 300; color: var(--secondary-gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Infrastructure</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-black);">MY1 Data Center</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- Malaysian Behavior Section -->
+    <section class="behavior-section">
+        <div class="container">
+            <h2 class="section-title">REALITI: MACAM MANA MALAYSIAN SHOPPING SEBENARNYA</h2>
+            
+            <div class="behavior-stats">
+                <div class="behavior-stat fade-in">
+                    <span class="number">87%</span>
+                    <p>Malaysian guna e-wallet untuk shopping online (GrabPay, TNG, Boost)</p>
+                </div>
+
+                <div class="behavior-stat fade-in">
+                    <span class="number">73%</span>
+                    <p>expect payment confirm terus, tak nak tunggu lama-lama</p>
+                </div>
+
+                <div class="behavior-stat fade-in">
+                    <span class="number">2.3x</span>
+                    <p>lagi rajin beli kalau boleh bayar cara dia suka</p>
+                </div>
+
+                <div class="behavior-stat fade-in">
+                    <span class="number">65%</span>
+                    <p>tinggalkan website kalau takde payment method yang dia nak</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="testimonial-section">
+        <div class="container">
+            <h2 class="section-title">Malaysian Businesses Already Winning with Lean X</h2>
+            
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">
+                    "Dulu memang stress gila! 6 app payment kena manage, duit masuk seminggu kemudian. Sekarang dengan Lean X, Shopee, walk-in customer, Instagram sales - semua masuk satu dashboard je. Same-day settlement ni game changer! Boleh restock barang trending terus. Sales naik 40% sebab takde stock kosong!"
+                </p>
+                <p class="testimonial-author">- Siti Rahman, Pemilik Butik Modest Wear, Wangsa Maju</p>
+            </div>
+
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">
+                    "Sebagai pemilik kedai elektronik, cash flow memang penting. Lean X bagi kita duit masuk hari yang sama - boleh bayar supplier terus! Customer pun suka sebab ada banyak pilihan payment. QR code, card, e-wallet semua ada. Setup pun cepat je, dalam sejam dah boleh operate!"
+                </p>
+                <p class="testimonial-author">- Ahmad Fauzi, Tech Haven Electronics, Shah Alam</p>
+            </div>
+
+            <div class="testimonial-card fade-in">
+                <p class="testimonial-text">
+                    "Online business memang rely on payment gateway yang fast. Lean X solve masalah besar kita - customer international pun boleh bayar, settlement cepat, dan fees lebih murah dari competitor. Support team responsive 24/7. Terbaik untuk e-commerce!"
+                </p>
+                <p class="testimonial-author">- Lisa Wong, Founder HomeDecorMY, Penang</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta" id="get-started">
+        <div class="container">
+            <div class="cta-content">
+                <h2>DAH CUKUP MELEPAS SALES SEBAB PAYMENT SLOW KAN?</h2>
+                <p>Join 150+ pemilik bisnes Malaysia yang dah pilih Lean X untuk cash flow yang lagi bagus!</p>
+                
+                <div class="cta-buttons">
+                    <a href="#" class="cta-primary">SAYA NAK SETUP DALAM 65 MINIT!</a>
+                    <a href="#" class="cta-secondary">TUNJUK DEMO DULU</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => observer.observe(el));
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Sticky Contact Footer
+        window.addEventListener('scroll', () => {
+            const stickyContact = document.querySelector('.sticky-contact');
+            const scrollPosition = window.scrollY + window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Show sticky footer when user scrolls past 50% of the page
+            if (window.scrollY > document.documentElement.scrollHeight * 0.5) {
+                stickyContact.classList.add('visible');
+            } else {
+                stickyContact.classList.remove('visible');
+            }
+        });
+    </script>
+
+    <!-- Sticky Contact Footer -->
+    <div class="sticky-contact">
+        <div class="sticky-contact-content">
+            <div class="sticky-contact-text">
+                <h4>Ada Soalan? Jom Berbincang!</h4>
+                <p>Team kami ready nak bantu anda setup payment system yang sesuai</p>
+            </div>
+            <a href="#get-started" class="sticky-contact-btn">CONTACT US</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="powered-by">Powered by</p>
+            <img src="assets/Nexova Logo (for powered by).png" alt="Nexova Digital" class="footer-logo">
+            <p class="footer-text">© 2025 Lean X. All rights reserved. | Modern payment solutions for Malaysian businesses.</p>
+        </div>
+    </footer>
+</body>
+</html>

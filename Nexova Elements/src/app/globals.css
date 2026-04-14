@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* ─── Nexova Design System ──────────────────────────────────────────── */
+:root {
+  --background: #f8fafc;   /* nexova-canvas-gray */
+  --foreground: #455263;   /* nexova-navy */
+
+  /* Nexova Brand Tokens */
+  --nexova-navy:           #455263;
+  --nexova-teal:           #5fc7cd;
+  --nexova-teal-light:     #5bc0be;
+  --nexova-purple:         #7c74ea;
+  --nexova-canvas-gray:    #f8fafc;
+  --nexova-surface-white:  #ffffff;
+  --nexova-divider-gray:   #e2e8f0;
+  --nexova-muted-text:     #969696;
+  --nexova-danger-red:     #ef4444;
+  --nexova-warning-yellow: #ffce33;
+  --nexova-accent-purple:  #8273b5;
+
+  /* Semantic tokens */
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  /* Colours */
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-nexova-navy:          var(--nexova-navy);
+  --color-nexova-teal:          var(--nexova-teal);
+  --color-nexova-teal-light:    var(--nexova-teal-light);
+  --color-nexova-purple:        var(--nexova-purple);
+  --color-nexova-canvas-gray:   var(--nexova-canvas-gray);
+  --color-nexova-muted-text:    var(--nexova-muted-text);
+  --color-nexova-danger-red:    var(--nexova-danger-red);
+  --color-nexova-warning-yellow: var(--nexova-warning-yellow);
+  --color-nexova-accent-purple: var(--nexova-accent-purple);
+
+  /* Fonts */
+  --font-sans: var(--font-satoshi);
+  --font-mono: var(--font-geist-mono);
+
+  /* Border radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* ─── Animations ────────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-20px); }
+}
+@keyframes accordion-down {
+  from { height: 0; }
+  to   { height: var(--radix-accordion-content-height); }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to   { height: 0; }
+}
+
+.animate-float      { animation: float 6s ease-in-out infinite; }
+.animate-float-slow { animation: float 8s ease-in-out infinite; }
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+

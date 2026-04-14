@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Lean.x</title>
+    <link rel="stylesheet" href="brand-variables.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            color: #455263;
+            background-color: var(--lean-bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Nexova Navbar */
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0;
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #455263;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .nav-menu a:hover {
+            background: #F8FAFC;
+            color: #5BC0BE;
+        }
+
+        .btn-nav-signup {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white !important;
+            padding: 0.5rem 1.4rem !important;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 12px rgba(91,192,190,0.3);
+        }
+
+        .btn-nav-signup:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(91,192,190,0.4) !important;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #455263;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+        }
+
+        /* Layout Container */
+        .signup-wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Left Column: Value Proposition */
+        .value-section {
+            flex: 1;
+            background: url('assets/Elements/(DESKTOP) 1920X1080 LEANX BG.png') no-repeat center center;
+            background-size: cover;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        /* Overlay to ensure text readability if bg is busy */
+        .value-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(69, 82, 99, 0.82), rgba(91, 192, 190, 0.70));
+            z-index: 1;
+        }
+
+        .value-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .logo-img {
+            height: 60px;
+            margin-bottom: 3rem;
+            filter: brightness(0) invert(1); /* Make logo white */
+            opacity: 0.95;
+        }
+
+        .hero-headline {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero-subhead {
+            font-size: 1.35rem;
+            margin-bottom: 3rem;
+            opacity: 1;
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        .benefits-list {
+            list-style: none;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .benefit-icon {
+            margin-right: 1.2rem;
+            width: 48px;
+            height: auto;
+            flex-shrink: 0;
+            margin-top: -5px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        /* Right Column: Form */
+        .form-section {
+            flex: 0.8;
+            background: white;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            color: #455263;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #455263;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background-color: #F8FAFC;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            color: #455263;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background-color: white;
+            border-color: #5BC0BE;
+            box-shadow: 0 4px 12px rgba(91, 192, 190, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: #adb5bd;
+        }
+
+        .btn-signup {
+            width: 100%;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            font-size: 1.1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(91, 192, 190, 0.35);
+        }
+
+        .btn-signup:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 192, 190, 0.45);
+        }
+
+        .reassurance {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--lean-text-body);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .signup-wrapper {
+                flex-direction: column;
+            }
+            
+            .value-section {
+                padding: 3rem 2rem;
+                min-height: auto;
+            }
+
+            .form-section {
+                padding: 3rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo">
+            <button class="mobile-menu-toggle">☰</button>
+            <ul class="nav-menu">
+                <li><a href="#services">Services</a></li>
+                <li><a href="index.html">Browse</a></li>
+                <li><a href="#tools">Tools</a></li>
+                <li><a href="#library">Library</a></li>
+                <li><a href="signup.html" class="btn-nav-signup">Sign Up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="signup-wrapper">
+        <!-- SECTIONS 1 & 2: Hero + Benefits (Left Side) -->
+        <div class="value-section">
+            <div class="value-content">
+                <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo-img">
+                
+                <!-- HERO SECTION -->
+                <h1 class="hero-headline">Full customisation starts here.</h1>
+                <p class="hero-subhead">Sign up to continue.</p>
+
+                <!-- BENEFITS SECTION -->
+                <ul class="benefits-list">
+                    <li class="benefit-item">
+                        <img src="assets/Elements/icon lean x 9.png" alt="Dashboard" class="benefit-icon">
+                        <span><strong>Unified Dashboard:</strong> Manage payments, billing, and analytics from one powerful, real-time dashboard.</span>
+                    </li>
+                    <li class="benefit-item">
+                        <img src="assets/Elements/icon lean x 3.png" alt="Billing" class="benefit-icon">
+                        <span><strong>Smarter Billing:</strong> Automate invoices via SMS, WhatsApp, and Telegram to get paid faster.</span>
+                    </li>
+                    <li class="benefit-item">
+                        <img src="assets/Elements/icon lean x 4.png" alt="Integration" class="benefit-icon">
+                        <span><strong>Seamless Integration:</strong> Connect your pages to our robust API infrastructure in just a few clicks.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECTION 3: Sign-Up Form (Right Side) -->
+        <div class="form-section">
+            <div class="form-container">
+                <h2 class="form-title">Create your account</h2>
+                
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <input type="text" id="fullname" class="form-input" placeholder="e.g. John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn-signup">Get Started For Free!</button>
+                    
+                    <p class="reassurance">
+                        Secure, encrypted, and free to get started. No credit card required.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const menu = document.querySelector('.nav-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html>

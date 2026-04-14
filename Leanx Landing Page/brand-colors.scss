@@ -1,0 +1,56 @@
+// Lean.x Brand Design System - SCSS Variables
+// Extracted from Lean.x website screenshot
+
+// ========================================
+// COLOR PALETTE
+// ========================================
+
+// Brand Colors
+$lean-purple: #8479b2;
+$lean-teal:   #5bc2c6;
+$lean-yellow: #fdd056;
+$lean-orange: #ff9f43;
+
+// Neutrals
+$white:       #ffffff;
+$gray-100:    #f8f9fa;
+$gray-200:    #e9ecef;
+$gray-600:    #757575; // Body text
+$gray-800:    #3d3d3d; // Headings
+$black:       #000000;
+
+// Semantic Assignments
+$primary:     $lean-purple;
+$secondary:   $lean-teal;
+$accent:      $lean-yellow;
+$success:     #28a745; // Standard success
+$danger:      #dc3545; // Standard danger
+
+// Text Colors
+$body-color:    $gray-600;
+$heading-color: $gray-800;
+$link-color:    $lean-teal;
+
+// ========================================
+// TYPOGRAPHY
+// ========================================
+
+$font-family-sans-serif: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+$font-weight-normal: 400;
+$font-weight-bold:   600;
+
+// ========================================
+// COMPONENTS
+// ========================================
+
+// Buttons
+$btn-border-radius: 50px; // Pill shape
+$btn-padding-y:     0.75rem;
+$btn-padding-x:     2rem;
+$btn-font-weight:   600;
+
+// Footer
+$footer-bg-top:    $lean-purple;
+$footer-bg-bottom: $lean-teal;

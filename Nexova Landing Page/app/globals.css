@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 214 18% 33%;
+    --card: 0 0% 100%;
+    --card-foreground: 214 18% 33%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 214 18% 33%;
+    --primary: 214 18% 33%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 214 18% 33%;
+    --muted: 210 40% 98%;
+    --muted-foreground: 0 0% 59%;
+    --accent: 183 52% 59%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 183 52% 59%;
+    --radius: 0.75rem;
+    --chart-1: 183 52% 59%;
+    --chart-2: 214 18% 33%;
+    --chart-3: 259 27% 58%;
+    --chart-4: 43 100% 60%;
+    --chart-5: 0 84% 60%;
+
+    /* Nexova Design Tokens */
+    --nexova-navy: #455263;
+    --nexova-teal: #5fc7cd;
+    --nexova-canvas-gray: #f8fafc;
+    --nexova-surface-white: #ffffff;
+    --nexova-divider-gray: #e2e8f0;
+    --nexova-muted-text: #969696;
+    --nexova-danger-red: #ef4444;
+    --nexova-warning-yellow: #ffce33;
+    --nexova-accent-purple: #8273b5;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* Add scroll margin to sections for smooth scrolling with fixed headers */
+  section[id],
+  div[id^='hero-'],
+  div[id^='features-'],
+  div[id^='testimonials-'],
+  div[id^='faq-'],
+  div[id^='cta-'],
+  div[id^='form-'],
+  div[id^='pricing-'],
+  div[id^='tabs-'],
+  div[id^='payment_button-'],
+  div[id^='footer-'] {
+    scroll-margin-top: 4rem;
+  }
+}
+
+/* ═══ Elements page animation keyframes ═══ */
+@keyframes bgshift { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+@keyframes blob { 0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%} 25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%} 50%{border-radius:50% 60% 30% 60%/30% 40% 70% 50%} 75%{border-radius:70% 30% 50% 50%/40% 70% 30% 50%} }
+@keyframes typing { 0%,85%{width:0} 20%,70%{width:17ch} }
+@keyframes blink { 50%{border-color:transparent} }
+@keyframes el-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes glow { 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:.8;transform:scale(1.1)} }
+@keyframes spin3d { from{transform:rotateX(25deg) rotateY(0deg)} to{transform:rotateX(25deg) rotateY(360deg)} }
+@keyframes tilt3d { 0%,100%{transform:rotateY(-15deg) rotateX(10deg)} 50%{transform:rotateY(15deg) rotateX(-10deg)} }
+@keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes barWave { 0%,100%{transform:scaleY(.4)} 50%{transform:scaleY(1)} }
+@keyframes bookFlip { 0%,100%{transform:rotateY(0)} 50%{transform:rotateY(-120deg)} }
+@keyframes tunnel { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(.3);opacity:0} }
+@keyframes scrollUp { from{transform:translateY(0)} to{transform:translateY(-50%)} }
+@keyframes cursorA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,20px)} }
+@keyframes cursorB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,15px)} }
+@keyframes moveVH { 0%{top:0;left:50%;transform:translate(-50%,0)} 25%{top:50%;left:100%;transform:translate(-100%,-50%)} 50%{top:100%;left:50%;transform:translate(-50%,-100%)} 75%{top:50%;left:0;transform:translate(0,-50%)} 100%{top:0;left:50%;transform:translate(-50%,0)} }
+@keyframes slideOutLeft { 0%,40%{opacity:1;transform:translateX(0)} 50%{opacity:0;transform:translateX(-100%)} 60%,100%{opacity:1;transform:translateX(0)} }
+@keyframes slideInRight { 0%,40%{opacity:0;transform:translateX(100%)} 50%,100%{opacity:1;transform:translateX(0)} }
+@keyframes shimmer { 0%{opacity:.3} 50%{opacity:.6} 100%{opacity:.3} }
+@keyframes pageFlip { 0%,100%{transform:rotateY(0)} 50%{transform:rotateY(-160deg)} }
+@keyframes magnetPull { 0%,100%{transform:translate(0,0)} 33%{transform:translate(4px,-3px)} 66%{transform:translate(-3px,4px)} }
+@keyframes trailDot { 0%{transform:translate(0,0)} 33%{transform:translate(40px,-20px)} 66%{transform:translate(60px,10px)} 100%{transform:translate(80px,-5px)} }
+@keyframes stackShuffle { 0%,80%{transform:translateY(0)} 90%{transform:translateY(-20px)} 100%{transform:translateY(0)} }
+@keyframes elasticStretch { 0%,100%{transform:scaleX(1)} 50%{transform:scaleX(1.6)} }
+@keyframes kanbanMove { 0%,100%{opacity:1;transform:translateX(0)} 50%{opacity:.5;transform:translateX(40px)} }
+@keyframes scratchReveal { 0%{clip-path:inset(0)} 100%{clip-path:inset(0 100% 0 0)} }
+@keyframes focusBlur { 0%,100%{filter:blur(4px);opacity:.4} 40%,60%{filter:blur(0px);opacity:1} }
+@keyframes floatBubble { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(10px,-10px) scale(1.1)} }
+@keyframes ripple { 0%{transform:scale(.5);opacity:.8} 100%{transform:scale(3);opacity:0} }
+@keyframes twinkle { 0%,100%{opacity:.2} 50%{opacity:1} }
+@keyframes particleFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(5px,-5px)} }
+@keyframes spotlightMove { 0%{top:20%;left:10%} 25%{top:30%;left:70%} 50%{top:60%;left:50%} 75%{top:20%;left:60%} 100%{top:20%;left:10%} }
+@keyframes gridWarp { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+@keyframes firework { 0%{transform:translateY(0) scale(0);opacity:0} 50%{transform:translateY(-30px) scale(1);opacity:1} 100%{transform:translateY(-30px) scale(1.5);opacity:0} }
+@keyframes matrixFall { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
+@keyframes drawLine { 0%{stroke-dashoffset:200} 50%{stroke-dashoffset:0} 100%{stroke-dashoffset:200} }
+@keyframes kineticType { 0%,100%{transform:scaleX(1) skewX(0)} 50%{transform:scaleX(1.1) skewX(-3deg)} }
+@keyframes kineticSkew { 0%,100%{transform:skewX(0) scaleY(1)} 25%{transform:skewX(10deg) scaleY(.95)} 75%{transform:skewX(-10deg) scaleY(1.05)} }
+@keyframes textFlicker { 0%{opacity:1} 50%{opacity:.3} }
+@keyframes explode { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(--tx,10px),var(--ty,-20px)) scale(0);opacity:0} }
+@keyframes holoShift { 0%,100%{opacity:.4;filter:hue-rotate(0deg)} 50%{opacity:.7;filter:hue-rotate(60deg)} }
+@keyframes holoShine { 0%,100%{transform:translateX(-100%)} 50%{transform:translateX(100%)} }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes colorShift { 0%,100%{filter:hue-rotate(0deg)} 50%{filter:hue-rotate(45deg)} }
+@keyframes glitch { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,2px)} }
+@keyframes glitchR { 0%,100%{clip-path:inset(0)} 20%{clip-path:inset(20% 0 60% 0);transform:translate(2px)} }
+@keyframes glitchL { 0%,100%{clip-path:inset(0)} 40%{clip-path:inset(40% 0 20% 0);transform:translate(-2px)} }
+@keyframes neuPress { 0%,100%{box-shadow:4px 4px 8px #1a1a26,-4px -4px 8px #3a3a4e} 50%{box-shadow:inset 2px 2px 4px #1a1a26,inset -2px -2px 4px #3a3a4e} }
+@keyframes stopMotion { 0%{transform:translateX(0)} 25%{transform:translateX(4px)} 50%{transform:translateX(0) rotate(5deg)} 75%{transform:translateX(-4px)} }
+@keyframes barGrow { 0%{transform:scaleY(0)} 100%{transform:scaleY(1)} }
+@keyframes circleProgress { 0%{stroke-dashoffset:138} 50%{stroke-dashoffset:20} 100%{stroke-dashoffset:138} }
+@keyframes countUp { 0%{opacity:0;transform:translateY(10px)} 20%,80%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-10px)} }
+@keyframes toastSlide { 0%{transform:translateX(100%);opacity:0} 15%,85%{transform:translateX(0);opacity:1} 100%{transform:translateX(100%);opacity:0} }
+@keyframes morphCheck { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+@keyframes confettiPop { 0%{transform:translate(0,0) scale(0)} 50%{transform:translate(var(--tx,15px),var(--ty,-20px)) scale(1.5)} 100%{transform:translate(var(--tx,15px),calc(var(--ty,-20px) + 30px)) scale(0)} }
+@keyframes menuReveal { 0%,30%{max-height:0;opacity:0} 50%,80%{max-height:60px;opacity:1} 100%{max-height:0;opacity:0} }
+@keyframes progressFill { 0%{width:0} 50%,100%{width:100%} }
+@keyframes tabSlide { 0%,30%{transform:translateX(0)} 35%,65%{transform:translateX(calc(100% + 2px))} 70%,100%{transform:translateX(calc(200% + 4px))} }
+@keyframes accordionOpen { 0%,100%{max-height:0;opacity:0} 30%,70%{max-height:30px;opacity:1} }
+@keyframes sidebarWidth { 0%,30%{width:56px} 40%,60%{width:20px} 70%,100%{width:56px} }
+@keyframes liquidBubble { 0%,100%{transform:scale(1) translateY(0)} 50%{transform:scale(1.3) translateY(-4px)} }
+@keyframes dockMagnify { 0%,100%{transform:scale(1)} 50%{transform:scale(1.6)} }
+@keyframes floatLabel { 0%,100%{transform:translateY(8px);font-size:8px;opacity:.4} 30%,70%{transform:translateY(-4px);font-size:7px;opacity:1} }
+@keyframes dropzonePulse { 0%,100%{border-color:rgba(255,255,255,.15)} 50%{border-color:rgba(91,192,190,.4)} }
+@keyframes wizardStep { 0%,100%{background:transparent} 30%,70%{background:rgba(91,192,190,.5)} }
+@keyframes toggleSlide { 0%,100%{transform:translateX(0)} 50%{transform:translateX(20px)} }
+@keyframes pricingToggle { 0%,100%{background:rgba(91,192,190,.2)} 50%{background:transparent} }
+@keyframes countFlip { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(.8)} }
+@keyframes comparisonSlide { 0%{clip-path:inset(0 80% 0 0)} 50%{clip-path:inset(0 20% 0 0)} 100%{clip-path:inset(0 80% 0 0)} }
+@keyframes sliderHandle { 0%{left:20%} 50%{left:80%} 100%{left:20%} }
+@keyframes bounceIcon { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+@keyframes microTap { 0%,100%{transform:scale(1)} 50%{transform:scale(.85)} }
+@keyframes islandExpand { 0%,100%{width:40px;padding:4px 8px} 30%,70%{width:100px;padding:6px 12px} }
+@keyframes islandText { 0%,15%{max-width:0;opacity:0} 30%,70%{max-width:60px;opacity:1} 85%,100%{max-width:0;opacity:0} }
+@keyframes logoReveal { 0%{opacity:0;transform:scale(.7) rotate(-10deg)} 50%{opacity:1;transform:scale(1.1) rotate(0)} 100%{opacity:1;transform:scale(1)} }
+@keyframes characterBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes fadeInUp { 0%{opacity:0;transform:translateY(8px)} 40%,60%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-8px)} }
+@keyframes stackPeel { 0%,80%{transform:translateY(0) rotate(0)} 90%{transform:translateY(-10px) rotate(-3deg)} 100%{transform:translateY(0) rotate(0)} }
+@keyframes aiWave { 0%,100%{transform:scaleY(.3)} 25%{transform:scaleY(1)} 50%{transform:scaleY(.6)} 75%{transform:scaleY(.9)} }

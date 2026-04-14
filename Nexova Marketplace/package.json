@@ -1,0 +1,8 @@
+{
+  "name": "nexova-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx --yes serve . -p 5501 --no-clipboard"
+  }
+}

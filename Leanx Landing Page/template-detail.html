@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Details - Lean.x</title>
+    <link rel="stylesheet" href="brand-variables.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            color: #455263;
+            background-color: #F8FAFC;
+        }
+
+        /* Nexova Navbar */
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0;
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #455263;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .nav-menu a:hover {
+            background: #F8FAFC;
+            color: #5BC0BE;
+        }
+
+        .btn-nav-signup {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white !important;
+            padding: 0.5rem 1.4rem !important;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 12px rgba(91,192,190,0.3);
+        }
+
+        .btn-nav-signup:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--lean-text-body);
+        }
+
+        .breadcrumb a {
+            color: #5BC0BE;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Template Header */
+        .template-header {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 4rem;
+            margin-bottom: 2rem;
+            align-items: start;
+        }
+
+        .template-main {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .template-badge {
+            display: inline-block;
+            background: rgba(91, 192, 190, 0.12);
+            color: #5BC0BE;
+            padding: 0.5rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(91, 192, 190, 0.25);
+        }
+
+        .template-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--lean-text-dark);
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        .template-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--lean-text-body);
+            font-size: 1rem;
+        }
+
+        .template-author strong {
+            color: var(--lean-text-dark);
+        }
+
+        .template-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--lean-text-body);
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+
+        .template-stats {
+            display: flex;
+            gap: 3rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--lean-text-body);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--lean-text-dark);
+        }
+
+        .attributes-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .attribute {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attribute-label {
+            font-size: 0.85rem;
+            color: var(--lean-text-body);
+            margin-bottom: 0.3rem;
+        }
+
+        .attribute-value {
+            font-weight: 500;
+            color: var(--lean-text-dark);
+        }
+
+        /* Sidebar */
+        .template-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .subscription-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .price-badge {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .price-period {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .price-original {
+            text-decoration: line-through;
+            opacity: 0.7;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-subscribe {
+            width: 100%;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            border-radius: 9999px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(91, 192, 190, 0.35);
+            margin-bottom: 1rem;
+        }
+
+        .btn-subscribe:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 192, 190, 0.45);
+        }
+
+        .btn-preview {
+            width: 100%;
+            background-color: white;
+            color: #5BC0BE;
+            border: 2px solid #5BC0BE;
+            padding: 1rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-preview:hover {
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border-color: transparent;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            color: var(--lean-text-body);
+        }
+
+        .benefit-icon {
+            color: #5BC0BE;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 20px;
+        }
+
+        .info-card {
+            background: #F8FAFC;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            font-size: 0.9rem;
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        /* Preview Gallery */
+        .preview-section {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            margin-bottom: 4rem;
+        }
+
+        .preview-section h2 {
+            display: none;
+        }
+
+        .preview-gallery {
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            cursor: default;
+            object-fit: contain;
+            display: block;
+        }
+
+        .preview-image:hover {
+            transform: none;
+            border-color: rgba(0,0,0,0.05);
+        }
+
+        .preview-main {
+            grid-column: auto;
+            height: auto;
+        }
+
+        /* Description Section */
+        .description-section {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            margin-bottom: 4rem;
+            max-width: 800px;
+        }
+
+        .description-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--lean-text-dark);
+        }
+
+        .description-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--lean-text-body);
+        }
+
+        .description-content p {
+            margin-bottom: 1.2rem;
+        }
+
+        .description-content ul {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .description-content ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            margin-bottom: 4rem;
+        }
+
+        .features-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--lean-text-dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(91, 192, 190, 0.4);
+            box-shadow: 0 8px 24px rgba(91, 192, 190, 0.12);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #5BC0BE, #7C74EA);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--lean-text-dark);
+        }
+
+        .feature-description {
+            font-size: 0.9rem;
+            color: var(--lean-text-body);
+            line-height: 1.6;
+        }
+
+        /* Related Templates */
+        .related-section {
+            margin-top: 4rem;
+        }
+
+        .related-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--lean-text-dark);
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .related-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .related-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .related-info {
+            padding: 1.5rem;
+        }
+
+        .related-category {
+            color: #5BC0BE;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .related-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--lean-text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--lean-text-body);
+        }
+
+        /* Footer */
+        .footer {
+            background: #455263;
+            color: white;
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: #5BC0BE;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .template-header {
+                grid-template-columns: 1fr;
+            }
+
+            .template-sidebar {
+                position: static;
+            }
+
+            .preview-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .attributes-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .template-title {
+                font-size: 1.8rem;
+            }
+
+            .main-container {
+                padding: 2rem 1rem;
+            }
+
+            .template-main,
+            .preview-section,
+            .description-section,
+            .features-section {
+                padding: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #455263;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo">
+            <button class="mobile-menu-toggle">☰</button>
+            <ul class="nav-menu">
+                <li><a href="#services">Services</a></li>
+                <li><a href="index.html">Browse</a></li>
+                <li><a href="#tools">Tools</a></li>
+                <li><a href="#library">Library</a></li>
+                <li><a href="signup.html" class="btn-nav-signup">Sign Up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">All Items</a> → <a href="index.html">Website Templates</a> → <span id="breadcrumb-title">Template Details</span>
+        </div>
+
+        <!-- Template Header -->
+        <div class="template-header">
+            <div class="template-main">
+                <span class="template-badge" id="template-badge">Blog</span>
+                <h1 class="template-title" id="template-title">Blog Style Template</h1>
+                <div class="template-author">
+                    By: <strong id="template-author">Lean.x Design Team</strong>
+                </div>
+                <p class="template-description" id="template-description">
+                    A clean and modern blog template perfect for content creators and writers. Features responsive design, customisable layouts, and SEO-optimised structure.
+                </p>
+
+                <div class="template-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">File Types</span>
+                        <span class="stat-value">HTML, CSS, JS</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Additions</span>
+                        <span class="stat-value">Responsive</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Files Included</span>
+                        <span class="stat-value">Documentation</span>
+                    </div>
+                </div>
+
+                <div class="attributes-list">
+                    <div class="attribute">
+                        <span class="attribute-label">Commercial License</span>
+                        <span class="attribute-value">Further information</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attribute-label">Last Updated</span>
+                        <span class="attribute-value">December 2025</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attribute-label">Compatible With</span>
+                        <span class="attribute-value">All Modern Browsers</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attribute-label">Software Version</span>
+                        <span class="attribute-value">HTML5, CSS3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="template-sidebar">
+                <div class="subscription-card">
+                    <div class="price-badge">
+                        <div class="price-label">GET OUR BEST OFFER</div>
+                        <div class="price">$12.38<span style="font-size: 1rem;">/month</span></div>
+                        <div class="price-original">was $16.50/month</div>
+                        <div class="price-period">Sale on now.</div>
+                    </div>
+
+                    <button class="btn-subscribe" onclick="window.location.href='signup.html'">
+                        Subscribe to download
+                    </button>
+                    <button class="btn-preview" id="btn-live-preview">Live preview</button>
+
+                    <ul class="benefits-list">
+                        <li class="benefit-item">
+                            <span class="benefit-icon">✓</span>
+                            <span>26+ million premium assets & templates</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-icon">✓</span>
+                            <span>Full all stock, video, image and audio gen</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-icon">✓</span>
+                            <span>Lifetime commercial license</span>
+                        </li>
+                        <li class="benefit-item">
+                            <span class="benefit-icon">✓</span>
+                            <span>Easy cancellation</span>
+                        </li>
+                    </ul>
+
+                    <div class="info-card">
+                        Already have an account? <a href="signup.html" style="color: #5BC0BE; font-weight: 600;">Sign In</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Preview Gallery -->
+        <section class="preview-section">
+            <h2>Preview</h2>
+            <div class="preview-gallery">
+                <img src="" alt="Template Preview" class="preview-image preview-main" id="preview-main">
+            </div>
+        </section>
+
+        <!-- Description -->
+        <section class="description-section">
+            <h2>Description</h2>
+            <div class="description-content" id="description-content">
+                <p>It has been visually appealing, produced with excellent rating from the current users. App on is an ideal application or application/production for the first year.</p>
+                <p><strong>Want this asset? Download this and all the creative assets you need from $38,25/month, 18month <a href="signup.html" style="color: #5BC0BE;">subscriptions</a> for the first year.</strong></p>
+                <p>This template includes:</p>
+                <ul>
+                    <li>Fully responsive design that works on all devices</li>
+                    <li>Clean, modern, and professional layout</li>
+                    <li>Easy to customise with well-documented code</li>
+                    <li>Cross-browser compatibility</li>
+                    <li>SEO-friendly structure</li>
+                    <li>Fast loading times and optimised performance</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features-section">
+            <h2>Features Included</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">R</div>
+                    <h3 class="feature-title">Responsive</h3>
+                    <p class="feature-description">Perfectly optimised for mobile, tablet, and desktop viewing</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">C</div>
+                    <h3 class="feature-title">Customisable</h3>
+                    <p class="feature-description">Easy to modify colours, fonts, and layouts to match your brand</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">F</div>
+                    <h3 class="feature-title">Fast Loading</h3>
+                    <p class="feature-description">Optimised code ensures quick page load times</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">D</div>
+                    <h3 class="feature-title">Documentation</h3>
+                    <p class="feature-description">Comprehensive documentation included for easy setup</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Templates -->
+        <section class="related-section">
+            <h2>More Templates You Might Like</h2>
+            <div class="related-grid" id="related-grid">
+                <!-- Related templates will be dynamically loaded -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="assets/Logos/LeanX Logo.png" alt="Lean.x" class="logo" style="height: 40px; margin-bottom: 1rem; filter: brightness(0) invert(1);">
+                <p style="color: #ddd;">Professional website templates for digital products. Launch your online business today.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="index.html">Browse Templates</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#library">My Library</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="signup.html">Sign Up</a></li>
+                    <li><a href="#">Create Account</a></li>
+                    <li><a href="#">My Favorites</a></li>
+                    <li><a href="#">Profile</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 Lean.x. Professional website templates for digital creators.
+        </div>
+    </footer>
+
+    <script>
+        // Template data matching browse page
+        const templates = {
+            'blog-style': {
+                badge: 'Blog',
+                title: 'Blog Style Template',
+                author: 'Lean.x Design Team',
+                description: 'A clean and modern blog template perfect for content creators and writers.',
+                descriptionFull: 'A beautifully crafted blog template designed for content creators, writers, and storytellers. Features a clean, distraction-free reading experience with customisable layouts, social sharing integration, and a powerful content management structure.',
+                image: 'assets/Website Templates/Blog Style Template.jpeg',
+                views: '1,245',
+                likes: '234',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/blog_tech_7d8e9f0a/index.html'
+            },
+            'ecommerce-bold': {
+                badge: 'E-Commerce',
+                title: 'E Commerce Bold Template',
+                author: 'Lean.x Design Team',
+                description: 'Bold and dynamic e-commerce template designed to showcase products beautifully.',
+                descriptionFull: 'A bold, conversion-focused e-commerce template built for online stores that want to make an impact. Features product galleries, shopping cart integration, checkout flows, and mobile-optimised purchasing experiences.',
+                image: 'assets/Website Templates/E Commerce Bold Template.jpeg',
+                views: '2,891',
+                likes: '567',
+                previewUrl: '#'
+            },
+            'fitness-minimal': {
+                badge: 'Fitness',
+                title: 'Fitness Minimal Template',
+                author: 'Lean.x Design Team',
+                description: 'Minimalist fitness template for gyms, trainers, and wellness professionals.',
+                descriptionFull: 'A sleek, minimalist template designed specifically for fitness professionals, gyms, and wellness coaches. Features class schedules, trainer profiles, membership tiers, and booking integration.',
+                image: 'assets/Website Templates/Fitness Minimal Template.jpeg',
+                views: '1,678',
+                likes: '321',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/fitness_minimal_24ca8bbd/index.html'
+            },
+            'medical-elegant': {
+                badge: 'Medical',
+                title: 'Medical Elegant Template',
+                author: 'Lean.x Design Team',
+                description: 'Elegant and professional template for medical practices and healthcare services.',
+                descriptionFull: 'A professional, trustworthy template designed for medical practices, clinics, and healthcare providers. Features appointment booking, service listings, doctor profiles, and patient resources.',
+                image: 'assets/Website Templates/Medical Elegant Template.jpeg',
+                views: '1,423',
+                likes: '289',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html'
+            },
+            'portfolio-minimal': {
+                badge: 'Portfolio',
+                title: 'Portfolio Minimal Template',
+                author: 'Lean.x Design Team',
+                description: 'Sleek portfolio template to showcase your work with style and sophistication.',
+                descriptionFull: 'A stunning portfolio template for creatives, designers, photographers, and artists. Features project galleries, case studies, testimonials, and contact forms to showcase your best work.',
+                image: 'assets/Website Templates/Portfolio Minimal Template.jpeg',
+                views: '3,124',
+                likes: '645',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_minimal_22d83524/index.html'
+            },
+            'restaurant-creative': {
+                badge: 'Restaurant',
+                title: 'Restaurant Creative Template',
+                author: 'Lean.x Design Team',
+                description: 'Creative restaurant template perfect for cafes, bars, and dining establishments.',
+                descriptionFull: 'A mouthwatering template designed for restaurants, cafes, bars, and food businesses. Features menu displays, reservation systems, photo galleries, and location maps.',
+                image: 'assets/Website Templates/Restaurant Creative Template.jpeg',
+                views: '2,456',
+                likes: '478',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/restaurant_creative_418334b4/index.html'
+            },
+            'saas-bold': {
+                badge: 'SAAS',
+                title: 'SAAS Bold Template',
+                author: 'Lean.x Design Team',
+                description: 'Modern and high-converting SAAS template for software companies and startups.',
+                descriptionFull: 'A powerful, conversion-optimized template designed specifically for SAAS products and tech startups. Features pricing tables, feature comparisons, integration showcases, and customer testimonials.',
+                image: 'assets/Website Templates/SAAS Bold Template.jpeg',
+                views: '3,210',
+                likes: '892',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/saas_bold_0453596c/index.html'
+            },
+            'professional-portfolio': {
+                badge: 'Portfolio',
+                title: 'Professional Portfolio Template',
+                author: 'Lean.x Design Team',
+                description: 'A sophisticated portfolio template for senior professionals and agencies.',
+                descriptionFull: 'Elevate your personal brand with this sophisticated portfolio template. Perfect for senior designers, developers, and creative agencies looking to showcase their work with elegance and authority.',
+                image: 'assets/Website Templates/Professional Portfolio Template.jpeg',
+                views: '1,890',
+                likes: '445',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/portfolio_professional_1e5ab469/index.html'
+            },
+            'legal-professional': {
+                badge: 'Legal',
+                title: 'Legal Professional Template',
+                author: 'Lean.x Design Team',
+                description: 'Trustworthy and authoritative template for law firms and legal consultants.',
+                descriptionFull: 'Build trust and credibility with this professional legal template. Designed for law firms, attorneys, and legal consultants, featuring practice area pages, attorney profiles, and consultation booking forms.',
+                image: 'assets/Website Templates/Legal Professional Template.jpeg',
+                views: '1,120',
+                likes: '215',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/legal_professional_c7c6d8a0/index.html'
+            },
+            'fitness-bold': {
+                badge: 'Fitness',
+                title: 'Fitness Bold Template',
+                author: 'Lean.x Design Team',
+                description: 'High-energy fitness template for gyms and personal trainers who want to stand out.',
+                descriptionFull: 'A high-energy, bold template designed to motivate and inspire. Perfect for modern gyms, CrossFit boxes, and personal trainers. Features class schedules, trainer bios, and membership sign-up flows.',
+                image: 'assets/Website Templates/Fitness Bold Template.jpeg',
+                views: '2,150',
+                likes: '530',
+                previewUrl: 'https://axtratemplates.vercel.app/built_templates/fitness_bold_fcbe0d96/index.html'
+            }
+        };
+
+        // Get template name from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const templateName = urlParams.get('template') || 'blog-style';
+
+        // Load template data
+        if (templates[templateName]) {
+            const template = templates[templateName];
+            document.getElementById('template-badge').textContent = template.badge;
+            document.getElementById('template-title').textContent = template.title;
+            document.getElementById('template-author').textContent = template.author;
+            document.getElementById('template-description').textContent = template.description;
+            document.getElementById('breadcrumb-title').textContent = template.title;
+            document.getElementById('preview-main').src = template.image;
+            document.getElementById('preview-main').alt = template.title;
+            
+            // Update Live Preview Button
+            const btnPreview = document.getElementById('btn-live-preview');
+            if (template.previewUrl && template.previewUrl !== '#') {
+                btnPreview.onclick = () => window.open(template.previewUrl, '_blank');
+                btnPreview.style.display = 'block';
+            } else {
+                btnPreview.style.display = 'none';
+            }
+            
+            // Update description content
+            const descContent = document.getElementById('description-content');
+            descContent.innerHTML = `
+                <p>${template.descriptionFull}</p>
+                <p><strong>Want this template? Download this and all the creative templates you need from $12.38/month with our <a href="signup.html" style="color: #5BC0BE;">unlimited subscription</a> for unlimited access.</strong></p>
+                <p>This template includes:</p>
+                <ul>
+                    <li>Fully responsive design that works on all devices</li>
+                    <li>Clean, modern, and professional layout</li>
+                    <li>Easy to customise with well-documented code</li>
+                    <li>Cross-browser compatibility</li>
+                    <li>SEO-friendly structure</li>
+                    <li>Fast loading times and optimised performance</li>
+                </ul>
+            `;
+
+            // Load related templates (exclude current)
+            const relatedGrid = document.getElementById('related-grid');
+            const templateKeys = Object.keys(templates).filter(key => key !== templateName);
+            const relatedTemplates = templateKeys.slice(0, 3);
+            
+            relatedGrid.innerHTML = relatedTemplates.map(key => {
+                const t = templates[key];
+                return `
+                    <div class="related-card" onclick="window.location.href='template-detail.html?template=${key}'">
+                        <img src="${t.image}" alt="${t.title}" class="related-image">
+                        <div class="related-info">
+                            <div class="related-category">${t.badge}</div>
+                            <h3 class="related-title">${t.title}</h3>
+                            <div class="related-stats">
+                                <span>${t.views} views</span>
+                                <span>${t.likes} likes</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle')?.addEventListener('click', function() {
+            const menu = document.querySelector('.nav-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html>
