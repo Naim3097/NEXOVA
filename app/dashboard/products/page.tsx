@@ -1,0 +1,413 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, Search, Package, Upload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import ProductModal from '@/components/dashboard/ProductModal';
+import BulkUploadModal from '@/components/dashboard/BulkUploadModal';
+
+interface Product {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  stock: number;
+  base_price: number;
+  currency: string;
+  quantity_pricing: Array<{ min_qty: number; price: number }>;
+  notes: string | null;
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
+  source_project_id: string | null;
+  source_template: string | null;
+  is_template_product: boolean;
+}
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/products');
+      const data = await response.json();
+      if (response.ok) {
+        setProducts(data.products || []);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // Delete product
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+
+    try {
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setProducts(products.filter((p) => p.id !== id));
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  // Bulk delete products
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    const count = selectedIds.size;
+    if (
+      !confirm(
+        `Are you sure you want to delete ${count} product${count > 1 ? 's' : ''}? This action cannot be undone.`
+      )
+    )
+      return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/products/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
+
+      if (response.ok) {
+        setProducts(products.filter((p) => !selectedIds.has(p.id)));
+        setSelectedIds(new Set());
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to delete products');
+      }
+    } catch (error) {
+      console.error('Error deleting products:', error);
+      alert('Failed to delete products');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Toggle single selection
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Toggle select all (filtered products)
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map((p) => p.id)));
+    }
+  };
+
+  // Filter products
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="flex-1 overflow-auto bg-[#F8FAFC] p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-[#455263]">Products</h1>
+              <p className="text-[#969696] mt-1">
+                Manage your product inventory
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkUploadModal(true)}
+                className="flex items-center gap-2"
+              >
+                <Upload size={20} />
+                Bulk Upload
+              </Button>
+              <Button
+                variant="teal"
+                onClick={() => {
+                  setEditingProduct(null);
+                  setShowModal(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus size={20} />
+                Add Product
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#969696]"
+              size={20}
+            />
+            <Input
+              type="text"
+              placeholder="Search by name or code..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              className="flex items-center gap-2"
+            >
+              <Trash2 size={16} />
+              {isDeleting ? 'Deleting...' : `Delete (${selectedIds.size})`}
+            </Button>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm">
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#5FC7CD]"></div>
+              <p className="mt-4 text-[#969696]">Loading products...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="p-12 text-center">
+              <Package className="mx-auto h-12 w-12 text-[#969696]" />
+              <h3 className="mt-4 text-lg font-medium text-[#455263]">
+                No products found
+              </h3>
+              <p className="mt-2 text-[#969696]">
+                {searchQuery
+                  ? 'Try adjusting your search'
+                  : 'Get started by adding your first product'}
+              </p>
+              {!searchQuery && (
+                <Button
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setShowModal(true);
+                  }}
+                  className="mt-4"
+                >
+                  <Plus size={20} className="mr-2" />
+                  Add Product
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                  <tr>
+                    <th className="px-4 py-3 text-left">
+                      <Checkbox
+                        checked={
+                          filteredProducts.length > 0 &&
+                          selectedIds.size === filteredProducts.length
+                        }
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Select all products"
+                      />
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Code
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Source
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Stock
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Price
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-[#969696] uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-[#E2E8F0]">
+                  {filteredProducts.map((product) => (
+                    <tr
+                      key={product.id}
+                      className={`hover:bg-[#F8FAFC] ${selectedIds.has(product.id) ? 'bg-[#5FC7CD]/5' : ''}`}
+                    >
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <Checkbox
+                          checked={selectedIds.has(product.id)}
+                          onCheckedChange={() => toggleSelect(product.id)}
+                          aria-label={`Select ${product.name}`}
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {product.image_url && (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="h-10 w-10 rounded object-cover mr-3"
+                            />
+                          )}
+                          <span className="text-sm font-medium text-[#455263]">
+                            {product.code}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-[#455263]">
+                          {product.name}
+                        </div>
+                        {product.description && (
+                          <div className="text-sm text-[#969696] truncate max-w-xs">
+                            {product.description}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {product.is_template_product &&
+                        product.source_template ? (
+                          <div className="flex items-center">
+                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[#5FC7CD]/10 text-[#5FC7CD]">
+                              📄 {product.source_template}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-[#969696]">Manual</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-[#455263]">
+                          {product.stock}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-[#455263]">
+                          {product.currency} {product.base_price.toFixed(2)}
+                        </div>
+                        {product.quantity_pricing.length > 0 && (
+                          <div className="text-xs text-[#969696]">
+                            {product.quantity_pricing.length} bulk price
+                            {product.quantity_pricing.length > 1 ? 's' : ''}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            product.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {product.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setEditingProduct(product);
+                            setShowModal(true);
+                          }}
+                          className="text-[#5FC7CD] hover:text-[#4bb5bb] mr-4"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="text-[#EF4444] hover:text-red-700"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6">
+            <div className="text-sm text-[#969696]">Total Products</div>
+            <div className="text-2xl font-bold text-[#455263] mt-1">
+              {products.length}
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6">
+            <div className="text-sm text-[#969696]">Active Products</div>
+            <div className="text-2xl font-bold text-green-600 mt-1">
+              {products.filter((p) => p.status === 'active').length}
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6">
+            <div className="text-sm text-[#969696]">Low Stock</div>
+            <div className="text-2xl font-bold text-orange-600 mt-1">
+              {products.filter((p) => p.stock < 10).length}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ProductModal
+        product={editingProduct}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={fetchProducts}
+      />
+
+      <BulkUploadModal
+        isOpen={showBulkUploadModal}
+        onClose={() => setShowBulkUploadModal(false)}
+        onSuccess={fetchProducts}
+      />
+    </div>
+  );
+}

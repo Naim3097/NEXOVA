@@ -1,0 +1,3320 @@
+import type { Project, Element, SEOSettings } from '@/types';
+import { generateTrackingScript } from '@/lib/analytics/tracking-script';
+import { generateBookingFormHTML } from '@/lib/publishing/booking-form-generator';
+import {
+  collectUsedFonts,
+  buildGoogleFontsLinkTag,
+  getFontFamilyCSS,
+} from '@/lib/fonts';
+
+/**
+ * Map icon names to SVG paths
+ */
+function getIconSVG(iconName: string): string {
+  const iconMap: Record<string, string> = {
+    'check-circle':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    star: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>',
+    zap: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
+    shield:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
+    heart:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>',
+    award:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>',
+    sparkles:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>',
+    rocket:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>',
+    target:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>',
+    'trending-up':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>',
+    clock:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    users:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>',
+    globe:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    lock: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>',
+    settings:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>',
+    'dollar-sign':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    gift: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>',
+    'thumbs-up':
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>',
+    lightbulb:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>',
+    smartphone:
+      '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+  };
+
+  return iconMap[iconName] || iconMap['check-circle'];
+}
+
+/**
+ * Generate complete HTML page from project data
+ */
+export function generateHTML(project: Project, elements: Element[]): string {
+  // Provide default empty object if seo_settings is null/undefined
+  const seo_settings = project.seo_settings || {};
+
+  // Collect all Google Fonts used across elements
+  const usedFonts = collectUsedFonts(elements);
+  const fontsLinkTag = buildGoogleFontsLinkTag(usedFonts);
+
+  return `<!DOCTYPE html>
+<html lang="${seo_settings.language || 'en'}">
+<head>
+  ${generateHeadContent(project, seo_settings, fontsLinkTag)}
+</head>
+<body>
+  <!-- Global project configuration -->
+  <script>
+    window.__PROJECT_ID__ = '${project.id}';
+
+    // Define stub modal functions that will be overridden by payment button elements
+    // This prevents errors when buttons reference these functions before they're fully defined
+    window.openCheckoutModal = window.openCheckoutModal || function(modalId, productName, productPrice, productId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    window.closeCheckoutModal = window.closeCheckoutModal || function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
+  </script>
+
+  ${generateBodyContent(elements)}
+  ${generateAnalyticsScripts(project)}
+</body>
+</html>`;
+}
+
+/**
+ * Generate <head> section with SEO meta tags
+ */
+function generateHeadContent(
+  project: Project,
+  seo: SEOSettings,
+  fontsLinkTag: string = ''
+): string {
+  return `
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${seo.title || project.name}</title>
+  <meta name="description" content="${seo.description || project.description || ''}">
+  ${seo.keywords ? `<meta name="keywords" content="${Array.isArray(seo.keywords) ? seo.keywords.join(', ') : seo.keywords}">` : ''}
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="${seo.ogType || 'website'}">
+  <meta property="og:title" content="${seo.ogTitle || seo.title || project.name}">
+  <meta property="og:description" content="${seo.ogDescription || seo.description || ''}">
+  ${seo.ogImage ? `<meta property="og:image" content="${seo.ogImage}">` : ''}
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="${seo.twitterCard || 'summary_large_image'}">
+  ${seo.twitterSite ? `<meta name="twitter:site" content="${seo.twitterSite}">` : ''}
+  <meta name="twitter:title" content="${seo.ogTitle || seo.title || project.name}">
+  <meta name="twitter:description" content="${seo.ogDescription || seo.description || ''}">
+  ${seo.ogImage ? `<meta name="twitter:image" content="${seo.ogImage}">` : ''}
+
+  <!-- Robots -->
+  <meta name="robots" content="${seo.robotsIndex ? 'index' : 'noindex'}, ${seo.robotsFollow ? 'follow' : 'nofollow'}">
+
+  ${seo.canonicalUrl ? `<link rel="canonical" href="${seo.canonicalUrl}">` : ''}
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Google Fonts -->
+  ${fontsLinkTag}
+
+  <!-- Styles -->
+  ${generateStyles()}
+
+  ${
+    seo.structuredData
+      ? `
+  <script type="application/ld+json">
+    ${JSON.stringify(seo.structuredData)}
+  </script>
+  `
+      : ''
+  }
+`;
+}
+
+/**
+ * Generate inline CSS styles
+ */
+function generateStyles(): string {
+  return `
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    section {
+      width: 100%;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .container-sm {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .container-lg {
+      max-width: 1536px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    button, .button {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .button-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .button-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .button-outline {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: white;
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+
+    .button-outline:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    h1 { font-size: 3rem; }
+    h2 { font-size: 2.5rem; }
+    h3 { font-size: 2rem; }
+    h4 { font-size: 1.5rem; }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.75rem; }
+      h3 { font-size: 1.5rem; }
+
+      .grid-cols-2,
+      .grid-cols-3 {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+
+    /* Utility classes */
+    .text-center { text-align: center; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mb-12 { margin-bottom: 3rem; }
+    .py-20 { padding: 5rem 0; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .gap-4 { gap: 1rem; }
+    .gap-8 { gap: 2rem; }
+  </style>
+`;
+}
+
+/**
+ * Generate body content from elements
+ */
+function generateBodyContent(elements: Element[]): string {
+  // Sort elements by order
+  const sortedElements = [...elements].sort((a, b) => a.order - b.order);
+
+  return sortedElements
+    .map((element) => {
+      switch (element.type) {
+        case 'announcement_bar':
+          return generateAnnouncementBarHTML(element);
+        case 'navigation':
+          return generateNavigationHTML(element);
+        case 'hero':
+          return generateHeroHTML(element);
+        case 'features':
+          return generateFeaturesHTML(element);
+        case 'testimonials':
+          return generateTestimonialsHTML(element);
+        case 'pricing':
+          return generatePricingHTML(element);
+        case 'faq':
+          return generateFAQHTML(element);
+        case 'cta':
+          return generateCTAHTML(element);
+        case 'payment_button':
+          return generatePaymentButtonHTML(element);
+        case 'booking_form':
+          return generateBookingFormHTML(element);
+        case 'form_with_payment':
+          return generateFormWithPaymentHTML(element);
+        case 'product_carousel':
+          return generateProductCarouselHTML(element);
+        case 'lead_form':
+          return generateLeadFormHTML(element);
+        case 'whatsapp_button':
+          return generateWhatsAppButtonHTML(element);
+        case 'media':
+          return generateMediaHTML(element);
+        case 'footer':
+          return generateFooterHTML(element);
+        default:
+          console.warn(
+            `[html-generator] Unknown element type: "${element.type}" — skipped. Add a case for this type in generateBodyContent().`
+          );
+          return `<!-- Unsupported element type: ${element.type} -->`;
+      }
+    })
+    .join('\n');
+}
+
+/**
+ * Generate Hero section HTML
+ */
+function generateHeroHTML(element: Element): string {
+  const {
+    variant,
+    headline,
+    subheadline,
+    ctaText,
+    ctaUrl,
+    image,
+    bgColor,
+    headlineColor = '#111827',
+    subheadlineColor = '#4b5563',
+    headlineSize = '5xl',
+    subheadlineSize = 'xl',
+    imageOpacity = 70,
+    buttonBgColor = '#2563eb',
+    buttonTextColor = '#ffffff',
+    headlineFont,
+    subheadlineFont,
+  } = element.props;
+
+  const headlineFontCSS = getFontFamilyCSS(headlineFont);
+  const subheadlineFontCSS = getFontFamilyCSS(subheadlineFont);
+  const headlineFontStyle = headlineFontCSS
+    ? ` font-family: ${headlineFontCSS};`
+    : '';
+  const subheadlineFontStyle = subheadlineFontCSS
+    ? ` font-family: ${subheadlineFontCSS};`
+    : '';
+
+  // Convert Tailwind sizes to actual CSS values
+  const headlineSizeMap: Record<string, string> = {
+    '3xl': '1.875rem',
+    '4xl': '2.25rem',
+    '5xl': '3rem',
+    '6xl': '3.75rem',
+    '7xl': '4.5rem',
+  };
+
+  const subheadlineSizeMap: Record<string, string> = {
+    base: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.875rem',
+  };
+
+  const headlineFontSize = headlineSizeMap[headlineSize] || '3rem';
+  const subheadlineFontSize = subheadlineSizeMap[subheadlineSize] || '1.25rem';
+
+  if (variant === 'centered') {
+    return `
+<section id="${element.type}-${element.order}" style="background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  <div class="container-sm text-center">
+    ${image ? `<img src="${image}" alt="Hero" style="width: 8rem; height: 8rem; margin: 0 auto 2rem; border-radius: 0.5rem; object-fit: cover;">` : ''}
+    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;${headlineFontStyle}">${headline}</h1>
+    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;${subheadlineFontStyle}">${subheadline}</p>
+    <a href="${ctaUrl}" class="button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}; border: none;">${ctaText}</a>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'image_left') {
+    return `
+<section id="${element.type}-${element.order}" style="background-color: ${bgColor}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  <div class="container">
+    <div class="grid grid-cols-2 gap-8 items-center">
+      <div>
+        <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;">${headline}</h1>
+        <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;">${subheadline}</p>
+        <a href="${ctaUrl}" class="button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}; border: none;">${ctaText}</a>
+      </div>
+      <div>
+        ${image ? `<img src="${image}" alt="Hero" style="width: 100%; height: 24rem; border-radius: 0.5rem; object-fit: cover; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">` : '<div style="width: 100%; height: 24rem; background: #e5e7eb; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #9ca3af;">Image placeholder</div>'}
+      </div>
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'image_bg') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; padding: 8rem 1rem; overflow: hidden; scroll-margin-top: 4rem;">
+  ${
+    image
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${image}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${imageOpacity / 100};"></div>
+  `
+      : `
+  <div style="position: absolute; inset: 0; background: #1f2937; display: flex; align-items: center; justify-content: center; color: #6b7280;">
+    Background Image
+  </div>
+  `
+  }
+  <div class="container-sm text-center" style="position: relative; z-index: 10;">
+    <h1 style="color: ${headlineColor}; font-size: ${headlineFontSize}; font-weight: bold; margin-bottom: 1.5rem;${headlineFontStyle}">${headline}</h1>
+    <p style="font-size: ${subheadlineFontSize}; color: ${subheadlineColor}; margin-bottom: 2rem;${subheadlineFontStyle}">${subheadline}</p>
+    <a href="${ctaUrl}" class="button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}; border: 2px solid ${buttonTextColor};">${ctaText}</a>
+  </div>
+</section>`;
+  }
+
+  return '';
+}
+
+/**
+ * Generate Features section HTML
+ */
+function generateFeaturesHTML(element: Element): string {
+  const {
+    variant,
+    title,
+    subtitle,
+    features,
+    backgroundImage,
+    backgroundOpacity = 70,
+    bgColor = '#000000',
+    fontFamily: featuresFontFamily,
+  } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(featuresFontFamily);
+  const titleFontStyle = titleFontCSS
+    ? ` style="font-family: ${titleFontCSS};"`
+    : '';
+  const subtitleHTML = subtitle
+    ? `\n    <p style="font-size: 1.125rem; color: #666; text-align: center; max-width: 42rem; margin: 0 auto 3rem;">${subtitle}</p>`
+    : '';
+
+  const backgroundHTML = backgroundImage
+    ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+    : '';
+
+  const renderFeatureIcon = (feature: any) => `
+    <div style="width: 3rem; height: 3rem; background: #dbeafe; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+      <svg style="width: 1.5rem; height: 1.5rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ${getIconSVG(feature.icon || 'check-circle')}
+      </svg>
+    </div>`;
+
+  const hasImage = (feature: any) =>
+    feature.image && feature.image.trim() !== '';
+
+  if (variant === 'grid') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div class="container" style="position: relative; z-index: 10;">
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>${subtitleHTML}
+    <div class="grid grid-cols-3 gap-8">
+      ${features
+        .map((feature: any) =>
+          hasImage(feature)
+            ? `
+        <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background: white;">
+          <div style="aspect-ratio: 4/3; overflow: hidden;">
+            <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">${feature.title}</h3>
+            <p style="color: #666; text-align: center;">${feature.description}</p>
+          </div>
+        </div>`
+            : `
+        <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+          ${renderFeatureIcon(feature)}
+          <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${feature.title}</h3>
+          <p style="color: #666;">${feature.description}</p>
+        </div>`
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'list') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: #f9fafb; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="position: relative; z-index: 10; max-width: 56rem; margin: 0 auto;">
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>${subtitleHTML}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      ${features
+        .map(
+          (feature: any) => `
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+          ${
+            hasImage(feature)
+              ? `<div style="flex-shrink: 0; width: 5rem; height: 5rem; border-radius: 0.5rem; overflow: hidden;">
+                <img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>`
+              : `<div style="flex-shrink: 0; width: 2.5rem; height: 2.5rem; background: #dbeafe; border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 1.25rem; height: 1.25rem; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  ${getIconSVG(feature.icon || 'check-circle')}
+                </svg>
+              </div>`
+          }
+          <div style="flex: 1; min-width: 0;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">${feature.title}</h3>
+            <p style="color: #666;">${feature.description}</p>
+          </div>
+        </div>`
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  if (variant === 'alternating') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${backgroundHTML}
+  <div style="position: relative; z-index: 10; max-width: 72rem; margin: 0 auto;">
+    <h2 class="text-center mb-16"${titleFontStyle}>${title}</h2>${subtitleHTML}
+    <div style="display: flex; flex-direction: column; gap: 5rem;">
+      ${features
+        .map(
+          (feature: any, index: number) => `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+          <div style="${index % 2 === 1 ? 'order: 2;' : ''}">
+            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">${feature.title}</h3>
+            <p style="font-size: 1.125rem; color: #666;">${feature.description}</p>
+          </div>
+          <div style="height: 16rem; border-radius: 0.5rem; overflow: hidden; ${index % 2 === 1 ? 'order: 1;' : ''} ${!hasImage(feature) ? 'background: #e5e7eb; display: flex; align-items: center; justify-content: center;' : ''}">
+            ${
+              hasImage(feature)
+                ? `<img src="${feature.image}" alt="${feature.title}" style="width: 100%; height: 100%; object-fit: cover;" />`
+                : `<span style="color: #9ca3af;">Feature illustration</span>`
+            }
+          </div>
+        </div>`
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  return '';
+}
+
+/**
+ * Generate Testimonials section HTML
+ */
+function generateTestimonialsHTML(element: Element): string {
+  const {
+    variant,
+    title,
+    testimonials,
+    backgroundImage,
+    backgroundOpacity = 70,
+    bgColor = '#000000',
+    fontFamily: testimonialsFontFamily,
+    sectionBgColor,
+    textColor,
+    quoteFont,
+    bgGradient: testimonialsGradient,
+    bgGradientFrom: testimonialsGradientFrom = '#667eea',
+    bgGradientTo: testimonialsGradientTo = '#764ba2',
+    bgGradientDirection: testimonialsGradientDir = 'to right',
+  } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(testimonialsFontFamily);
+  const quoteFontCSS = getFontFamilyCSS(quoteFont);
+  const quoteFontInline = quoteFontCSS ? ` font-family: ${quoteFontCSS};` : '';
+  const titleStyleParts = [
+    titleFontCSS ? `font-family: ${titleFontCSS}` : '',
+    textColor ? `color: ${textColor}` : '',
+  ]
+    .filter(Boolean)
+    .join('; ');
+  const titleFontStyle = titleStyleParts ? ` style="${titleStyleParts};"` : '';
+  const sectionBg = testimonialsGradient
+    ? `linear-gradient(${testimonialsGradientDir}, ${testimonialsGradientFrom}, ${testimonialsGradientTo})`
+    : sectionBgColor || '#f9fafb';
+  const quoteTextColor = textColor || '#374151';
+  const nameTextColor = textColor || '#111827';
+  const roleTextColor = textColor ? `${textColor}cc` : '#6b7280';
+
+  const renderStars = (rating: number) => {
+    return Array(5)
+      .fill(0)
+      .map((_, i) => {
+        const filled = i < rating;
+        return `<svg style="width: 1rem; height: 1rem; display: inline-block; ${filled ? 'color: #fbbf24; fill: #fbbf24;' : 'color: #d1d5db;'}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>`;
+      })
+      .join('');
+  };
+
+  if (variant === 'grid') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${sectionBg}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div class="container" style="position: relative; z-index: 10;">
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>
+    <div class="grid grid-cols-3 gap-8">
+      ${testimonials
+        .map(
+          (testimonial: any) => `
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+          <div style="margin-bottom: 1rem;">${renderStars(testimonial.rating)}</div>
+          <p style="color: ${quoteTextColor}; margin-bottom: 1rem; font-style: italic;${quoteFontInline}">"${testimonial.quote}"</p>
+          <div style="margin-top: 1rem;">
+            <p style="font-weight: 600; color: ${nameTextColor}; margin: 0;">${testimonial.name}</p>
+            <p style="font-size: 0.875rem; color: ${roleTextColor}; margin: 0;">${testimonial.role}</p>
+          </div>
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  return '';
+}
+
+/**
+ * Generate FAQ section HTML
+ */
+function generateFAQHTML(element: Element): string {
+  const {
+    variant,
+    title,
+    questions,
+    backgroundImage,
+    backgroundOpacity = 70,
+    bgColor = '#000000',
+    fontFamily: faqFontFamily,
+  } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(faqFontFamily);
+  const titleFontStyle = titleFontCSS
+    ? ` style="font-family: ${titleFontCSS};"`
+    : '';
+
+  if (variant === 'single_column') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: white; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div class="container-sm" style="position: relative; z-index: 10;">
+    <h2 class="text-center mb-12"${titleFontStyle}>${title}</h2>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      ${questions
+        .map(
+          (item: any, index: number) => `
+        <details style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;">
+          <summary style="padding: 1rem 1.5rem; font-weight: 600; font-size: 1.125rem; cursor: pointer; background: white; list-style: none;">
+            ${item.question}
+            <span style="float: right;">▼</span>
+          </summary>
+          <div style="padding: 1rem 1.5rem; background: #f9fafb; border-top: 1px solid #e5e7eb;">
+            <p style="color: #374151; margin: 0;">${item.answer}</p>
+          </div>
+        </details>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  return '';
+}
+
+/**
+ * Generate CTA section HTML
+ */
+function generateCTAHTML(element: Element): string {
+  const {
+    variant,
+    headline,
+    description,
+    buttonText,
+    buttonUrl,
+    bgGradient,
+    backgroundImage,
+    backgroundOpacity = 70,
+    buttonColor = '#ffffff',
+    buttonTextColor = '#111827',
+    buttonSize = 'lg',
+    buttonFontSize = '1.125rem',
+    fontFamily: ctaFontFamily,
+  } = element.props;
+
+  const headlineFontCSS = getFontFamilyCSS(ctaFontFamily);
+  const headlineFontInline = headlineFontCSS
+    ? ` font-family: ${headlineFontCSS};`
+    : '';
+
+  // Button padding based on size
+  const getButtonPadding = () => {
+    switch (buttonSize) {
+      case 'sm':
+        return '0.5rem 1rem';
+      case 'md':
+        return '0.75rem 1.5rem';
+      case 'lg':
+        return '1rem 2rem';
+      default:
+        return '1rem 2rem';
+    }
+  };
+
+  const buttonStyles = `
+    background-color: ${buttonColor};
+    color: ${buttonTextColor};
+    font-size: ${buttonFontSize};
+    border: 2px solid ${buttonTextColor};
+    border-radius: 0.5rem;
+    font-weight: 600;
+    padding: ${getButtonPadding()};
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  `.trim();
+
+  if (variant === 'centered') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; background: ${bgGradient}; padding: 5rem 1rem; scroll-margin-top: 4rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: #000000; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div class="container-sm text-center" style="position: relative; z-index: 10; color: white;">
+    <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;${headlineFontInline}">${headline}</h2>
+    <p style="font-size: 1.5rem; margin-bottom: 2rem; color: rgba(255, 255, 255, 0.9);">${description}</p>
+    <a href="${buttonUrl || '#'}" style="${buttonStyles}" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${buttonText} →</a>
+  </div>
+</section>`;
+  }
+
+  return '';
+}
+
+/**
+ * Generate Payment Button section HTML
+ */
+function generatePaymentButtonHTML(element: Element): string {
+  const {
+    products = [],
+    currency,
+    buttonText,
+    buttonColor,
+    buttonSize,
+    enableBumpOffer,
+    bumpOfferName,
+    bumpOfferDescription,
+    bumpOfferAmount,
+    bumpOfferDiscount,
+    successMessage,
+    failureMessage,
+    bgColor,
+    // Legacy fields for backwards compatibility
+    productName,
+    productDescription,
+    amount,
+    productImage,
+  } = element.props;
+
+  // Use products array or fall back to legacy single product
+  const displayProducts =
+    products.length > 0
+      ? products
+      : [
+          {
+            id: '1',
+            name: productName || 'Product Name',
+            description: productDescription || '',
+            price: amount || 0,
+            image: productImage,
+          },
+        ];
+
+  const hasMultipleProducts = displayProducts.length > 1;
+
+  const buttonId = `payment-btn-${element.id}`;
+  const checkoutModalId = `checkout-modal-${element.id}`;
+  const bumpModalId = `bump-modal-${element.id}`;
+
+  // Calculate bump offer discounted price
+  const bumpDiscountedPrice =
+    bumpOfferAmount && bumpOfferDiscount
+      ? bumpOfferAmount * (1 - bumpOfferDiscount / 100)
+      : bumpOfferAmount;
+
+  // Button size styles
+  const sizeStyles: Record<string, string> = {
+    sm: 'padding: 0.5rem 1.5rem; font-size: 0.875rem;',
+    md: 'padding: 0.75rem 2rem; font-size: 1rem;',
+    lg: 'padding: 1rem 2.5rem; font-size: 1.125rem;',
+  };
+  const buttonSizeStyle = sizeStyles[buttonSize] || sizeStyles['md'];
+
+  // Format currency
+  const formatCurrency = (value: number) => {
+    // Handle undefined or null values
+    const price = value || 0;
+    if (currency === 'MYR') return `RM ${price.toFixed(2)}`;
+    return `${currency} ${price.toFixed(2)}`;
+  };
+
+  return `
+<section style="background-color: ${bgColor}; padding: 4rem 1rem;" id="${element.type}-${element.order}">
+  <div class="container" style="max-width: ${hasMultipleProducts ? '80rem' : '32rem'}; margin: 0 auto;">
+    ${
+      hasMultipleProducts
+        ? `
+      <!-- Multiple Products Grid -->
+      <h2 style="font-size: 2.25rem; font-weight: bold; text-align: center; margin-bottom: 3rem; color: #111827;">Choose Your Product</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 70rem; margin: 0 auto;">
+        ${displayProducts
+          .map(
+            (product: any, index: number) => `
+          <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; ${product.featured ? 'transform: scale(1.05); border: 2px solid #fbbf24;' : ''}">
+            ${
+              product.featured
+                ? `
+            <div style="background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; text-align: center; padding: 0.5rem; font-weight: 600; font-size: 0.875rem;">
+              ⭐ Most Popular
+            </div>
+            `
+                : ''
+            }
+
+            <!-- Product Image -->
+            ${
+              product.image
+                ? `
+            <div style="height: 12rem; overflow: hidden;">
+              <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            `
+                : `
+            <div style="height: 12rem; background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); display: flex; align-items: center; justify-content: center;">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+            </div>
+            `
+            }
+
+            <div style="padding: 1.5rem; text-align: center;">
+              <h3 style="font-size: 1.25rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${product.name}</h3>
+              ${product.description ? `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">${product.description}</p>` : ''}
+              <div style="margin-bottom: 1.5rem;">
+                <span style="font-size: 2rem; font-weight: bold; color: #111827;">${formatCurrency(product.price)}</span>
+              </div>
+              <button
+                onclick="openCheckoutModal('${checkoutModalId}', '${product.name}', ${product.price || 0}, '${product.id || ''}')"
+                style="
+                  ${buttonSizeStyle}
+                  background-color: ${buttonColor};
+                  color: white;
+                  border: none;
+                  border-radius: 0.5rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: transform 0.2s;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                  width: 100%;
+                "
+                onmouseover="this.style.transform='scale(1.05)'"
+                onmouseout="this.style.transform='scale(1)'"
+              >
+                ${buttonText}
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+    `
+        : `
+      <!-- Single Product Card -->
+      <div style="background: white; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden;">
+        <!-- Product Image -->
+        ${
+          displayProducts[0].image
+            ? `
+        <div style="height: 16rem; overflow: hidden;">
+          <img src="${displayProducts[0].image}" alt="${displayProducts[0].name}" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        `
+            : `
+        <div style="padding: 2rem 2rem 0 2rem; text-align: center;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 4rem; height: 4rem; background: #dbeafe; border-radius: 9999px; margin-bottom: 1rem;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+        `
+        }
+
+        <div style="padding: 2rem; text-align: center;">
+          <h2 style="font-size: 1.5rem; font-weight: bold; color: #111827; margin-bottom: 0.5rem;">${displayProducts[0].name}</h2>
+          ${displayProducts[0].description ? `<p style="color: #6b7280; margin-bottom: 1rem;">${displayProducts[0].description}</p>` : ''}
+          <div style="margin-bottom: 1.5rem;">
+            <span style="font-size: 2.25rem; font-weight: bold; color: #111827;">${formatCurrency(displayProducts[0].price)}</span>
+          </div>
+          <button
+            id="${buttonId}"
+            onclick="openCheckoutModal('${checkoutModalId}', '${displayProducts[0].name}', ${displayProducts[0].price || 0}, '${displayProducts[0].id || ''}')"
+            style="
+              ${buttonSizeStyle}
+              background-color: ${buttonColor};
+              color: white;
+              border: none;
+              border-radius: 0.5rem;
+              font-weight: 600;
+              cursor: pointer;
+              transition: transform 0.2s;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            "
+            onmouseover="this.style.transform='scale(1.05)'"
+            onmouseout="this.style.transform='scale(1)'"
+          >
+            ${buttonText}
+          </button>
+          <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 1rem;">
+            Powered by LeanX - Secure Payment
+          </p>
+        </div>
+      </div>
+    `
+    }
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+      <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <!-- Modal Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+          <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Secure Checkout</h2>
+          <button onclick="closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <form id="checkout-form-${element.id}" style="padding: 1.5rem;">
+          <!-- Order Summary -->
+          <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem;">Order Summary</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>${displayProducts[0].name}</span>
+              <span style="font-weight: 600;">${formatCurrency(displayProducts[0].price)}</span>
+            </div>
+            <div id="shipping-cost-${element.id}" style="display: none; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid #e5e7eb; margin-top: 0.5rem;">
+              <span style="font-size: 0.875rem;">Priority Shipping & Insurance</span>
+              <span style="font-size: 0.875rem; font-weight: 600;">RM 10.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid #d1d5db;">
+              <span style="font-weight: bold;">Total</span>
+              <span id="total-amount-${element.id}" style="font-weight: bold;">${formatCurrency(displayProducts[0].price)}</span>
+            </div>
+          </div>
+
+          <!-- Shipping Option -->
+          <div style="border: 2px solid #fcd34d; background: #fef3c7; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: start; cursor: pointer;">
+              <input type="checkbox" id="add-shipping-${element.id}" style="margin-top: 0.25rem; margin-right: 0.75rem;">
+              <div>
+                <p style="font-weight: 600; margin: 0 0 0.25rem 0;">Yes! Add Priority Shipping & Insurance</p>
+                <p style="font-size: 0.875rem; color: #4b5563; margin: 0;">Get your order faster and fully insured against damage.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Bank Selection -->
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 1rem;">Select Your Bank</h3>
+
+            <!-- Loading State -->
+            <div id="banks-loading-${element.id}" style="display: flex; align-items: center; justify-content: center; padding: 2rem;">
+              <div style="width: 2rem; height: 2rem; border: 3px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+            </div>
+
+            <!-- Error State -->
+            <div id="banks-error-${element.id}" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 0.375rem; padding: 1rem; text-align: center;">
+              <p style="color: #dc2626; font-size: 0.875rem; margin: 0 0 0.5rem 0;">Failed to load banks</p>
+              <button type="button" onclick="window.fetchBanks_${element.id}()" style="font-size: 0.875rem; padding: 0.25rem 0.75rem; background: white; border: 1px solid #dc2626; color: #dc2626; border-radius: 0.25rem; cursor: pointer;">Retry</button>
+            </div>
+
+            <!-- Banks List -->
+            <div id="banks-list-${element.id}" style="display: none;">
+              <!-- Banks will be dynamically inserted here -->
+            </div>
+
+            <input type="hidden" id="selected-bank-${element.id}" required>
+            <p id="bank-error-${element.id}" style="display: none; font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">Please select a bank</p>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem;">Email (Optional)</label>
+            <input
+              type="email"
+              id="customer-email-${element.id}"
+              placeholder="your@email.com"
+              style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
+            >
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">We'll send your receipt to this email</p>
+          </div>
+
+          <button
+            type="submit"
+            style="width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.375rem; font-weight: 600; font-size: 1.125rem; cursor: pointer;"
+          >
+            Proceed to Secure Payment - <span id="button-total-${element.id}">${formatCurrency(displayProducts[0].price)}</span>
+          </button>
+<style>
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+
+          <div style="text-align: center; margin-top: 1rem;">
+            <p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0;">
+              <svg style="display: inline; width: 1rem; height: 1rem; vertical-align: middle;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+              256-bit SSL Secure Payment
+            </p>
+            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.25rem 0;">Powered by LeanX</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  ${
+    enableBumpOffer && bumpOfferName
+      ? `
+  <!-- Bump Offer Modal -->
+  <div id="${bumpModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+      <div style="background: white; border-radius: 0.5rem; max-width: 40rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <!-- Red Banner -->
+        <div style="background: #dc2626; color: white; text-align: center; padding: 0.75rem;">
+          <p style="font-weight: bold; margin: 0;">WAIT! YOUR ORDER IS NOT COMPLETE YET...</p>
+        </div>
+
+        <div style="padding: 2rem;">
+          <h2 style="font-size: 1.875rem; font-weight: bold; text-align: center; margin-bottom: 1rem;">Add This Special Offer?</h2>
+          <p style="text-align: center; color: #374151; font-size: 1.125rem; margin-bottom: 1.5rem;">${bumpOfferDescription}</p>
+
+          <!-- Product Card -->
+          <div style="background: white; border: 2px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <div style="background: #e5e7eb; border-radius: 0.5rem; height: 16rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+              <svg style="width: 5rem; height: 5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+
+            <h3 style="font-size: 1.25rem; font-weight: bold; text-align: center; margin-bottom: 1rem;">${bumpOfferName}</h3>
+
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <p style="color: #6b7280; text-decoration: line-through; font-size: 1.125rem; margin-bottom: 0.25rem;">${formatCurrency(bumpOfferAmount || 0)}</p>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                <p style="font-size: 2.25rem; font-weight: bold; color: #dc2626; margin: 0;">${formatCurrency(bumpDiscountedPrice || 0)}</p>
+                ${bumpOfferDiscount ? `<span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">${bumpOfferDiscount}% OFF</span>` : ''}
+              </div>
+            </div>
+
+            <button
+              onclick="acceptBumpOffer('${element.id}')"
+              style="width: 100%; padding: 1rem; background: #16a34a; color: white; border: none; border-radius: 0.5rem; font-weight: bold; font-size: 1.125rem; cursor: pointer; margin-bottom: 1rem;"
+            >
+              Yes! Add To My Order
+            </button>
+          </div>
+
+          <div style="text-align: center;">
+            <button
+              onclick="declineBumpOffer('${element.id}')"
+              style="background: none; border: none; color: #6b7280; text-decoration: underline; font-size: 0.875rem; cursor: pointer;"
+            >
+              No thanks, I'll pass on this discount
+            </button>
+          </div>
+
+          <p style="font-size: 0.75rem; text-align: center; color: #9ca3af; margin-top: 1.5rem;">
+            This is a one-time offer only available on this page.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  `
+      : ''
+  }
+
+  <script>
+    (function() {
+      const projectId = window.__PROJECT_ID__;
+      const elementId = '${element.id}';
+      let transactionId = null;
+      let addShipping = false;
+      let bumpOfferAccepted = false;
+      let banks = [];
+      let selectedBankId = null;
+
+      // Fetch banks from API
+      window.fetchBanks_${element.id} = async function() {
+        const loadingEl = document.getElementById('banks-loading-${element.id}');
+        const errorEl = document.getElementById('banks-error-${element.id}');
+        const listEl = document.getElementById('banks-list-${element.id}');
+
+        loadingEl.style.display = 'flex';
+        errorEl.style.display = 'none';
+        listEl.style.display = 'none';
+
+        try {
+          const response = await fetch('/api/payments/banks?projectId=' + projectId);
+          const data = await response.json();
+
+          if (data.success && data.banks) {
+            banks = data.banks;
+            renderBanks(banks);
+            loadingEl.style.display = 'none';
+            listEl.style.display = 'block';
+          } else {
+            throw new Error(data.error || 'Failed to load banks');
+          }
+        } catch (error) {
+          console.error('Failed to fetch banks:', error);
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+        }
+      };
+
+      // Render banks list
+      function renderBanks(banksList) {
+        const listEl = document.getElementById('banks-list-${element.id}');
+        listEl.innerHTML = banksList.map(function(bank) {
+          var logoHtml = bank.logo ?
+            '<img src="' + bank.logo + '" alt="' + bank.name + '" style="width: 2rem; height: 2rem; object-fit: contain;" />' :
+            '<svg style="width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>';
+
+          return '<button type="button" onclick="window.selectBank_${element.id}(\'' + bank.id + '\')" id="bank-btn-' + bank.id + '" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 1rem; margin-bottom: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor=\'#d1d5db\'" onmouseout="this.style.borderColor=(selectedBankId===\'' + bank.id + '\' ? \'#2563eb\' : \'#e5e7eb\')">' +
+            '<div style="display: flex; align-items: center; gap: 0.75rem;">' +
+              logoHtml +
+              '<span style="font-weight: 500; color: #111827;">' + bank.name + '</span>' +
+            '</div>' +
+            '<div id="bank-check-' + bank.id + '" style="display: none; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #2563eb; align-items: center; justify-content: center;">' +
+              '<svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="currentColor" viewBox="0 0 20 20">' +
+                '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />' +
+              '</svg>' +
+            '</div>' +
+          '</button>';
+        }).join('');
+      }
+
+      // Select bank
+      window.selectBank_${element.id} = function(bankId) {
+        selectedBankId = bankId;
+        document.getElementById('selected-bank-${element.id}').value = bankId;
+        document.getElementById('bank-error-${element.id}').style.display = 'none';
+
+        // Update UI
+        banks.forEach(function(bank) {
+          var btn = document.getElementById('bank-btn-' + bank.id);
+          var check = document.getElementById('bank-check-' + bank.id);
+          if (bank.id === bankId) {
+            btn.style.borderColor = '#2563eb';
+            btn.style.background = '#eff6ff';
+            check.style.display = 'flex';
+          } else {
+            btn.style.borderColor = '#e5e7eb';
+            btn.style.background = 'white';
+            check.style.display = 'none';
+          }
+        });
+      };
+
+      // Handle shipping checkbox
+      const shippingCheckbox = document.getElementById('add-shipping-${element.id}');
+      if (shippingCheckbox) {
+        shippingCheckbox.addEventListener('change', function(e) {
+          addShipping = e.target.checked;
+          const shippingCost = document.getElementById('shipping-cost-${element.id}');
+          const totalEl = document.getElementById('total-amount-${element.id}');
+          const buttonTotalEl = document.getElementById('button-total-${element.id}');
+
+          if (shippingCost) shippingCost.style.display = addShipping ? 'flex' : 'none';
+
+          const baseAmount = ${displayProducts[0].price};
+          const total = addShipping ? baseAmount + 10 : baseAmount;
+          const formatted = '${currency}' === 'MYR' ? 'RM ' + total.toFixed(2) : '${currency} ' + total.toFixed(2);
+
+          if (totalEl) totalEl.textContent = formatted;
+          if (buttonTotalEl) buttonTotalEl.textContent = formatted;
+        });
+      }
+
+      // Open checkout modal
+      document.getElementById('${buttonId}').addEventListener('click', function() {
+        document.getElementById('${checkoutModalId}').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      });
+
+      // Open checkout modal (global function for onclick handlers)
+      window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+        document.getElementById(modalId).style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        // Fetch banks when modal opens
+        if (banks.length === 0) {
+          window.fetchBanks_${element.id}();
+        }
+      };
+
+      // Close checkout modal
+      window.closeCheckoutModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+
+      // Handle checkout form submission
+      document.getElementById('checkout-form-${element.id}').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('customer-email-${element.id}').value;
+        const bankId = document.getElementById('selected-bank-${element.id}').value;
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+
+        // Validate bank selection
+        if (!bankId) {
+          document.getElementById('bank-error-${element.id}').style.display = 'block';
+          return;
+        }
+
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span style="display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Processing...';
+
+        try {
+          // Build payment payload
+          const payload = {
+            projectId: projectId,
+            productName: '${displayProducts[0].name}',
+            productDescription: '${displayProducts[0].description || ''}',
+            amount: addShipping ? ${displayProducts[0].price} + 10 : ${displayProducts[0].price},
+            currency: '${currency}',
+            bankId: bankId, // Include selected bank ID for Silent Bill method
+          };
+
+          // Only include customerEmail if provided
+          if (email && email.trim()) {
+            payload.customerEmail = email.trim();
+          }
+
+          // Create transaction and get LeanX payment URL
+          const createResponse = await fetch('/api/payments/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const createResult = await createResponse.json();
+          if (!createResult.success || !createResult.paymentUrl) {
+            // Include validation details if available
+            let errorMsg = createResult.error || 'Failed to create payment session';
+            if (createResult.details) {
+              errorMsg += '\\n\\nDetails:\\n' + JSON.stringify(createResult.details, null, 2);
+            }
+            throw new Error(errorMsg);
+          }
+
+          // Redirect to LeanX payment page
+          window.location.href = createResult.paymentUrl;
+
+        } catch (error) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonText;
+          // Show the actual error message from the API
+          const errorMessage = error.message || '${failureMessage}';
+          alert(errorMessage);
+          console.error('Payment error:', error);
+        }
+      });
+
+      ${
+        enableBumpOffer && bumpOfferName
+          ? `
+      // Accept bump offer
+      window.acceptBumpOffer = async function(elemId) {
+        bumpOfferAccepted = true;
+        document.getElementById('${bumpModalId}').style.display = 'none';
+
+        const cardNumber = document.getElementById('card-number-${element.id}').value.replace(/\\s/g, '');
+        const expiryDate = document.getElementById('expiry-date-${element.id}').value.replace(/\\//g, '');
+        const cvv = document.getElementById('cvv-${element.id}').value;
+
+        await processPayment(transactionId, cardNumber, expiryDate, cvv, true);
+      };
+
+      // Decline bump offer
+      window.declineBumpOffer = async function(elemId) {
+        bumpOfferAccepted = false;
+        document.getElementById('${bumpModalId}').style.display = 'none';
+
+        const cardNumber = document.getElementById('card-number-${element.id}').value.replace(/\\s/g, '');
+        const expiryDate = document.getElementById('expiry-date-${element.id}').value.replace(/\\//g, '');
+        const cvv = document.getElementById('cvv-${element.id}').value;
+
+        await processPayment(transactionId, cardNumber, expiryDate, cvv, false);
+      };
+      `
+          : ''
+      }
+
+      // Process payment
+      async function processPayment(txnId, cardNumber, expiryDate, cvv, acceptedBump = false) {
+        try {
+          const response = await fetch('/api/payments/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transactionId: txnId,
+              cardNumber: cardNumber,
+              expiryDate: expiryDate,
+              cvv: cvv
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            alert('${successMessage}');
+            // Reset form
+            document.getElementById('checkout-form-${element.id}').reset();
+          } else {
+            alert('${failureMessage}');
+          }
+        } catch (error) {
+          alert('${failureMessage}');
+          console.error('Payment processing error:', error);
+        } finally {
+          document.body.style.overflow = 'auto';
+        }
+      }
+    })();
+  </script>
+</section>`;
+}
+
+/**
+ * Generate Announcement Bar HTML
+ */
+function generateAnnouncementBarHTML(element: Element): string {
+  const {
+    message,
+    bgColor,
+    textColor,
+    showCountdown,
+    countdownLabel,
+    countdownEndDate,
+    isSticky,
+    showCloseButton,
+    link,
+    linkText,
+  } = element.props;
+
+  const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 50;' : '';
+
+  return `
+<div
+  id="announcement-${element.id}"
+  style="background-color: ${bgColor}; color: ${textColor}; padding: 0.75rem 1rem; ${stickyStyle}"
+>
+  <div style="max-width: 80rem; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative;">
+    <!-- Main centered content -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <span style="font-weight: 500; text-align: center;">${message}</span>
+      ${
+        showCountdown && countdownEndDate
+          ? `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          ${countdownLabel ? `<span style="font-size: 0.875rem; opacity: 0.9;">${countdownLabel}</span>` : ''}
+          <div id="countdown-${element.id}" style="display: flex; gap: 0.25rem; font-family: monospace;">
+            <div style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem; min-width: 2.5rem; text-align: center;">
+              <span class="days" style="font-weight: bold;">00</span><span style="font-size: 0.75rem; opacity: 0.75;">d</span>
+            </div>
+            <span style="font-weight: bold;">:</span>
+            <div style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem; min-width: 2.5rem; text-align: center;">
+              <span class="hours" style="font-weight: bold;">00</span><span style="font-size: 0.75rem; opacity: 0.75;">h</span>
+            </div>
+            <span style="font-weight: bold;">:</span>
+            <div style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem; min-width: 2.5rem; text-align: center;">
+              <span class="minutes" style="font-weight: bold;">00</span><span style="font-size: 0.75rem; opacity: 0.75;">m</span>
+            </div>
+            <span style="font-weight: bold;">:</span>
+            <div style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem; min-width: 2.5rem; text-align: center;">
+              <span class="seconds" style="font-weight: bold;">00</span><span style="font-size: 0.75rem; opacity: 0.75;">s</span>
+            </div>
+          </div>
+        </div>
+      `
+          : ''
+      }
+      ${
+        link && linkText
+          ? `
+        <a href="${link}" style="text-decoration: underline; font-weight: 600; color: inherit;">${linkText}</a>
+      `
+          : ''
+      }
+    </div>
+    <!-- Close Button - Absolute positioned to the right -->
+    ${
+      showCloseButton
+        ? `
+      <button
+        onclick="document.getElementById('announcement-${element.id}').style.display='none'"
+        style="position: absolute; right: 0; padding: 0.25rem; background: transparent; border: none; cursor: pointer; color: inherit; font-size: 1.25rem; transition: opacity 0.2s;"
+        onmouseover="this.style.opacity='0.7'"
+        onmouseout="this.style.opacity='1'"
+        aria-label="Close announcement"
+      >&times;</button>
+    `
+        : ''
+    }
+  </div>
+</div>
+${
+  showCountdown && countdownEndDate
+    ? `
+<script>
+  (function() {
+    const countdownEl = document.getElementById('countdown-${element.id}');
+    const endDate = new Date('${countdownEndDate}').getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const difference = endDate - now;
+
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        countdownEl.querySelector('.days').textContent = String(days).padStart(2, '0');
+        countdownEl.querySelector('.hours').textContent = String(hours).padStart(2, '0');
+        countdownEl.querySelector('.minutes').textContent = String(minutes).padStart(2, '0');
+        countdownEl.querySelector('.seconds').textContent = String(seconds).padStart(2, '0');
+      } else {
+        countdownEl.innerHTML = '<span style="font-weight: bold;">EXPIRED</span>';
+      }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
+`
+    : ''
+}`;
+}
+
+/**
+ * Generate Navigation HTML
+ */
+function generateNavigationHTML(element: Element): string {
+  const {
+    logo,
+    logoText,
+    menuItems,
+    ctaButton,
+    bgColor,
+    textColor,
+    isSticky,
+    layout,
+  } = element.props;
+
+  const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 40;' : '';
+  const justifyContent = layout === 'center' ? 'center' : 'space-between';
+
+  return `
+<nav
+  id="nav-${element.id}"
+  style="background-color: ${bgColor}; color: ${textColor}; ${stickyStyle}"
+>
+  <div style="max-width: 80rem; margin: 0 auto; padding: 0 1rem;">
+    <div style="display: flex; align-items: center; justify-content: ${justifyContent}; height: 4rem;">
+      <!-- Logo -->
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        ${logo ? `<img src="${logo}" alt="${logoText || 'Logo'}" style="height: 2rem;">` : `<span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>`}
+      </div>
+
+      <!-- Desktop Menu -->
+      <div id="menu-${element.id}" style="display: none; align-items: center; gap: 2rem;">
+        ${menuItems
+          .map(
+            (item: any) => `
+          <a href="${item.url}" style="color: ${textColor}; text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${item.label}</a>
+        `
+          )
+          .join('')}
+        ${
+          ctaButton && ctaButton.text
+            ? `
+          <a href="${ctaButton.url || '#'}" class="button button-primary" style="padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
+        `
+            : ''
+        }
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-btn-${element.id}"
+        onclick="document.getElementById('mobile-menu-${element.id}').style.display = document.getElementById('mobile-menu-${element.id}').style.display === 'none' ? 'block' : 'none'"
+        style="padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: ${textColor};"
+      >
+        <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu-${element.id}" style="display: none; padding-bottom: 1rem;">
+      ${menuItems
+        .map(
+          (item: any) => `
+        <a href="${item.url}" style="display: block; padding: 0.75rem 0; color: ${textColor}; text-decoration: none; font-weight: 500;">${item.label}</a>
+      `
+        )
+        .join('')}
+      ${
+        ctaButton && ctaButton.text
+          ? `
+        <a href="${ctaButton.url || '#'}" class="button button-primary" style="display: inline-block; margin-top: 0.5rem; padding: 0.5rem 1.5rem;">${ctaButton.text}</a>
+      `
+          : ''
+      }
+    </div>
+  </div>
+</nav>
+<script>
+  // Show desktop menu on larger screens
+  function checkMenuDisplay() {
+    const desktopMenu = document.getElementById('menu-${element.id}');
+    const mobileBtn = document.getElementById('mobile-menu-btn-${element.id}');
+    if (window.innerWidth >= 768) {
+      desktopMenu.style.display = 'flex';
+      mobileBtn.style.display = 'none';
+    } else {
+      desktopMenu.style.display = 'none';
+      mobileBtn.style.display = 'block';
+    }
+  }
+  checkMenuDisplay();
+  window.addEventListener('resize', checkMenuDisplay);
+</script>`;
+}
+
+/**
+ * Generate Pricing HTML
+ */
+function generatePricingHTML(element: Element): string {
+  const {
+    title,
+    subtitle,
+    plans,
+    layout,
+    backgroundImage,
+    backgroundOpacity = 70,
+    bgColor = '#000000',
+    enablePaymentIntegration = false,
+    fontFamily: pricingFontFamily,
+  } = element.props;
+
+  const titleFontCSS = getFontFamilyCSS(pricingFontFamily);
+  const titleFontInline = titleFontCSS ? ` font-family: ${titleFontCSS};` : '';
+
+  const checkoutModalId = `pricing-checkout-modal-${element.id}`;
+
+  if (layout === 'cards') {
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; padding: 5rem 1rem; background: #f9fafb; scroll-margin-top: 4rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;${titleFontInline}">${title}</h2>
+      ${subtitle ? `<p style="font-size: 1.25rem; color: #666; max-width: 42rem; margin: 0 auto;">${subtitle}</p>` : ''}
+    </div>
+
+    <!-- Pricing Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+      ${plans
+        .map(
+          (plan: any) => `
+        <div style="background: white; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 2rem; display: flex; flex-direction: column; ${plan.highlighted ? 'border: 2px solid #3b82f6; transform: scale(1.05);' : ''}">
+          ${
+            plan.highlighted
+              ? `
+            <div style="background: #3b82f6; color: white; font-size: 0.875rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; align-self: flex-start; margin-bottom: 1rem;">Most Popular</div>
+          `
+              : ''
+          }
+          <h3 style="font-size: 1.5rem; font-weight: bold; color: #111; margin-bottom: 0.5rem;">${plan.name}</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">${plan.description}</p>
+          <div style="margin-bottom: 1.5rem;">
+            <span style="font-size: 3rem; font-weight: bold; color: #111;">${plan.currency} ${plan.price}</span>
+            <span style="color: #666; margin-left: 0.5rem;">/ ${plan.period}</span>
+          </div>
+          <ul style="list-style: none; margin-bottom: 2rem; flex: 1;">
+            ${plan.features
+              .map(
+                (feature: string) => `
+              <li style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <svg style="width: 1.25rem; height: 1.25rem; color: #10b981; flex-shrink: 0; margin-top: 0.125rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span style="color: #374151;">${feature}</span>
+              </li>
+            `
+              )
+              .join('')}
+          </ul>
+          ${
+            enablePaymentIntegration
+              ? `
+            <button
+              onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+              style="
+                width: 100%;
+                padding: 0.75rem 1.5rem;
+                background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'};
+                color: ${plan.highlighted ? 'white' : '#3b82f6'};
+                border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'};
+                border-radius: 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+                text-align: center;
+              "
+              onmouseover="this.style.transform='scale(1.05)'"
+              onmouseout="this.style.transform='scale(1)'"
+            >
+              ${plan.buttonText}
+            </button>
+          `
+              : `
+            <a href="${plan.buttonUrl}" style="display: block; width: 100%; padding: 0.75rem 1.5rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.5rem; font-weight: 600; text-align: center; text-decoration: none;">${plan.buttonText}</a>
+          `
+          }
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>
+
+${
+  enablePaymentIntegration
+    ? `
+<!-- Checkout Modal for Pricing -->
+<div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
+        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div style="padding: 1.5rem; text-align: center;">
+        <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
+        <p style="color: #6b7280; font-size: 0.875rem;">Add a Payment Button element to enable full checkout functionality.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Define openCheckoutModal for pricing if not already defined
+  if (typeof window.openCheckoutModal === 'undefined') {
+    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        // Try to trigger bank fetching if available
+        // Look for any fetchBanks function and call it
+        for (let key in window) {
+          if (key.startsWith('fetchBanks_') && typeof window[key] === 'function') {
+            try {
+              window[key]();
+              break;
+            } catch (e) {
+              console.log('Could not fetch banks:', e);
+            }
+          }
+        }
+      }
+    };
+  }
+
+  // Define closeCheckoutModal if not already defined
+  if (typeof window.closeCheckoutModal === 'undefined') {
+    window.closeCheckoutModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }
+</script>
+`
+    : ''
+}`;
+  } else {
+    // Table layout
+    return `
+<section id="${element.type}-${element.order}" style="position: relative; overflow: hidden; padding: 5rem 1rem; background: #f9fafb; scroll-margin-top: 4rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2.25rem; font-weight: bold; color: #111; margin-bottom: 1rem;${titleFontInline}">${title}</h2>
+      ${subtitle ? `<p style="font-size: 1.25rem; color: #666; max-width: 42rem; margin: 0 auto;">${subtitle}</p>` : ''}
+    </div>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; overflow: hidden;">
+        <thead>
+          <tr style="background: #f3f4f6;">
+            <th style="padding: 1rem; text-align: left; font-weight: 600;">Plan</th>
+            <th style="padding: 1rem; text-align: left; font-weight: 600;">Price</th>
+            <th style="padding: 1rem; text-align: left; font-weight: 600;">Features</th>
+            <th style="padding: 1rem; text-align: left; font-weight: 600;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${plans
+            .map(
+              (plan: any, index: number) => `
+            <tr style="${index % 2 === 0 ? 'background: white;' : 'background: #f9fafb;'}">
+              <td style="padding: 1rem;">
+                <div style="font-weight: bold; color: #111;">${plan.name}</div>
+                <div style="font-size: 0.875rem; color: #666;">${plan.description}</div>
+              </td>
+              <td style="padding: 1rem;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: #111;">${plan.currency}${plan.price}</div>
+                <div style="font-size: 0.875rem; color: #666;">/ ${plan.period}</div>
+              </td>
+              <td style="padding: 1rem;">
+                <ul style="list-style: none; padding: 0;">
+                  ${plan.features
+                    .slice(0, 3)
+                    .map(
+                      (feature: string) => `
+                    <li style="font-size: 0.875rem; color: #374151; margin-bottom: 0.25rem;">✓ ${feature}</li>
+                  `
+                    )
+                    .join('')}
+                  ${plan.features.length > 3 ? `<li style="font-size: 0.875rem; color: #666;">+${plan.features.length - 3} more</li>` : ''}
+                </ul>
+              </td>
+              <td style="padding: 1rem;">
+                ${
+                  enablePaymentIntegration
+                    ? `
+                  <button
+                    onclick="openCheckoutModal('${checkoutModalId}', '${plan.name}', ${plan.priceNumeric || parseFloat(plan.price) || 0}, 'plan-${plan.name}')"
+                    style="
+                      padding: 0.5rem 1.25rem;
+                      background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'};
+                      color: ${plan.highlighted ? 'white' : '#3b82f6'};
+                      border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'};
+                      border-radius: 0.375rem;
+                      font-weight: 600;
+                      cursor: pointer;
+                    "
+                  >
+                    ${plan.buttonText}
+                  </button>
+                `
+                    : `
+                  <a href="${plan.buttonUrl}" style="display: inline-block; padding: 0.5rem 1.25rem; background-color: ${plan.highlighted ? '#3b82f6' : 'transparent'}; color: ${plan.highlighted ? 'white' : '#3b82f6'}; border: ${plan.highlighted ? 'none' : '2px solid #3b82f6'}; border-radius: 0.375rem; font-weight: 600; text-decoration: none;">${plan.buttonText}</a>
+                `
+                }
+              </td>
+            </tr>
+          `
+            )
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+${
+  enablePaymentIntegration
+    ? `
+<!-- Checkout Modal for Pricing -->
+<div id="${checkoutModalId}" style="display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); padding: 1rem;">
+  <div style="display: flex; align-items: center; justify-center; min-height: 100vh;">
+    <div style="background: white; border-radius: 0.5rem; max-width: 32rem; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0;">Complete Purchase</h2>
+        <button onclick="if(window.closeCheckoutModal) closeCheckoutModal('${checkoutModalId}')" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.5rem;">&times;</button>
+      </div>
+      <div style="padding: 1.5rem; text-align: center;">
+        <p style="color: #6b7280; margin-bottom: 1rem;">Checkout modal opened successfully!</p>
+        <p style="color: #6b7280; font-size: 0.875rem;">Add a Payment Button element to enable full checkout functionality.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Define openCheckoutModal for pricing if not already defined
+  if (typeof window.openCheckoutModal === 'undefined') {
+    window.openCheckoutModal = function(modalId, productName, productPrice, productId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        // Try to trigger bank fetching if available
+        // Look for any fetchBanks function and call it
+        for (let key in window) {
+          if (key.startsWith('fetchBanks_') && typeof window[key] === 'function') {
+            try {
+              window[key]();
+              break;
+            } catch (e) {
+              console.log('Could not fetch banks:', e);
+            }
+          }
+        }
+      }
+    };
+  }
+
+  // Define closeCheckoutModal if not already defined
+  if (typeof window.closeCheckoutModal === 'undefined') {
+    window.closeCheckoutModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
+  }
+</script>
+`
+    : ''
+}`;
+  }
+}
+
+/**
+ * Generate Form With Payment HTML
+ */
+function generateFormWithPaymentHTML(element: Element): string {
+  const {
+    title = 'Order Form',
+    description,
+    nameLabel = 'Name',
+    mobileLabel = 'Mobile Number',
+    emailLabel = 'Email',
+    showName = true,
+    showMobile = true,
+    showEmail = true,
+    nameRequired = true,
+    mobileRequired = true,
+    emailRequired = true,
+    products = [],
+    currency = 'MYR',
+    submitButtonText = 'Complete Payment',
+    submitButtonColor = '#ef4444',
+    bgColor = '#ffffff',
+    companyName = '',
+  } = element.props;
+
+  const formatCurrency = (value: number) => {
+    if (currency === 'MYR') return `RM ${value.toFixed(2)}`;
+    return `${currency} ${value.toFixed(2)}`;
+  };
+
+  const nameFieldHTML = showName
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${nameLabel}${nameRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <input type="text" placeholder="Enter your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+    </div>`
+    : '';
+
+  const mobileFieldHTML = showMobile
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${mobileLabel}${mobileRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <div style="display: flex;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid #d1d5db; border-right: none; border-radius: 0.5rem 0 0 0.5rem; background: #f9fafb;">
+          <span>🇲🇾</span>
+          <span style="color: #6b7280; font-size: 0.875rem;">▼</span>
+        </div>
+        <input type="tel" placeholder="012-345 6789" style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0 0.5rem 0.5rem 0; font-size: 1rem; box-sizing: border-box;" />
+      </div>
+    </div>`
+    : '';
+
+  const emailFieldHTML = showEmail
+    ? `
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.375rem;">
+        ${emailLabel}${emailRequired ? '<span style="color: #ef4444;">*</span>' : ''}
+      </label>
+      <input type="email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+    </div>`
+    : '';
+
+  const sectionId = `form-payment-${element.order}`;
+  const jsId = `form_payment_${element.order}`;
+
+  const productsHTML =
+    products.length > 0
+      ? `
+    <div id="${sectionId}-products" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;">
+      <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Item</div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Qty</div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Amount</div>
+      </div>
+      ${products
+        .map((product: any, idx: number) => {
+          const hasVariations =
+            product.variations &&
+            product.variations.length > 0 &&
+            product.variations[0]?.options?.length > 0;
+          const productId = product.id || `prod-${idx}`;
+
+          // Bundle pricing info
+          const bundleInfoHTML =
+            product.bundlePricing && product.bundlePricing.length > 0
+              ? `<div style="margin-top: 0.25rem; font-size: 0.75rem; color: #16a34a;">${product.bundlePricing
+                  .slice(0, 3)
+                  .map(
+                    (b: any) =>
+                      `Buy ${b.quantity} = ${formatCurrency(b.totalPrice)}`
+                  )
+                  .join(' | ')}</div>`
+              : '';
+
+          // Variant grid (hidden by default, toggled via JS)
+          let variantGridHTML = '';
+          if (hasVariations) {
+            variantGridHTML = `
+              <div id="${sectionId}-variants-${idx}" style="display: none; padding: 0.75rem 1rem; border-bottom: 1px solid #f3f4f6;">
+                ${product.variations
+                  .map(
+                    (variation: any) => `
+                  <div style="margin-bottom: 0.75rem;">
+                    <div style="font-size: 0.75rem; font-weight: 500; color: #6b7280; margin-bottom: 0.5rem;">${variation.name}</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                      ${variation.options
+                        .map((option: any) => {
+                          const variantPrice =
+                            product.price + (option.priceAdjustment || 0);
+                          const variantKey = `${productId}-${option.value}`;
+                          return `
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border-radius: 0.375rem; padding: 0.375rem 0.5rem;">
+                          <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 0.875rem; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${option.label}</div>
+                            <div style="font-size: 0.75rem; color: #2563eb;">${formatCurrency(variantPrice)}</div>
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 0.125rem; border: 1px solid #d1d5db; border-radius: 0.25rem; background: white; margin-left: 0.5rem;">
+                            <button type="button" onclick="${jsId}_changeQty('${variantKey}', -1, ${option.stock || 0}, ${variantPrice})" style="padding: 0.25rem 0.5rem; color: #6b7280; background: none; border: none; cursor: pointer; font-size: 0.875rem;">−</button>
+                            <span id="${sectionId}-qty-${variantKey}" style="width: 1.5rem; text-align: center; font-size: 0.875rem; font-weight: 500;">0</span>
+                            <button type="button" onclick="${jsId}_changeQty('${variantKey}', 1, ${option.stock || 0}, ${variantPrice})" style="padding: 0.25rem 0.5rem; color: #6b7280; background: none; border: none; cursor: pointer; font-size: 0.875rem;">+</button>
+                          </div>
+                        </div>`;
+                        })
+                        .join('')}
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>`;
+          }
+
+          if (hasVariations) {
+            // Product with variations - clickable to expand, shows total qty badge
+            return `
+      <div data-product-idx="${idx}" data-product-id="${productId}" data-base-price="${product.price}">
+        <div style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: start; border-bottom: 1px solid #f3f4f6; cursor: pointer;" onclick="${jsId}_toggleVariants(${idx})">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span id="${sectionId}-chevron-${idx}" style="color: #9ca3af; font-size: 0.75rem; transition: transform 0.2s;">▶</span>
+              <div>
+                <div style="font-weight: 500; color: #111827;">${product.name}</div>
+                <div style="color: #2563eb; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}
+                  <span style="color: #9ca3af; font-size: 0.75rem; margin-left: 0.25rem;">(tap to select)</span>
+                </div>
+                ${bundleInfoHTML}
+                ${product.description ? `<div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">${product.description}</div>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center;">
+            <span id="${sectionId}-total-qty-${idx}" style="display: none; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: #dbeafe; color: #1e40af;">0 selected</span>
+            <span id="${sectionId}-select-hint-${idx}" style="font-size: 0.875rem; color: #9ca3af;">Select below</span>
+          </div>
+          <div id="${sectionId}-amount-${idx}" style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
+        </div>
+        ${variantGridHTML}
+      </div>`;
+          } else {
+            // Simple product without variations
+            return `
+      <div data-product-idx="${idx}" data-product-id="${productId}" data-base-price="${product.price}" style="display: grid; grid-template-columns: 5fr 4fr 3fr; gap: 1rem; padding: 1rem; align-items: center; border-bottom: 1px solid #f3f4f6;">
+        <div>
+          <div style="font-weight: 500; color: #111827;">${product.name}</div>
+          <div style="color: #2563eb; font-size: 0.875rem; font-weight: 500;">${formatCurrency(product.price)}</div>
+          ${bundleInfoHTML}
+          ${product.description ? `<div style="color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;">${product.description}</div>` : ''}
+        </div>
+        <div style="display: flex; justify-content: center;">
+          <div style="display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+            <button type="button" onclick="${jsId}_changeQty('${productId}', -1, ${product.stock || 0}, ${product.price})" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">−</button>
+            <span id="${sectionId}-qty-${productId}" style="width: 2rem; text-align: center; font-weight: 500;">0</span>
+            <button type="button" onclick="${jsId}_changeQty('${productId}', 1, ${product.stock || 0}, ${product.price})" style="padding: 0.5rem 0.75rem; color: #6b7280; background: none; border: none; cursor: pointer;">+</button>
+          </div>
+        </div>
+        <div id="${sectionId}-amount-${idx}" style="text-align: right; color: #111827; font-weight: 500;">${formatCurrency(0)}</div>
+      </div>`;
+          }
+        })
+        .join('')}
+    </div>`
+      : '';
+
+  const totalHTML = `
+    <div style="background: #f9fafb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 1.125rem; font-weight: 700; color: #111827;">Total Amount:</span>
+        <span id="${sectionId}-total" style="font-size: 1.5rem; font-weight: 700; color: #111827;">${formatCurrency(0)}</span>
+      </div>
+      <p id="${sectionId}-total-hint" style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Please select your items above.</p>
+    </div>`;
+
+  // Build product data for JS
+  const productsJSData = JSON.stringify(
+    products.map((p: any, idx: number) => ({
+      idx,
+      id: p.id || `prod-${idx}`,
+      price: p.price,
+      bundlePricing: p.bundlePricing || [],
+      hasVariations: !!(
+        p.variations &&
+        p.variations.length > 0 &&
+        p.variations[0]?.options?.length > 0
+      ),
+      variations: (p.variations || []).map((v: any) => ({
+        options: (v.options || []).map((o: any) => ({
+          value: o.value,
+          priceAdjustment: o.priceAdjustment || 0,
+        })),
+      })),
+    }))
+  );
+
+  const interactiveJS = `
+<script>
+(function() {
+  var sid = '${sectionId}';
+  var quantities = {};
+  var products = ${productsJSData};
+  var currency = '${currency}';
+
+  function fmtCur(v) {
+    if (currency === 'MYR' || currency === 'RM') return 'RM ' + v.toFixed(2);
+    return currency + ' ' + v.toFixed(2);
+  }
+
+  function getBundlePrice(product, qty) {
+    if (!product.bundlePricing || product.bundlePricing.length === 0 || qty <= 0) return null;
+    var sorted = product.bundlePricing.slice().sort(function(a,b){ return b.quantity - a.quantity; });
+    for (var i = 0; i < sorted.length; i++) {
+      if (qty >= sorted[i].quantity) return sorted[i].totalPrice;
+    }
+    return null;
+  }
+
+  window.${jsId}_toggleVariants = function(idx) {
+    var el = document.getElementById(sid + '-variants-' + idx);
+    var chevron = document.getElementById(sid + '-chevron-' + idx);
+    if (!el) return;
+    if (el.style.display === 'none') {
+      el.style.display = 'block';
+      if (chevron) chevron.style.transform = 'rotate(90deg)';
+    } else {
+      el.style.display = 'none';
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  };
+
+  window.${jsId}_changeQty = function(key, delta, stock, price) {
+    var current = quantities[key] || 0;
+    var newQty = Math.max(0, current + delta);
+    if (stock > 0 && newQty > stock) newQty = stock;
+    quantities[key] = newQty;
+
+    // Update qty display
+    var qtyEl = document.getElementById(sid + '-qty-' + key);
+    if (qtyEl) qtyEl.textContent = newQty;
+
+    // Recalculate all amounts and total
+    recalculate();
+  };
+
+  function recalculate() {
+    var grandTotal = 0;
+
+    for (var i = 0; i < products.length; i++) {
+      var p = products[i];
+      var productAmount = 0;
+
+      if (p.hasVariations) {
+        var totalQty = 0;
+        var totalVariantPrice = 0;
+
+        for (var v = 0; v < p.variations.length; v++) {
+          var opts = p.variations[v].options;
+          for (var o = 0; o < opts.length; o++) {
+            var vKey = p.id + '-' + opts[o].value;
+            var qty = quantities[vKey] || 0;
+            totalQty += qty;
+            totalVariantPrice += (p.price + opts[o].priceAdjustment) * qty;
+          }
+        }
+
+        // Apply bundle pricing
+        var bundleTotal = getBundlePrice(p, totalQty);
+        if (bundleTotal !== null && totalQty > 0) {
+          var originalTotal = p.price * totalQty;
+          if (bundleTotal < originalTotal && originalTotal > 0) {
+            var ratio = bundleTotal / originalTotal;
+            productAmount = totalVariantPrice * ratio;
+          } else {
+            productAmount = totalVariantPrice;
+          }
+        } else {
+          productAmount = totalVariantPrice;
+        }
+
+        // Update total qty badge
+        var totalQtyEl = document.getElementById(sid + '-total-qty-' + i);
+        var hintEl = document.getElementById(sid + '-select-hint-' + i);
+        if (totalQtyEl && hintEl) {
+          if (totalQty > 0) {
+            totalQtyEl.style.display = 'inline';
+            totalQtyEl.textContent = totalQty + ' selected';
+            hintEl.style.display = 'none';
+          } else {
+            totalQtyEl.style.display = 'none';
+            hintEl.style.display = 'inline';
+          }
+        }
+      } else {
+        var simpleQty = quantities[p.id] || 0;
+        productAmount = p.price * simpleQty;
+
+        // Apply bundle pricing for simple products
+        var simpleBundleTotal = getBundlePrice(p, simpleQty);
+        if (simpleBundleTotal !== null && simpleQty > 0) {
+          productAmount = simpleBundleTotal;
+        }
+      }
+
+      // Update amount display
+      var amountEl = document.getElementById(sid + '-amount-' + i);
+      if (amountEl) amountEl.textContent = fmtCur(productAmount);
+
+      grandTotal += productAmount;
+    }
+
+    // Update grand total
+    var totalEl = document.getElementById(sid + '-total');
+    if (totalEl) totalEl.textContent = fmtCur(grandTotal);
+
+    var hintEl = document.getElementById(sid + '-total-hint');
+    if (hintEl) {
+      hintEl.textContent = grandTotal > 0 ? '' : 'Please select your items above.';
+    }
+  }
+
+  // Listen for add-to-cart events from product carousel
+  window.addEventListener('product-add-to-cart', function(e) {
+    var detail = e.detail;
+    if (!detail || !detail.productId) return;
+
+    var productId = detail.productId;
+    var variantValue = (detail.variantValue || detail.variant || '').toLowerCase();
+
+    // Find the matching product
+    for (var i = 0; i < products.length; i++) {
+      var p = products[i];
+      if (p.id !== productId) continue;
+
+      if (p.hasVariations && variantValue) {
+        // Find matching variant option and increment its qty
+        for (var v = 0; v < p.variations.length; v++) {
+          var opts = p.variations[v].options;
+          for (var o = 0; o < opts.length; o++) {
+            if (opts[o].value.toLowerCase() === variantValue) {
+              var vKey = p.id + '-' + opts[o].value;
+              var current = quantities[vKey] || 0;
+              quantities[vKey] = current + 1;
+              var qtyEl = document.getElementById(sid + '-qty-' + vKey);
+              if (qtyEl) qtyEl.textContent = quantities[vKey];
+              // Expand variants section
+              var variantsEl = document.getElementById(sid + '-variants-' + i);
+              if (variantsEl) variantsEl.style.display = 'block';
+              var chevron = document.getElementById(sid + '-chevron-' + i);
+              if (chevron) chevron.style.transform = 'rotate(90deg)';
+              recalculate();
+              // Auto-scroll to the variant qty element
+              var scrollTarget = qtyEl || variantsEl;
+              if (scrollTarget) {
+                setTimeout(function() {
+                  scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+              }
+              return;
+            }
+          }
+        }
+      } else {
+        // Simple product - increment qty
+        var current = quantities[p.id] || 0;
+        quantities[p.id] = current + 1;
+        var qtyEl = document.getElementById(sid + '-qty-' + p.id);
+        if (qtyEl) qtyEl.textContent = quantities[p.id];
+        recalculate();
+        // Auto-scroll to the product qty element
+        if (qtyEl) {
+          setTimeout(function() {
+            qtyEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+        return;
+      }
+    }
+  });
+})();
+</script>`;
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: 2rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container-sm" style="max-width: 42rem; margin: 0 auto;">
+    ${
+      title || description
+        ? `
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      ${title ? `<h2 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${title}</h2>` : ''}
+      ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
+    </div>`
+        : ''
+    }
+    ${nameFieldHTML}
+    ${mobileFieldHTML}
+    ${emailFieldHTML}
+    <div style="margin-top: 1.5rem;">
+      ${productsHTML}
+    </div>
+    ${totalHTML}
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; margin-bottom: 1.5rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+      <span>Your payment is secured &amp; encrypted</span>
+    </div>
+    <button type="button" style="width: 100%; padding: 1rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1.125rem; border: none; cursor: pointer; background-color: ${submitButtonColor};">
+      ${submitButtonText}
+    </button>
+    ${
+      companyName
+        ? `
+    <div style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 1rem;">
+      <p>&copy; ${new Date().getFullYear()} ${companyName}.</p>
+    </div>`
+        : ''
+    }
+  </div>
+${products.length > 0 ? interactiveJS : ''}
+</section>`;
+}
+
+/**
+ * Generate Product Carousel/Showcase HTML
+ */
+function generateProductCarouselHTML(element: Element): string {
+  const {
+    title = 'Our Products',
+    subtitle,
+    products = [],
+    columns = 3,
+    bgColor = '#ffffff',
+    textColor = '#1f2937',
+    priceColor = '#2563eb',
+    showPrice = true,
+    showDescription = true,
+    cardStyle = 'shadow',
+    showAddToCart = true,
+    addToCartButtonColor = '#111827',
+    addToCartButtonText = 'Add to Cart',
+  } = element.props;
+
+  const formatCurrency = (value: number, curr: string = 'MYR') => {
+    if (curr === 'MYR' || curr === 'RM') return `RM${value.toFixed(2)}`;
+    return `${curr} ${value.toFixed(2)}`;
+  };
+
+  // Generate unique ID for scoped styles (CSS) and JS-safe version (no hyphens)
+  const sectionId = `product-carousel-${element.order}`;
+  const jsId = `product_carousel_${element.order}`;
+
+  const cardBorder =
+    cardStyle === 'bordered' ? 'border: 1px solid #e5e7eb;' : '';
+  const cardShadow =
+    cardStyle === 'shadow' ? 'box-shadow: 0 1px 3px rgba(0,0,0,0.1);' : '';
+
+  const productsGridHTML = products
+    .map((product: any) => {
+      const hasVariations =
+        product.variations &&
+        product.variations.length > 0 &&
+        product.variations[0]?.options?.length > 0;
+      const variantOptions = hasVariations ? product.variations[0].options : [];
+      const basePrice = product.base_price || product.price || 0;
+      const currency = product.currency || 'MYR';
+
+      // Calculate price range for products with variations
+      let priceRangeHTML = '';
+      if (showPrice) {
+        if (hasVariations) {
+          const adjustments = variantOptions
+            .map((opt: any) => opt.priceAdjustment || 0)
+            .filter((adj: number) => adj > 0);
+          const maxAdjustment =
+            adjustments.length > 0 ? Math.max(...adjustments) : 0;
+          if (maxAdjustment > 0) {
+            priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)} - ${formatCurrency(basePrice + maxAdjustment, currency)}</div>`;
+          } else {
+            priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)}</div>`;
+          }
+        } else {
+          priceRangeHTML = `<div class="${sectionId}-card-price" style="color: ${priceColor};">${formatCurrency(basePrice, currency)}</div>`;
+        }
+      }
+
+      // Variant selector HTML
+      let variantHTML = '';
+      if (hasVariations && showAddToCart) {
+        const optionsHTML = variantOptions
+          .map(
+            (opt: any) =>
+              `<option value="${opt.value}" data-adjustment="${opt.priceAdjustment || 0}">${opt.label}</option>`
+          )
+          .join('');
+        variantHTML = `
+        <div class="${sectionId}-variant-wrap">
+          <select class="${sectionId}-variant-select" data-product-id="${product.id}" data-base-price="${basePrice}" data-currency="${currency}" onchange="handleVariantChange_${jsId}(this)">
+            <option value="">Choose an option</option>
+            ${optionsHTML}
+          </select>
+          <svg class="${sectionId}-variant-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>`;
+      }
+
+      // Add to cart button HTML
+      let buttonHTML = '';
+      if (showAddToCart) {
+        const buttonText = hasVariations
+          ? 'Select Options'
+          : addToCartButtonText;
+        buttonHTML = `<button class="${sectionId}-cart-btn" style="background-color: ${addToCartButtonColor};" onclick="handleAddToCart_${jsId}(this, '${product.id}')">${buttonText}</button>`;
+      }
+
+      return `
+    <div class="${sectionId}-card" style="background: white; border-radius: 0.75rem; overflow: hidden; ${cardShadow} ${cardBorder}">
+      ${
+        product.image_url
+          ? `<div style="width: 100%; aspect-ratio: 1; overflow: hidden;">
+        <img src="${product.image_url}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+      </div>`
+          : `<div style="width: 100%; aspect-ratio: 1; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>`
+      }
+      <div class="${sectionId}-card-body">
+        ${variantHTML}
+        <h3 class="${sectionId}-card-title" style="color: ${textColor};">${product.name}</h3>
+        ${showDescription && product.description ? `<p class="${sectionId}-card-desc">${product.description}</p>` : ''}
+        ${priceRangeHTML}
+        ${buttonHTML}
+      </div>
+    </div>`;
+    })
+    .join('');
+
+  // Check if any product has variations (to include JS)
+  const hasAnyVariations = products.some(
+    (p: any) =>
+      p.variations &&
+      p.variations.length > 0 &&
+      p.variations[0]?.options?.length > 0
+  );
+
+  const formatFn = `
+  function formatCurrency_${jsId}(value, currency) {
+    if (currency === 'MYR' || currency === 'RM') return 'RM' + value.toFixed(2);
+    return currency + ' ' + value.toFixed(2);
+  }`;
+
+  const variantJS = hasAnyVariations
+    ? `
+  function handleVariantChange_${jsId}(select) {
+    var card = select.closest('.${sectionId}-card');
+    var priceEl = card.querySelector('.${sectionId}-card-price');
+    if (!priceEl) return;
+    var basePrice = parseFloat(select.dataset.basePrice);
+    var currency = select.dataset.currency;
+    var selected = select.options[select.selectedIndex];
+    if (select.value === '') {
+      // Reset to price range
+      var opts = select.querySelectorAll('option[data-adjustment]');
+      var maxAdj = 0;
+      for (var i = 0; i < opts.length; i++) {
+        var adj = parseFloat(opts[i].dataset.adjustment) || 0;
+        if (adj > maxAdj) maxAdj = adj;
+      }
+      if (maxAdj > 0) {
+        priceEl.textContent = formatCurrency_${jsId}(basePrice, currency) + ' - ' + formatCurrency_${jsId}(basePrice + maxAdj, currency);
+      } else {
+        priceEl.textContent = formatCurrency_${jsId}(basePrice, currency);
+      }
+      // Reset button text
+      var btn = card.querySelector('.${sectionId}-cart-btn');
+      if (btn) btn.textContent = 'Select Options';
+    } else {
+      var adjustment = parseFloat(selected.dataset.adjustment) || 0;
+      priceEl.textContent = formatCurrency_${jsId}(basePrice + adjustment, currency);
+      // Update button text
+      var btn = card.querySelector('.${sectionId}-cart-btn');
+      if (btn) btn.textContent = '${addToCartButtonText}';
+    }
+  }`
+    : '';
+
+  const cartJS = showAddToCart
+    ? `
+  function handleAddToCart_${jsId}(btn, productId) {
+    var card = btn.closest('.${sectionId}-card');
+    var select = card.querySelector('.${sectionId}-variant-select');
+    if (select && select.value === '') {
+      select.focus();
+      select.style.borderColor = '#ef4444';
+      setTimeout(function() { select.style.borderColor = '#d1d5db'; }, 2000);
+      return;
+    }
+    btn.style.backgroundColor = '#22c55e';
+    btn.textContent = 'Added!';
+    btn.disabled = true;
+    setTimeout(function() {
+      btn.style.backgroundColor = '${addToCartButtonColor}';
+      btn.textContent = select && select.value !== '' ? '${addToCartButtonText}' : 'Select Options';
+      btn.disabled = false;
+    }, 1500);
+    // Dispatch cart event for integration
+    var variant = select ? select.options[select.selectedIndex].text : '';
+    var variantValue = select ? select.value : '';
+    window.dispatchEvent(new CustomEvent('product-add-to-cart', { detail: { productId: productId, variant: variant, variantValue: variantValue } }));
+  }`
+    : '';
+
+  return `
+<style>
+  #${sectionId} .${sectionId}-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  #${sectionId} .${sectionId}-card-body {
+    padding: 0.75rem;
+  }
+  #${sectionId} .${sectionId}-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #${sectionId} .${sectionId}-card-desc {
+    color: #6b7280;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #${sectionId} .${sectionId}-card-price {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  #${sectionId} .${sectionId}-variant-wrap {
+    position: relative;
+    margin-bottom: 0.75rem;
+  }
+  #${sectionId} .${sectionId}-variant-select {
+    width: 100%;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    color: #374151;
+    background: white;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #${sectionId} .${sectionId}-variant-select:focus {
+    outline: none;
+    border-color: #6b7280;
+  }
+  #${sectionId} .${sectionId}-variant-chevron {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #9ca3af;
+  }
+  #${sectionId} .${sectionId}-cart-btn {
+    width: 100%;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  #${sectionId} .${sectionId}-cart-btn:hover {
+    opacity: 0.9;
+  }
+  @media (min-width: 768px) {
+    #${sectionId} .${sectionId}-grid {
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: 1.5rem;
+    }
+    #${sectionId} .${sectionId}-card-body {
+      padding: 1.25rem;
+    }
+    #${sectionId} .${sectionId}-card-title {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+    #${sectionId} .${sectionId}-card-desc {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    #${sectionId} .${sectionId}-card-price {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    #${sectionId} .${sectionId}-variant-select {
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+    #${sectionId} .${sectionId}-cart-btn {
+      padding: 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>
+<section id="${sectionId}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2rem; font-weight: 700; color: ${textColor}; margin-bottom: 0.75rem;">${title}</h2>
+      ${subtitle ? `<p style="color: #6b7280; font-size: 1.125rem; max-width: 600px; margin: 0 auto;">${subtitle}</p>` : ''}
+    </div>
+    <div class="${sectionId}-grid">
+      ${productsGridHTML}
+    </div>
+  </div>
+</section>
+<script>
+${formatFn}
+${variantJS}
+${cartJS}
+</script>`;
+}
+
+/**
+ * Generate Lead Form HTML
+ */
+function generateLeadFormHTML(element: Element): string {
+  const {
+    title = 'Get In Touch',
+    description = "Fill out the form below and we'll get back to you soon.",
+    nameLabel = 'Your Name',
+    emailLabel = 'Email Address',
+    phoneLabel = 'Phone Number (optional)',
+    messageLabel = 'Message (optional)',
+    submitButtonText = 'Submit',
+    submitButtonColor = '#2563eb',
+    fields = { showPhone: true, showMessage: true },
+    bgColor = '#ffffff',
+  } = element.props;
+
+  const formId = `lead-form-${element.id}`;
+  const statusId = `lead-form-status-${element.id}`;
+  const btnId = `lead-form-btn-${element.id}`;
+
+  return `
+<section id="${element.type}-${element.order}" style="padding: 4rem 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div class="container-sm" style="max-width: 42rem; margin: 0 auto;">
+    <div style="background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 2.5rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.875rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${title}</h2>
+        ${description ? `<p style="color: #6b7280;">${description}</p>` : ''}
+      </div>
+      <form id="${formId}" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${nameLabel} <span style="color: #ef4444;">*</span></label>
+          <input type="text" name="customer_name" required placeholder="Your name" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${emailLabel} <span style="color: #ef4444;">*</span></label>
+          <input type="email" name="customer_email" required placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>
+        ${
+          fields.showPhone
+            ? `
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${phoneLabel}</label>
+          <input type="tel" name="customer_phone" placeholder="012-345 6789" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box;" />
+        </div>`
+            : ''
+        }
+        ${
+          fields.showMessage
+            ? `
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem;">${messageLabel}</label>
+          <textarea name="message" rows="4" placeholder="Your message..." style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; box-sizing: border-box; resize: vertical;"></textarea>
+        </div>`
+            : ''
+        }
+        <div id="${statusId}" style="display: none; padding: 0.75rem 1rem; border-radius: 0.5rem; text-align: center; font-size: 0.875rem;"></div>
+        <button id="${btnId}" type="submit" style="width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; color: white; font-size: 1rem; border: none; cursor: pointer; background-color: ${submitButtonColor}; margin-top: 0.5rem;">
+          ${submitButtonText}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+(function() {
+  var form = document.getElementById('${formId}');
+  var btn = document.getElementById('${btnId}');
+  var statusEl = document.getElementById('${statusId}');
+  var originalBtnText = btn.textContent;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(form);
+    var name = (formData.get('customer_name') || '').toString().trim();
+    var email = (formData.get('customer_email') || '').toString().trim();
+    var phone = (formData.get('customer_phone') || '').toString().trim();
+    var message = (formData.get('message') || '').toString().trim();
+
+    if (!name || !email) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = 'Please fill in your name and email address.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    btn.style.opacity = '0.7';
+    statusEl.style.display = 'none';
+
+    var data = {
+      project_id: window.__PROJECT_ID__,
+      element_id: '${element.id}',
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone || null,
+      message: message || null
+    };
+
+    fetch('/api/leads/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) {
+        statusEl.style.display = 'block';
+        statusEl.style.background = '#f0fdf4';
+        statusEl.style.color = '#16a34a';
+        statusEl.textContent = result.message || 'Thank you! Your information has been submitted.';
+        form.reset();
+      } else {
+        statusEl.style.display = 'block';
+        statusEl.style.background = '#fef2f2';
+        statusEl.style.color = '#dc2626';
+        statusEl.textContent = result.error || 'Something went wrong. Please try again.';
+      }
+    })
+    .catch(function(err) {
+      console.error('Lead form error:', err);
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = 'Failed to submit. Please try again.';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = originalBtnText;
+      btn.style.opacity = '1';
+    });
+  });
+})();
+</script>`;
+}
+
+/**
+ * Generate WhatsApp Button HTML
+ */
+function generateWhatsAppButtonHTML(element: Element): string {
+  const {
+    phoneNumber = '',
+    message = '',
+    buttonText = 'WhatsApp Us',
+    buttonColor = '#25D366',
+    buttonSize = 'md',
+    position = 'fixed',
+    fixedPosition = 'bottom-right',
+    showIcon = true,
+  } = element.props;
+
+  const cleanPhone = phoneNumber.replace(/\D/g, '');
+  const encodedMessage = message ? encodeURIComponent(message) : '';
+  const waUrl = `https://wa.me/${cleanPhone}${encodedMessage ? `?text=${encodedMessage}` : ''}`;
+
+  const sizeStyles: Record<string, string> = {
+    sm: 'padding: 0.5rem 1rem; font-size: 0.875rem;',
+    md: 'padding: 0.75rem 1.5rem; font-size: 1rem;',
+    lg: 'padding: 1rem 2rem; font-size: 1.125rem;',
+  };
+
+  const positionStyles: Record<string, string> = {
+    'bottom-right': 'bottom: 1.5rem; right: 1.5rem;',
+    'bottom-left': 'bottom: 1.5rem; left: 1.5rem;',
+    'top-right': 'top: 1.5rem; right: 1.5rem;',
+    'top-left': 'top: 1.5rem; left: 1.5rem;',
+  };
+
+  const whatsappSVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+  if (position === 'fixed') {
+    return `
+<a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="position: fixed; ${positionStyles[fixedPosition] || positionStyles['bottom-right']} z-index: 50; display: inline-flex; align-items: center; gap: 0.5rem; background-color: ${buttonColor}; color: white; border-radius: 9999px; ${sizeStyles[buttonSize] || sizeStyles['md']} font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  ${showIcon ? whatsappSVG : ''}
+  ${buttonText}
+</a>`;
+  }
+
+  return `
+<div style="text-align: center; padding: 1.5rem;">
+  <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: ${buttonColor}; color: white; border-radius: 9999px; ${sizeStyles[buttonSize] || sizeStyles['md']} font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    ${showIcon ? whatsappSVG : ''}
+    ${buttonText}
+  </a>
+</div>`;
+}
+
+/**
+ * Generate Media Element HTML
+ */
+function generateMediaHTML(element: Element): string {
+  const {
+    variant = 'single',
+    mediaType = 'image',
+    mediaUrl,
+    mediaItems = [],
+    altText = 'Media content',
+    autoplay = false,
+    loop = true,
+    muted = true,
+    controls = true,
+    layout = 'contained',
+    maxWidth = '100%',
+    aspectRatio = 'auto',
+    borderRadius = '8px',
+    showCaption = false,
+    caption = '',
+    bgColor = '#ffffff',
+    paddingY = '2rem',
+    shadow = 'none',
+    // Carousel specific
+    showArrows = true,
+    showDots = true,
+    autoSlide = false,
+    slideInterval = 5,
+    // Gallery/Masonry specific
+    columns = 3,
+    gap = 'md',
+  } = element.props;
+
+  const shadowStyles: Record<string, string> = {
+    none: 'none',
+    sm: '0 1px 2px rgba(0,0,0,0.05)',
+    md: '0 4px 6px -1px rgba(0,0,0,0.1)',
+    lg: '0 10px 15px -3px rgba(0,0,0,0.1)',
+    xl: '0 20px 25px -5px rgba(0,0,0,0.1)',
+  };
+
+  const gapSizes: Record<string, string> = {
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+  };
+
+  const aspectRatioStyle =
+    aspectRatio !== 'auto'
+      ? `aspect-ratio: ${aspectRatio.replace(':', '/')};`
+      : '';
+  const containerMaxWidth = layout === 'full_width' ? '100%' : maxWidth;
+  const containerMargin =
+    layout === 'left'
+      ? '0 auto 0 0'
+      : layout === 'right'
+        ? '0 0 0 auto'
+        : '0 auto';
+
+  const uniqueId = `media_${element.order}_${element.id.slice(-8)}`;
+  const gapSize = gapSizes[gap] || '1rem';
+
+  // Get items for multi-image variants
+  const items =
+    mediaItems.length > 0
+      ? mediaItems
+      : mediaUrl
+        ? [{ id: '1', url: mediaUrl, altText, caption }]
+        : [];
+
+  // SINGLE VARIANT
+  if (variant === 'single' || !variant) {
+    let mediaContent = '';
+    if (!mediaUrl) {
+      mediaContent = `
+      <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius}; ${aspectRatioStyle}">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>`;
+    } else if (mediaType === 'video') {
+      mediaContent = `
+      <video style="width: 100%; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; ${aspectRatioStyle}" ${controls ? 'controls' : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''} ${muted ? 'muted' : ''} playsinline>
+        <source src="${mediaUrl}" />
+      </video>`;
+    } else {
+      mediaContent = `
+      <img src="${mediaUrl}" alt="${altText}" style="width: 100%; height: auto; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'}; object-fit: cover; ${aspectRatioStyle}" />`;
+    }
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: ${containerMaxWidth}; margin: ${containerMargin};">
+    ${mediaContent}
+    ${showCaption && caption ? `<p style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem;">${caption}</p>` : ''}
+  </div>
+</section>`;
+  }
+
+  // CAROUSEL VARIANT
+  if (variant === 'carousel') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for carousel</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    const defaultAspectRatio =
+      aspectRatio === 'auto' ? '16/9' : aspectRatio.replace(':', '/');
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto; position: relative;">
+    <div id="${uniqueId}" style="overflow: hidden; border-radius: ${borderRadius};">
+      <div id="${uniqueId}-track" style="display: flex; transition: transform 0.5s ease-in-out;">
+        ${items
+          .map(
+            (item: any, index: number) => `
+          <div style="min-width: 100%; flex-shrink: 0;">
+            <img src="${item.url}" alt="${item.altText || `Slide ${index + 1}`}" style="width: 100%; object-fit: cover; aspect-ratio: ${defaultAspectRatio}; box-shadow: ${shadowStyles[shadow] || 'none'};" />
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+    </div>
+    ${
+      showArrows && items.length > 1
+        ? `
+    <button onclick="${uniqueId}Prev()" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 1.25rem; color: #1f2937; font-weight: bold;">&#10094;</button>
+    <button onclick="${uniqueId}Next()" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 1.25rem; color: #1f2937; font-weight: bold;">&#10095;</button>
+    `
+        : ''
+    }
+    ${
+      showDots && items.length > 1
+        ? `
+    <div id="${uniqueId}-dots" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+      ${items
+        .map(
+          (_: any, index: number) => `
+        <button onclick="${uniqueId}GoTo(${index})" style="width: ${index === 0 ? '1.5rem' : '0.625rem'}; height: 0.625rem; border-radius: 9999px; border: none; background: ${index === 0 ? '#1f2937' : '#d1d5db'}; cursor: pointer; transition: all 0.3s;"></button>
+      `
+        )
+        .join('')}
+    </div>
+    `
+        : ''
+    }
+    ${showCaption && items[0]?.caption ? `<p id="${uniqueId}-caption" style="text-align: center; color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem;">${items[0].caption}</p>` : ''}
+  </div>
+  <script>
+    (function() {
+      var current = 0;
+      var total = ${items.length};
+      var track = document.getElementById('${uniqueId}-track');
+      var dots = document.querySelectorAll('#${uniqueId}-dots button');
+      var caption = document.getElementById('${uniqueId}-caption');
+      var captions = ${JSON.stringify(items.map((item: any) => item.caption || ''))};
+
+      function updateSlide() {
+        if (track) track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach(function(dot, i) {
+          dot.style.width = i === current ? '1.5rem' : '0.625rem';
+          dot.style.background = i === current ? '#1f2937' : '#d1d5db';
+        });
+        if (caption && captions[current]) caption.textContent = captions[current];
+      }
+
+      window['${uniqueId}Next'] = function() { current = (current + 1) % total; updateSlide(); };
+      window['${uniqueId}Prev'] = function() { current = (current - 1 + total) % total; updateSlide(); };
+      window['${uniqueId}GoTo'] = function(i) { current = i; updateSlide(); };
+
+      ${autoSlide ? `setInterval(function() { current = (current + 1) % total; updateSlide(); }, ${slideInterval * 1000});` : ''}
+    })();
+  </script>
+</section>`;
+  }
+
+  // GALLERY VARIANT
+  if (variant === 'gallery') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for gallery</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    const defaultAspectRatio =
+      aspectRatio === 'auto' ? '1/1' : aspectRatio.replace(':', '/');
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: repeat(${columns}, 1fr); gap: ${gapSize};">
+      ${items
+        .map(
+          (item: any, index: number) => `
+        <div style="overflow: hidden; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'};">
+          <img src="${item.url}" alt="${item.altText || `Gallery image ${index + 1}`}" style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: ${defaultAspectRatio}; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  // MASONRY VARIANT
+  if (variant === 'masonry') {
+    if (items.length === 0) {
+      return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      <p style="color: #9ca3af; margin-top: 0.5rem;">Add images for masonry</p>
+    </div>
+  </div>
+</section>`;
+    }
+
+    // Distribute items into columns
+    const columnItems: any[][] = Array.from({ length: columns }, () => []);
+    items.forEach((item: any, index: number) => {
+      columnItems[index % columns].push(item);
+    });
+
+    return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: 80rem; margin: 0 auto;">
+    <div style="display: flex; gap: ${gapSize};">
+      ${columnItems
+        .map(
+          (colItems: any[]) => `
+        <div style="flex: 1; display: flex; flex-direction: column; gap: ${gapSize};">
+          ${colItems
+            .map(
+              (item: any, index: number) => `
+            <div style="overflow: hidden; border-radius: ${borderRadius}; box-shadow: ${shadowStyles[shadow] || 'none'};">
+              <img src="${item.url}" alt="${item.altText || `Image ${index + 1}`}" style="width: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" />
+            </div>
+          `
+            )
+            .join('')}
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+  </div>
+</section>`;
+  }
+
+  // Fallback to single
+  return `
+<section id="${element.type}-${element.order}" style="padding: ${paddingY} 1rem; background-color: ${bgColor}; scroll-margin-top: 4rem;">
+  <div style="max-width: ${containerMaxWidth}; margin: ${containerMargin};">
+    <div style="width: 100%; min-height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: ${borderRadius};">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+    </div>
+  </div>
+</section>`;
+}
+
+/**
+ * Generate Footer HTML
+ */
+function generateFooterHTML(element: Element): string {
+  const {
+    logo,
+    logoText,
+    description,
+    columns,
+    socialLinks,
+    copyright,
+    bgColor,
+    textColor,
+    backgroundImage,
+    backgroundOpacity = 70,
+  } = element.props;
+
+  // Fallback globe icon for unknown platforms
+  const globeIcon =
+    'M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h4M18 12h4M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83';
+
+  const socialIcons: any = {
+    facebook: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z',
+    twitter:
+      'M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z',
+    instagram:
+      'M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 2h11A4.5 4.5 0 0122 6.5v11a4.5 4.5 0 01-4.5 4.5h-11A4.5 4.5 0 012 17.5v-11A4.5 4.5 0 016.5 2z',
+    linkedin:
+      'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z',
+    youtube:
+      'M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z M9.75 15.02l5.75-3.27-5.75-3.27v6.54z',
+    tiktok:
+      'M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z',
+    pinterest:
+      'M9.04 21.54c.96.29 1.93.46 2.96.46a10 10 0 0010-10A10 10 0 0012 2 10 10 0 002 12c0 4.25 2.67 7.9 6.44 9.34-.09-.78-.18-2.07 0-2.96l1.15-4.94s-.29-.58-.29-1.5c0-1.38.86-2.41 1.84-2.41.86 0 1.26.65 1.26 1.44 0 .86-.57 2.09-.86 3.27-.17.98.52 1.84 1.52 1.84 1.78 0 3.16-1.9 3.16-4.58 0-2.4-1.72-4.04-4.19-4.04-2.82 0-4.48 2.1-4.48 4.31 0 .86.28 1.73.74 2.3.09.06.09.14.06.29l-.29 1.09c0 .17-.11.23-.28.14-1.18-.57-1.9-2.36-1.9-3.77 0-3.02 2.24-5.91 6.53-5.91 3.42 0 6.07 2.43 6.07 5.67 0 3.41-2.13 6.15-5.1 6.15-.98 0-1.91-.52-2.23-1.12l-.57 2.27c-.21.8-.86 1.77-1.27 2.38z',
+  };
+
+  return `
+<footer style="position: relative; overflow: hidden; background-color: ${bgColor || '#1f2937'}; color: ${textColor || '#f3f4f6'}; padding: 3rem 1rem 1.5rem;">
+  ${
+    backgroundImage
+      ? `
+  <div style="position: absolute; inset: 0; background-image: url(${backgroundImage}); background-size: cover; background-position: center;"></div>
+  <div style="position: absolute; inset: 0; background-color: ${bgColor || '#1f2937'}; opacity: ${backgroundOpacity / 100};"></div>
+  `
+      : ''
+  }
+  <div style="max-width: 80rem; margin: 0 auto; position: relative; z-index: 10;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+      <!-- Logo & Description -->
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+          ${logo ? `<img src="${logo}" alt="${logoText || 'Logo'}" style="height: 2rem;">` : `<span style="font-size: 1.25rem; font-weight: bold;">${logoText}</span>`}
+        </div>
+        ${description ? `<p style="color: ${textColor || '#d1d5db'}; font-size: 0.875rem; line-height: 1.6;">${description}</p>` : ''}
+
+        ${
+          socialLinks && socialLinks.length > 0
+            ? `
+          <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            ${socialLinks
+              .map(
+                (social: any) => `
+              <a href="${social.url}" style="color: ${textColor || '#d1d5db'}; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="${socialIcons[social.platform] || globeIcon}"></path>
+                </svg>
+              </a>
+            `
+              )
+              .join('')}
+          </div>
+        `
+            : ''
+        }
+      </div>
+
+      <!-- Link Columns -->
+      ${columns
+        .map(
+          (column: any) => `
+        <div>
+          <h4 style="font-weight: 600; margin-bottom: 1rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">${column.title}</h4>
+          <ul style="list-style: none; padding: 0;">
+            ${column.links
+              .map(
+                (link: any) => `
+              <li style="margin-bottom: 0.75rem;">
+                <a href="${link.url}" style="color: ${textColor || '#d1d5db'}; font-size: 0.875rem; text-decoration: none; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">${link.label}</a>
+              </li>
+            `
+              )
+              .join('')}
+          </ul>
+        </div>
+      `
+        )
+        .join('')}
+    </div>
+
+    <!-- Copyright -->
+    <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; text-align: center;">
+      <p style="color: ${textColor || '#9ca3af'}; font-size: 0.875rem;">${copyright}</p>
+    </div>
+  </div>
+</footer>`;
+}
+
+/**
+ * Generate analytics scripts
+ */
+function generateAnalyticsScripts(project: Project): string {
+  const scripts: string[] = [];
+
+  // Add comprehensive tracking script for our own analytics
+  scripts.push(generateTrackingScript(project.id));
+
+  // Add custom integrations if configured
+  if (project.integrations) {
+    // Meta Pixel
+    if (project.integrations.metaPixel) {
+      scripts.push(`
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '${project.integrations.metaPixel}');
+    fbq('track', 'PageView');
+  </script>
+      `);
+    }
+
+    // Google Analytics
+    if (project.integrations.googleAnalytics) {
+      scripts.push(`
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${project.integrations.googleAnalytics}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${project.integrations.googleAnalytics}');
+  </script>
+      `);
+    }
+  }
+
+  return scripts.join('\n');
+}
