@@ -44,7 +44,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Services', 'Appointment', 'Team', 'Blog'],
     description:
       'Modern dental clinic landing page with appointment booking, services list, team showcase, testimonials, and blog.',
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/apexcare-dental',
   },
   {
     slug: 'timeshop-smartwatch',
@@ -54,7 +54,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Products', 'Specs', 'Video', 'Testimonials'],
     description:
       'Sleek e-commerce landing page for digital smartwatches. Includes product grid, feature showcase, limited-time offers, and video demo.',
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_3c3ea951/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/timeshop-smartwatch',
   },
   {
     slug: 'ai-real-estate',
@@ -64,7 +64,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Property Listings', 'Analytics', 'Team', 'Blog'],
     description:
       'Premium AI-driven real estate platform with property listings, analytics, team showcase, blog insights, and contact form.',
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/realestate_professional_138d1185/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/ai-real-estate',
   },
   {
     slug: 'classic-barber',
@@ -74,7 +74,7 @@ export const TEMPLATES: Template[] = [
     tags: ['Services', 'Gallery', 'Booking', 'Team'],
     description:
       'Premium barbershop template with dark luxurious aesthetic. Features services, team showcase, gallery, reviews, and booking form.',
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/fitness_bold_fcbe0d96/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/classic-barber',
   },
   {
     slug: 'saas-launch',

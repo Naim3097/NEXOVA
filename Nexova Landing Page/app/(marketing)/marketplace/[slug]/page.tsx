@@ -50,7 +50,7 @@ const TEMPLATES: Template[] = [
       'Mobile-responsive design',
     ],
     pages: ['Home', 'About', 'Services', 'Book Appointment', 'Blog'],
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/medical_elegant_085c1e61/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/apexcare-dental',
   },
   {
     slug: 'timeshop-smartwatch',
@@ -79,7 +79,7 @@ const TEMPLATES: Template[] = [
       'Mobile-responsive design',
     ],
     pages: ['Home', 'Products', 'Product Detail', 'Contact'],
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/ecommerce_bold_3c3ea951/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/timeshop-smartwatch',
   },
   {
     slug: 'ai-real-estate',
@@ -110,7 +110,7 @@ const TEMPLATES: Template[] = [
       'Contact form with budget range selector',
     ],
     pages: ['Home', 'Properties', 'Property Detail', 'Insights', 'Contact'],
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/realestate_professional_138d1185/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/ai-real-estate',
   },
   {
     slug: 'classic-barber',
@@ -138,7 +138,7 @@ const TEMPLATES: Template[] = [
       'Booking form with service selection',
     ],
     pages: ['Single page (scrollable)'],
-    demoUrl: 'https://axtratemplates.vercel.app/built_templates/fitness_bold_fcbe0d96/index.html',
+    demoUrl: 'https://nexova-template-pokjak.vercel.app/templates/classic-barber',
   },
   {
     slug: 'saas-launch',
